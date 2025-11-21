@@ -72,6 +72,8 @@ import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
@@ -885,7 +887,7 @@ enum class Video { NONE, ON, PENDING, OFF }
 private val callUri = mutableStateOf("")
 private val callUriEnabled = mutableStateOf(true)
 private val callUriLabel = mutableStateOf("")
-private var securityIcon = mutableIntStateOf(-1)
+private var securityIconTint = mutableIntStateOf(-1)
 private val showCallTimer = mutableStateOf(false)
 private var callDuration = 0
 private val showSuggestions = mutableStateOf(false)
@@ -1091,8 +1093,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(
-                    uasStatus.value[selected] ?:
-                    R.drawable.locked_yellow),
+                    uasStatus.value[selected] ?: R.drawable.circle_yellow
+                ),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = Modifier
@@ -1305,7 +1307,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 },
                 modifier = Modifier.padding(start = 6.dp,
                     top = 4.dp,
-                    end = if (securityIcon.intValue != -1) 6.dp else 0.dp),
+                    end = if (securityIconTint.intValue != -1) 6.dp else 0.dp),
             )
             DisposableEffect(Unit) {
                 onDispose {
@@ -1316,28 +1318,31 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 }
             }
         }
-        if (securityIcon.intValue != -1) {
+        if (securityIconTint.intValue != -1) {
             Icon(
-                imageVector = ImageVector.vectorResource(securityIcon.intValue),
+                imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
+                    Icons.Filled.LockOpen
+                else
+                    Icons.Filled.Lock,
                 contentDescription = null,
                 modifier = Modifier
                     .size(28.dp)
                     .padding(top = 4.dp)
                     .clickable {
-                        when (securityIcon.intValue) {
-                            R.drawable.unlocked -> {
+                        when (securityIconTint.intValue) {
+                            R.color.colorTrafficRed -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
                                 showAlert.value = true
                             }
 
-                            R.drawable.locked_yellow -> {
+                            R.color.colorTrafficYellow -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.peer_not_verified)
                                 showAlert.value = true
                             }
 
-                            R.drawable.locked_green -> {
+                            R.color.colorTrafficGreen -> {
                                 dialogTitle.value = ctx.getString(R.string.info)
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
                                 positiveText.value = ctx.getString(R.string.unverify)
@@ -1351,7 +1356,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                                 "Command 'zrtp_unverify ${call.zid}' failed"
                                             )
                                         else
-                                            securityIcon.intValue = R.drawable.locked_yellow
+                                            securityIconTint.intValue = R.color.colorTrafficYellow
                                     }
                                 }
                                 negativeText.value = ctx.getString(R.string.cancel)
@@ -1359,7 +1364,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                             }
                         }
                     },
-                tint = Color.Unspecified,
+                tint = colorResource(securityIconTint.intValue)
             )
         }
     }
@@ -2555,7 +2560,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
         callUriEnabled.value = true
         showCallTimer.value = false
-        securityIcon.intValue = -1
+        securityIconTint.intValue = -1
         showHangupButton.value = false
         callTransfer.value = false
         dtmfText.value = ""
@@ -2599,7 +2604,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     ctx.getString(R.string.outgoing_call_to_dots)
                 callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                 showCallTimer.value = false
-                securityIcon.intValue = -1
+                securityIconTint.intValue = -1
                 showCallButton.value = false
                 showCallVideoButton.value = false
                 videoIcon.value = Video.NONE
@@ -2611,7 +2616,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             }
             "incoming" -> {
                 showCallTimer.value = false
-                securityIcon.intValue = -1
+                securityIconTint.intValue = -1
                 val uri = call.diverterUri()
                 if (uri != "") {
                     callUriLabel.value = ctx.getString(R.string.diverted_by_dots)
@@ -2649,9 +2654,9 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 callDuration = call.duration()
                 showCallTimer.value = true
                 if (ua.account.mediaEnc == "")
-                    securityIcon.intValue = -1
+                    securityIconTint.intValue = -1
                 else
-                    securityIcon.intValue = call.security
+                    securityIconTint.intValue = call.security
                 showCallButton.value = false
                 showCallVideoButton.value = false
                 if (call.hasVideo())
@@ -2800,20 +2805,20 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             onPositiveClicked.value = {
                 call.security = if (Api.cmd_exec("zrtp_verify ${ev[2]}") != 0) {
                     Log.e(TAG, "Command 'zrtp_verify ${ev[2]}' failed")
-                    R.drawable.locked_yellow
+                    R.color.colorTrafficYellow
                 } else {
-                    R.drawable.locked_green
+                    R.color.colorTrafficGreen
                 }
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
-                    securityIcon.intValue = call.security
+                    securityIconTint.intValue = call.security
             }
             negativeText.value = ctx.getString(R.string.no)
             onNegativeClicked.value = {
-                call.security = R.drawable.locked_yellow
+                call.security = R.color.colorTrafficYellow
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
-                    securityIcon.intValue = R.drawable.locked_yellow
+                    securityIconTint.intValue = R.color.colorTrafficYellow
                 onNegativeClicked.value = {}
             }
             showDialog.value = true
@@ -2826,7 +2831,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 return
             }
             if (aor == viewModel.selectedAor.value)
-                securityIcon.intValue = call.security
+                securityIconTint.intValue = call.security
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -2877,7 +2882,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             }
             else {
                 showCallTimer.value = false
-                securityIcon.intValue = -1
+                securityIconTint.intValue = -1
             }
             if (aor == viewModel.selectedAor.value) {
                 ua.account.resumeUri = ""

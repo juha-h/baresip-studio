@@ -9,7 +9,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var onHoldCall: Call? = null
     var newCall: Call? = null
     var rejected = false  // Incoming rejected by user or outgoing fails but not due to 408 or 480
-    var security = R.drawable.unlocked
+    var security = R.color.colorTrafficRed
     var zid = ""
     var startTime: GregorianCalendar? = null  // Set when call is established
     var referTo = ""
@@ -121,6 +121,10 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     fun replaces(): Boolean {
         return Api.call_replaces(callp)
+    }
+
+    init {
+        if (ua.account.mediaEnc != "") security = R.color.colorTrafficRed
     }
 
     fun destroy() {
