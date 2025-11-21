@@ -56,6 +56,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -118,6 +120,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -1344,12 +1347,12 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 enabled=callButtonEnabled.value
             ) {
                 Icon(
-                    imageVector = if (callButtonEnabled.value)
-                        ImageVector.vectorResource(id = R.drawable.call)
-                    else
-                        ImageVector.vectorResource(id = R.drawable.call_yellow),
+                    imageVector = Icons.Filled.Call,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(if (callButtonEnabled.value)
+                        R.color.colorTrafficGreen
+                    else
+                        R.color.colorTrafficYellow),
                     contentDescription = null,
                 )
             }
@@ -1374,9 +1377,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                    imageVector = Icons.Filled.CallEnd,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
             }
@@ -1400,9 +1403,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                    imageVector = Icons.Filled.CallEnd,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
             }
@@ -1790,9 +1793,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                    imageVector = Icons.Filled.Call,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficGreen),
                     contentDescription = null,
                 )
             }
@@ -1806,9 +1809,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                    imageVector = Icons.Filled.CallEnd,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
             }
