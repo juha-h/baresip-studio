@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -224,7 +226,11 @@ private fun CallVolume() {
                 }
             ) {
                 Text(text = volNames[itemPosition.intValue])
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp)
+                )
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
@@ -467,7 +473,11 @@ private fun ToneCountry() {
                 }
             ) {
                 Text(text = countryNames[itemPosition.intValue])
-                CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp)
+                )
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,

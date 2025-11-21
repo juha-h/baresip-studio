@@ -1,8 +1,11 @@
 package com.tutpro.baresip.plus
 
 import android.app.Application
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -66,18 +69,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         _hideKeyboard.intValue++
     }
 
-    private val _speakerIcon = MutableStateFlow(R.drawable.speaker_off)
-    val speakerIcon: StateFlow<Int> = _speakerIcon.asStateFlow()
+    private val _micIcon = MutableStateFlow(Icons.Filled.Mic)
+    val micIcon: StateFlow<ImageVector> = _micIcon.asStateFlow()
 
-    fun updateSpeakerIcon(iconResId: Int) {
-        _speakerIcon.value = iconResId
-    }
-
-    private val _micIcon = MutableStateFlow(R.drawable.mic_on)
-    val micIcon: StateFlow<Int> = _micIcon.asStateFlow()
-
-    fun updateMicIcon(iconResId: Int) {
-        _micIcon.value = iconResId
+    fun updateMicIcon(icon: ImageVector) {
+        _micIcon.value = icon
     }
 
     private val _isDialpadVisible = MutableStateFlow(false)

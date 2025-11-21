@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,11 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -223,15 +222,15 @@ private fun Uris(
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
-                Image(
-                    painter = painterResource(R.drawable.message),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Chat,
                     contentDescription = "Send Message",
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(end = 24.dp).clickable {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
-                            Log.w(TAG, "message clickable did not find AoR $aor")
+                            Log.w(TAG, "Message clickable did not find AoR $aor")
                         else {
                             val intent = Intent(ctx, MainActivity::class.java)
                             intent.putExtra("uap", ua.uap)
@@ -244,15 +243,15 @@ private fun Uris(
                         }
                     }
                 )
-                Image(
-                    painter = painterResource(R.drawable.call_small),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                Icon(
+                    imageVector = Icons.Outlined.Call,
                     contentDescription = "Call",
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.clickable {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
-                            Log.w(TAG, "message clickable did not find AoR $aor")
+                            Log.w(TAG, "Call clickable did not find AoR $aor")
                         else {
                             val intent = Intent(ctx, MainActivity::class.java)
                             intent.putExtra("uap", ua.uap)

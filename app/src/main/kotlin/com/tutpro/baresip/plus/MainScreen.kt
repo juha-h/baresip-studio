@@ -67,10 +67,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Dialpad
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.SpeakerPhone
+import androidx.compose.material.icons.filled.VoiceOverOff
+import androidx.compose.material.icons.filled.Voicemail
+import androidx.compose.material.icons.outlined.ArrowCircleRight
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -570,14 +583,14 @@ private fun TopAppBar(
     onQuitClick: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val currentSpeakerIcon by viewModel.speakerIcon.collectAsState()
     val currentMicIcon by viewModel.micIcon.collectAsState()
 
     val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
 
-    val recOffImage = ImageVector.vectorResource(R.drawable.rec_off)
-    val recOnImage = ImageVector.vectorResource(R.drawable.rec_on)
+    val recOffImage = Icons.Filled.VoiceOverOff
+    val recOnImage = Icons.Filled.RecordVoiceOver
     var recImage by remember { mutableStateOf(recOffImage) }
+    val isSpeakerOn = remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
 
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -642,7 +655,7 @@ private fun TopAppBar(
             Spacer(modifier = Modifier.width(22.dp))
 
             Icon(
-                imageVector = ImageVector.vectorResource(currentMicIcon),
+                imageVector = currentMicIcon,
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
@@ -650,11 +663,11 @@ private fun TopAppBar(
                             if (Call.call("connected") != null) {
                                 BaresipService.isMicMuted = !BaresipService.isMicMuted
                                 if (BaresipService.isMicMuted) {
-                                    viewModel.updateMicIcon(R.drawable.mic_off)
+                                    viewModel.updateMicIcon(Icons.Filled.MicOff)
                                     Api.calls_mute(true)
                                 }
                                 else {
-                                    viewModel.updateMicIcon(R.drawable.mic_on)
+                                    viewModel.updateMicIcon(Icons.Filled.Mic)
                                     Api.calls_mute(false)
                                 }
                             }
@@ -675,23 +688,17 @@ private fun TopAppBar(
             Spacer(modifier = Modifier.width(16.dp))
 
             Icon(
-                imageVector = ImageVector.vectorResource(currentSpeakerIcon),
+                imageVector = Icons.Filled.SpeakerPhone,
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
-                                Log.d(
-                                    TAG, "Toggling speakerphone when dev/mode is " +
-                                            "${am.communicationDevice!!.type}/${am.mode}"
+                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                        "${am.communicationDevice!!.type}/${am.mode}"
                                 )
+                            isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                            viewModel.updateSpeakerIcon(
-                                if (Utils.isSpeakerPhoneOn(am))
-                                    R.drawable.speaker_on
-                                else
-                                    R.drawable.speaker_off
-                            )
                         },
                         onLongClick = {
                             alertTitle.value = ctx.getString(R.string.speakerphone_title)
@@ -699,7 +706,7 @@ private fun TopAppBar(
                             showAlert.value = true
                         },
                     ),
-                tint = if (Utils.isSpeakerPhoneOn(am))
+                tint = if (isSpeakerOn.value)
                     MaterialTheme.colorScheme.error
                 else
                     MaterialTheme.colorScheme.onPrimary,
@@ -800,7 +807,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     .size(buttonSize)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.voicemail),
+                    imageVector = Icons.Filled.Voicemail,
                     contentDescription = null,
                     Modifier.size(buttonSize),
                     tint = if (hasNewVoicemail) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
@@ -814,7 +821,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.contacts),
+                imageVector = Icons.Filled.Person,
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = MaterialTheme.colorScheme.secondary
@@ -831,7 +838,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.messages),
+                imageVector = Icons.AutoMirrored.Filled.Chat,
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
@@ -848,7 +855,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 .size(buttonSize)
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.calls),
+                imageVector = Icons.Filled.History,
                 contentDescription = null,
                 Modifier.size(buttonSize),
                 tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
@@ -861,7 +868,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             enabled = dialpadButtonEnabled.value
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.dialpad),
+                imageVector = Icons.Filled.Dialpad,
                 contentDescription = null,
                 modifier = Modifier.size(buttonSize),
                 tint = if (isDialpadVisible)
@@ -1127,9 +1134,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             )
             Icon(
                 imageVector = if (expanded)
-                    Icons.Default.KeyboardArrowUp
+                    Icons.Filled.KeyboardArrowUp
                 else
-                    Icons.Default.KeyboardArrowDown,
+                    Icons.Filled.KeyboardArrowDown,
                 contentDescription = null
             )
             androidx.compose.material3.DropdownMenu(
@@ -1278,14 +1285,14 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
         }
         if (showCallTimer.value) {
             val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
-            var chronometerInstance: Chronometer? = null
+            val chronometerInstance = remember { mutableStateOf<Chronometer?>(null) }
             AndroidView(
                 factory = { context ->
                     Chronometer(context).apply {
                         textSize = 16F
                         setTextColor(textColor)
                         base = SystemClock.elapsedRealtime() - (callDuration * 1000L)
-                        chronometerInstance = this
+                        chronometerInstance.value = this
                     }
                 },
                 update = { chronometerView ->
@@ -1302,7 +1309,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
             )
             DisposableEffect(Unit) {
                 onDispose {
-                    chronometerInstance?.let {
+                    chronometerInstance.value?.let {
                         it.stop()
                         Log.d(TAG, "DisposableEffect: Chronometer stopped in onDispose")
                     }
@@ -1522,7 +1529,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_hold),
+                    imageVector = Icons.Outlined.PauseCircle,
                     modifier = Modifier.size(48.dp),
                     tint = if (callOnHold.value)
                         MaterialTheme.colorScheme.error
@@ -1551,7 +1558,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_transfer),
+                    imageVector = Icons.Outlined.ArrowCircleRight,
                     modifier = Modifier.size(48.dp),
                     tint = if (callTransfer.value)
                         MaterialTheme.colorScheme.error
@@ -1857,7 +1864,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.info),
+                    imageVector = Icons.Outlined.Info,
                     modifier = Modifier.size(36.dp),
                     tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
@@ -2565,7 +2572,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         videoIcon.value = Video.NONE
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
-            viewModel.updateMicIcon(R.drawable.mic_on)
+            viewModel.updateMicIcon(Icons.Filled.Mic)
         }
     } else {
         pullToRefreshEnabled.value = false

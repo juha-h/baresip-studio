@@ -14,13 +14,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -46,12 +50,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -362,9 +364,9 @@ private fun AccountContent(
                     }) {
                         Icon(
                             if (showPassword.value)
-                                ImageVector.vectorResource(R.drawable.visibility)
+                                Icons.Filled.Visibility
                             else
-                                ImageVector.vectorResource(R.drawable.visibility_off),
+                                Icons.Filled.VisibilityOff,
                             contentDescription = "Visibility",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -583,7 +585,11 @@ private fun AccountContent(
                     }
                 ) {
                     Text(text = mediaEncMap[mediaEnc]!!)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -636,7 +642,11 @@ private fun AccountContent(
                     }
                 ) {
                     Text(text = mediaNatMap[mediaNat]!!)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -735,9 +745,9 @@ private fun AccountContent(
                     IconButton(onClick = { showPassword.value = !showPassword.value }) {
                         Icon(
                             if (showPassword.value)
-                                ImageVector.vectorResource(R.drawable.visibility)
+                                Icons.Filled.Visibility
                             else
-                                ImageVector.vectorResource(R.drawable.visibility_off),
+                                Icons.Filled.VisibilityOff,
                             contentDescription = "Visibility",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -838,7 +848,11 @@ private fun AccountContent(
                     }
                 ) {
                     Text(text = dtmfModeMap[dtmfMode]!!)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -890,7 +904,11 @@ private fun AccountContent(
                     modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
                     Text(text = answerModeMap[answerMode]!!)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -940,7 +958,11 @@ private fun AccountContent(
                     modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
                     Text(text = redirectModeMap[autoRedirect]!!)
-                    CustomElements.DrawDrawable(R.drawable.arrow_drop_down)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
@@ -1296,7 +1318,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     } catch (_: NumberFormatException) {
         0
     }
-    if (regInt < 60 || regInt > 3600) {
+    if (regInt !in 60..3600) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_reg_int), "$regInt")
         showAlert.value = true

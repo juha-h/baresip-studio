@@ -39,7 +39,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,7 +61,7 @@ import java.text.DateFormat
 import java.util.GregorianCalendar
 
 fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewModel: ViewModel) {
-    composable("call_details") { backStackEntry ->
+    composable("call_details") { _ ->
         val callRow = remember { viewModel.consumeSelectedCallRow() }
         CallDetailsScreen(navController, callRow!!)
     }
@@ -170,19 +172,19 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
         items(details) { detail ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(detail.direction),
+                    painter = painterResource(
+                        if (callUp(detail.direction)) R.drawable.call_up else R.drawable.call_down
+                    ),
+                    colorFilter = ColorFilter.tint(colorResource(id = callTint(detail.direction))),
                     contentDescription = "Direction",
                     modifier = Modifier.width(64.dp)
                         .clickable {
                             Toast.makeText(ctx,
                                 when (detail.direction) {
-                                    R.drawable.call_down_green,
-                                    R.drawable.call_up_green-> ctx.getString(R.string.call_answered)
-                                    R.drawable.call_down_blue -> ctx.getString(R.string.call_answered_elsewhere)
-                                    R.drawable.call_missed_in,
-                                    R.drawable.call_missed_out -> ctx.getString(R.string.call_missed)
-                                    R.drawable.call_down_red,
-                                    R.drawable.call_up_red-> ctx.getString(R.string.call_rejected)
+                                    CALL_DOWN_GREEN, CALL_UP_GREEN -> ctx.getString(R.string.call_answered)
+                                    CALL_DOWN_BLUE -> ctx.getString(R.string.call_answered_elsewhere)
+                                    CALL_MISSED_IN, CALL_MISSED_OUT -> ctx.getString(R.string.call_missed)
+                                    CALL_DOWN_RED, CALL_UP_RED -> ctx.getString(R.string.call_rejected)
                                     else -> ""
                                 },
                                 Toast.LENGTH_SHORT
@@ -215,7 +217,7 @@ private fun startTime(detail: Details): String {
         startTimeText = stopText
         durationText = "?"
     } else {
-        if (startTime == null  || detail.direction == R.drawable.call_down_blue) {
+        if (startTime == null  || detail.direction == CALL_DOWN_BLUE) {
             startTimeText = stopText
             durationText = ""
         } else {

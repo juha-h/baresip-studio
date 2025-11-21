@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.text.format.DateUtils.isToday
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -36,6 +35,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
@@ -60,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -329,9 +330,12 @@ private fun Chats(
                     }
 
                     null -> {
-                        val avatarImage = BitmapFactory
-                            .decodeResource(ctx.resources, R.drawable.person_image)
-                        CustomElements.ImageAvatar(avatarImage)
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(36.dp).scale(1.2f),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.width(6.dp))

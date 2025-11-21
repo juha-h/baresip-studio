@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -61,12 +62,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -256,11 +255,11 @@ private fun TopAppBar(
                         }
                     }
                     else
-                        Log.w(TAG, "onClickListener did not find UA for $aor")
+                        Log.w(TAG, "Call button onClick listener did not find UA for $aor")
                 }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_small),
+                    imageVector = Icons.Outlined.Call,
                     contentDescription = "Call",
                 )
             }
@@ -399,7 +398,7 @@ private fun Messages(
                             neutralButtonText.value = ctx.getString(R.string.delete)
                             neutralAction.value = {
                                 message.delete()
-                                onMessageDeleted
+                                onMessageDeleted()
                             }
                         } else {
                             dialogMessage.value = ctx.getString(R.string.short_message_question)

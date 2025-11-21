@@ -3,10 +3,10 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.CAMERA
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.RECORD_AUDIO
-import android.Manifest.permission.CAMERA
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.app.KeyguardManager
@@ -18,7 +18,6 @@ import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.IntentFilter
-import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -140,23 +139,12 @@ class MainActivity : ComponentActivity() {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
                 if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
-                    val speakerIcon = if (Utils.isSpeakerPhoneOn(am))
-                        R.drawable.speaker_on
-                    else
-                        R.drawable.speaker_off
-                    viewModel.updateSpeakerIcon(speakerIcon)
                 }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
         }
 
         initialized = true
-
-        viewModel.updateMicIcon(if (BaresipService.isMicMuted)
-            R.drawable.mic_off
-        else
-            R.drawable.mic_on
-        )
 
         val restartApp = {
             Log.i(TAG, "Restarting baresip")
@@ -219,7 +207,7 @@ class MainActivity : ComponentActivity() {
         BaresipService.supportedCameras = Utils.supportedCameras(applicationContext).isNotEmpty()
 
         if (BaresipService.supportedCameras)
-            permissions = permissions + CAMERA
+            permissions += CAMERA
 
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
