@@ -5,7 +5,6 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.format.DateUtils
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.CallMade
+import androidx.compose.material.icons.automirrored.filled.CallReceived
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,10 +40,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -171,11 +170,12 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
     ) {
         items(details) { detail ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(
-                        if (callUp(detail.direction)) R.drawable.call_up else R.drawable.call_down
-                    ),
-                    colorFilter = ColorFilter.tint(colorResource(id = callTint(detail.direction))),
+                Icon(
+                    imageVector = if (callUp(detail.direction))
+                        Icons.AutoMirrored.Filled.CallMade
+                    else
+                        Icons.AutoMirrored.Filled.CallReceived,
+                    tint = colorResource(id = callTint(detail.direction)),
                     contentDescription = "Direction",
                     modifier = Modifier.width(64.dp)
                         .clickable {

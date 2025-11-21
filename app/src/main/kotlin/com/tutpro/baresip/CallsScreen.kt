@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -29,6 +28,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.CallMade
+import androidx.compose.material.icons.automirrored.filled.CallReceived
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,11 +51,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -404,11 +403,13 @@ private fun Calls(
                                 recordings = true
                             if (count > 3)
                                 continue
-                            Image(
-                                painter = painterResource(
-                                    if (callUp(d.direction)) R.drawable.call_up else R.drawable.call_down
-                                ),
-                                colorFilter = ColorFilter.tint(colorResource(id = callTint(d.direction))),
+                            Icon(
+                                imageVector = if (callUp(d.direction))
+                                    Icons.AutoMirrored.Filled.CallMade
+                                else
+                                    Icons.AutoMirrored.Filled.CallReceived,
+                                modifier = Modifier.size(20.dp),
+                                tint = colorResource(id = callTint(d.direction)),
                                 contentDescription = "Direction"
                             )
                             count++
