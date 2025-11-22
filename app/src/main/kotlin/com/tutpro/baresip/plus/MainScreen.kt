@@ -68,6 +68,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -80,6 +82,7 @@ import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
+import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.filled.Voicemail
 import androidx.compose.material.icons.outlined.ArrowCircleRight
@@ -1392,37 +1395,36 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 enabled=callButtonEnabled.value
             ) {
                 Icon(
-                    imageVector = if (callButtonEnabled.value)
-                        ImageVector.vectorResource(id = R.drawable.call)
-                    else
-                        ImageVector.vectorResource(id = R.drawable.call_yellow),
+                    imageVector = Icons.Filled.Call,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(if (callButtonEnabled.value)
+                        R.color.colorTrafficGreen
+                    else
+                        R.color.colorTrafficYellow),
                     contentDescription = null,
                 )
             }
 
         if (showCallVideoButton.value) {
-            Spacer(modifier = Modifier.width(48.dp))
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    showSuggestions.value = false
-                    callClick(ctx, viewModel, true)
-                },
-                enabled = callVideoButtonEnabled.value
-            ) {
-                Icon(
-                    imageVector = if (callVideoButtonEnabled.value)
-                        ImageVector.vectorResource(id = R.drawable.call_video)
-                    else
-                        ImageVector.vectorResource(id = R.drawable.call_video_yellow),
-                    modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
-                    contentDescription = null,
-                )
-            }
             Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Filled.VideoCall,
+                modifier = Modifier
+                    .size(58.dp)
+                    .clickable(
+                        enabled = callVideoButtonEnabled.value,
+                        onClick = {
+                            showSuggestions.value = false
+                            callClick(ctx, viewModel, true)
+                        }
+                    ),
+                tint = colorResource(if (callVideoButtonEnabled.value)
+                    R.color.colorTrafficGreen
+                else
+                    R.color.colorTrafficYellow),
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.size(6.dp))
         }
 
         if (showCancelButton.value) {
@@ -1445,9 +1447,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                    imageVector = Icons.Filled.CallEnd,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
             }
@@ -1473,9 +1475,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                    imageVector = Icons.Filled.CallEnd,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
             }
@@ -1886,7 +1888,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                    imageVector = Icons.Filled.Call,
                     modifier = Modifier.size(48.dp),
                     tint = Color.Unspecified,
                     contentDescription = null,
@@ -1900,7 +1902,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.call_video),
+                    imageVector = Icons.Filled.VideoCall,
                     modifier = Modifier.size(48.dp),
                     tint = Color.Unspecified,
                     contentDescription = null,
@@ -1916,9 +1918,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.hangup),
+                    imageVector = Icons.Filled.CallEnd,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
             }
@@ -2072,7 +2074,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 val vs = ImageButton(factoryContext).apply {
                     videoSecurityButtonInstance = this
                     id = View.generateViewId()
-                    visibility = if (securityIcon.intValue != -1) View.VISIBLE else View.GONE
+                    visibility = if (securityIconTint.intValue != -1) View.VISIBLE else View.GONE
                     setBackgroundResource(0)
                     val prm: RelativeLayout.LayoutParams =
                         RelativeLayout.LayoutParams(
@@ -2086,18 +2088,18 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         }
                     layoutParams = prm
                     setOnClickListener {
-                        when (securityIcon.intValue) {
-                            R.drawable.unlocked -> {
+                        when (securityIconTint.intValue) {
+                            R.color.colorTrafficRed -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
                                 showAlert.value = true
                             }
-                            R.drawable.locked_yellow -> {
+                            R.color.colorTrafficYellow -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.peer_not_verified)
                                 showAlert.value = true
                             }
-                            R.drawable.locked_green -> {
+                            R.color.colorTrafficGreen -> {
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
                                 positiveText.value = ctx.getString(R.string.unverify)
                                 onPositiveClicked.value = {
@@ -2110,7 +2112,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                                 "Command 'zrtp_unverify ${call.zid}' failed"
                                             )
                                         else
-                                            securityIcon.intValue = R.drawable.locked_yellow
+                                            securityIconTint.intValue = R.color.colorTrafficYellow
                                     }
                                 }
                                 onNegativeClicked.value = {}
@@ -2272,9 +2274,9 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
             update = { _ ->
                 Log.d(TAG, "AndroidView update")
                 videoSecurityButtonInstance?.let { button ->
-                    if (securityIcon.intValue != -1) {
+                    if (securityIconTint.intValue != -1) {
                         button.visibility = View.VISIBLE
-                        button.setImageResource(videoSecurityIcon(securityIcon.intValue))
+                        button.setImageResource(videoSecurityIcon(securityIconTint.intValue))
                     }
                     else
                         button.visibility = View.GONE
@@ -2292,8 +2294,8 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
 private fun videoSecurityIcon(security: Int): Int {
     return when (security) {
-        R.drawable.unlocked -> R.drawable.unlocked_video
-        R.drawable.locked_video_yellow -> R.drawable.locked_video_yellow
+        R.color.colorTrafficRed -> R.drawable.unlocked_video
+        R.color.colorTrafficYellow -> R.drawable.locked_video_yellow
         else -> R.drawable.locked_video_green
     }
 }
