@@ -2923,7 +2923,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
     Log.d(TAG, "Handling intent '$action'")
     val ev = action.split(",")
     when (ev[0]) {
-        "call", "dial" -> {
+        "call", "video call", "dial" -> {
             if (Call.inCall()) {
                 Toast.makeText(ctx, ctx.getString(R.string.call_already_active),
                     Toast.LENGTH_SHORT).show()
@@ -2939,6 +2939,8 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call")
                 callClick(ctx, viewModel, false)
+            else if(ev[0] == "video call")
+                callClick(ctx, viewModel, true)
         }
         "call show", "call answer" -> {
             val callp = intent.getLongExtra("callp", 0L)

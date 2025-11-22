@@ -37,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.VideoCall
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -241,6 +242,29 @@ private fun TopAppBar(
         },
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
+            IconButton(
+                onClick = {
+                    val ua = UserAgent.ofAor(account.aor)
+                    if (ua != null) {
+                        val intent = Intent(ctx, MainActivity::class.java)
+                        intent.putExtra("uap", ua.uap)
+                        intent.putExtra("peer", peerUri)
+                        handleIntent(ctx, viewModel, intent, "video call")
+                        navController.navigate("main") {
+                            popUpTo("main")
+                            launchSingleTop = true
+                        }
+                    }
+                    else
+                        Log.w(TAG, "Video Call button onClick listener did not find UA for $aor")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.VideoCall,
+                    modifier = Modifier.size(36.dp),
+                    contentDescription = "Video Call",
+                )
+            }
             IconButton(
                 onClick = {
                     val ua = UserAgent.ofAor(account.aor)
