@@ -37,7 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.VideoCall
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -260,7 +260,7 @@ private fun TopAppBar(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.VideoCall,
+                    imageVector = Icons.Outlined.Videocam,
                     modifier = Modifier.size(36.dp),
                     contentDescription = "Video Call",
                 )
