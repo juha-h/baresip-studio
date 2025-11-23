@@ -18,12 +18,8 @@ import android.os.Process
 import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Chronometer
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +41,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -72,6 +69,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
@@ -80,9 +78,14 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
 import androidx.compose.material.icons.filled.VideoCall
+import androidx.compose.material.icons.filled.VideoCameraBack
+import androidx.compose.material.icons.filled.VideoCameraFront
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.filled.Voicemail
 import androidx.compose.material.icons.outlined.ArrowCircleRight
@@ -102,7 +105,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -544,7 +546,9 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -595,7 +599,7 @@ private fun TopAppBar(
     val recOffImage = Icons.Filled.VoiceOverOff
     val recOnImage = Icons.Filled.RecordVoiceOver
     var recImage by remember { mutableStateOf(recOffImage) }
-    val isSpeakerOn = remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
+    var isSpeakerOn by remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
 
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -635,8 +639,7 @@ private fun TopAppBar(
                                 recImage = if (BaresipService.isRecOn) {
                                     Api.module_load("sndfile")
                                     recOnImage
-                                }
-                                else {
+                                } else {
                                     Api.module_unload("sndfile")
                                     recOffImage
                                 }
@@ -670,8 +673,7 @@ private fun TopAppBar(
                                 if (BaresipService.isMicMuted) {
                                     viewModel.updateMicIcon(Icons.Filled.MicOff)
                                     Api.calls_mute(true)
-                                }
-                                else {
+                                } else {
                                     viewModel.updateMicIcon(Icons.Filled.Mic)
                                     Api.calls_mute(false)
                                 }
@@ -699,10 +701,11 @@ private fun TopAppBar(
                     .combinedClickable(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
-                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                        "${am.communicationDevice!!.type}/${am.mode}"
+                                Log.d(
+                                    TAG, "Toggling speakerphone when dev/mode is " +
+                                            "${am.communicationDevice!!.type}/${am.mode}"
                                 )
-                            isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
+                            isSpeakerOn = !Utils.isSpeakerPhoneOn(am)
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
                         },
                         onLongClick = {
@@ -711,7 +714,7 @@ private fun TopAppBar(
                             showAlert.value = true
                         },
                     ),
-                tint = if (isSpeakerOn.value)
+                tint = if (isSpeakerOn)
                     MaterialTheme.colorScheme.error
                 else
                     MaterialTheme.colorScheme.onPrimary,
@@ -779,7 +782,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     val buttonSize = 48.dp
 
     Row(
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -869,7 +875,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 
         IconButton(
             onClick = { viewModel.toggleDialpadVisibility() },
-            modifier = Modifier.weight(1f).size(buttonSize),
+            modifier = Modifier
+                .weight(1f)
+                .size(buttonSize),
             enabled = dialpadButtonEnabled.value
         ) {
             Icon(
@@ -974,8 +982,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
                                     showCall(ctx, viewModel, ua)
                                 }
                             }
-                        }
-                        else if (offset > swipeThreshold) {
+                        } else if (offset > swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                 val newPos = when (curPos) {
@@ -1071,8 +1078,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                }
-                                else {
+                                } else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1123,8 +1129,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                }
-                                else {
+                                } else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1408,7 +1413,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
         if (showCallVideoButton.value) {
             Spacer(modifier = Modifier.weight(1f))
             Icon(
-                imageVector = Icons.Filled.VideoCall,
+                imageVector = Icons.Filled.Videocam,
                 modifier = Modifier
                     .size(58.dp)
                     .clickable(
@@ -1494,18 +1499,15 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     }
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(
-                            when (videoIcon.value) {
-                                Video.ON, Video.PENDING -> R.drawable.video_on
-                                Video.OFF -> R.drawable.video_off
-                                else -> 0
-                            }
-                        ),
+                        imageVector = if (videoIcon.value == Video.OFF)
+                            Icons.Filled.VideocamOff
+                        else // Video.ON, Video.PENDING
+                            Icons.Filled.Videocam,
                         modifier = Modifier.size(48.dp),
-                        tint = when (videoIcon.value) {
-                            Video.PENDING -> colorResource(R.color.colorTrafficYellow)
-                            else -> MaterialTheme.colorScheme.secondary
-                        },
+                        tint = if (videoIcon.value == Video.PENDING)
+                            colorResource(R.color.colorTrafficYellow)
+                        else
+                            MaterialTheme.colorScheme.secondary,
                         contentDescription = null,
                     )
                 }
@@ -1590,7 +1592,8 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         }
                     ) {
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
@@ -1641,7 +1644,12 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
+                                        .padding(
+                                            start = 4.dp,
+                                            end = 4.dp,
+                                            top = 12.dp,
+                                            bottom = 2.dp
+                                        )
                                         .focusRequester(focusRequester),
                                     label = { Text(stringResource(R.string.transfer_destination)) },
                                     textStyle = TextStyle(fontSize = 18.sp),
@@ -1933,7 +1941,9 @@ private fun OnHoldNotice() {
     OutlinedButton(
         onClick = {},
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-        modifier = Modifier.padding(16.dp).wrapContentSize(),
+        modifier = Modifier
+            .padding(16.dp)
+            .wrapContentSize(),
         shape = RoundedCornerShape(20)
     ) {
         Text(
@@ -1943,8 +1953,8 @@ private fun OnHoldNotice() {
     }
 }
 
-@Composable
-fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
+/*@Composable
+fun VideoLayoutOld(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
     Surface(
         modifier = Modifier.fillMaxSize().navigationBarsPadding().background(Color.Black),
@@ -2290,13 +2300,314 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
         if (showOnHoldNotice.value)
             OnHoldNotice()
     }
-}
+}*/
 
-private fun videoSecurityIcon(security: Int): Int {
-    return when (security) {
-        R.color.colorTrafficRed -> R.drawable.unlocked_video
-        R.color.colorTrafficYellow -> R.drawable.locked_video_yellow
-        else -> R.drawable.locked_video_green
+@Composable
+fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
+
+    LocalSoftwareKeyboardController.current?.hide()
+
+    var isFrontCamera by remember { mutableStateOf(BaresipService.isCameraFront) }
+    val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
+    var isSpeakerOn by remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
+    var isMicMuted by remember { mutableStateOf(BaresipService.isMicMuted) }
+
+    val iconSize = 36.dp
+
+    // Use a Box to layer the UI controls on top of the video
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .navigationBarsPadding()
+    ) {
+        // The Video Layer (Must remain AndroidView for the Surface)
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                // Assuming VideoView is your custom class from the original code
+                val videoView = VideoView(context)
+
+                // Set layout params for the internal surface if needed
+                videoView.surfaceView.apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                }
+                // Return the surfaceView to be rendered by Compose
+                videoView.surfaceView
+            }
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 6.dp, top = 32.dp, bottom = 32.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.Start
+        ) {
+            // Top Left Group
+            Column(horizontalAlignment = Alignment.Start) {
+                // Camera Switch Button
+                if (Utils.isCameraAvailable(ctx)) {
+                    IconButton(
+                        onClick = {
+                            val call = Call.call("connected")
+                            if (call != null) {
+                                if (call.setVideoSource(!isFrontCamera) != 0)
+                                    Log.w(TAG, "********** Failed to set video source to ${!isFrontCamera}")
+                                else {
+                                    isFrontCamera = !isFrontCamera
+                                    BaresipService.isCameraFront = isFrontCamera
+                                    Log.w(TAG, "********** set video source to $isFrontCamera")
+                                }
+                            }
+                            else {
+                                Log.w(TAG, "********** call is null")
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isFrontCamera)
+                                Icons.Filled.VideoCameraFront
+                            else
+                                Icons.Filled.VideoCameraBack,
+                            contentDescription = "Camera Switch",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    }
+                }
+
+                // Snapshot Button
+                if (Build.VERSION.SDK_INT >= 29 ||
+                    Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp)) // Gap between buttons
+                    IconButton(
+                        onClick = {
+                            val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
+                            val fileName = "IMG_" + sdf.format(Date()) + ".png"
+                            val filePath = Utils.downloadsPath(fileName)
+                            if (Api.cmd_exec("snapshot_recv $filePath") != 0)
+                                Log.e(TAG, "Command 'snapshot_recv $filePath' failed")
+                            else
+                                MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.PhotoCamera,
+                            contentDescription = "Take Snapshot",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    }
+                }
+            }
+
+            // Bottom Left Group
+            Column(horizontalAlignment = Alignment.Start) {
+                // Security Button
+                if (securityIconTint.intValue != -1) {
+                    IconButton(
+                        onClick = {
+                            when (securityIconTint.intValue) {
+                                R.color.colorTrafficRed -> {
+                                    alertTitle.value = ctx.getString(R.string.alert)
+                                    alertMessage.value = ctx.getString(R.string.call_not_secure)
+                                    showAlert.value = true
+                                }
+
+                                R.color.colorTrafficYellow -> {
+                                    alertTitle.value = ctx.getString(R.string.alert)
+                                    alertMessage.value = ctx.getString(R.string.peer_not_verified)
+                                    showAlert.value = true
+                                }
+
+                                R.color.colorTrafficGreen -> {
+                                    dialogMessage.value = ctx.getString(R.string.call_is_secure)
+                                    positiveText.value = ctx.getString(R.string.unverify)
+                                    onPositiveClicked.value = {
+                                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                                        val call = ua.currentCall()
+                                        if (call != null) {
+                                            if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
+                                                Log.e(
+                                                    TAG,
+                                                    "Command 'zrtp_unverify ${call.zid}' failed"
+                                                )
+                                            else
+                                                securityIconTint.intValue =
+                                                    R.color.colorTrafficYellow
+                                        }
+                                    }
+                                    onNegativeClicked.value = {}
+                                    showDialog.value = true
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
+                                Icons.Filled.LockOpen
+                            else
+                                Icons.Filled.Lock,
+                            contentDescription = "Security Status",
+                            tint = colorResource(securityIconTint.intValue),
+                            modifier = Modifier.size(iconSize)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp)) // Gap between buttons
+                }
+
+                // Video Off Button
+                IconButton(
+                    onClick = {
+                        Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+                        onCloseVideo()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.VideocamOff,
+                        contentDescription = "Turn Video Off",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+            }
+        }
+
+        // Right Side Controls
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 6.dp, top = 32.dp, bottom = 32.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.End
+        ) {
+            // Top Right Group
+            Column(horizontalAlignment = Alignment.End) {
+                // Speaker button
+                IconButton(
+                    onClick = {
+                        Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                        Timer().schedule(250) {
+                            isSpeakerOn = Utils.isSpeakerPhoneOn(am)
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.SpeakerPhone,
+                        contentDescription = "Toggle speakerphone",
+                        tint = if (isSpeakerOn)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Microphone Toggle
+                IconButton(
+                    onClick = {
+                        isMicMuted = !isMicMuted
+                        if (isMicMuted) {
+                            viewModel.updateMicIcon(Icons.Filled.MicOff)
+                            Api.calls_mute(true)
+                        } else {
+                            viewModel.updateMicIcon(Icons.Filled.Mic)
+                            Api.calls_mute(false)
+                        }
+                        BaresipService.isMicMuted = isMicMuted
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (isMicMuted) Icons.Filled.MicOff else Icons.Filled.Mic,
+                        contentDescription = "Toggle Microphone",
+                        tint = if (isMicMuted)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+            }
+
+            // Bottom Right Group
+            Column(horizontalAlignment = Alignment.End) {
+                // Call Info Button
+                IconButton(
+                    onClick = {
+                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                        val calls = ua.calls()
+                        if (calls.isNotEmpty()) {
+                            val call = calls[0]
+                            val stats = call.stats("video")
+                            alertTitle.value = ctx.getString(R.string.call_info)
+                            if (stats != "") {
+                                val parts = stats.split(",")
+                                val codecs = call.videoCodecs().split(',')
+                                val duration = call.duration()
+                                val txCodec = if (codecs.isNotEmpty()) codecs[0] else ""
+                                val rxCodec = if (codecs.size > 1) codecs[1] else ""
+                                alertMessage.value = "${String.format(ctx.getString(R.string.duration), duration)}\n" +
+                                        "${ctx.getString(R.string.codecs)}: $txCodec/$rxCodec\n" +
+                                        "${String.format(ctx.getString(R.string.rate), parts[0])}\n" +
+                                        "${String.format(ctx.getString(R.string.average_rate), parts[1])}\n" +
+                                        "${String.format(ctx.getString(R.string.jitter), parts[4])}\n" +
+                                        "${ctx.getString(R.string.packets)}: ${parts[2]}\n" +
+                                        "${ctx.getString(R.string.lost)}: ${parts[3]}"
+                            } else {
+                                alertMessage.value = ctx.getString(R.string.call_info_not_available)
+                            }
+                            showAlert.value = true
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Call Info",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Hangup Button
+                IconButton(
+                    onClick = {
+                        if (!Utils.isCameraAvailable(ctx))
+                            Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+
+                        // Assuming abandonAudioFocus is handled in the ViewModel or separate logic now,
+                        // or you can keep using the legacy call:
+                        // (ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager).abandonAudioFocus(null)
+
+                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                        val uaCalls = ua.calls()
+                        if (uaCalls.isNotEmpty()) {
+                            val call = uaCalls.last()
+                            Api.ua_hangup(ua.uap, call.callp, 0, "")
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CallEnd,
+                        contentDescription = "Hangup",
+                        tint = colorResource(R.color.colorTrafficRed),
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+            }
+        }
+
+
     }
 }
 

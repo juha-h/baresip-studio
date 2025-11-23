@@ -1788,7 +1788,7 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var supportedCameras = false
-        var cameraFront = true
+        var isCameraFront = true
         var callVolume = 0
         var speakerPhone = false
         var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 500L
