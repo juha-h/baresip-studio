@@ -1415,7 +1415,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             Icon(
                 imageVector = Icons.Filled.Videocam,
                 modifier = Modifier
-                    .size(58.dp)
+                    .size(52.dp)
                     .clickable(
                         enabled = callVideoButtonEnabled.value,
                         onClick = {
@@ -1458,7 +1458,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     contentDescription = null,
                 )
             }
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.weight(1f))
         }
 
         if (showHangupButton.value) {
