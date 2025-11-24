@@ -1916,9 +1916,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     contentDescription = null,
                 )
             }
-
-            // Spacer(Modifier.weight(1f)) ???
-
+            
             IconButton(
                 modifier = Modifier.size(48.dp),
                 onClick = {
@@ -1953,355 +1951,6 @@ private fun OnHoldNotice() {
     }
 }
 
-/*@Composable
-fun VideoLayoutOld(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
-
-    Surface(
-        modifier = Modifier.fillMaxSize().navigationBarsPadding().background(Color.Black),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-        var videoSecurityButtonInstance: ImageButton? = null
-
-        LocalSoftwareKeyboardController.current?.hide()
-
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { factoryContext ->
-
-                val videoView =  VideoView(factoryContext)
-
-                val frameLayout = FrameLayout(factoryContext).apply {
-                    layoutParams = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                    )
-                }
-
-                videoView.surfaceView.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-
-                frameLayout.addView(videoView.surfaceView)
-
-                val buttonsLayout = RelativeLayout(ctx).apply {
-                    layoutParams = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                    )
-                }
-
-                // Video Button
-                val vb = ImageButton(factoryContext).apply {
-                    id = View.generateViewId()
-                    setImageResource(R.drawable.video_off)
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-                            addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-                            marginStart = 6
-                            bottomMargin = 28
-                        }
-                    layoutParams = prm
-                    setOnClickListener {
-                        Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
-                        onCloseVideo()
-                    }
-                }
-                buttonsLayout.addView(vb)
-
-                // Camera Button
-                val cb = ImageButton(factoryContext).apply {
-                    if (!Utils.isCameraAvailable(context))
-                        visibility = View.INVISIBLE
-                    id = View.generateViewId()
-                    setImageResource(R.drawable.camera_front)
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-                            addRule(RelativeLayout.ALIGN_PARENT_TOP)
-                            marginStart = 6
-                            topMargin = 32
-                        }
-                    layoutParams = prm
-                    setOnClickListener {
-                        val call = Call.call("connected")
-                        if (call != null) {
-                            if (call.setVideoSource(!BaresipService.cameraFront) != 0)
-                                Log.w(TAG, "Failed to set video source")
-                            else
-                                BaresipService.cameraFront = !BaresipService.cameraFront
-                            if (BaresipService.cameraFront)
-                                setImageResource(R.drawable.camera_front)
-                            else
-                                setImageResource(R.drawable.camera_rear)
-                        }
-                    }
-                }
-                buttonsLayout.addView(cb)
-
-                // Snapshot Button
-                if ((Build.VERSION.SDK_INT >= 29) ||
-                    Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
-                    val sb = ImageButton(factoryContext).apply {
-                        id = View.generateViewId()
-                        setImageResource(R.drawable.snapshot)
-                        setBackgroundResource(0)
-                        val prm: RelativeLayout.LayoutParams =
-                            RelativeLayout.LayoutParams(
-                                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                                RelativeLayout.LayoutParams.WRAP_CONTENT
-                            ).apply {
-                                addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-                                addRule(RelativeLayout.BELOW, cb.id)
-                                marginStart = 6
-                                topMargin = 32
-                            }
-                        layoutParams = prm
-                        setOnClickListener {
-                            val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
-                            val fileName = "IMG_" + sdf.format(Date()) + ".png"
-                            val filePath = Utils.downloadsPath(fileName)
-                            if (Api.cmd_exec("snapshot_recv $filePath") != 0)
-                                Log.e(TAG, "Command 'snapshot_recv $filePath' failed")
-                            else
-                                MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
-                        }
-                    }
-                    buttonsLayout.addView(sb)
-                }
-
-                // Video Security Button
-                val vs = ImageButton(factoryContext).apply {
-                    videoSecurityButtonInstance = this
-                    id = View.generateViewId()
-                    visibility = if (securityIconTint.intValue != -1) View.VISIBLE else View.GONE
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-                            addRule(RelativeLayout.ABOVE, vb.id)
-                            marginStart = 6
-                            bottomMargin = 32
-                        }
-                    layoutParams = prm
-                    setOnClickListener {
-                        when (securityIconTint.intValue) {
-                            R.color.colorTrafficRed -> {
-                                alertTitle.value = ctx.getString(R.string.alert)
-                                alertMessage.value = ctx.getString(R.string.call_not_secure)
-                                showAlert.value = true
-                            }
-                            R.color.colorTrafficYellow -> {
-                                alertTitle.value = ctx.getString(R.string.alert)
-                                alertMessage.value = ctx.getString(R.string.peer_not_verified)
-                                showAlert.value = true
-                            }
-                            R.color.colorTrafficGreen -> {
-                                dialogMessage.value = ctx.getString(R.string.call_is_secure)
-                                positiveText.value = ctx.getString(R.string.unverify)
-                                onPositiveClicked.value = {
-                                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                                    val call = ua.currentCall()
-                                    if (call != null) {
-                                        if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
-                                            Log.e(
-                                                TAG,
-                                                "Command 'zrtp_unverify ${call.zid}' failed"
-                                            )
-                                        else
-                                            securityIconTint.intValue = R.color.colorTrafficYellow
-                                    }
-                                }
-                                onNegativeClicked.value = {}
-                                showDialog.value = true
-                            }
-                        }
-                    }
-                }
-                buttonsLayout.addView(vs)
-
-                // Speaker Button
-                val sp = ImageButton(factoryContext).apply {
-                    id = View.generateViewId()
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-                            addRule(RelativeLayout.ALIGN_PARENT_TOP)
-                            marginEnd = 0
-                            topMargin = 32
-                        }
-                    layoutParams = prm
-                    setImageResource(
-                        if (Utils.isSpeakerPhoneOn(am))
-                            R.drawable.speaker_on_button
-                        else
-                            R.drawable.speaker_off_button
-                    )
-                    setOnClickListener {
-                        Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(context), am)
-                        Timer().schedule(250) {
-                            setImageResource(
-                                if (Utils.isSpeakerPhoneOn(am)) {
-                                    R.drawable.speaker_on_button
-                                } else {
-                                    R.drawable.speaker_off_button
-                                }
-                            )
-                        }
-                    }
-                }
-                buttonsLayout.addView(sp)
-
-                // Mic Button
-                val mb = ImageButton(factoryContext).apply {
-                    id = View.generateViewId()
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-                            addRule(RelativeLayout.BELOW, sp.id)
-                            marginEnd = 0
-                            topMargin = 32
-                        }
-                    layoutParams = prm
-                    if (BaresipService.isMicMuted)
-                        setImageResource(R.drawable.mic_off_button)
-                    else
-                        setImageResource(R.drawable.mic_on_button)
-                    setOnClickListener {
-                        BaresipService.isMicMuted = !BaresipService.isMicMuted
-                        if (BaresipService.isMicMuted) {
-                            this.setImageResource(R.drawable.mic_off_button)
-                            Api.calls_mute(true)
-                        } else {
-                            this.setImageResource(R.drawable.mic_on_button)
-                            Api.calls_mute(false)
-                        }
-                    }
-                }
-                buttonsLayout.addView(mb)
-
-                // Hangup Button
-                val hb = ImageButton(factoryContext).apply {
-                    id = View.generateViewId()
-                    setImageResource(R.drawable.hangup)
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-                            addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-                            marginEnd = 0
-                            bottomMargin = 32
-                        }
-                    layoutParams = prm
-                    setOnClickListener {
-                        if (!Utils.isCameraAvailable(context))
-                            Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        abandonAudioFocus(ctx)
-                        val uaCalls = ua.calls()
-                        if (uaCalls.isNotEmpty()) {
-                            val call = uaCalls.last()
-                            val callp = call.callp
-                            Log.d(TAG, "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}")
-                            Api.ua_hangup(ua.uap, callp, 0, "")
-                        }
-                    }
-                }
-                buttonsLayout.addView(hb)
-
-                // Info Button
-                val ib = ImageButton(factoryContext).apply {
-                    setImageResource(R.drawable.video_info)
-                    setBackgroundResource(0)
-                    val prm: RelativeLayout.LayoutParams =
-                        RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-                            addRule(RelativeLayout.ABOVE, hb.id)
-                            marginEnd = 0
-                            bottomMargin = 32
-                        }
-                    layoutParams = prm
-                    setOnClickListener {
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val calls = ua.calls()
-                        if (calls.isNotEmpty()) {
-                            val call = calls[0]
-                            val stats = call.stats("video")
-                            alertTitle.value = ctx.getString(R.string.call_info)
-                            if (stats != "") {
-                                val parts = stats.split(",")
-                                val codecs = call.videoCodecs().split(',')
-                                val duration = call.duration()
-                                val txCodec = if (codecs.isNotEmpty()) codecs[0] else ""
-                                val rxCodec = if (codecs.size > 1) codecs[1] else ""
-                                alertMessage.value = "${String.format(ctx.getString(R.string.duration), duration)}\n" +
-                                        "${ctx.getString(R.string.codecs)}: $txCodec/$rxCodec\n" +
-                                        "${String.format(ctx.getString(R.string.rate), parts[0])}\n" +
-                                        "${String.format(ctx.getString(R.string.average_rate), parts[1])}\n" +
-                                        "${String.format(ctx.getString(R.string.jitter), parts[4])}\n" +
-                                        "${ctx.getString(R.string.packets)}: ${parts[2]}\n" +
-                                        "${ctx.getString(R.string.lost)}: ${parts[3]}"
-                            }
-                            else
-                                alertMessage.value = ctx.getString(R.string.call_info_not_available)
-                            showAlert.value = true
-                        }
-                    }
-                }
-                buttonsLayout.addView(ib)
-
-                frameLayout.addView(buttonsLayout)
-
-                frameLayout
-            },
-            update = { _ ->
-                Log.d(TAG, "AndroidView update")
-                videoSecurityButtonInstance?.let { button ->
-                    if (securityIconTint.intValue != -1) {
-                        button.visibility = View.VISIBLE
-                        button.setImageResource(videoSecurityIcon(securityIconTint.intValue))
-                    }
-                    else
-                        button.visibility = View.GONE
-                }
-            },
-            onRelease = { _ ->
-                Log.d(TAG, "AndroidView onRelease")
-            }
-        )
-
-        if (showOnHoldNotice.value)
-            OnHoldNotice()
-    }
-}*/
-
 @Composable
 fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
@@ -2313,6 +1962,15 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
     var isMicMuted by remember { mutableStateOf(BaresipService.isMicMuted) }
 
     val iconSize = 36.dp
+
+    LaunchedEffect(Unit) {
+        delay(1000)
+        val call = Call.call("connected")
+        if (call != null) {
+            Log.d(TAG, "Syncing video source to Front (sending ${isFrontCamera})")
+            call.setVideoSource(isFrontCamera)
+        }
+    }
 
     // Use a Box to layer the UI controls on top of the video
     Box(
@@ -2352,20 +2010,19 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
             Column(horizontalAlignment = Alignment.Start) {
                 // Camera Switch Button
                 if (Utils.isCameraAvailable(ctx)) {
+
                     IconButton(
                         onClick = {
                             val call = Call.call("connected")
                             if (call != null) {
-                                if (call.setVideoSource(!isFrontCamera) != 0)
-                                    Log.w(TAG, "********** Failed to set video source to ${!isFrontCamera}")
-                                else {
-                                    isFrontCamera = !isFrontCamera
-                                    BaresipService.isCameraFront = isFrontCamera
-                                    Log.w(TAG, "********** set video source to $isFrontCamera")
+                                val targetUiState = !isFrontCamera
+                                if (call.setVideoSource(targetUiState) != 0) {
+                                    Log.w(TAG, "Failed to switch camera")
+                                } else {
+                                    isFrontCamera = targetUiState
+                                    BaresipService.isCameraFront = targetUiState
+                                    Log.d(TAG, "Switched UI to $targetUiState")
                                 }
-                            }
-                            else {
-                                Log.w(TAG, "********** call is null")
                             }
                         }
                     ) {
