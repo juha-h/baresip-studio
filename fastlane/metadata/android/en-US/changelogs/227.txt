@@ -1,0 +1,6 @@
+- Used Material Design icons almost everywhere
+- Composed video layout
+- Added video call button to chat and Android contact screens
+- Fixed video camera switching
+- Placed call cancel button to middle of the call row
+- New translations (Chinese)
