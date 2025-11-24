@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -27,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -226,7 +229,7 @@ private fun Uris(
                     imageVector = Icons.AutoMirrored.Filled.Chat,
                     contentDescription = "Send Message",
                     tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(end = 24.dp).clickable {
+                    modifier = Modifier.clickable {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
@@ -243,6 +246,29 @@ private fun Uris(
                         }
                     }
                 )
+                Spacer(modifier = Modifier.width(14.dp))
+                Icon(
+                    imageVector = Icons.Outlined.Videocam,
+                    contentDescription = "Video Call",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(32.dp).clickable {
+                        val aor = viewModel.selectedAor.value
+                        val ua = UserAgent.ofAor(aor)
+                        if (ua == null)
+                            Log.w(TAG, "Call clickable did not find AoR $aor")
+                        else {
+                            val intent = Intent(ctx, MainActivity::class.java)
+                            intent.putExtra("uap", ua.uap)
+                            intent.putExtra("peer", uri)
+                            handleIntent(ctx, viewModel, intent, "video call")
+                            navController.navigate("main") {
+                                popUpTo("main") { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.width(12.dp))
                 Icon(
                     imageVector = Icons.Outlined.Call,
                     contentDescription = "Call",
