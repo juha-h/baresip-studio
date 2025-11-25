@@ -662,7 +662,7 @@ class BaresipService: Service() {
     }
 
     @Suppress("unused")
-    @SuppressLint("UnspecifiedImmutableFlag", "DiscouragedApi")
+    @SuppressLint("UnspecifiedImmutableFlag", "DiscouragedApi", "FullScreenIntentPolicy")
     @Keep
     fun uaEvent(event: String, uap: Long, callp: Long) {
 
@@ -912,7 +912,8 @@ class BaresipService: Service() {
                                 .setShowWhen(true)
                                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                                .setFullScreenIntent(pi, true)
+                            if (VERSION.SDK_INT < 34 || nm.canUseFullScreenIntent())
+                                nb.setFullScreenIntent(pi, true)
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                                 .putExtra("action", "call answer")
                                 .putExtra("callp", callp)
