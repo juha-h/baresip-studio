@@ -29,6 +29,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -88,11 +90,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -116,6 +118,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -128,6 +131,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -1716,27 +1720,61 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
             val focusRequester = remember { FocusRequester() }
             val shouldRequestFocus by focusDtmf
-            TextField(
+            val interactionSource = remember { MutableInteractionSource() }
+            BasicTextField(
                 value = dtmfText.value,
-                onValueChange = {
-                    if (it.length > dtmfText.value.length) {
-                        val char = it.last()
+                onValueChange = { newText ->
+                    if (newText.length > dtmfText.value.length) {
+                        val char = newText.last()
                         if (char.isDigit() || char == '*' || char == '#') {
                             Log.d(TAG, "Got DTMF digit '$char'")
                             val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
                             ua.currentCall()?.sendDigit(char)
                         }
                     }
-                    dtmfText.value = it
+                    dtmfText.value = newText
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier
                     .width(80.dp)
                     .focusRequester(focusRequester),
                 enabled = dtmfEnabled.value,
-                textStyle = TextStyle(fontSize = 16.sp),
-                label = { Text(stringResource(R.string.dtmf)) },
-                singleLine = true
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                singleLine = true,
+                interactionSource = interactionSource,
+                decorationBox = { innerTextField ->
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        value = dtmfText.value,
+                        visualTransformation = VisualTransformation.None,
+                        innerTextField = innerTextField,
+                        singleLine = true,
+                        enabled = dtmfEnabled.value,
+                        interactionSource = interactionSource,
+                        label = {
+                            Text(
+                                stringResource(R.string.dtmf),
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        },
+                        contentPadding = PaddingValues(
+                            start = 4.dp,
+                            end = 4.dp,
+                            top = 8.dp,
+                            bottom = 8.dp
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    )
+                }
             )
             LaunchedEffect(shouldRequestFocus) {
                 if (shouldRequestFocus) {
