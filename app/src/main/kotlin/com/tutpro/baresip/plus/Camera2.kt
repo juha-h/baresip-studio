@@ -158,8 +158,13 @@ class Camera2(
                 camera.createCaptureSession(sessionConfig)
 
             } catch (e: CameraAccessException) {
+                Log.e(TAG, "CameraAccessException: ${e.message}")
+                e.printStackTrace()
+            } catch (e: IllegalStateException) {
+                Log.e(TAG, "IllegalStateException: ${e.message}")
                 e.printStackTrace()
             }
+
         }
 
         override fun onDisconnected(camera: CameraDevice) {
