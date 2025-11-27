@@ -8,6 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
@@ -71,7 +74,7 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
-import kotlin.text.replaceFirstChar
+import androidx.core.graphics.toColorInt
 
 object Utils {
 
@@ -169,7 +172,7 @@ object Utils {
 
     private fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
-        val scheme = uri.substring(0, 4)
+        val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
@@ -1081,6 +1084,65 @@ object Utils {
             Log.e("Utils", "readUrlWithCustomCa failed: ${e.message}")
             return null
         }
+    }
+
+    fun Bitmap.toCircle(): Bitmap {
+        // Use full package names to avoid conflict with Compose classes
+        val output = androidx.core.graphics.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(output)
+        val paint = android.graphics.Paint()
+        val rect = android.graphics.Rect(0, 0, this.width, this.height)
+
+        paint.isAntiAlias = true
+        canvas.drawARGB(0, 0, 0, 0)
+
+        canvas.drawCircle(this.width / 2f, this.height / 2f, this.width / 2f, paint)
+
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(this, rect, rect, paint)
+        return output
+    }
+
+    fun createTextAvatar(context: Context, letter: String, colorHex: String): Bitmap {
+        // Standard notification large icon size is usually 64dp or 48dp.
+        // We use a decent resolution (e.g. 128x128) and let Android scale it down.
+        val size = 128
+
+        // Use KTX createBitmap to match toCircle style
+        val bitmap = androidx.core.graphics.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+
+        // Use Fully Qualified Names to avoid Compose conflicts
+        val canvas = android.graphics.Canvas(bitmap)
+
+        // 1. Draw the colored circle background
+        val bgPaint = android.graphics.Paint()
+        bgPaint.isAntiAlias = true
+        try {
+            bgPaint.color = colorHex.toColorInt()
+        } catch (_: Exception) {
+            bgPaint.color = android.graphics.Color.GRAY // Fallback color
+        }
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, bgPaint)
+
+        // 2. Draw the text (Initial)
+        val textPaint = android.graphics.Paint()
+        textPaint.isAntiAlias = true
+        textPaint.color = android.graphics.Color.WHITE
+        textPaint.textSize = size / 2f // Text size is half the circle size
+        textPaint.textAlign = android.graphics.Paint.Align.CENTER
+
+        // Use a bold font if possible to match your UI
+        textPaint.typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+
+        // Calculate vertical center to center the text properly
+        val bounds = android.graphics.Rect()
+        textPaint.getTextBounds(letter, 0, letter.length, bounds)
+        val yOffset = (bounds.bottom - bounds.top) / 2f
+
+        // Draw text at Center X, Center Y + half text height (to visually center)
+        canvas.drawText(letter.uppercase(), size / 2f, (size / 2f) + (yOffset / 2) + (bounds.height()/4), textPaint)
+
+        return bitmap
     }
 
     /*fun listFilesInDirectory(directoryPath: String): List<File> {

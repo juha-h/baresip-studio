@@ -22,6 +22,7 @@ runtimeLivedata = "1.9.4"
 composeMaterial3 = "1.4.0"
 navigationRuntimeAndroid = "2.9.6"
 composeMaterialIcons = "1.7.8"
+media3CommonKtx = "1.8.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
