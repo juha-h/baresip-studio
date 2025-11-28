@@ -7,4 +7,5 @@
     <color name="colorTrafficGreen">#4CAF50</color>
     <color name="colorTrafficYellow">#FFEB3B</color>
     <color name="colorTrafficRed">#d83025</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>
