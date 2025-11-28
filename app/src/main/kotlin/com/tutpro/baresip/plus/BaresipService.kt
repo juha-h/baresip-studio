@@ -22,13 +22,14 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
 import android.content.res.Configuration
 import android.database.ContentObserver
+import android.graphics.ImageDecoder
+import android.media.AudioAttributes
 import android.graphics.BitmapFactory
 import android.hardware.camera2.CameraManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_NORMAL
-import android.media.AudioManager.RINGER_MODE_SILENT
 import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
@@ -70,11 +71,13 @@ import androidx.core.app.NotificationCompat.MessagingStyle
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
+import com.tutpro.baresip.plus.Utils.toCircle
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
@@ -918,7 +921,7 @@ class BaresipService: Service() {
                             startActivity(newIntent)
                             return
                         }
-                        val channelId = if (shouldVibrate()) MEDIUM_CHANNEL_ID else HIGH_CHANNEL_ID
+                        val channelId = if (shouldVibrate()) HIGH_CHANNEL_ID else MEDIUM_CHANNEL_ID
                         val callerNumber = peerUri.split(":")[1].split("@")[0]
                         if (shouldStartRinging(channelId, callerNumber))
                             startRinging()
@@ -932,19 +935,44 @@ class BaresipService: Service() {
                             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent, piFlags)
                             val nb = NotificationCompat.Builder(this, channelId)
                             val caller = Utils.friendlyUri(this, peerUri, ua.account)
-                            val person = Person.Builder().setName(caller).build()
-                            nb.setSmallIcon(R.drawable.ic_stat_call)
+                            val callerContact = Contact.findContact(peerUri)
+                            val personBuilder = Person.Builder().setName(caller)
+                            val contactColor = callerContact?.color() ?: "#B0B0B0"
+                            val initial = if (caller.isNotEmpty()) caller.take(1) else "?"
+                            val textAvatarBitmap = Utils.createTextAvatar(initial,contactColor)
+                            var icon = IconCompat.createWithBitmap(textAvatarBitmap)
+                            if (callerContact is Contact.BaresipContact) {
+                                if (callerContact.avatarImage != null)
+                                    icon = IconCompat.createWithBitmap(callerContact.avatarImage!!.toCircle())
+                            }
+                            else if (callerContact is Contact.AndroidContact) {
+                                // AndroidContact has a URI, we must decode it
+                                if (callerContact.thumbnailUri != null) {
+                                    try {
+                                        val source = ImageDecoder.createSource(contentResolver,
+                                            callerContact.thumbnailUri!!)
+                                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                                            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                                            // decoder.setTargetSize(256, 256)
+                                        }
+                                        icon = IconCompat.createWithBitmap(bitmap.toCircle())
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "Failed to load Android contact avatar: $e")
+                                    }
+                                }
+                            }
+                            val person = personBuilder.setIcon(icon).build()
+                            nb.setSmallIcon(R.drawable.ic_notification_call)
                                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                 .setContentIntent(pi)
                                 .setCategory(Notification.CATEGORY_CALL)
                                 .setAutoCancel(false)
                                 .setOngoing(true)
-                                .setContentTitle(getString(R.string.incoming_call_from))
-                                .setContentText(caller)
+                                .setContentText(getString(R.string.is_calling))
                                 .setWhen(System.currentTimeMillis())
                                 .setShowWhen(true)
                                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
                             if (VERSION.SDK_INT < 34 || nm.canUseFullScreenIntent())
                                 nb.setFullScreenIntent(pi, true)
                             val answerIntent = Intent(applicationContext, MainActivity::class.java)
@@ -1044,7 +1072,7 @@ class BaresipService: Service() {
                             val pi = PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE, intent, piFlags)
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val target = Utils.friendlyUri(this, ev[1], ua.account)
-                            nb.setSmallIcon(R.drawable.ic_stat_call)
+                            nb.setSmallIcon(R.drawable.ic_notification_call)
                                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                 .setContentIntent(pi)
                                 .setDefaults(Notification.DEFAULT_SOUND)
@@ -1063,8 +1091,10 @@ class BaresipService: Service() {
                             denyIntent.putExtra("callp", callp)
                             val denyPendingIntent = PendingIntent.getService(this,
                                 DENY_REQ_CODE, denyIntent, piFlags)
-                            nb.addAction(R.drawable.ic_stat_call, getString(R.string.accept), acceptPendingIntent)
-                            nb.addAction(R.drawable.ic_stat_call_end, getString(R.string.deny), denyPendingIntent)
+                            nb.addAction(R.drawable.ic_notification_call,
+                                getString(R.string.accept), acceptPendingIntent)
+                            nb.addAction(R.drawable.ic_notification_call_end,
+                                getString(R.string.deny), denyPendingIntent)
                             nm.notify(TRANSFER_NOTIFICATION_ID, nb.build())
                             return
                         }
@@ -1141,7 +1171,7 @@ class BaresipService: Service() {
                                     val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE,
                                         intent, piFlags)
                                     val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                                    nb.setSmallIcon(R.drawable.ic_stat_call_missed)
+                                    nb.setSmallIcon(R.drawable.ic_notification_call_missed)
                                             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                             .setContentIntent(pi)
                                             .setCategory(Notification.CATEGORY_CALL)
@@ -1226,11 +1256,34 @@ class BaresipService: Service() {
             val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent, piFlags)
 
             // message notification builder
-            val senderDisplayName = Utils.friendlyUri(this, peerUri, ua.account)
-            val senderPerson = Person.Builder()
-                .setName(senderDisplayName)
-                .setKey(peerUri)
-                .build()
+            val sender = Utils.friendlyUri(this, peerUri, ua.account)
+            val senderContact = Contact.findContact(peerUri)
+            val personBuilder = Person.Builder().setName(sender)
+            val contactColor = senderContact?.color() ?: "#B0B0B0"
+            val initial = if (sender.isNotEmpty()) sender.take(1) else "?"
+            val textAvatarBitmap = Utils.createTextAvatar(initial,contactColor)
+            var icon = IconCompat.createWithBitmap(textAvatarBitmap)
+            if (senderContact is Contact.BaresipContact) {
+                if (senderContact.avatarImage != null)
+                    icon = IconCompat.createWithBitmap(senderContact.avatarImage!!.toCircle())
+            }
+            else if (senderContact is Contact.AndroidContact) {
+                // AndroidContact has a URI, we must decode it
+                if (senderContact.thumbnailUri != null) {
+                    try {
+                        val source = ImageDecoder.createSource(contentResolver,
+                            senderContact.thumbnailUri!!)
+                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                            // decoder.setTargetSize(256, 256)
+                        }
+                        icon = IconCompat.createWithBitmap(bitmap.toCircle())
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to load Android contact avatar: $e")
+                    }
+                }
+            }
+            val senderPerson = personBuilder.setIcon(icon).build()
             val localUserPerson = Person.Builder()
                 .setName(getString(R.string.you))
                 .setKey(ua.account.aor)
@@ -1240,7 +1293,7 @@ class BaresipService: Service() {
                 .setGroupConversation(false)
                 .addMessage(text, timeStamp, senderPerson)
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_message)
+                .setSmallIcon(R.drawable.ic_notification_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentIntent(pi)
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
@@ -1249,7 +1302,7 @@ class BaresipService: Service() {
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-            // messafe inline reply
+            // message inline reply
             val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
                 .setLabel(getString(R.string.reply))
                 .build()
@@ -1263,7 +1316,7 @@ class BaresipService: Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
             val inlineReplyAction = NotificationCompat.Action.Builder(
-                R.drawable.ic_stat_reply,
+                R.drawable.ic_notification_reply,
                 getString(R.string.reply),
                 directReplyPendingIntent
             ).addRemoteInput(remoteInput)
@@ -1277,7 +1330,7 @@ class BaresipService: Service() {
             saveIntent.putExtra("uap", uap).putExtra("time", timeStampString)
             val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
             val saveAction = NotificationCompat.Action.Builder(
-                R.drawable.ic_stat_save,
+                R.drawable.ic_notification_save,
                 getString(R.string.save),
                 savePendingIntent
             ).build()
@@ -1288,7 +1341,7 @@ class BaresipService: Service() {
             deleteIntent.putExtra("uap", uap).putExtra("time", timeStampString)
             val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
             val deleteAction = NotificationCompat.Action.Builder(
-                R.drawable.ic_stat_delete,
+                R.drawable.ic_notification_delete,
                 getString(R.string.delete),
                 deletePendingIntent
             ).build()
@@ -1353,22 +1406,29 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        val lowChannel = NotificationChannel(LOW_CHANNEL_ID, "No sound or vibrate",
+        val lowChannel = NotificationChannel(LOW_CHANNEL_ID, "No sound, no vibrate",
             NotificationManager.IMPORTANCE_LOW)
+        lowChannel.description = "Background status notifications"
         lowChannel.enableVibration(false)
         lowChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         nm.createNotificationChannel(lowChannel)
-
-        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "Sound and vibrate",
+        val ringAttributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+            .build()
+        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "Sound, vibrate, and peek",
             NotificationManager.IMPORTANCE_HIGH)
+        highChannel.description = "Incoming calls and important alerts"
         highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         highChannel.enableVibration(true)
+        highChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI, ringAttributes)
         nm.createNotificationChannel(highChannel)
-
-        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Sound",
-            NotificationManager.IMPORTANCE_HIGH)
+        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Sound only",
+            NotificationManager.IMPORTANCE_DEFAULT)
+        mediumChannel.description = "Incoming messages"
         mediumChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         mediumChannel.enableVibration(false)
+        mediumChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI, ringAttributes)
         nm.createNotificationChannel(mediumChannel)
     }
 
@@ -1381,7 +1441,7 @@ class BaresipService: Service() {
             PendingIntent.FLAG_IMMUTABLE)
         val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.ic_stat)
+                .setSmallIcon(R.drawable.ic_notification_b)
                 .setContentIntent(pi)
                 .setOngoing(true)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -1473,17 +1533,22 @@ class BaresipService: Service() {
     }
 
     private fun shouldVibrate(): Boolean {
-        return if (am.ringerMode != RINGER_MODE_SILENT)
-            if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE)
-                true
-            else
-                if (am.getStreamVolume(AudioManager.STREAM_RING) != 0)
-                    @Suppress("DEPRECATION")
-                    Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) != 0
-                else
-                    false
-        else
+        // 1. If the phone is in Silent mode, never vibrate
+        if (am.ringerMode == AudioManager.RINGER_MODE_SILENT) return false
+        // 2. If the phone is in Vibrate mode, always vibrate
+        if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE) return true
+        // 3. If the phone is in Normal (Ringing) mode:
+        // First, check if the ringer volume is actually non-zero
+        if (am.getStreamVolume(AudioManager.STREAM_RING) == 0) return false
+        // Finally, check the system "Vibrate for calls" setting.
+        // Although deprecated, it is the standard way to check the "Also vibrate for calls" toggle.
+        return try {
+            @Suppress("DEPRECATION")
+            Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) != 0
+        } catch (_: Exception) {
+            // If the setting can't be read, default to FALSE to be non-intrusive.
             false
+        }
     }
 
     private fun isStarredContact(callerNumber: String): Boolean {

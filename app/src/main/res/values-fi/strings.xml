@@ -271,6 +271,7 @@
     <string name="reply">Vastaa</string>
     <string name="save">Talleta</string>
     <string name="incoming_call_from">Puhelu soittajalta</string>
+    <string name="is_calling">soittaa</string>
     <string name="missed_call_from">Vastaamaton puhelu soittajalta</string>
     <string name="missed_calls">Vastaamattomia puheluita</string>
     <string name="missed_calls_count">%1$d vastaamatonta puhelua</string>

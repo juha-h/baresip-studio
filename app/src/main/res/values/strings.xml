@@ -256,6 +256,7 @@
     <string name="reply">Reply</string>
     <string name="save">Save</string>
     <string name="incoming_call_from">Incoming call from</string>
+    <string name="is_calling">is calling</string>
     <string name="missed_call_from">Missed call from</string>
     <string name="missed_calls">Missed calls</string>
     <string name="missed_calls_count">%1$d missed calls</string>

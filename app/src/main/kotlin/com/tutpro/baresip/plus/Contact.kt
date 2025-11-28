@@ -44,6 +44,16 @@ sealed class Contact {
         }
     }
 
+    fun color(): String {
+        val intColor = when (this) {
+            is AndroidContact -> color
+            is BaresipContact -> color
+        }
+        // Mask with 0xFFFFFF to ensure we get the standard 6-character hex code (RRGGBB)
+        // ignoring the alpha channel for compatibility with simple string parsers.
+        return String.format("#%06X", 0xFFFFFF and intColor)
+    }
+
     fun copy(): Contact {
         val copy = when (this) {
             is BaresipContact ->
