@@ -1,0 +1,4 @@
+- Replaced baresip launcher PNG image with vector drawable
+- Replaced call, hangup, lock, camera front/back, and screenshot icons with Material Design icons
+- Used outlined text field for DTMF digits
+- Notification fixes and improvements
