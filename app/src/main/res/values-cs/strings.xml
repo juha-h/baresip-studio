@@ -198,7 +198,6 @@
     <string name="reject">Odmítnout</string>
     <string name="account_allocation_failure">Nepodařilo se vytvořit nový účet.</string>
     <string name="delete_account">Chcete odstranit účet \'%1$s\'\?</string>
-    <string name="incoming_call_from">Příchozí hovor od</string>
     <string name="missed_call_from">Zmeškaný hovor od</string>
     <string name="missed_calls">Zmeškané hovory</string>
     <string name="call">Hovor</string>

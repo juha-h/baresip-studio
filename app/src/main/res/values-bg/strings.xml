@@ -87,7 +87,6 @@
     <!-- Baresip Service -->
     <string name="answer">Отговор</string>
     <string name="reject">Отхвърляне</string>
-    <string name="incoming_call_from">Обадете се от</string>
     <string name="transfer_request">Заявка за прехвърляне на обаждане до</string>
     <string name="message_from">Съобщение от</string>
     <!-- Calls Activity -->

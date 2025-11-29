@@ -213,7 +213,6 @@
     <string name="stun_username">STUN/TURN Benutzername</string>
     <string name="stun_username_help">Benutzername, wenn der STUN/TURN Server einen verlangt</string>
     <string name="call_info">Ruf Informationen</string>
-    <string name="incoming_call_from">Eingehender Anruf von</string>
     <string name="missed_call_from">Verpasster Anruf von</string>
     <string name="sending_failed">Nachricht senden fehlgeschlagen</string>
     <string name="delete_chats_alert">Möchten Sie den Chat-Verlauf des Kontos \'%1$s\' löschen?</string>

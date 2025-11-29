@@ -139,7 +139,6 @@
     <string name="call_history">Histórico de Chamadas</string>
     <string name="message_from">Mensagem de</string>
     <string name="transfer_request">Pedido de Transferência</string>
-    <string name="incoming_call_from">Recebendo chamada de</string>
     <string name="answer">Atender</string>
     <string name="reject">Rejeitar</string>
     <string name="delete_account">Você quer excluir a conta \'%1$s\'\?</string>

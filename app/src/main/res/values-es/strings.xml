@@ -99,7 +99,6 @@
     <!-- Baresip Service -->
     <string name="answer">Contestar</string>
     <string name="reject">Rechazar</string>
-    <string name="incoming_call_from">Llamada entrante de</string>
     <string name="transfer_request">Solicitud de transferencia</string>
     <string name="message_from">Mensaje de</string>
     <!-- Calls Activity -->
