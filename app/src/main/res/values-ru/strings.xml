@@ -65,7 +65,6 @@
     <string name="hangup">Прервать вызов</string>
     <string name="help">Помощь</string>
     <string name="hold">Удержание/возобновление вызова</string>
-    <string name="incoming_call_from">Входящий вызов от</string>
     <string name="incoming_call_from_dots">Вызов от …</string>
     <string name="info">Информация</string>
     <string name="invalid_chat_peer_uri">Недопустимый URI узла чата</string>

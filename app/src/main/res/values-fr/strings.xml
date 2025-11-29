@@ -56,7 +56,6 @@
     <string name="call_history">Historique des appels</string>
     <string name="message_from">Message de</string>
     <string name="transfer_request_to">Demande de transfert d’appel vers</string>
-    <string name="incoming_call_from">Appel entrant de</string>
     <string name="reject">Refuser</string>
     <string name="answer">Répondre</string>
     <string name="delete_account">Voulez-vous supprimer le compte « %1$s » \?</string>

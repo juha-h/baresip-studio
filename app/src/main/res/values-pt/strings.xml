@@ -66,7 +66,6 @@
     <string name="stun_password_help">Palavra-passe, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="long_chat_question">Quer apagar o chat com o par \'%1$s\' ou adicionar o par aos contatos\?</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
-    <string name="incoming_call_from">Recebendo chamada de</string>
     <string name="send">Enviar</string>
     <string name="voicemail_messages">Mensagens do Correio de Voz</string>
     <string name="video_call">Chamada de vídeo</string>

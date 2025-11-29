@@ -34,7 +34,6 @@
     <string name="call_history">Samtalshistorik</string>
     <string name="message_from">Meddelande från</string>
     <string name="missed_call_from">Missat samtal från</string>
-    <string name="incoming_call_from">Inkommande samtal från</string>
     <string name="reject">Avvisa</string>
     <string name="answer">Svara</string>
     <string name="delete_account">Vill du ta bort kontot \'%1$s\'\?</string>

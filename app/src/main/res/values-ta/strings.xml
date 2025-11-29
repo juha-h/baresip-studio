@@ -112,7 +112,6 @@
     <string name="delete_account">\'%1$s\' கணக்கை நீக்க விரும்புகிறீர்களா?</string>
     <string name="answer">விடை</string>
     <string name="reject">நிராகரிக்கவும்</string>
-    <string name="incoming_call_from">இருந்து உள்வரும் அழைப்பு</string>
     <string name="missed_call_from">இருந்து தவறவிட்ட அழைப்பு</string>
     <string name="missed_calls">தவறவிட்ட அழைப்புகள்</string>
     <string name="missed_calls_count">%1$d தவறவிட்ட அழைப்புகள்</string>

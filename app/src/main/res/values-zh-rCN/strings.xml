@@ -88,7 +88,6 @@
     <string name="reject">拒绝</string>
     <string name="reply">回复</string>
     <string name="save">保存</string>
-    <string name="incoming_call_from">来电来自</string>
     <string name="missed_call_from">未接来电来自</string>
     <string name="missed_calls">未接来电</string>
     <string name="missed_calls_count">%1$d 个未接来电</string>

@@ -31,7 +31,6 @@
     <string name="delete_account">Doriți să ștergeți contul \'%1$s\'\?</string>
     <string name="answer">Răspunde</string>
     <string name="reject">Respinge</string>
-    <string name="incoming_call_from">Apel de la</string>
     <string name="transfer_request">Cerere transfer apel către</string>
     <string name="message_from">Mesaj de la</string>
     <string name="call_history">Istoric apeluri</string>

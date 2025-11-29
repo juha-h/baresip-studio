@@ -25,7 +25,6 @@
     <string name="delete_account">Ønsker du å slette kontoen \"%1$s\"\?</string>
     <string name="answer">Svar</string>
     <string name="reject">Legg på</string>
-    <string name="incoming_call_from">Samtale fra</string>
     <string name="message_from">Melding fra</string>
     <string name="call_history">Anropslogg</string>
     <string name="call">Ring</string>

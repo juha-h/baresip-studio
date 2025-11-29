@@ -219,7 +219,6 @@
     <string name="call_history">通話履歴</string>
     <string name="message_from">メッセージ着信</string>
     <string name="transfer_request_to">転送リクエスト</string>
-    <string name="incoming_call_from">着信</string>
     <string name="reject">拒否</string>
     <string name="answer">応答</string>
     <string name="delete_account">アカウント %1$s を削除しますか?</string>
