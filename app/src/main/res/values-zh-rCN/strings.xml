@@ -444,4 +444,5 @@
         ]]></string>
     <string name="dynamic_colors">动态配色</string>
     <string name="dynamic_colors_help">如果在 Android 设置中启用，则使用动态配色</string>
+    <string name="is_calling">正在呼叫</string>
 </resources>
