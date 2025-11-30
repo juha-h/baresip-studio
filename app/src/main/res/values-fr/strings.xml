@@ -13,7 +13,6 @@
     <string name="restore">Restaurer</string>
     <string name="backup">Sauvegarder</string>
     <string name="confirmation">Confirmation</string>
-    <string name="help">Aide</string>
     <string name="error">Erreur</string>
     <string name="status">Statut</string>
     <string name="send">Envoyer</string>
@@ -73,7 +72,6 @@
     <string name="authentication_username">Nom d’utilisateur d’authentification</string>
     <string name="invalid_display_name">Nom d’affichage invalide « %1$s »</string>
     <string name="display_name_help">Nom (le cas échéant) utilisé dans l\'URI From des demandes sortantes.</string>
-    <string name="your_name">Votre nom</string>
     <string name="display_name">Nom d’affichage</string>
     <string name="account">Compte</string>
     <string name="about_title_plus">À propos de baresip+</string>
@@ -106,8 +104,6 @@
     <string name="manual">Manuel</string>
     <string name="answer_mode">Mode de réponse</string>
     <string name="default_account">Compte par défaut</string>
-    <string name="user_domain">user@domain</string>
-    <string name="user_id">Id. utilisateur</string>
     <string name="callee">Appelant</string>
     <string name="dtmf">DTMF</string>
     <string name="alert">Alerte</string>
@@ -122,7 +118,6 @@
     <string name="audio_modules_title">Modules audio</string>
     <string name="invalid_account_nickname">Surnom de compte invalide « %1$s »</string>
     <string name="non_unique_account_nickname">Le surnom « %1$s » existe déjà</string>
-    <string name="account_nickname">Surnom du compte</string>
     <string name="account_nickname_help">Surnom (le cas échéant) utilisé pour identifier ce compte dans l\'application baresip.</string>
     <string name="nickname">Surnom</string>
     <string name="outbound_proxies">Proxies sortants</string>
@@ -135,8 +130,6 @@
     <string name="reg_int_help">Indique à quelle fréquence (en secondes) baresip envoie des demandes REGISTER. Les valeurs valides sont comprises entre 60 et 3600.</string>
     <string name="invalid_reg_int">Intervalle d’enregistrement invalide \'%1$s\'</string>
     <string name="invalid_stun_password">Mot de passe invalide \'%1$s\'</string>
-    <string name="prefer_ipv6_media">Préférer média IPv6</string>
-    <string name="prefer_ipv6_media_help">Si coché, proposer d’utiliser le protocole média IPv6 (s’il est disponible) lorsque le protocole multimédia de l’homologue ne peut pas être déterminé automatiquement.</string>
     <string name="rtcp_mux">Multiplexage RTCP</string>
     <string name="rtcp_mux_help">Si coché, les paquets RTP et RTCP sont multiplexés sur un seul port (RFC 5761).</string>
     <string name="dtmf_mode">Mode DTMF</string>
@@ -145,7 +138,6 @@
     <string name="redirect_mode">Mode redirection</string>
     <string name="redirect_mode_help">Sélectionne si la demande de redirection d’appel est suivie automatiquement ou si une confirmation est demandée.</string>
     <string name="voicemain_uri_help">URI SIP pour la vérification des messages vocaux. Si laissé vide, les messages vocaux (indications d’attente de message) ne sont pas souscrits.</string>
-    <string name="invalid_voicemail_uri">URI de messagerie vocale invalide \'%1$s\'</string>
     <string name="country_code">Code pays</string>
     <string name="invalid_country_code">Code de pays invalide \'%1$s’</string>
     <string name="telephony_provider">Fournisseur téléphonie</string>
@@ -221,7 +213,6 @@
     <string name="user_domain_or_number">utilisateur@domaine ou numéro de téléphone</string>
     <string name="favorite">Favoris</string>
     <string name="favorite_help">Si coché, le contact est affiché parmi les autres favoris en haut de la liste des contacts.</string>
-    <string name="invalid_contact_uri">URI SIP invalide</string>
     <string name="android_contact_help">Si coché, ce contact est ajouté aux contacts Android.</string>
     <string name="avatar_image">Image de profil</string>
     <string name="contact_action_question">Voulez-vous appeler ou envoyer un message à \'%1$s\' ?</string>
@@ -264,13 +255,11 @@
     <string name="restore_unzip_failed">Échec à restaurer les données de l’application. Android version 14 et ultérieure ne permet pas de restaurer les données qui ont été sauvegardées avant %1$s version %2$s.</string>
     <string name="no_notifications">Vous ne pouvez pas utiliser cette application sans la permission \"Notifications\".</string>
     <string name="no_calls">Baresip a besoin de la permission \"Microphone\" pour les appels vocaux.</string>
-    <string name="no_bluetooth">Baresip n’est pas capable de détecter la connectivité Bluetooth sans l’autorisation \"Appareils à proximité\".</string>
     <string name="no_video_calls">Accorder à la \"Caméra\" l’autorisation de passer ou de répondre aux appels vidéo.</string>
     <string name="no_backup">Vous ne pouvez pas créer de sauvegarde sans la permission \"Stockage\".</string>
     <string name="no_restore">Vous ne pouvez pas restaurer la sauvegarde sans l’autorisation \"Stockage\".</string>
     <string name="no_android_contacts">Vous ne pouvez pas accéder aux contacts Android sans la permission \"Contacts\".</string>
     <string name="no_cameras">Pas de caméras vidéo prises en charge !</string>
-    <string name="show_password">Afficher le mot de passe</string>
     <string name="no_network">Pas de connexion réseau !</string>
     <string name="no_aec">Pas d’annulation d’écho acoustique matérielle !</string>
     <string name="audio_focus_denied">Focus audio refusé !</string>

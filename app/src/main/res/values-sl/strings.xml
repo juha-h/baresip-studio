@@ -3,7 +3,6 @@
     <string name="authentication_username">Uporabniško Ime</string>
     <string name="invalid_display_name">Napačno ime za prikaz %1$s</string>
     <string name="display_name_help">Ime (če je) uporabljen v polju From URI za odhodne akcije.</string>
-    <string name="your_name">Moje Ime</string>
     <string name="display_name">Prikazano ime</string>
     <string name="account">Račun</string>
     <string name="about_title_plus">O baresip+</string>

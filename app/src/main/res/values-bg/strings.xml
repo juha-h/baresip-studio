@@ -22,7 +22,6 @@
     <!-- Account Activity -->
     <string name="account">Акаунт</string>
     <string name="display_name">Показване на име</string>
-    <string name="your_name">Твоето име</string>
     <string name="display_name_help">Публично име (ако има такова), използвано в URI на изходящи заявки.</string>
     <string name="authentication_username">Потребителско име за удостоверяване</string>
     <string name="authentication_username_help">Потребителско име за удостоверяване, ако се изисква от изходящ прокси.</string>
@@ -77,7 +76,6 @@
     <string name="default_account_help">Ако е отметнато, този акаунт се избира при стартиране на baresip. </string>
     <!-- Accounts Activity -->
     <string name="accounts">Профили</string>
-    <string name="user_domain">потребител@домейн</string>
     <string name="invalid_aor">Невалиден потребител@домейн \'%1$s\'</string>
     <string name="account_exists">Профила \'%1$s\' вече съществува.</string>
     <string name="account_allocation_failure">"Неуспешно разпределяне на нов акаунт.</string>
@@ -175,7 +173,6 @@
     <string name="contact_name">име</string>
     <string name="invalid_contact">Невалидно име за контакт \'%1$s\'</string>
     <string name="contact_already_exists">Този контакт \'%1$s\' вече съществува.</string>
-    <string name="invalid_contact_uri">Невалиден SIP URI</string>
     <!-- Contacts Activity -->
     <string name="contacts">Контакти</string>
     <string name="contact_action_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
@@ -192,7 +189,6 @@
     <string name="no">не</string>
     <string name="accept">приемам</string>
     <string name="deny">отказвам</string>
-    <string name="user_id">Потребителско Име</string>
     <string name="password">Парола</string>
     <string name="add">Добави</string>
     <string name="delete">Изтрий</string>
@@ -209,7 +205,6 @@
     <string name="outgoing_call_to_dots">Изходящо повикване до…</string>
     <string name="incoming_call_from_dots">Входящо обаждане от…</string>
     <string name="transferring_call_to_dots">Прехвърляне на обаждане до…</string>
-    <string name="invalid_sip_uri">Невалиден SIP URI \'%1$s\'</string>
     <string name="callee">Набиране</string>
     <string name="hangup">Затвори</string>
     <string name="hold">Задържане</string>

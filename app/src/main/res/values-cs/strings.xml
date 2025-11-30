@@ -6,7 +6,6 @@
     <string name="invalid_stun_username">Neplatné uživatelské jméno \'%1$s\'</string>
     <string name="account">Účet</string>
     <string name="stun_username">Uživatelské jméno STUN/TURN</string>
-    <string name="user_domain">uživatel@doména</string>
     <string name="invalid_aor">Neplatný uživatel@doména[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="encrypt_password">Šifrovat heslo</string>
     <string name="missed_calls_count">%1$d zmeškaných hovorů</string>
@@ -20,7 +19,6 @@
     <string name="invalid_authentication_password">Neplatné ověřovací heslo \'%1$s\'</string>
     <string name="invalid_account_nickname">Neplatná přezdívka účtu \'%1$s\'</string>
     <string name="non_unique_account_nickname">Přezdívka \'%1$s\' již existuje</string>
-    <string name="your_name">Vaše jméno</string>
     <string name="about_text_plus"><![CDATA[
         <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
@@ -77,7 +75,6 @@
                 <li><b>AOMedia</b> AV1 kodek</li>
         </ul>
         ]]></string>
-    <string name="account_nickname">Přezdívka účtu</string>
     <string name="account_nickname_help">Přezdívka (pokud existuje) používaná k identifikaci tohoto účtu v aplikaci baresip.</string>
     <string name="nickname">Přezdívka</string>
     <string name="authentication_password">Heslo</string>
@@ -100,7 +97,6 @@
     <string name="invalid_stun_server">Neplatná URI serveru STUN/TURN \'%1$s\'</string>
     <string name="media_nat_help">Vybírá protokol pro průchod médií skrze NAT (pokud existuje). Možné volby jsou STUN (Session Traversal Utilities for NAT, RFC 5389) a ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="stun_server">Server STUN/TURN</string>
-    <string name="stun_server_uri">URI serveru STUN/TURN</string>
     <string name="stun_username_help">Uživatelské jméno, pokud ho server STUN/TURN vyžaduje</string>
     <string name="stun_server_help">URI serveru STUN/TURN ve tvaru scheme:host[:port][\?transport=udp|tcp], kde scheme je \"stun\", \"stuns\", \"turn\" nebo \"turns\". Výchozí server STUN pro protokoly STUN a ICE je \'stun:stun.l.google.com:19302\', který ukazuje na veřejný server STUN společnosti Google. Výchozí server TURN neexistuje.</string>
     <string name="stun_password">Heslo STUN/TURN</string>
@@ -170,9 +166,7 @@
 \n • SRTP-MANDF znamená, že RTP/SAVPF je nabízen v odchozím hovoru a vyžadován v příchozím hovoru.
 \n • SRTP-MAND znamená, že RTP/SAVP je nabízen v odchozím hovoru a vyžadován v příchozím hovoru.
 \n • SRTP znamená, že RTP/AVP je nabízen v odchozím hovoru a že RTP/SAVP nebo RTP/SAVPF je použit, pokud je nabízen v příchozím hovoru.</string>
-    <string name="prefer_ipv6_media">Preferovat média IPv6</string>
     <string name="dtmf_mode_help">Vybírá způsob odesílání tónů DTMF 0-9, #, * a A-D.</string>
-    <string name="prefer_ipv6_media_help">Pokud je zatrženo, nabídne použití protokolu medií IPv6 (je-li k dispozici), pokud protokol medií partnera nelze určit automaticky.</string>
     <string name="voicemail_uri">URI hlasové schránky</string>
     <string name="dtmf_mode">Režim DTMF</string>
     <string name="answer_mode">Režim odpovědi</string>
@@ -180,14 +174,11 @@
     <string name="auto">Automaticky</string>
     <string name="country_code">Kód země</string>
     <string name="voicemain_uri_help">SIP URI pro kontrolu zpráv hlasové pošty. Pokud je ponecháno prázdné, zprávy hlasové pošty (indikace čekající zprávy) nejsou přihlášeny k odběru.</string>
-    <string name="invalid_voicemail_uri">Neplatné URI hlasové schránky \'%1$s\'</string>
-    <string name="country_code_hint">+kód</string>
     <string name="country_code_help">Kód země E.164 tohoto účtu. Pokud uživatelská část \"Od\" v URI příchozího hovoru nebo zprávy obsahuje telefonní číslo, které nezačíná znakem \"+\", a pokud se vyhledání kontaktu nezdaří, je číslo předřazeno tomuto kódu země a vyhledání kontaktu je zopakováno. Pokud telefonní číslo začíná jedinou číslicí \"0\", číslice \"0\" se před prefixací čísla odstraní.</string>
     <string name="default_account">Výchozí účet</string>
     <string name="invalid_country_code">Neplatný kód země \'%1$s\'</string>
     <string name="telephony_provider_help">Hostitelská část SIP URI používaná při volání na telefonní čísla. Výchozí tovární nastavení je doména účtu. Pokud není zadána, nelze tento účet použít pro volání na telefonní čísla.</string>
     <string name="default_account_help">Pokud je zatrženo, je tento účet vybrán při spuštění baresipu.</string>
-    <string name="telephony_provider_hint">Hostitelská část SIP URI</string>
     <string name="invalid_sip_uri_hostpart">Neplatná část hostitelského URI SIP \'%1$s\'</string>
     <string name="new_account">SIP URI nového účtu</string>
     <string name="accounts">Účty</string>
@@ -249,7 +240,6 @@
     <string name="android_contact_help">Pokud je zaškrtnuto, je tento kontakt přidán do kontaktů systému Android.</string>
     <string name="avatar_image">Profilový obrázek</string>
     <string name="invalid_contact">Neplatné jméno kontaktu \'%1$s\'</string>
-    <string name="invalid_contact_uri">Neplatné SIP URI</string>
     <string name="contact_delete_question">Chcete odstranit kontakt \'%1$s\'\?</string>
     <string name="alert">Upozornění</string>
     <string name="add">Přidat</string>
@@ -266,13 +256,11 @@
     <string name="accept">Přijmout</string>
     <string name="delete">Smazat</string>
     <string name="no">Ne</string>
-    <string name="user_id">ID uživatele</string>
     <string name="password">Heslo</string>
     <string name="error">Chyba</string>
     <string name="confirmation">Potvrzení</string>
     <string name="edit">Upravit</string>
     <string name="status">Stav</string>
-    <string name="help">Nápověda</string>
     <string name="anonymous">Anonymní</string>
     <string name="unknown">Neznámý</string>
     <string name="invalid_sip_or_tel_uri">Neplatný SIP nebo tel. URI \'%1$s\'</string>
@@ -285,7 +273,6 @@
     <string name="diverted_by_dots">Přesměrováno …</string>
     <string name="incoming_call_from_dots">Volání z …</string>
     <string name="lost">Ztracené</string>
-    <string name="invalid_sip_uri">Neplatné SIP URI \'%1$s\'</string>
     <string name="call_transfer">Přepojení hovoru</string>
     <string name="transferring_call_to_dots">Přesměrování hovoru na …</string>
     <string name="no_telephony_provider">Účet \'%1$s\' nemá žádného poskytovatele telefonních služeb</string>
@@ -337,7 +324,6 @@
     <string name="transfer_request_query">Souhlasíte s přepojením tohoto hovoru na \'%1$s\'\?</string>
     <string name="call_is_secure">Toto volání je BEZPEČNÉ a účastník je OVĚŘENÝ! Chcete zrušit ověření účastníka\?</string>
     <string name="backed_up">Data aplikace byla zálohována do souboru \'%1$s\'. Ve verzi systému Android 9 se soubor nachází ve složce Download.</string>
-    <string name="no_bluetooth">baresip není schopen zjistit připojení Bluetooth bez povolení oprávnění \"Blízká zařízení\".</string>
     <string name="call_failed">Volání se nezdařilo</string>
     <string name="peer_not_verified">Toto volání je BEZPEČNÉ, ale účastník není ověřen!</string>
     <string name="unverify">Zrušit ověření</string>
@@ -354,7 +340,6 @@
     <string name="no_restore">Bez oprávnění pro přístup k \"Úložišti\" nelze zálohu obnovit.</string>
     <string name="audio_focus_denied">Zaměření zvuku zamítnuto!</string>
     <string name="audio_and_video_permissions">baresip+ potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Kamera\" pro videohovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth, oprávnění \"Oznámení\" pro odesílání oznámení a na Androidu 9 oprávnění „Úložiště“ pro operace zálohování a obnovení.</string>
-    <string name="show_password">Zobrazit heslo</string>
     <string name="no_network">Bez připojení k síti!</string>
     <string name="audio_permissions">baresip potřebuje oprávnění \"Mikrofon\" pro hlasové hovory, oprávnění \"Blízká zařízení\" pro detekci mikrofonu/reproduktoru Bluetooth, oprávnění \"Oznámení\" pro odesílání oznámení a na Androidu 9 oprávnění „Úložiště“ pro operace zálohování a obnovení.</string>
     <string name="address_family_help">Vybírá, které IP adresy baresip používá. Pokud je vybráno IPv4 nebo IPv6, baresip používá pouze IPv4 nebo IPv6 adresy. Pokud není vybrána žádná z těchto možností, používá baresip jak IPv4, tak IPv6 adresy.</string>

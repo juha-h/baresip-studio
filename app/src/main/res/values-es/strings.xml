@@ -42,7 +42,6 @@
     <!-- Account Activity -->
     <string name="account">Cuenta</string>
     <string name="display_name">Nombre para mostrar</string>
-    <string name="your_name">Su nombre</string>
     <string name="display_name_help">Nombre (si lo hay) utilizado en el URI de origen de las solicitudes salientes.</string>
     <string name="authentication_username">Nombre de usuario de autenticación</string>
     <string name="authentication_username_help">Nombre de usuario de autenticación si se requiere la autenticación de las solicitudes SIP. El valor por defecto es el nombre de usuario de la cuenta.</string>
@@ -89,7 +88,6 @@
     </string>
     <!-- Accounts Activity -->
     <string name="accounts">Cuentas</string>
-    <string name="user_domain">usuario@dominio</string>
     <string name="invalid_aor">usuario@dominio[:puerto][;transport=udp|tcp|tls] «%1$s» no válido</string>
     <string name="account_exists">Ya existe la cuenta «%1$s».</string>
     <string name="account_allocation_failure">Error al asignar la cuenta nueva.</string>
@@ -181,7 +179,6 @@
     <string name="contact_name">Nombre</string>
     <string name="invalid_contact">El nombre de contacto «%1$s» no es válido</string>
     <string name="contact_already_exists">Ya existe el contacto «%1$s».</string>
-    <string name="invalid_contact_uri">URI de SIP no válido</string>
     <!-- Contacts Activity -->
     <string name="contacts">Contactos</string>
     <string name="contact_action_question">¿Quieres llamar o enviar un mensaje a \'%1$s\'?</string>
@@ -198,7 +195,6 @@
     <string name="no">No</string>
     <string name="accept">Aceptar</string>
     <string name="deny">Denegar</string>
-    <string name="user_id">Id. de usuario</string>
     <string name="password">Contraseña</string>
     <string name="add">Añadir</string>
     <string name="delete">Eliminar</string>
@@ -215,7 +211,6 @@
     <string name="outgoing_call_to_dots">Llamar a …</string>
     <string name="incoming_call_from_dots">Llamada de …</string>
     <string name="transferring_call_to_dots">Transfiriendo llamada a …</string>
-    <string name="invalid_sip_uri">URI de SIP no válido \'%1$s\'</string>
     <string name="callee">Destinatario</string>
     <string name="hangup">Colgar</string>
     <string name="hold">Retención/desconexión de llamadas</string>
@@ -261,7 +256,6 @@
     <string name="invalid_authentication_password">Contraseña incorrecta%1$s</string>
     <string name="invalid_authentication_username">Nombre de usuario no válido \'%1$s\'</string>
     <string name="video_codecs_help">Lista de códecs de vídeo por orden de prioridad. Arrastre para reordenar, deslice a la derecha para activar o desactivar.</string>
-    <string name="show_password">Mostrar contraseña</string>
     <string name="no_cameras">No tiene ninguna cámara de video compatible.</string>
     <string name="no_video_calls">Concede permiso a \"Cámara\" para realizar o responder videollamadas.</string>
     <string name="restart_request">Solicitud de reinicio</string>
@@ -277,7 +271,6 @@
     <string name="video_request">Solicitud de vídeo</string>
     <string name="video_call">Videollamada</string>
     <string name="confirmation">Confirmación</string>
-    <string name="help">Ayuda</string>
     <string name="android_contact_help">Si está marcada, este contacto se añade a los contactos de Android.</string>
     <string name="reset">Restablecer</string>
     <string name="reset_config_alert">¿Estás seguro de que quieres restablecer los valores de fábrica\?</string>
@@ -293,13 +286,10 @@
     <string name="missed_call_from">Llamada perdida de</string>
     <string name="accounts_help">Cuando se crea una nueva cuenta, el número de puerto de la cuenta y el protocolo de transporte pueden ser dados opcionalmente: &lt;usuario&gt;@&lt;dominio&gt;[:&lt;puerto&gt;][;transporte=udp|tcp|tls]. Si se indica &lt;puerto&gt; y no se indica el protocolo de transporte, el protocolo de transporte será por defecto udp. Si no se da &lt;puerto&gt; y se da el protocolo de transporte, &lt;puerto&gt; es por defecto 5060 o 5061 (TLS). Si no se indica ninguno de los dos y no se especifica ningún proxy de salida, el registrador de la cuenta (si lo hay) se determina únicamente a partir de la información DNS del dominio.</string>
     <string name="new_account">Nueva cuenta</string>
-    <string name="invalid_voicemail_uri">URI de buzón de voz inválido \'%1$s\'</string>
     <string name="dtmf_info">Solicitudes SIP INFO</string>
     <string name="dtmf_inband">Eventos RTP en banda</string>
     <string name="dtmf_mode_help">Selecciona cómo se envían los tonos DTMF 0-9, #, * y A-D.</string>
     <string name="dtmf_mode">Modo DTMF</string>
-    <string name="prefer_ipv6_media_help">Si está marcada, ofrece utilizar el protocolo de medios IPv6 (si está disponible) cuando el protocolo de medios del par no puede determinarse automáticamente.</string>
-    <string name="prefer_ipv6_media">Preferir medios IPv6</string>
     <string name="invalid_stun_password">Contraseña inválida \'%1$s\'</string>
     <string name="stun_password_help">Contraseña si lo requiere el servidor STUN/TURN</string>
     <string name="stun_password">Contraseña STUN/TURN</string>
@@ -307,7 +297,6 @@
     <string name="stun_username_help">Nombre de usuario si lo requiere el servidor STUN / TURN</string>
     <string name="stun_username">Nombre de usuario STUN/TURN</string>
     <string name="invalid_stun_server">URI del servidor STUN/TURN inválido \'%1$s\'</string>
-    <string name="stun_server_uri">URI del servidor STUN/TURN</string>
     <string name="video_codecs">Codecs de vídeo</string>
     <string name="invalid_proxy_server_uri">URI del servidor proxy inválido \'%1$s\'</string>
     <string name="invalid_display_name">Nombre de pantalla inválido \'%1$s\'</string>
@@ -363,13 +352,11 @@ También se pueden comunicar problemas.
     <string name="country_code">Código del país</string>
     <string name="reg_int_help">Indica la frecuencia (en segundos) con la que baresip envía peticiones REGISTRO. Los valores válidos van de 60 a 3600.</string>
     <string name="rtcp_mux_help">Si está marcada, los paquetes RTP y RTCP se multiplexan en un único puerto (RFC 5761).</string>
-    <string name="account_nickname">Apodo de la cuenta</string>
     <string name="account_nickname_help">Apodo (si lo hay) utilizado para identificar esta cuenta dentro de la aplicación baresip.</string>
     <string name="invalid_account_nickname">Apodo de la cuenta no válido \"%1$s</string>
     <string name="non_unique_account_nickname">El apodo \'%1$s\' ya existe</string>
     <string name="nickname">Apodo</string>
     <string name="both">Ambos</string>
-    <string name="country_code_hint">+código</string>
     <string name="call_details">Detalles de la llamada</string>
     <string name="peer">Interlocutores</string>
     <string name="direction">Dirección</string>
@@ -379,7 +366,6 @@ También se pueden comunicar problemas.
     <string name="avatar_image">Imagen del perfil</string>
     <string name="telephony_provider">Proveedor de telefonía</string>
     <string name="telephony_provider_help">Parte del host SIP URI utilizada en las llamadas a números de teléfono. Por defecto es el dominio de la cuenta. Si no se indica, esta cuenta no puede utilizarse para llamar a números de teléfono.</string>
-    <string name="telephony_provider_hint">Parte del host SIP URI</string>
     <string name="invalid_country_code">Código del país \"%1$s\" no válido</string>
     <string name="invalid_sip_uri_hostpart">Parte del host SIP URI \'%1$s\' no válida</string>
     <string name="codec_action">Reordenar</string>
@@ -411,7 +397,6 @@ También se pueden comunicar problemas.
     <string name="no_notifications">No podrá utilizar esta aplicación sin el permiso de \"Notificaciones\".</string>
     <string name="battery_optimizations_help">Desactive las optimizaciones de batería (recomendado) si desea reducir la probabilidad de que Android restrinja el acceso de baresip a la red o lo ponga en estado de espera.</string>
     <string name="contacts_consent">Si se eligen contactos de Android, pueden ser usados en llamadas y mensajes como referencias a SIP y tel URIs. baresip aplicación no almacena contactos de Android ni compartirlos con nadie. Para que los contactos de Android estén disponibles en baresip, Google requiere que aceptes su uso según se describe aquí y en la <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Política de privacidad</a> de la aplicación.</string>
-    <string name="no_bluetooth">baresip no es capaz de detectar la conectividad Bluetooth sin el permiso \"Dispositivos cercanos\".</string>
     <string name="no_android_contacts">No se puede acceder a los contactos de Android sin el permiso \"Contactos\".</string>
     <string name="audio_focus_denied">¡Enfoque de audio denegado!</string>
     <string name="audio_and_video_permissions">baresip+ necesita el permiso \"Micrófono\" para las llamadas de voz, el permiso \"Cámara\" para las videollamadas, el permiso \"Dispositivos cercanos\" para la detección de micrófonos/altavoces Bluetooth y el permiso \"Notificaciones\" para la publicación de notificaciones.</string>

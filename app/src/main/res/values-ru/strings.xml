@@ -63,13 +63,11 @@
     <string name="failed_to_load_module">Не могу загрузить модуль.</string>
     <string name="failed_to_set_dns_servers">Не могу установиь ДНС сервера</string>
     <string name="hangup">Прервать вызов</string>
-    <string name="help">Помощь</string>
     <string name="hold">Удержание/возобновление вызова</string>
     <string name="incoming_call_from_dots">Вызов от …</string>
     <string name="info">Информация</string>
     <string name="invalid_chat_peer_uri">Недопустимый URI узла чата</string>
     <string name="invalid_contact">Неверное имя контакта \'%1$s\'</string>
-    <string name="invalid_contact_uri">Неверный SIP URI</string>
     <string name="invalid_dns_servers">Неверный ДНС сервер</string>
     <string name="invalid_listen_address">Неверный адрес</string>
     <string name="invalid_opus_bitrate">Неверный Opus bitrate</string>
@@ -87,7 +85,6 @@
     <string name="yes">Да</string>
     <string name="you">Вы</string>
     <string name="you_have">Вы имеете</string>
-    <string name="your_name">Ваше имя</string>
     <string name="about_title">О baresip</string>
     <string name="audio_codecs_help">Список аудиокодеков в порядке приоритета. Перетащите, чтобы изменить порядок, щелкните длинным щелчком, чтобы включить или выключить.</string>
     <string name="audio_modules_title">Аудио модули</string>
@@ -124,7 +121,6 @@
     <string name="restart">Перезагрузка</string>
     <string name="restore">Восстановление</string>
     <string name="verify">Запрос на проверку</string>
-    <string name="user_id">ID пользователя</string>
     <string name="no_calls">baresip требуется разрешение доступа к микрофону для голосовых вызовов.</string>
     <string name="long_message_question">Хотите удалить сообщения или добавить пользователя \'%1$s\' в контакты?</string>
     <string name="accept">Принять</string>
@@ -151,7 +147,6 @@
     <string name="invalid_opus_packet_loss">Неверный процент потерь Opus</string>
     <string name="media_nat">Прохождение медиа NAT</string>
     <string name="media_nat_help">Выбирает протокол прохождения медиа NAT (если есть). Возможные варианты: STUN (Session Traversal Utilities for NAT, RFC 5389) и ICE (Interactive Connectivity Establishment, RFC 5245).</string>
-    <string name="show_password">Показать пароль</string>
     <string name="no_cameras">У вас нет поддерживаемых камер!</string>
     <string name="no_video_calls">Выдайте разрешение доступа к камере для совершения видеозвонков или ответа на них.</string>
     <string name="restore_failed">Не удалось восстановить данные приложения. Проверьте, что вы указали правильный пароль и что файл резервной копии принадлежит этому приложению. В Android версии 9 также проверьте Apps → baresip → Permissions → Storage и наличие файла \'%1$s\' в папке Download.</string>
@@ -167,7 +162,6 @@
     <string name="allow_video">Разрешить передачу и приём видео с \'%1$s\'\?</string>
     <string name="video_request">Видео запрос</string>
     <string name="video_call">Видеозвонок</string>
-    <string name="invalid_sip_uri">Недействительный SIP URI \'%1$s\'</string>
     <string name="confirmation">Подтверждение</string>
     <string name="read_ca_certs_error">Не удалось прочитать файл \'ca_certs.crt\'.</string>
     <string name="read_cert_error">Не удалось прочитать файл \'cert.pem\'.</string>
@@ -187,13 +181,9 @@
     <string name="listen_address_help">IP-адрес и порт вида \'адрес:порт\', по которым baresip прослушивает входящие SIP-запросы. Если IP-адрес является IPv6-адресом, он должен быть написан в скобках []. IPv4-адрес 0.0.0.0 или IPv6-адрес [::] заставляет baresip прослушивать все доступные адреса. Если оставить пустым (заводское значение по умолчанию), baresip будет прослушивать произвольный порт на всех доступных адресах.</string>
     <string name="long_chat_question">Вы хотите удалить чат с собеседником \'%1$s\' или добавить собеседника в контакты\?</string>
     <string name="invalid_aor">Недействительный user@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
-    <string name="user_domain">пользователь@домен</string>
     <string name="accounts_help">SIP URI или новая учётная в форме: &lt;пользователь&gt;@&lt;домен&gt;[:&lt;порт&gt;][;transport=udp|tcp|tls]. Если порт указан, а транспортный протокол отсутствует, по умолчанию используется протокол UDP. Если же указан транспортный протокол и отсутствует порт, по умолчанию используется порт 5060 или 5061 (TLS). Если ни один из них не указан и не используется исходящий прокси-сервер, регистратор учётной записи (если есть) определяется исключительно на основе DNS-информации домена.</string>
-    <string name="invalid_voicemail_uri">Недействительный URI голосовой почты \'%1$s\'</string>
     <string name="voicemain_uri_help">SIP URI для проверки сообщений голосовой почты. Если оставить поле пустым, сообщения голосовой почты (индикаторы ожидающего сообщения) не задействуются.</string>
     <string name="manual">Вручную</string>
-    <string name="prefer_ipv6_media_help">Если этот флажок установлен, предлагать использовать медиа-протокол IPv6 (если доступен), если медиа-протокол собеседника не может быть автоматически определен.</string>
-    <string name="prefer_ipv6_media">Предпочитать IPv6 медиа</string>
     <string name="invalid_stun_password">Неверный пароль \'%1$s\'</string>
     <string name="stun_password_help">Пароль, если требуется сервером STUN/TURN</string>
     <string name="stun_password">Пароль STUN/TURN</string>
@@ -270,7 +260,6 @@
         </ul>
         ]]></string>
     <string name="about_title_plus">О baresip+</string>
-    <string name="stun_server_uri">URI-адрес сервера STUN/TURN</string>
     <string name="dark_theme">Темная тема</string>
     <string name="verify_server">Проверка сертификатов сервера</string>
     <string name="peer">Пир</string>
@@ -295,7 +284,6 @@
     <string name="battery_optimizations_help">Отключите оптимизацию работы батареи (рекомендуется), если вы хотите снизить вероятность того, что Android ограничит доступ baresip к сети или переведет baresip в режим ожидания.</string>
     <string name="audio_settings">Аудионастройки</string>
     <string name="account_nickname_help">Псевдоним (если есть), используемый для идентификации этой учетной записи в baresip app.</string>
-    <string name="account_nickname">Псевдоним учетной записи</string>
     <string name="invalid_account_nickname">Неверный никнейм учетной записи \'%1$s\'</string>
     <string name="non_unique_account_nickname">Никнейм \'%1$s\' уже существует</string>
     <string name="country_code">Код страны</string>
@@ -318,10 +306,7 @@
     <string name="lost">Потеряно</string>
     <string name="no_android_contacts">Вы не можете получить доступ к контактам Android без разрешения «Контакты».</string>
     <string name="jitter">Джиттер: %1$s (мс)</string>
-    <string name="no_bluetooth">baresip не может обнаружить Bluetooth-подключение без разрешения «Устройства поблизости».</string>
-    <string name="country_code_hint">+код</string>
     <string name="invalid_country_code">Неверный код страны \'%1$s\'</string>
-    <string name="telephony_provider_hint">Хостовая часть SIP URI</string>
     <string name="choose_destination_uri">Выберите целевой URI</string>
     <string name="packets">Пакеты</string>
     <string name="average_rate">Средняя скорость: %1$s (кбит/с)</string>

@@ -4,7 +4,6 @@
     <string name="status">Status</string>
     <string name="dtmf">DTMF</string>
     <string name="backup">Cópia de Segurança</string>
-    <string name="show_password">Mostrar Senha</string>
     <string name="no_calls">O baresip precisa de permissão do \"Microfone\" para realizar chamadas de voz.</string>
     <string name="restore_failed">Falha ao restaurar os dados do aplicativo. Verifique se inseriu a senha correta e que o arquivo de backup seja deste aplicativo, Na versão 9 do Android, verifique também em Aplicativos → baresip → Permissões → Armazenamento e se o arquivo \'%1$s\' existe na pasta Download.</string>
     <string name="restored">Os dados do aplicativo foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
@@ -40,7 +39,6 @@
     <string name="hold">Chamada em espera/liberar</string>
     <string name="hangup">Desligar</string>
     <string name="callee">Destinatário</string>
-    <string name="invalid_sip_uri">URI SIP \'%1$s\' inválida</string>
     <string name="transferring_call_to_dots">Transferindo chamada para …</string>
     <string name="incoming_call_from_dots">Chamada de …</string>
     <string name="outgoing_call_to_dots">Chamando …</string>
@@ -48,14 +46,12 @@
     <string name="restart">Reiniciar</string>
     <string name="about">Sobre</string>
     <string name="restore">Restaurar</string>
-    <string name="help">Ajuda</string>
     <string name="error">Erro</string>
     <string name="send">Enviar</string>
     <string name="edit">Editar</string>
     <string name="delete">Excluir</string>
     <string name="add">Adicionar</string>
     <string name="password">Senha</string>
-    <string name="user_id">ID do Usuário</string>
     <string name="deny">Recusar</string>
     <string name="accept">Aceitar</string>
     <string name="no">Não</string>
@@ -70,7 +66,6 @@
     <string name="send_message">Enviar Mensagem</string>
     <string name="contact_action_question">Você quer ligar ou enviar mensagem para \'%1$s\'\?</string>
     <string name="contacts">Contatos</string>
-    <string name="invalid_contact_uri">URI SIP inválida</string>
     <string name="contact_already_exists">Contato \'%1$s\' já existe.</string>
     <string name="invalid_contact">Nome de contato \'%1$s\' inválido</string>
     <string name="contact_name">Nome</string>
@@ -147,21 +142,17 @@
     <string name="account_allocation_failure">Houve uma falha ao alocar a nova conta.</string>
     <string name="account_exists">A conta \'%1$s\' já existe.</string>
     <string name="invalid_aor">usuario@dominio[:porta][;transport=udp|tcp|tls] inválido \'%1$s\'</string>
-    <string name="user_domain">usuario@dominio</string>
     <string name="accounts_help">SIP URI da nova conta no formato: &lt;usuário&gt;@@&lt;domínio&gt;[:&lt;porta&gt;][;transport=udp|tcp|tls]. Se a &lt;porta&gt; for informada e o protocolo de transporte não, o padrão será UDP. Se a &lt;porta&gt; não for informada e o protocolo de transporte for, a &lt;porta&gt; padrão é 5060 ou 5061 (TLS). Se nenhum dos dois ou nenhum proxy for informado, o usuário da conta (caso haja) é determinado exclusivamente com base nas informações do DNS do domínio.</string>
     <string name="new_account">SIP URI da nova conta</string>
     <string name="accounts">Contas</string>
     <string name="default_account_help">Se marcado, esta conta é selecionada quando o baresip for iniciado.</string>
     <string name="default_account">Conta Padrão</string>
-    <string name="invalid_voicemail_uri">URI de Correio de Voz inválida \'%1$s\'</string>
     <string name="voicemain_uri_help">URI SIP para checar mensagens de correio de voz. Se deixado em branco, as mensagens do correio de voz (Indicação de Mensagem em Espera) não serão assinadas.</string>
     <string name="voicemail_uri">URI do Correio de Voz</string>
     <string name="auto">Automático</string>
     <string name="manual">Manual</string>
     <string name="answer_mode_help">Selecione como chamadas recebidas são respondidas.</string>
     <string name="answer_mode">Modo de Atendimento</string>
-    <string name="prefer_ipv6_media_help">Se selecionado, oferece usar protocolo de mídia IPv6 (se disponível) quando o protocolo de mídia do par não puder ser determinado automaticamente.</string>
-    <string name="prefer_ipv6_media">Preferir Mídia IPv6</string>
     <string name="media_encryption_help">Selecione o protocolo de criptografia de transporte de mídia (se houver).
 \n • ZRTP (recomendado) significa que a negociação de criptografia de mídia ZRTP ponta-a-ponta é tentada depois que a ligação foi estabelecida. 
 \n • DTLS-SRTPF significa que UDP/TLS/RTP/SAVPF é oferecido em chamadas efetuadas que RTP/SAVP, RTP/SAVPF, UDP/TLS/RTP/SAVP, ou UDP/TLS/RTP/SAVPF é usado se oferecida em chamadas recebidas. 
@@ -195,7 +186,6 @@
     <string name="authentication_username">Nome de Usuário de Autenticação</string>
     <string name="invalid_display_name">Nome de Exibição Inválido\'%1$s\'</string>
     <string name="display_name_help">Nome (se houver) usado em From URI de solicitações de saída.</string>
-    <string name="your_name">Seu Nome</string>
     <string name="display_name">Nome de Exibição</string>
     <string name="account">Conta</string>
     <string name="about_text"><![CDATA[
@@ -310,7 +300,6 @@
         </ul>
         ]]></string>
     <string name="about_title_plus">Sobre o baresip+</string>
-    <string name="stun_server_uri">Servidor URI STUN/TURN</string>
     <string name="sip_trace_help">Se selecionado em conjunto com Debug, as mensagens Logcat incluem também o pedido SIP e o rastreamento da resposta. A opção não é ativada automaticamente durante a inicialização do baresip.</string>
     <string name="sip_trace">Rastreio SIP</string>
     <string name="allow_video_recv">Aceitar o recebimento de vídeo a partir do \'%1$s\'\?</string>
@@ -348,7 +337,6 @@
     <string name="direction">Direção</string>
     <string name="time">Hora</string>
     <string name="telephony_provider">Operadora de telefonia</string>
-    <string name="telephony_provider_hint">Parte do host SIP URI</string>
     <string name="invalid_sip_uri_hostpart">Parte inválida do host SIP URI \'%1$s\'</string>
     <string name="sip_or_tel_uri">SIP ou tel. URI</string>
     <string name="user_domain_or_number">usuário@domínio ou o número de telefone</string>
@@ -365,10 +353,8 @@
     <string name="consent_request">Solicitação de consentimento</string>
     <string name="contacts_consent">Se os contatos do Android forem escolhidos, eles podem ser usados em chamadas e mensagens como referências a URIs SIP e tel. O aplicativo baresip não armazena contatos do Android nem os compartilha com ninguém. Para tornar os contatos do Android disponíveis no baresip, o Google exige que você aceite seu uso conforme descrito aqui e na <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">política de privacidade</a>.</string>
     <string name="country_code">Código do país</string>
-    <string name="country_code_hint">+código</string>
     <string name="country_code_help">O código do país E.164 desta conta. Se durante o recebimento da chamada ou mensagem do usuário a parte URI recebida tiver um número de telefone que não começa com o sinal \'+\' e se a busca de contato falhar, o número será prefixado com este código do país e a busca pelo contato será testada novamente. Se o número de telefone começar com um único dígito \'0\', o dígito \'0\' será removido antes que o número seja prefixado.</string>
     <string name="invalid_country_code">Código do país inválido \'%1$s\'</string>
-    <string name="account_nickname">Apelido da conta</string>
     <string name="account_nickname_help">Apelido (se houver) é utilizado para identificar essa conta dentro do aplicativo baresip.</string>
     <string name="invalid_account_nickname">Apelido inválido da conta \'%1$s\'</string>
     <string name="non_unique_account_nickname">O apelido \'%1$s\' já existe</string>
@@ -378,7 +364,6 @@
     <string name="rtcp_mux_help">Se marcada, os pacotes RTP e RTCP são multiplexados numa única porta (RFC 5761).</string>
     <string name="no_notifications">Você não pode usar este aplicativo sem a permissão \"Notificações\".</string>
     <string name="audio_focus_denied">Foco de áudio negado!</string>
-    <string name="no_bluetooth">O baresip não é capaz de detectar a conectividade Bluetooth sem a permissão \"Dispositivos próximos\".</string>
     <string name="permissions_rationale">Justificativa das permissões</string>
     <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth e a permissão \"Notificações\" para postar notificações.</string>
     <string name="audio_and_video_permissions">O baresip+ precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmera\" para realizar chamadas de vídeo. da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, assim como a permissão \"Notificações\" para postar notificações.</string>

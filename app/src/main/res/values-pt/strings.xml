@@ -3,9 +3,7 @@
     <string name="restored">Os dados da aplicação foram restaurados. O baresip precisa ser reiniciado. Reiniciar agora\?</string>
     <string name="short_chat_question">Quer apagar o chat com \'%1$s\'\?</string>
     <string name="start_automatically_help">Se marcado, baresip iniciar automaticamente depois que o aparelho reiniciar.</string>
-    <string name="help">Ajuda</string>
     <string name="verify_sas">Quer verificar SAS &lt;%1$s&gt;\?</string>
-    <string name="invalid_sip_uri">URI SIP \'%1$s\' inválida</string>
     <string name="tls_ca_file_help">Se estiver marcada, foi ou será carregado um ficheiro que contém certificados TLS de tais autoridades de certificação que não estão incluídas no sistema operativo Android. Na versão 9 do Android, um ficheiro chamado “ca_certs.crt” é carregado da pasta Download.</string>
     <string name="debug_help">Se selecionado, disponibiliza mensagens de depuração no registo log e informações para o Logcat.</string>
     <string name="answer">Atender</string>
@@ -33,7 +31,6 @@
     <string name="incoming_call_from_dots">Chamada de …</string>
     <string name="add">Adicionar</string>
     <string name="alert">Alerta</string>
-    <string name="prefer_ipv6_media">Preferir Mídia IPv6</string>
     <string name="one_new_message">uma nova mensagem</string>
     <string name="contact_delete_question">Quer apagar o contato \'%1$s\'\?</string>
     <string name="default_call_volume">Volume de Chamadas prefinido</string>
@@ -194,7 +191,6 @@
             <li><b>GNU GPLv3</b> codec G.729</li>
         </ul>
         ]]></string>
-    <string name="your_name">Seu Nome</string>
     <string name="video_size">Tamanho do Quadro do Vídeo</string>
     <string name="restore_failed">Falha ao restaurar os dados da aplicação. Verifique se inseriu a palavra-passe correta e que o ficheiro de backup seja deste aplicação, Nas versões do Android 9 e anteriores, verifique também em Apps → baresip → Permissões → Armazenamento e se o ficheiro \'%1$s\' existe na pasta Download.</string>
     <string name="restart">Reiniciar</string>
@@ -210,9 +206,7 @@
     <string name="audio_codecs">Codecs de Áudio</string>
     <string name="enable_history">Ativar</string>
     <string name="dtmf">DTMF</string>
-    <string name="invalid_voicemail_uri">URI de Correio de Voz inválida \'%1$s\'</string>
     <string name="no_calls">O baresip precisa de permissão do \"Microfone\" para realizar chamadas de voz.</string>
-    <string name="invalid_contact_uri">URI SIP inválida</string>
     <string name="read_ca_certs_error">Houve uma falha ao ler o ficheiro \'ca_certs.crt\'.</string>
     <string name="account_exists">A conta \'%1$s\' já existe.</string>
     <string name="listen_address_help">O endereço IP e a porta do formulário \"address:port\" são os endereços onde o baresip escuta as solicitações SIP recebidas. Se o endereço IP for IPv6, deve ser escrito entre colchetes []. O endereço IPv4 0.0.0.0 ou o endereço IPv6 [::] faz com que o baresip escute em todos os endereços disponíveis. Se for deixado em branco (padrão de fábrica), o baresip escuta numa porta arbitrária em todos os endereços disponíveis.</string>
@@ -226,21 +220,17 @@
     <string name="about">Sobre</string>
     <string name="calls_call_message_question">Quer ligar ou enviar a mensagem para \'%1$s\'\?</string>
     <string name="sending_failed">Envio de mensagem falhou</string>
-    <string name="user_domain">usuario@dominio</string>
-    <string name="user_id">ID do Utilizador</string>
     <string name="invalid_listen_address">Endereço de Escuta inválido</string>
     <string name="stun_username_help">Nome do utilizador, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="invalid_authentication_password">Palavra-passe de Autenticação Inválida \'%1$s\'</string>
     <string name="authentication_password_help">Palavra-passe de Autenticação com até 64 caracteres. Se o Nome de Utilizador de Autenticação for informado mas a palavra-passe não, ela será solicitada quando o baresip for iniciado.</string>
     <string name="answer_mode">Modo de Atendimento</string>
-    <string name="show_password">Mostrar Palavra-passe</string>
     <string name="message_from">Mensagem de</string>
     <string name="account">Conta</string>
     <string name="edit">Editar</string>
     <string name="aec">Cancelamento de Eco Acústico</string>
     <string name="delete_chats">Apagar</string>
     <string name="debug">Depuração</string>
-    <string name="prefer_ipv6_media_help">Se selecionado, oferece usar protocolo de mídia IPv6 (se disponível) quando o protocolo de mídia do par não puder ser determinado automaticamente.</string>
     <string name="invalid_opus_packet_loss">Percentagem de Perda de Pacotes do Opus inválida</string>
     <string name="dns_servers_help">Lista de endereço de servidores de DNS separados por vírgula. Endereços de servidores DNS são obtidos dinamicamente pelo sistema. Cada endereço DNS é na forma \'ip:porta\' ou \'ip\'. Se a porta é omitida, a predefinição será 53. Se o ip é um endereço IPv6 e também a porta é fornecida, o ip precisa ser escrito dentro de colchetes []. Por exemplo, escutar \'8.8.8.8:53,[2001:4860:4860::8888]:53\' aponta para endereços IPv4 e IPv6 dos servidores de DNS do Google.</string>
     <string name="notice">Aviso</string>
@@ -276,7 +266,6 @@
     <string name="dtmf_inband">Eventos na Banda RTP</string>
     <string name="dtmf_mode_help">Selecione como os tons DTMF 0–9, #, * e A-D serão enviados.</string>
     <string name="dtmf_mode">Modo DTMF</string>
-    <string name="stun_server_uri">Servidor URI STUN/TURN</string>
     <string name="about_text_plus"><![CDATA[
         <h1>Biblioteca Baresip baseado em agente de utilizador SIP com vídeo chamadas</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
@@ -357,19 +346,16 @@
     <string name="blind">Cego</string>
     <string name="attended">Participou</string>
     <string name="telephony_provider">Provedor de telefonia</string>
-    <string name="telephony_provider_hint">Parte do host SIP URI</string>
     <string name="invalid_sip_uri_hostpart">Parte do host URI SIP inválida \'%1$s\'</string>
     <string name="reg_int">Intervalo de registo</string>
     <string name="invalid_reg_int">Intervalo de registo inválido\'%1$s\'</string>
     <string name="rtcp_mux_help">Se marcada, os pacotes RTP e RTCP são multiplexados numa única porta (RFC 5761).</string>
     <string name="codec_action">Reordenar</string>
-    <string name="no_bluetooth">O baresip não é capaz de detetar a conectividade Bluetooth sem a permissão \"Aparelhos próximos\".</string>
     <string name="rtcp_mux">Multiplexagem RTCP</string>
     <string name="country_code">Código do país</string>
     <string name="no_telephony_provider">A conta \'%1$s\' não tem provedor telefonico</string>
     <string name="no_notifications">Não pode usar esta aplicação sem a permissão \"Notificações\".</string>
     <string name="audio_focus_denied">Foco de áudio negado!</string>
-    <string name="country_code_hint">+código</string>
     <string name="invalid_country_code">Código do país inválido \'%1$s\'</string>
     <string name="diverted_by_dots">Desviado por …</string>
     <string name="choose_destination_uri">Escolha a URI de destino</string>
@@ -377,7 +363,6 @@
     <string name="unknown">Desconhecido</string>
     <string name="consent_request">Solicitação de consentimento</string>
     <string name="country_code_help">O código do país E.164 desta conta. Se durante o recebimento da chamada ou mensagem do utilizador a parte URI recebida tiver um número de telefone que não começa com o sinal \'+\' e se a busca de contato falhar, o número será prefixado com este código do país e a busca pelo contato será testada novamente. Se o número de telefone começar com um único dígito \'0\', o dígito \'0\' será removido antes que o número seja prefixado.</string>
-    <string name="account_nickname">Apelido da conta</string>
     <string name="account_nickname_help">Apelido (se houver) é utilizado para identificar essa conta dentro da app baresip.</string>
     <string name="invalid_account_nickname">Apelido inválido da conta \'%1$s\'</string>
     <string name="non_unique_account_nickname">O apelido \'%1$s\' já existe</string>
