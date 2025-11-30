@@ -254,8 +254,6 @@
     <string name="decrypt_password">Palauta salasanalla</string>
     <string name="delete_account">Haluatko poistaa tilin \'%1$s\'\?</string>
     <!-- Baresip Service -->
-    <string name="answer">Vastaa</string>
-    <string name="reject">Hylkää</string>
     <string name="reply">Vastaa</string>
     <string name="save">Talleta</string>
     <string name="is_calling">soittaa</string>
@@ -263,7 +261,6 @@
     <string name="missed_calls">Vastaamattomia puheluita</string>
     <string name="missed_calls_count">%1$d vastaamatonta puhelua</string>
     <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
-    <string name="message_from">Viesti lähettäjältä</string>
     <string name="call_auto_rejected">Automaattisesti hylätty puhelu soittajalta \`%1$s\`</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
@@ -275,14 +272,10 @@
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
     <string name="playing_recording">Tallenteen kuuntelu …</string>
-    <string name="calls_call_message_question">Haluatko soittaa tai lähettää viestin kohteeseen
-        \'%1$s\'\?
-    </string>
     <string name="calls_add_delete_question">Haluatko luoda uuden yhteystiedon \'%1$s\' tai poistaa
         %2$s puheluhistoriasta\?
     </string>
     <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta\?</string>
-    <string name="delete_history">Tyhjennä</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
@@ -291,7 +284,6 @@
     <string name="call_missed">Puheluun ei vastattu</string>
     <string name="call_rejected">Puhelu hylätty</string>
     <!-- Chat Activity -->
-    <string name="chat">Viestiketju</string>
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
     <string name="long_message_question">Haluatko poistaa viestin tai
@@ -305,22 +297,13 @@
     <string name="today">Tänään</string>
     <string name="you">Sinä</string>
     <string name="new_chat_peer">Uusi viestin kohde</string>
-    <string name="invalid_chat_peer_uri">Virheellinen viestikumppanin URI</string>
     <string name="long_chat_question">Haluatko poistaa viestiketjun tai
     luoda uuden yhteystiedon \'%1$s\'\?</string>
     <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'\?</string>
-    <string name="delete_chats">Tyhjennä</string>
     <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian\?</string>
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audion koodausmenetelmät</string>
-    <string name="audio_codecs_help">Luettelo audion koodausmenetelmistä prioriteettijärjestyksessä.
-        Järjestä raahaamalla ja pudottamalla, ota käyttöön tai poista käytöstä pitkällä painalluksella.
-    </string>
     <string name="video_codecs">Videon koodausmenetelmät</string>
-    <string name="video_codecs_help">Luettelo videon koodausmenetelmistä prioriteettijärjestyksessä.
-        Järjestä raahaamalla ja pudottamalla, ota käyttöön tai poista käytöstä pitkällä painalluksella.
-    </string>
-    <string name="codec_action">Järjestä</string>
     <!-- Config Activity -->
     <string name="configuration">Asetukset</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>
@@ -386,13 +369,11 @@
         käytettävissä.
     </string>
     <string name="failed_to_load_module">Modulin lataaminen epäonnistui.</string>
-    <string name="aec">Akustinen kaiun poisto (AKP)</string>
     <string name="microphone_gain">Mikrofonin äänikerroin</string>
     <string name="microphone_gain_help">Kertoo mikrofonin äänen voimakkuuden tällä desimaaliluvulla.
         Minimikerroin on 1.0 (tehdasasetus), mikä ei muuta mikrofonin äänen voimakkuutta.  Suuremmat
         arvot voivat vaikuttaa negatiivisesti äänen laatuun.</string>
     <string name="invalid_microphone_gain">Virheellinen mikrofonin äänikerroin</string>
-    <string name="_1.0" translatable="false">1.0</string>
     <string name="opus_bit_rate">Opus-koodekin bittinopeus</string>
     <string name="opus_bit_rate_help">Opus-koodekin käyttämä
     keskimääräinen enimmäisnopeus. Mahdollisia arvoja ovat
@@ -456,7 +437,6 @@
     <string name="consent_request">Suostumuspyyntö</string>
     <string name="contacts_consent">Jos Androidin yhteystiedot on valittu, voit käyttää niitä puheluissa ja viesteissä SIP ja tel URI:en ohella. Baresip ei talleta Androidin yhteystietoja eikä jaa niitä kenellekään. Jotta Baresip saisi käyttöönsä Androidin yhteystiedot, Google vaatii, että annat siihen suostumuksen hyväksymällä Baresip-sovelluksen <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">yksityisyyskäytännöt</a>.</string>
     <!-- Contact Activity -->
-    <string name="contact">Yhteystieto</string>
     <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
     <string name="sip_or_tel_uri">SIP tai tel URI</string>
@@ -474,7 +454,6 @@
     viestin ositteeseen \'%1$s\'\?</string>
     <string name="send_message">Lähetä viesti</string>
     <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'\?</string>
-    <string name="contacts_exceeded">Yhteystietojesi enimmäismäärä %1$d on ylittynyt.</string>
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
@@ -485,11 +464,9 @@
     <string name="no">Ei</string>
     <string name="accept">Hyväksy</string>
     <string name="deny">Estä</string>
-    <string name="password">Salasana</string>
     <string name="add">Lisää</string>
     <string name="delete">Poista</string>
     <string name="edit">Muokkaa</string>
-    <string name="send">Lähetä</string>
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
     <string name="confirmation">Vahvistus</string>
@@ -507,19 +484,14 @@
     <string name="outgoing_call_to_dots">Puhelu ulos …</string>
     <string name="incoming_call_from_dots">Puhelu sisään …</string>
     <string name="diverted_by_dots">Siirtäjä …</string>
-    <string name="transferring_call_to_dots">Puhelun siirto …</string>
     <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
-    <string name="callee">Puhelun kohde</string>
-    <string name="hangup">Lopeta</string>
     <string name="video_call">Videopuhelu</string>
     <string name="video_request">Videopyyntö</string>
     <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'\?</string>
     <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'\?</string>
     <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'\?</string>
-    <string name="hold">Puhelu pitoon/pidosta</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
-    <string name="mic">Mikrofoni päälle/pois</string>
     <string name="rec_in_call">Tallennus voidaan asettaa päälle tai pois vain silloin, kun puhelu
         ei ole yhdistetty</string>
     <string name="call_transfer">Puhelun siirto</string>
@@ -539,7 +511,6 @@
     <string name="packets">Paketit</string>
     <string name="lost">Hukkunut</string>
     <string name="jitter">Vaihtelu: %1$s (ms)</string>
-    <string name="voicemail">Puheposti</string>
     <string name="voicemail_messages">Puhepostiviestit</string>
     <string name="you_have">Sinulla on</string>
     <string name="one_new_message">yksi uusi viesti</string>
@@ -549,8 +520,6 @@
     <string name="and">ja</string>
     <string name="no_messages">Sinulla ei ole viestejä</string>
     <string name="listen">Kuuntele</string>
-    <string name="messages">Viestit</string>
-    <string name="dialpad">Numeronäppäimistö</string>
     <string name="call_already_active">Sinulla on jo puhelu käynnissä.</string>
     <string name="start_failed">Sovelluksen käynnistäminen epäonnistui. Tämä voi johtua virheellisestä
         Asetukset arvosta.  Tarkista Kuunteluosoite, TLS-varmennintiedosto ja TLS CA-tiedosto.

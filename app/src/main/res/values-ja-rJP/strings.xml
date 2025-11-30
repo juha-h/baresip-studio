@@ -92,8 +92,6 @@
         \n • sip:192.168.43.50:443;transport=wss
     </string>
     <string name="register_help">チェックを入れると、登録が有効になり、12 分間隔で REGISTER 要求が送信されます。</string>
-    <string name="audio_codecs_help">対応しているオーディオコーデックの優先順位一覧</string>
-    <string name="video_codecs_help">対応しているビデオコーデックの優先順位一覧</string>
     <string name="media_nat_help">必要であればメディアのNAT探索プロトコルを選択してください。
         選択肢としては、STUN（Session Traversal Utilities for NAT、RFC 5389）
         とICE（Interactive Connectivity Establishment、RFC 5245）があります。
@@ -167,8 +165,6 @@
     <string name="transfer">転送</string>
     <string name="video_request">テレビ電話リクエスト</string>
     <string name="video_call">テレビ電話</string>
-    <string name="hangup">切断</string>
-    <string name="transferring_call_to_dots">転送中</string>
     <string name="incoming_call_from_dots">着信中</string>
     <string name="outgoing_call_to_dots">発信中</string>
     <string name="quit">終了</string>
@@ -179,11 +175,9 @@
     <string name="confirmation">確認</string>
     <string name="error">エラー</string>
     <string name="status">状態</string>
-    <string name="send">送信</string>
     <string name="edit">編集</string>
     <string name="delete">削除</string>
     <string name="add">追加</string>
-    <string name="password">パスワード</string>
     <string name="deny">拒否</string>
     <string name="accept">承認</string>
     <string name="no">いいえ</string>
@@ -196,12 +190,10 @@
     <string name="invalid_contact">無効な連絡先名 %1$s です</string>
     <string name="contact_name">名前</string>
     <string name="new_contact">新規連絡先</string>
-    <string name="contact">連絡先</string>
     <string name="debug">デバック</string>
     <string name="dns_servers">DNSサーバー</string>
     <string name="start_automatically">自動的に開始</string>
     <string name="configuration">設定</string>
-    <string name="delete_chats">削除</string>
     <string name="you">あなた</string>
     <string name="today">今日</string>
     <string name="sending_failed">メッセージの送信に失敗</string>
@@ -210,16 +202,11 @@
     <string name="delete_history_alert">アカウント %1$s の通話履歴を削除しますか?</string>
     <string name="enable_history">有効化</string>
     <string name="disable_history">無効化</string>
-    <string name="delete_history">削除</string>
-    <string name="calls_call_message_question"> %1$s に電話をかけるか、メッセージを送信しますか?</string>
     <string name="calls_call">通話</string>
     <string name="calls_calls">通話</string>
     <string name="call">着信中</string>
     <string name="call_history">通話履歴</string>
-    <string name="message_from">メッセージ着信</string>
     <string name="transfer_request_to">転送リクエスト</string>
-    <string name="reject">拒否</string>
-    <string name="answer">応答</string>
     <string name="delete_account">アカウント %1$s を削除しますか?</string>
     <string name="decrypt_password">復号化パスワード</string>
     <string name="encrypt_password">暗号化パスワード</string>
@@ -230,7 +217,6 @@
     <string name="invalid_stun_username">無効な表示名 %1$s です</string>
     <string name="stun_username">STUN/TURNユーザー名</string>
     <string name="voicemail_messages">Voicemailメッセージ</string>
-    <string name="voicemail">Voicemail</string>
     <string name="voicemail_uri">VoicemailのURI</string>
     <string name="authentication_username">認証ユーザー名</string>
     <string name="display_name_help">必要であればFrom URIで使用される名前を入力</string>
@@ -261,13 +247,11 @@
     <string name="default_account">既定のアカウント</string>
     <string name="account_exists">アカウント %1$s は既に存在します</string>
     <string name="account_allocation_failure">新しいアカウントの割り当てに失敗しました。</string>
-    <string name="chat">チャットメッセージ</string>
     <string name="chat_with"> %1$s とチャット</string>
     <string name="short_message_question">メッセージを削除しますか?</string>
     <string name="message_failed">失敗</string>
     <string name="chats">チャット履歴</string>
     <string name="new_chat_peer">新しいチャット相手</string>
-    <string name="invalid_chat_peer_uri">SIP URIが無効です</string>
     <string name="short_chat_question"> %1$s とのチャットを削除しますか?</string>
     <string name="delete_chats_alert">アカウント %1$s とのチャット履歴を削除しますか?</string>
     <string name="listen_address">受信対象アドレス</string>
@@ -291,8 +275,6 @@
     <string name="read_ca_certs_error">ダウンロード・ディレクトリから \'ca_certs.crt\' の読み込みに失敗しました。</string>
     <string name="alert">警告</string>
     <string name="notice">通知</string>
-    <string name="callee">呼び出し先</string>
-    <string name="hold">保留</string>
     <string name="call_transfer">通話転送</string>
     <string name="transfer_destination">転送先</string>
     <string name="transfer_failed">転送失敗</string>
@@ -309,8 +291,6 @@
     <string name="old_messages">古いメッセージ</string>
     <string name="and">と</string>
     <string name="no_messages">メッセージはありません</string>
-    <string name="messages">メッセージ</string>
-    <string name="dialpad">ダイヤルパット</string>
     <string name="call_already_active">すでに通話中です</string>
     <string name="verify">確認要求</string>
     <string name="transfer_request">転送要求</string>
@@ -326,14 +306,12 @@
     <string name="stun_password_help">STUN/TURN サーバーで必要な場合のパスワード</string>
     <string name="answer_mode_help">着信した電話にどのように応答するかを選択します。</string>
     <string name="start_automatically_help">チェックを入れると、デバイスの再起動後に自動的にbaresipが起動します</string>
-    <string name="aec">音響エコーキャンセル</string>
     <string name="default_call_volume_help">設定されている場合、デフォルトの通話音声の音量は1～10段階です</string>
     <string name="dark_theme_help">ダークテーマを強制する</string>
     <string name="debug_help">チェックを入れると、デバッグおよび情報レベルのログメッセージをLogcatに提供します。</string>
     <string name="reset_config_help">チェックを入れると、設定は工場出荷時のデフォルト値にリセットされます。</string>
     <string name="contact_action_question"> %1$s に電話をかけるか、メッセージを送信しますか？</string>
     <string name="contact_delete_question">連絡先 %1$s を削除しますか?</string>
-    <string name="contacts_exceeded">連絡先の最大数 %1$d を超えました</string>
     <string name="allow_video"> %1$s でテレビ通話の送受信を許可しますか?</string>
     <string name="allow_video_send"> %1$s へのテレビ通話を許可しますか?</string>
     <string name="allow_video_recv"> %1$s からのテレビ通話を許可しますか?</string>

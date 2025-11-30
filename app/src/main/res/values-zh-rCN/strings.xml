@@ -75,15 +75,12 @@
     <string name="encrypt_password">加密密码</string>
     <string name="decrypt_password">解密密码</string>
     <string name="delete_account">是否要删除账号“%1$s”？</string>
-    <string name="answer">接听</string>
-    <string name="reject">拒绝</string>
     <string name="reply">回复</string>
     <string name="save">保存</string>
     <string name="missed_call_from">未接来电来自</string>
     <string name="missed_calls">未接来电</string>
     <string name="missed_calls_count">%1$d 个未接来电</string>
     <string name="transfer_request_to">通话转接请求至</string>
-    <string name="message_from">消息来自</string>
     <string name="call_auto_rejected">自动拒接来自 %1$s 的通话</string>
     <string name="call_history">通话记录</string>
     <string name="call_details">通话详情</string>
@@ -95,10 +92,8 @@
     <string name="time">时间</string>
     <string name="calls_duration">时长</string>
     <string name="playing_recording">正在播放录音…</string>
-    <string name="calls_call_message_question">您要呼叫还是发送消息至“%1$s”？</string>
     <string name="calls_add_delete_question">您要将“%1$s”添加到联系人中，还是从通话记录中删除 %2$s？</string>
     <string name="calls_delete_question">是否要从通话记录中删除“%1$s”%2$s？</string>
-    <string name="delete_history">删除</string>
     <string name="disable_history">禁用</string>
     <string name="enable_history">启用</string>
     <string name="delete_history_alert">是否要删除账号“%1$s”的通话记录？</string>
@@ -106,7 +101,6 @@
     <string name="call_answered_elsewhere">通话已在别处接听</string>
     <string name="call_missed">通话未接</string>
     <string name="call_rejected">通话已拒接</string>
-    <string name="chat">聊天消息</string>
     <string name="chat_with">与 %1$s 聊天</string>
     <string name="new_message">新消息</string>
     <string name="long_message_question">您要删除消息还是将对方“%1$s”添加到联系人中？</string>
@@ -118,16 +112,11 @@
     <string name="today">今天</string>
     <string name="you">您</string>
     <string name="new_chat_peer">新的聊天伙伴</string>
-    <string name="invalid_chat_peer_uri">聊天伙伴 URI 无效</string>
     <string name="long_chat_question">您要删除与对方“%1$s”的聊天，还是将对方添加到联系人中？</string>
     <string name="short_chat_question">是否要删除与“%1$s”的聊天？</string>
-    <string name="delete_chats">删除</string>
     <string name="delete_chats_alert">是否要删除账号“%1$s”的聊天记录？</string>
     <string name="audio_codecs">音频编解码器</string>
-    <string name="audio_codecs_help">按优先级顺序排列的音频编解码器列表。拖动可重新排序，长按可启用或禁用。</string>
     <string name="video_codecs">视频编解码器</string>
-    <string name="video_codecs_help">按优先级顺序排列的视频编解码器列表。拖动可重新排序，长按可启用或禁用。</string>
-    <string name="codec_action">重新排序</string>
     <string name="configuration">设置</string>
     <string name="start_automatically">自动启动</string>
     <string name="start_automatically_help">如果选中，baresip 将在设备（重新）启动后自动启动。</string>
@@ -159,7 +148,6 @@
     <string name="audio_modules_title">音频模块</string>
     <string name="audio_modules_help">已选中的模块提供的音频编解码器可供账号使用。</string>
     <string name="failed_to_load_module">无法加载模块。</string>
-    <string name="aec">声学回声消除</string>
     <string name="microphone_gain">麦克风增益</string>
     <string name="microphone_gain_help">将麦克风音量乘以此十进制数。最小值为 1.0（出厂默认），禁用麦克风增益。较大的值可能会对音频质量产生负面影响。</string>
     <string name="invalid_microphone_gain">麦克风增益值无效</string>
@@ -207,7 +195,6 @@
     <string name="config_restart">您需要重启 baresip 才能激活新设置。是否立即重启？</string>
     <string name="consent_request">同意请求</string>
     <string name="contacts_consent">如果选择了 Android 联系人，可将其作为 SIP 和 tel URI 的引用用于通话和消息。baresip 应用不会存储 Android 联系人，也不会与任何人共享。为了使 Android 联系人在 baresip 中可用，Google 要求您接受此处和应用<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">隐私政策</a>中所述的使用。</string>
-    <string name="contact">联系人</string>
     <string name="new_contact">新联系人</string>
     <string name="contact_name">名称</string>
     <string name="sip_or_tel_uri">SIP 或 tel URI</string>
@@ -222,7 +209,6 @@
     <string name="contact_action_question">您要呼叫还是发送消息至“%1$s”？</string>
     <string name="send_message">发送消息</string>
     <string name="contact_delete_question">是否要删除联系人“%1$s”？</string>
-    <string name="contacts_exceeded">您的联系人数量已超过上限 %1$d。</string>
     <string name="alert">提醒</string>
     <string name="info">信息</string>
     <string name="notice">通知</string>
@@ -232,11 +218,9 @@
     <string name="no">否</string>
     <string name="accept">接受</string>
     <string name="deny">拒绝</string>
-    <string name="password">密码</string>
     <string name="add">添加</string>
     <string name="delete">删除</string>
     <string name="edit">编辑</string>
-    <string name="send">发送</string>
     <string name="status">状态</string>
     <string name="error">错误</string>
     <string name="confirmation">确认</string>
@@ -250,19 +234,14 @@
     <string name="quit">退出</string>
     <string name="outgoing_call_to_dots">呼叫…</string>
     <string name="incoming_call_from_dots">通话来自…</string>
-    <string name="transferring_call_to_dots">正在转接通话至…</string>
     <string name="diverted_by_dots">已转接…</string>
     <string name="no_telephony_provider">账号“%1$s”没有电话服务提供者</string>
-    <string name="callee">被叫方</string>
-    <string name="hangup">挂断</string>
     <string name="video_call">视频通话</string>
     <string name="video_request">视频请求</string>
     <string name="allow_video_send">是否接受向“%1$s”发送视频？</string>
     <string name="allow_video">是否接受“%1$s”发送和接收视频？</string>
     <string name="allow_video_recv">是否接受从“%1$s”接收视频？</string>
-    <string name="hold">通话保持/取消保持</string>
     <string name="call_is_on_hold">通话处于保持状态</string>
-    <string name="mic">麦克风开/关</string>
     <string name="rec_in_call">仅在未连接通话时才可以打开或关闭录音</string>
     <string name="call_transfer">通话转接</string>
     <string name="blind">盲转</string>
@@ -281,7 +260,6 @@
     <string name="packets">数据包</string>
     <string name="lost">丢包数</string>
     <string name="jitter">抖动：%1$s（毫秒）</string>
-    <string name="voicemail">语音信箱</string>
     <string name="voicemail_messages">语音信箱消息</string>
     <string name="you_have">您有</string>
     <string name="one_new_message">一条新消息</string>
@@ -291,8 +269,6 @@
     <string name="and">以及</string>
     <string name="no_messages">您没有消息</string>
     <string name="listen">听</string>
-    <string name="messages">消息</string>
-    <string name="dialpad">拨号键盘</string>
     <string name="call_already_active">您已有正在进行的通话。</string>
     <string name="start_failed">baresip 无法启动。这可能是由于设置值无效。请检查监听地址、TLS 证书文件和 TLS CA 文件。然后重启 baresip。</string>
     <string name="registering_failed">注册 %1$s 失败。</string>

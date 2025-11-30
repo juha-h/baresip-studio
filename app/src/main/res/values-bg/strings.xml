@@ -43,7 +43,6 @@
     <string name="register_help">Ако е отметнато, регистрацията е активирана и заявките за РЕГИСТРИРАНЕ се изпращат на 
 		12 минути интервали. </string>
     <string name="audio_codecs">Аудио кодеци</string>
-    <string name="audio_codecs_help">Списък на поддържаните аудио кодеци в приоритетен ред.</string>
     <string name="media_nat">NAT Traversal Average</string>
     <string name="media_nat_help">Избира протокол за преминаване на носител NAT (ако има такъв). Възможният избор е STUN 
 		(Помощни програми за сесионно преминаване за NAT, RFC 5389) и ICE (Интерактивна свързаност 
@@ -83,26 +82,20 @@
     <string name="decrypt_password">Дешифриране на парола</string>
     <string name="delete_account">Искате ли да изтриете акаунта \'%1$s\'?</string>
     <!-- Baresip Service -->
-    <string name="answer">Отговор</string>
-    <string name="reject">Отхвърляне</string>
     <string name="transfer_request">Заявка за прехвърляне на обаждане до</string>
-    <string name="message_from">Съобщение от</string>
     <!-- Calls Activity -->
     <string name="call_history">История на обажданията</string>
     <string name="call">Обади се</string>
     <string name="calls_calls">повиквания</string>
     <string name="calls_call">обади се</string>
-    <string name="calls_call_message_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
-    <string name="calls_add_delete_question">Искате ли да добавите \'%1$s\' към контакти или изтриване 
+    <string name="calls_add_delete_question">Искате ли да добавите \'%1$s\' към контакти или изтриване
 		%2$s от историята на обажданията? 
 	</string>
     <string name="calls_delete_question">Искате ли да изтриете \'%1$s\' %2$s от историята на обажданията? </string>
-    <string name="delete_history">Изтрий</string>
     <string name="disable_history">Забрани история на обаждания</string>
     <string name="enable_history">Разреши история на обаждания</string>
     <string name="delete_history_alert">Искате ли да изтриете историята на обажданията на акаунта \'%1$s\'?</string>
     <!-- Chat Activity -->
-    <string name="chat">Съобщения в чата</string>
     <string name="chat_with">Чатя с %1$s</string>
     <string name="new_message">Ново съобщение</string>
     <string name="long_message_question">Искате ли да изтриете съобщението или да добавите потребителя \'%1$s\' в контакти?</string>
@@ -115,11 +108,9 @@
     <string name="today">днес</string>
     <string name="you">Вие</string>
     <string name="new_chat_peer">Нов потребител за чат</string>
-    <string name="invalid_chat_peer_uri">Невалиден SIP URI</string>
-    <string name="long_chat_question">Искате ли да изтриете чата с този потребител \'%1$s\' или 
+    <string name="long_chat_question">Искате ли да изтриете чата с този потребител \'%1$s\' или
 		да го добавяне в контактите?</string>
     <string name="short_chat_question">Искате ли да изтриете чата с \'%1$s\'?</string>
-    <string name="delete_chats">Изтрий</string>
     <string name="delete_chats_alert">Искате ли да изтриете историята на чата на акаунта \'%1$s\'?</string>
     <!-- Config Activity -->
     <string name="configuration">Конфигуриране</string>
@@ -145,7 +136,6 @@
     <string name="tls_certificate_file_help">Ако е поставена отметка, файл \'cert.pem\' съдържащ TLS сертификатът и личният ключ на този екземпляр baresip е бил или ще бъде зареден от директорията за Изтегляне. От съображения за сигурност изтрийте файла след зареждането му.</string>
     <string name="tls_ca_file">TLS CA File</string>
     <string name="tls_ca_file_help">Ако е поставено отметка, файл \'ca_certs.crt\' съдържащи TLS сертификати на Сертифициращите органи е бил или ще бъде зареден от директорията за Изтегляне.</string>
-    <string name="aec">Акустично отменяне на ехото</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Средна максимална битова скорост, използвана от аудио поток на Opus. 
 		Валидните стойности са 6000-510000. Фабрично по подразбиране е 28000.
@@ -168,7 +158,6 @@
     <string name="read_ca_certs_error">Файлът не беше прочетен \'ca_certs.crt\' от директорията за изтегляне.</string>
     <string name="config_restart">Трябва да рестартирате baresip, за да активирате новата конфигурация. Рестартирай сега?</string>
     <!-- Contact Activity -->
-    <string name="contact">контакт</string>
     <string name="new_contact">Нов контакт</string>
     <string name="contact_name">име</string>
     <string name="invalid_contact">Невалидно име за контакт \'%1$s\'</string>
@@ -178,7 +167,6 @@
     <string name="contact_action_question">Искате ли да се обадите или да изпратите съобщение до \'%1$s\'?</string>
     <string name="send_message">Изпрати съобщение</string>
     <string name="contact_delete_question">Искате ли да изтриете този контакт \'%1$s\'?</string>
-    <string name="contacts_exceeded">Вашият максимален брой контакти %1$d е надвишен.</string>
     <!-- Generic -->
     <string name="alert">Внимание</string>
     <string name="info">Информация</string>
@@ -189,11 +177,9 @@
     <string name="no">не</string>
     <string name="accept">приемам</string>
     <string name="deny">отказвам</string>
-    <string name="password">Парола</string>
     <string name="add">Добави</string>
     <string name="delete">Изтрий</string>
     <string name="edit">Редактиране</string>
-    <string name="send">Изпращам</string>
     <string name="status">Статус</string>
     <string name="error">Грешка</string>
     <!-- Main Activity -->
@@ -204,16 +190,11 @@
     <string name="quit">Отписване</string>
     <string name="outgoing_call_to_dots">Изходящо повикване до…</string>
     <string name="incoming_call_from_dots">Входящо обаждане от…</string>
-    <string name="transferring_call_to_dots">Прехвърляне на обаждане до…</string>
-    <string name="callee">Набиране</string>
-    <string name="hangup">Затвори</string>
-    <string name="hold">Задържане</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Информация за обаждане</string>
     <string name="duration">Продължителност %1$d (s)</string>
     <string name="codecs">Кодеци</string>
     <string name="rate">Скорост: %1$s</string>
-    <string name="voicemail">Гласова поща</string>
     <string name="voicemail_messages">Съобщения за гласова поща</string>
     <string name="you_have">Ти имаш</string>
     <string name="one_new_message">едно ново съобщение</string>
@@ -223,8 +204,6 @@
     <string name="and">и</string>
     <string name="no_messages">Нямате съобщения</string>
     <string name="listen">Слушам</string>
-    <string name="messages">Съобщения</string>
-    <string name="dialpad">Бутони за набиране</string>
     <string name="call_already_active">Вече имате активно обаждане.</string>
     <string name="start_failed">Baresip не успя да стартира. Това може да се дължи на невалиден адрес за слушане или TLS файл. 
 		Те са нулирани. Рестартирайте baresip. 

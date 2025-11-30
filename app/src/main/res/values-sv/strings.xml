@@ -7,14 +7,11 @@
     <string name="contacts">Kontakter</string>
     <string name="contact_name">Namn</string>
     <string name="new_contact">Ny kontakt</string>
-    <string name="contact">Kontakt</string>
     <string name="dark_theme">Mörkt tema</string>
     <string name="invalid_dns_servers">Ogiltiga DNS-servrar</string>
     <string name="dns_servers">DNS-servrar</string>
     <string name="start_automatically">Starta automatiskt</string>
     <string name="configuration">Inställningar</string>
-    <string name="delete_chats">Ta bort</string>
-    <string name="invalid_chat_peer_uri">Ogiltig chat-motpart-URI</string>
     <string name="you">Du</string>
     <string name="today">Idag</string>
     <string name="add_contact">Lägg till kontakt</string>
@@ -23,18 +20,13 @@
     <string name="delete_history_alert">Vill du ta bort samtalshistoriken för kontot \'%1$s\'\?</string>
     <string name="enable_history">Aktivera</string>
     <string name="disable_history">Inaktivera</string>
-    <string name="delete_history">Ta bort</string>
     <string name="calls_delete_question">Vill du ta bort \'%1$s\' %2$s från samtalshistoriken\?</string>
     <string name="calls_add_delete_question">Vill du lägga till \'%1$s\' to dina kontakter eller ta bort %2$s från samtalshistoriken\?</string>
-    <string name="calls_call_message_question">Vill du ringa eller skicka meddelande till \'%1$s\'\?</string>
     <string name="calls_call">samtal</string>
     <string name="calls_calls">samtal</string>
     <string name="call">Ring</string>
     <string name="call_history">Samtalshistorik</string>
-    <string name="message_from">Meddelande från</string>
     <string name="missed_call_from">Missat samtal från</string>
-    <string name="reject">Avvisa</string>
-    <string name="answer">Svara</string>
     <string name="delete_account">Vill du ta bort kontot \'%1$s\'\?</string>
     <string name="account_exists">Kontot \'%1$s\' finns redan.</string>
     <string name="invalid_aor">Ogiltig användare@domän[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
@@ -57,11 +49,9 @@
     <string name="media_nat_help">Väljer protokoll för NAT-passering av media. Möjliga val är STUN (Session Traversal Utilities for NAT, RFC 5389) och ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="no">Nej</string>
     <string name="yes">Ja</string>
-    <string name="password">Lösenord</string>
     <string name="add">Lägg till</string>
     <string name="delete">Ta bort</string>
     <string name="edit">Ändra</string>
-    <string name="send">Skicka</string>
     <string name="status">Status</string>
     <string name="error">Fel</string>
     <string name="backup">Säkerhetskopiera</string>
@@ -71,16 +61,12 @@
     <string name="quit">Avsluta</string>
     <string name="outgoing_call_to_dots">Ring till …</string>
     <string name="incoming_call_from_dots">Samtal från …</string>
-    <string name="transferring_call_to_dots">Kopplar samtal till …</string>
-    <string name="hangup">Lägg på</string>
-    <string name="mic">Mikrofon på/av</string>
     <string name="call_transfer">Koppla samtal</string>
     <string name="transfer_destination">Koppla till</string>
     <string name="transfer_failed">Koppling misslyckades</string>
     <string name="transfer">Koppling</string>
     <string name="dtmf">DTMF</string>
     <string name="codecs">Kodekar</string>
-    <string name="voicemail">Röstbrevlåda</string>
     <string name="voicemail_messages">Röstmeddelanden</string>
     <string name="one_new_message">ett nytt meddelande</string>
     <string name="you_have">Du har</string>
@@ -90,7 +76,6 @@
     <string name="and">och</string>
     <string name="listen">Lyssna</string>
     <string name="no_messages">Du har inga meddelanden</string>
-    <string name="messages">Meddelanden</string>
     <string name="registering_failed">Registrering av %1$s misslyckades.</string>
     <string name="call_failed">Samtal misslyckades</string>
     <string name="call_closed">Samtal avslutat</string>
@@ -100,9 +85,7 @@
     <string name="peer_not_verified">Detta samtal är SÄKERT, men motparten är INTE verifierad!</string>
     <string name="stun_username">STUN/TURN-användarnamn</string>
     <string name="stun_server">STUN/TURN-server</string>
-    <string name="video_codecs_help">Lista över videokodekar i prioritetsordning. Dra för att ordna om, tryck länge för att aktivera eller inaktivera.</string>
     <string name="video_codecs">Videokodekar</string>
-    <string name="audio_codecs_help">Lista över ljudkodekar i prioritetsordning. Dra för att ändra ordningen, tryck länge för att aktivera eller inaktivera.</string>
     <string name="audio_codecs">Ljudkodekar</string>
     <string name="register_help">Kryssa i för att aktivera registrering och att REGISTER-förfrågningar skickas periodiskt enligt angett registreringsintervall.</string>
     <string name="register">Registrera</string>
@@ -177,12 +160,10 @@ där även problem kan rapporteras.</p>
     <string name="audio_modules_title">Ljudmoduler</string>
     <string name="start_failed">Baresip kunde inte starta. Det kan bero på ett ogiltigt värde för en inställning. Kontrollera Adress att lyssna på, TLS certifikat-fil och TLS CA-fil. Starta sedan om baresip.</string>
     <string name="call_already_active">Du har redan ett pågående samtal.</string>
-    <string name="dialpad">Knappsats</string>
     <string name="rate">Nuvarande hastighet: %1$s (kbits/s)</string>
     <string name="call_info_not_available">Ingen information tillgänglig</string>
     <string name="call_info">Samtalsinformation</string>
     <string name="duration">Längd: %1$d (sekunder)</string>
-    <string name="hold">Parkera/återuppta samtal</string>
     <string name="allow_video_recv">Acceptera att ta emot video från \'%1$s\'\?</string>
     <string name="allow_video_send">Acceptera att skicka video till \'%1$s\'\?</string>
     <string name="allow_video">Acceptera att skicka och ta emot video med \'%1$s\'\?</string>
@@ -203,13 +184,11 @@ där även problem kan rapporteras.</p>
     <string name="invalid_opus_bitrate">Ogiltig Opus-bitrate</string>
     <string name="opus_packet_loss">Förväntat Opus-pakettapp</string>
     <string name="opus_bit_rate">Opus-bitrate</string>
-    <string name="aec">Akustisk ekoutsläckning</string>
     <string name="failed_to_load_module">Kunde inte ladda modul.</string>
     <string name="audio_modules_help">Ljudkodekar som tillhandahålls av de förkryssade modulerna är tillgängliga för konton.</string>
     <string name="tls_ca_file">TLS CA-fil</string>
     <string name="verify_server">Verifiera servercertifikat</string>
     <string name="chat_with">Chatta med %1$s</string>
-    <string name="chat">Chattmeddelanden</string>
     <string name="transfer_request_to">Begäran att koppla samtalet till</string>
     <string name="account_allocation_failure">Kunde inte skapa ett nytt konto.</string>
     <string name="default_account_help">Kryssa i för att välja detta konto när baresip startar.</string>
@@ -321,7 +300,6 @@ där även problem kan rapporteras.</p>
     <string name="notice">Notis</string>
     <string name="info">Info</string>
     <string name="alert">Varning</string>
-    <string name="contacts_exceeded">Maximalt antal kontakter %1$d har överskridits.</string>
     <string name="sip_trace">SIP-trafik</string>
     <string name="debug">Felsökning</string>
     <string name="video_size_help">Storlek på bildrutorna i skickad video (bredd x höjd)</string>
@@ -333,7 +311,6 @@ där även problem kan rapporteras.</p>
     <string name="restored">Programdata återställd. baresip behöver startas om. Starta om nu\?</string>
     <string name="backup_failed">Kunde inte säkerhetskopiera programdata till filen \'%1$s\'. Kontrollera Appar → baresip → Behörigheter → Lagring.</string>
     <string name="backed_up">Applikationsdata (exklusive inspelningar) säkerhetskopierade till filen ’%1$s’. I Android version 9 finns filen i mappen Hämtningar.</string>
-    <string name="callee">Motpart</string>
     <string name="no_network">Inget nätverk tillgängligt!</string>
     <string name="missed_calls">Missade samtal</string>
     <string name="missed_calls_count">%1$d missade samtal</string>
@@ -373,7 +350,6 @@ där även problem kan rapporteras.</p>
     <string name="blind">Blind</string>
     <string name="contacts_consent">Om Androids kontakter används då kan de användas som SIP- eller tel-URI-referenser för samtal och för att skicka meddelanden. baresip sparar inte Androids kontakter och delar dem inte heller med någon. För att Androids kontakter ska bli tillgängliga i baresip kräver Google att du accepterar användningen som beskrivs här och i appens <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">integritetspolicy</a>. </string>
     <string name="rtcp_mux_help">Kryssa i för att låta RTP- och RTCP-paket använda samma port (RFC 5761).</string>
-    <string name="codec_action">Ändra ordning</string>
     <string name="rtcp_mux">RTCP-multiplex</string>
     <string name="no_notifications">Det går inte att använda den här appen utan behörigheten \"Aviseringar\".</string>
     <string name="account_nickname_help">Namn (valfritt) som används för att identifiera det här kontot i baresip-appen.</string>

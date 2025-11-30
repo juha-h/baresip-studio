@@ -3,8 +3,6 @@
     <string name="transfer">Transférer</string>
     <string name="video_request">Demande de vidéo</string>
     <string name="video_call">Appel vidéo</string>
-    <string name="hangup">Raccrocher</string>
-    <string name="transferring_call_to_dots">Transfert d’appel à…</string>
     <string name="incoming_call_from_dots">Appel entrant de…</string>
     <string name="outgoing_call_to_dots">Appel sortant à…</string>
     <string name="quit">Quitter</string>
@@ -15,11 +13,9 @@
     <string name="confirmation">Confirmation</string>
     <string name="error">Erreur</string>
     <string name="status">Statut</string>
-    <string name="send">Envoyer</string>
     <string name="edit">Modifier</string>
     <string name="delete">Supprimer</string>
     <string name="add">Ajouter</string>
-    <string name="password">Mot de passe</string>
     <string name="deny">Refuser</string>
     <string name="accept">Accepter</string>
     <string name="no">Non</string>
@@ -33,12 +29,10 @@
     <string name="invalid_contact">Nom de contact invalide « %1$s »</string>
     <string name="contact_name">Nom</string>
     <string name="new_contact">Nouveau contact</string>
-    <string name="contact">Contact</string>
     <string name="debug">Débogage</string>
     <string name="dns_servers">Serveurs DNS</string>
     <string name="start_automatically">Démarrer automatiquement</string>
     <string name="configuration">Paramètres</string>
-    <string name="delete_chats">Supprimer</string>
     <string name="you">Vous</string>
     <string name="today">Aujourd’hui</string>
     <string name="sending_failed">Échec de l’envoi du message</string>
@@ -47,16 +41,11 @@
     <string name="delete_history_alert">Voulez-vous supprimer l’historique des appels du compte « %1$s » \?</string>
     <string name="enable_history">Activer</string>
     <string name="disable_history">Désactiver</string>
-    <string name="delete_history">Supprimer</string>
-    <string name="calls_call_message_question">Voulez-vous appeler ou envoyer un message à « %1$s » \?</string>
     <string name="calls_call">appel</string>
     <string name="calls_calls">appels</string>
     <string name="call">Appel</string>
     <string name="call_history">Historique des appels</string>
-    <string name="message_from">Message de</string>
     <string name="transfer_request_to">Demande de transfert d’appel vers</string>
-    <string name="reject">Refuser</string>
-    <string name="answer">Répondre</string>
     <string name="delete_account">Voulez-vous supprimer le compte « %1$s » \?</string>
     <string name="decrypt_password">Déchiffrer le mot de passe</string>
     <string name="encrypt_password">Chiffrer le mot de passe</string>
@@ -67,7 +56,6 @@
     <string name="invalid_stun_username">Nom d’utilisateur « %1$s » invalide</string>
     <string name="stun_username">Nom d’utilisateur STUN / TURN</string>
     <string name="voicemail_messages">Messages vocaux</string>
-    <string name="voicemail">Messagerie vocale</string>
     <string name="voicemail_uri">URI de la messagerie vocale</string>
     <string name="authentication_username">Nom d’utilisateur d’authentification</string>
     <string name="invalid_display_name">Nom d’affichage invalide « %1$s »</string>
@@ -81,8 +69,6 @@
     <string name="authentication_password">Mot de passe d\'authentification</string>
     <string name="invalid_authentication_username">Nom d\'utilisateur d\'authentification invalide « %1$s »</string>
     <string name="call_already_active">Vous avez déjà un appel actif.</string>
-    <string name="dialpad">Clavier</string>
-    <string name="messages">Messages</string>
     <string name="listen">Écouter</string>
     <string name="no_messages">Vous n\'avez aucun message</string>
     <string name="and">et</string>
@@ -104,7 +90,6 @@
     <string name="manual">Manuel</string>
     <string name="answer_mode">Mode de réponse</string>
     <string name="default_account">Compte par défaut</string>
-    <string name="callee">Appelant</string>
     <string name="dtmf">DTMF</string>
     <string name="alert">Alerte</string>
     <string name="notice">Notice</string>
@@ -112,7 +97,6 @@
     <string name="codecs">Codecs</string>
     <string name="chats">Historique des conversations</string>
     <string name="unverify">Annuler la vérification</string>
-    <string name="chat">Messages des conversations</string>
     <string name="listen_address">Adresse d\'écoute</string>
     <string name="reset">Restaurer</string>
     <string name="audio_modules_title">Modules audio</string>
@@ -163,9 +147,6 @@
     <string name="call_missed">Appel manqué</string>
     <string name="call_rejected">Appel rejeté</string>
     <string name="short_message_question">Voulez-vous supprimer le message ?</string>
-    <string name="audio_codecs_help">Liste des codecs audio dans l’ordre de priorité. Faites glisser pour réorganiser, cliquez longuement pour activer ou désactiver.</string>
-    <string name="video_codecs_help">Liste des codecs vidéo dans l’ordre de priorité. Faites glisser pour réorganiser, cliquez longuement pour activer ou désactiver.</string>
-    <string name="codec_action">Réordonner</string>
     <string name="start_automatically_help">Si coché, Baresip démarre automatiquement après le (re)démarrage de l’appareil.</string>
     <string name="battery_optimizations">Optimisations batterie</string>
     <string name="battery_optimizations_help">Désactivez les optimisations de la batterie (recommandé) si vous souhaitez réduire la probabilité qu’Android limite l’accès de Baresip au réseau ou entre en mode veille.</string>
@@ -188,7 +169,6 @@
     <string name="speaker_phone_help">Si coché, le téléphone haut-parleur est automatiquement allumé lorsque l’appel commence.</string>
     <string name="audio_modules_help">Les codecs audio fournis par les modules vérifiés sont disponibles pour une utilisation par les comptes.</string>
     <string name="failed_to_load_module">Échec du chargement du module.</string>
-    <string name="aec">Annulation d\'écho acoustique</string>
     <string name="microphone_gain">Gain du microphone</string>
     <string name="microphone_gain_help">Multipliez le volume du microphone par ce nombre décimal. La valeur minimale est de 1,0 (défaut d’usine) qui désactive le gain du microphone. Des valeurs plus grandes peuvent affecter négativement la qualité audio.</string>
     <string name="invalid_microphone_gain">Valeur de gain du microphone invalide</string>
@@ -217,7 +197,6 @@
     <string name="avatar_image">Image de profil</string>
     <string name="contact_action_question">Voulez-vous appeler ou envoyer un message à \'%1$s\' ?</string>
     <string name="contact_delete_question">Voulez-vous supprimer le contact \'%1$s\' ?</string>
-    <string name="contacts_exceeded">Votre nombre maximum de contacts %1$d a été dépassé.</string>
     <string name="anonymous">Anonyme</string>
     <string name="unknown">Inconnu(e)</string>
     <string name="no_telephony_provider">Le compte \'%1$s\' n’a pas de fournisseur de téléphonie</string>
@@ -225,7 +204,6 @@
     <string name="allow_video_send">Accepter l’envoi de vidéo à \'%1$s\' ?</string>
     <string name="allow_video_recv">Accepter de recevoir une vidéo de \'%1$s\' ?</string>
     <string name="call_is_on_hold">L\'appel est en attente</string>
-    <string name="hold">Appel mis en attente/libéré</string>
     <string name="rec_in_call">L’enregistrement peut être activé ou désactivé uniquement lorsque l’appel n’est pas connecté</string>
     <string name="call_transfer">Transfert d\'appel</string>
     <string name="transfer_destination">Destination de transfert</string>

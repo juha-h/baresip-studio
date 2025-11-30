@@ -10,9 +10,7 @@
     <string name="invalid_account_nickname">Ungültiger Konto Nickname \'%1$s\'</string>
     <string name="redirect_mode">Rufumleitungsmodus</string>
     <string name="telephony_provider">Telefonieanbieter</string>
-    <string name="reject">Zurückweisen</string>
     <string name="transfer_request_to">Anrufübertragungsanfrage an</string>
-    <string name="message_from">Nachricht von</string>
     <string name="about">Über</string>
     <string name="register_help">Wenn angeklickt wird das Registrieren aktiviert und REGISTER-Anfragen werden in dem durch das Registrierenintervall angegebenen Intervall gesendet.</string>
     <string name="reg_int">Registrierenintervall</string>
@@ -34,7 +32,6 @@
     <string name="delete_account">Möchten Sie Konto \'%1$s\' löschen?</string>
     <string name="missed_calls">Verpasste Anrufe</string>
     <string name="missed_calls_count">%1$d verpasste Anrufe</string>
-    <string name="chat">Chat Nachrichten</string>
     <string name="chat_with">Chat mit %1$s</string>
     <string name="today">Heute</string>
     <string name="short_chat_question">Möchten Sie den Chat mit \'%1$s\' löschen?</string>
@@ -57,9 +54,7 @@
     <string name="default_account">Voreingestelltes Konto</string>
     <string name="peer">Gesprächspartner</string>
     <string name="invalid_dns_servers">Ungültiger DNS Server</string>
-    <string name="mic">Mikrofon an/aus</string>
     <string name="call_details">Anrufdetails</string>
-    <string name="invalid_chat_peer_uri">Ungültige URI des Chatpartners</string>
     <string name="display_name_help">Name (falls gewünscht) für die Von-URI bei ausgehenden Anfragen.</string>
     <string name="authentication_username_help">Benutzername für die Authentifizierung, wenn eine Authentifizierung von SIP-Anfragen erforderlich ist. Standardwert ist der Benutzername des Kontos.</string>
     <string name="invalid_display_name">Ungültiger Anzeigename \'%1$s\'</string>
@@ -76,7 +71,6 @@
     <string name="accounts">Konten</string>
     <string name="new_account">SIP URI des neuen Kontos</string>
     <string name="decrypt_password">Passwort entschlüsseln</string>
-    <string name="calls_call_message_question">Wollen Sie \'%1$s\' anrufen oder eine Nachricht senden?</string>
     <string name="new_message">Neue Nachricht</string>
     <string name="contact_name">Name</string>
     <string name="call_auto_rejected">Auto-abgewiesener Anruf von %1$s</string>
@@ -84,7 +78,6 @@
     <string name="call_history">Anrufliste</string>
     <string name="invalid_listen_address">Ungültige Listening-Adresse</string>
     <string name="tls_certificate_file">TLS Zertifikat-Datei</string>
-    <string name="contacts_exceeded">Die maximale Anzahl %1$d von Kontakten ist überschritten.</string>
     <string name="contact_action_question">Wollen Sie \'%1$s\' anrufen oder eine Nachricht senden?</string>
     <string name="unknown">Unbekannt</string>
     <string name="no_telephony_provider">Konto \'%1$s\' hat keinen Telefonanbieter</string>
@@ -99,9 +92,6 @@
     <string name="delete_history_alert">Möchten Sie den Anrufverlauf des Kontos \'%1$s löschen?</string>
     <string name="long_message_question">Möchten Sie die Nachricht löschen oder Gesprächspartner \'%1$s\' zu Kontakten hinzufügen?</string>
     <string name="message_failed">Fehlgeschlagen</string>
-    <string name="delete_chats">Löschen</string>
-    <string name="video_codecs_help">Liste der Video-Codecs nach Priorität. Ziehen, um umzuordnen, lange gedrückt halten, um zu aktivieren / deaktivieren.</string>
-    <string name="codec_action">Neuordnen</string>
     <string name="configuration">Einstellungen</string>
     <string name="start_automatically_help">Wenn angeklickt wird Baresip automatisch ausgeführt nach dem Gerät (Neu)Start.</string>
     <string name="battery_optimizations">Batterieoptimierungen</string>
@@ -126,11 +116,7 @@
     <string name="outgoing_call_to_dots">Anruf zu …</string>
     <string name="incoming_call_from_dots">Anruf von …</string>
     <string name="diverted_by_dots">Umgeleitet von …</string>
-    <string name="transferring_call_to_dots">Anruf weiterleiten an …</string>
-    <string name="callee">Adresse/Telefonnummer</string>
-    <string name="hangup">Auflegen</string>
     <string name="video_call">Videoanruf</string>
-    <string name="hold">Ruf Halten</string>
     <string name="call_is_on_hold">Ruf gehalten</string>
     <string name="rec_in_call">Aufnahme kann nur ein- oder ausgeschalten werden wenn der Ruf nicht verbunden ist</string>
     <string name="one_new_message">eine neue Nachricht</string>
@@ -138,8 +124,6 @@
     <string name="no_messages">Sie haben keine Nachrichten</string>
     <string name="and">und</string>
     <string name="listen">Hören</string>
-    <string name="messages">Nachrichten</string>
-    <string name="dialpad">Wähltastatur</string>
     <string name="call_already_active">Sie haben schon einen aktiven Anruf.</string>
     <string name="registering_failed">’%1$s‘ konnte nicht registriert werden.</string>
     <string name="call_failed">Anruf fehlgeschlagen</string>
@@ -151,7 +135,6 @@
     <string name="invalid_contact">Ungültiger Kontaktname \'%1$s\'</string>
     <string name="favorite">Favorit</string>
     <string name="android_contact_help">Wenn angeklickt, wird der Kontakt zum Android Adressbuch hinzugefügt.</string>
-    <string name="delete_history">Löschen</string>
     <string name="calls_duration">Dauer</string>
     <string name="invalid_country_code">Ungültiger Ländercode \'%1$s</string>
     <string name="short_message_question">Möchten Sie die Nachricht löschen?</string>
@@ -168,9 +151,7 @@
     <string name="send_message">Nachricht senden</string>
     <string name="contacts">Kontakte</string>
     <string name="accept">Akzeptieren</string>
-    <string name="password">Passwort</string>
     <string name="delete">Löschen</string>
-    <string name="send">Senden</string>
     <string name="error">Fehler</string>
     <string name="add">Hinzufügen</string>
     <string name="edit">Bearbeiten</string>
@@ -188,7 +169,6 @@
     <string name="dns_servers">DNS Server</string>
     <string name="verify_server">Serverzertifikate überprüfen</string>
     <string name="verify_server_help">Bei Anklicken werden von Baresip TLS-Zertifikate von SIP User Agent und SIP Proxy Servern bei Verwendung von TLS-Transport überprüft.</string>
-    <string name="voicemail">Sprachnachrichten</string>
     <string name="backup_failed">Sicherung nach \'%1$s\' fehlgeschlagen. Überprüfen Sie Apps → baresip → Berechtigungen → Speicher.</string>
     <string name="restored">Anwendungsdaten wurden wiederhergestellt und baresip muß neugestartet werden. Neustarten?</string>
     <string name="restore_failed">Wiederherstellung der Anwendungsdaten fehlgeschlagen. Überprüfen Sie das eingegebene Passwort und dass die Wiederherstellungsdatei von dieser Anwendung stammt. In Android Version 9: Überprüfen Sie Apps → baresip → Berechtigungen → Speicher, sowie, dass \'%1$s\' im Download Ordner existiert.</string>
@@ -203,14 +183,11 @@
     <string name="missed_call_from">Verpasster Anruf von</string>
     <string name="sending_failed">Nachricht senden fehlgeschlagen</string>
     <string name="delete_chats_alert">Möchten Sie den Chat-Verlauf des Kontos \'%1$s\' löschen?</string>
-    <string name="audio_codecs_help">Liste der Audio-Codecs nach Priorität. Ziehen zum Umordnen, zum Aktivieren oder Deaktivieren lange gedrückt halten.</string>
     <string name="rel_100">Zuverlässige temporäre Antworten</string>
     <string name="rel_100_help">Wenn angeklickt gibt das Unterstützung für zuverlässige vorläufige Antworten an (RFC 3262).</string>
     <string name="redirect_mode_help">Bestimmt ob eine Rufumleitungsanfrage automatisch befolgt wird oder erst nach einer Bestätigung (manuell).</string>
-    <string name="contact">Kontakt</string>
     <string name="you">Du</string>
     <string name="invalid_aor">Ungültiger benutzer@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
-    <string name="answer">Antwort</string>
     <string name="long_chat_question">Möchten Sie den Chat mit Partner \'%1$s\' löschen oder Partner zu den Kontakten hinzufügen?</string>
     <string name="new_chat_peer">Neuer Chat Partner</string>
     <string name="outbound_proxies_help">SIP URI von einem oder zwei Proxies, die beim Senden von Anfragen verwendet werden müssen. Wenn zwei angegeben sind werden REGISTER Anfragen an beide gesendet, andere Anfragen an den ersten antwortenden. Wenn keine Proxies für ausgehende Verbindungen angegeben sind, werden Verbindungen basiert auf DNS NAPTR/SRV/A record lookup des hostparts der URI der Rufadresse gesendet. Wenn der hostpart der SIP URI eine IPv6 Adresse ist, muß diese in eckigen Klammern geschrieben werden [].
@@ -375,7 +352,6 @@
     <string name="transfer_request">Transferanfrage</string>
     <string name="allow_video_send">Zustimmen, dass Video zu \'%1$s\' gesendet wird?</string>
     <string name="verify">Anfrage verifizieren</string>
-    <string name="aec">Akustische Echounterdrückung</string>
     <string name="sip_trace">SIP Trace (Zurückverfolgung)</string>
     <string name="sip_trace_help">Falls angekreuzt und falls Debug aktiviert ist, werden Logcat Nachrichten SIP Anfragen und Antwort-Traces enthalten. Wird beim Starten von baresip deaktiviert.</string>
     <string name="ok">OK</string>
