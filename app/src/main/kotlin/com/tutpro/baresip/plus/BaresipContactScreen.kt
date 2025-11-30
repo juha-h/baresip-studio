@@ -339,6 +339,7 @@ private fun ContactContent(
         )
         if (screenState.new && BaresipService.contactsMode == "both")
             Android(
+                ctx = ctx,
                 android = screenState.android,
                 onAndroidChange = { newAndroid -> onStateChange(screenState.copy(android = newAndroid)) }
             )
@@ -488,7 +489,6 @@ private fun Favorite(ctx: Context, favorite: Boolean, onFavoriteChange: (Boolean
                     alertMessage.value = ctx.getString(R.string.favorite_help)
                     showAlert.value = true
                 },
-            color = MaterialTheme.colorScheme.onBackground,
         )
         Switch(
             checked = favorite,
@@ -498,7 +498,7 @@ private fun Favorite(ctx: Context, favorite: Boolean, onFavoriteChange: (Boolean
 }
 
 @Composable
-private fun Android(android: Boolean, onAndroidChange: (Boolean) -> Unit) {
+private fun Android(ctx: Context, android: Boolean, onAndroidChange: (Boolean) -> Unit) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -506,8 +506,12 @@ private fun Android(android: Boolean, onAndroidChange: (Boolean) -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.android),
-            modifier = Modifier.weight(1f),
-            //color = MaterialTheme.colorScheme.onBackground
+            modifier = Modifier.weight(1f)
+                .clickable {
+                    alertTitle.value = ctx.getString(R.string.android)
+                    alertMessage.value = ctx.getString(R.string.android_contact_help)
+                    showAlert.value = true
+                },
         )
         Switch(
             checked = android,
