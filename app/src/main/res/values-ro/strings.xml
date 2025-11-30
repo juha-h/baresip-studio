@@ -3,7 +3,6 @@
     <string name="about_title">Despre baresip</string>
     <string name="account">Cont</string>
     <string name="display_name">Nume afișat</string>
-    <string name="your_name">Numele tău</string>
     <string name="display_name_help">Nume (dacă este cazul) utilizat în adresa solicitărilor de conectare.</string>
     <string name="authentication_username">Nume utilizator de autentificare</string>
     <string name="authentication_username_help">Numele de utilizator dacă este necesar pentru proxy de ieșire.</string>
@@ -22,7 +21,6 @@
     <string name="default_account">Cont implicit</string>
     <string name="default_account_help">Dacă este bifată, acest cont este selectat atunci când baresip este pornit.</string>
     <string name="accounts">Conturi</string>
-    <string name="user_domain">utilizator@domeniu</string>
     <string name="invalid_aor">utilizator@domeniu[:port][;transport=udp|tcp|tls] \'%1$s\' este invalid</string>
     <string name="account_exists">Contul \'%1$s\' exista deja.</string>
     <string name="account_allocation_failure">Nu s-a putut aloca un cont nou.</string>
@@ -73,7 +71,6 @@
     <string name="contact_name">Nume</string>
     <string name="invalid_contact">Nume de contact invalid \'%1$s\'</string>
     <string name="contact_already_exists">Contactul \'%1$s\' deja există.</string>
-    <string name="invalid_contact_uri">Adresă SIP invalidă</string>
     <string name="contacts">Contacte</string>
     <string name="contact_action_question">Doriți să apelați sau să trimiteți un mesaj către \'%1$s\'\?</string>
     <string name="send_message">Trimite mesaj</string>
@@ -88,7 +85,6 @@
     <string name="no">Nu</string>
     <string name="accept">Acceptă</string>
     <string name="deny">Refuză</string>
-    <string name="user_id">ID utilizator</string>
     <string name="password">Parolă</string>
     <string name="add">Adaugă</string>
     <string name="delete">Șterge</string>
@@ -101,7 +97,6 @@
     <string name="outgoing_call_to_dots">Apel efectuat către …</string>
     <string name="incoming_call_from_dots">Apel primit de la …</string>
     <string name="transferring_call_to_dots">Transfer apel către …</string>
-    <string name="invalid_sip_uri">Adresă SIP invalidă \'%1$s\'</string>
     <string name="callee">Apelat</string>
     <string name="hangup">Închide</string>
     <string name="hold">Pune în așteptare</string>

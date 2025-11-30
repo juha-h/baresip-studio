@@ -3,15 +3,12 @@
     <string name="about_title">பரேசிப் பற்றி</string>
     <string name="about_title_plus">Paresip+ பற்றி</string>
     <string name="account">கணக்கு</string>
-    <string name="account_nickname">கணக்கு புனைப்பெயர்</string>
     <string name="account_nickname_help">இந்த கணக்கை PARESIP பயன்பாட்டில் அடையாளம் காண புனைப்பெயர் (ஏதேனும் இருந்தால்) பயன்படுத்தப்படுகிறது.</string>
     <string name="invalid_authentication_password">தவறான அங்கீகார கடவுச்சொல் \'%1$s\'</string>
     <string name="outbound_proxies">வெளிச்செல்லும் ப்ராக்சிகள்</string>
     <string name="sip_uri_of_proxy_server">பதிலாள் சேவையகத்தின் SIP யூரி</string>
     <string name="sip_uri_of_another_proxy_server">மற்றொரு பதிலாள் சேவையகத்தின் யூரி</string>
     <string name="register">பதிவு செய்யுங்கள்</string>
-    <string name="prefer_ipv6_media">ஐபிவி 6 மீடியாவை விரும்புங்கள்</string>
-    <string name="prefer_ipv6_media_help">சரிபார்க்கப்பட்டால், பியரின் மீடியா நெறிமுறையை தானாகவே தீர்மானிக்க முடியாதபோது ஐபிவி 6 மீடியா நெறிமுறையை (கிடைத்தால்) பயன்படுத்த சலுகை.</string>
     <string name="audio_codecs_help">முன்னுரிமை வரிசையில் ஆடியோ கோடெக்குகளின் பட்டியல். மறுதொடக்கம் செய்ய இழுக்கவும், இயக்க அல்லது முடக்க நீண்ட சொடுக்கவும்.</string>
     <string name="video_codecs">வீடியோ கோடெக்குகள்</string>
     <string name="video_codecs_help">முன்னுரிமை வரிசையில் வீடியோ கோடெக்குகளின் பட்டியல். மறுதொடக்கம் செய்ய இழுக்கவும், இயக்க அல்லது முடக்க நீண்ட சொடுக்கவும்.</string>
@@ -31,7 +28,6 @@
     <string name="user_agent">பயனர் முகவர்</string>
     <string name="accept">ஏற்றுக்கொள்</string>
     <string name="deny">மறுக்கவும்</string>
-    <string name="user_id">பயனர் ஐடி</string>
     <string name="password">கடவுச்சொல்</string>
     <string name="add">கூட்டு</string>
     <string name="delete">நீக்கு</string>
@@ -45,7 +41,6 @@
     <string name="invalid_account_nickname">தவறான கணக்கு புனைப்பெயர் \'%1$s\'</string>
     <string name="non_unique_account_nickname">\'%1$s\' என்ற புனைப்பெயர் ஏற்கனவே உள்ளது</string>
     <string name="display_name">காட்சி பெயர்</string>
-    <string name="your_name">உங்கள் பெயர்</string>
     <string name="display_name_help">வெளிச்செல்லும் கோரிக்கைகளின் யூரி இலிருந்து பெயர் (ஏதேனும் இருந்தால்) பயன்படுத்தப்படுகிறது.</string>
     <string name="invalid_display_name">தவறான காட்சி பெயர் \'%1$s\'</string>
     <string name="authentication_username">அங்கீகார பயனர்பெயர்</string>
@@ -62,7 +57,6 @@
     <string name="invalid_reg_int">தவறான பதிவு இடைவெளி \'%1$s\'</string>
     <string name="media_nat">மீடியா நாட் டிராவர்சல்</string>
     <string name="media_nat_help">மீடியா நாட் டிராவர்சல் நெறிமுறையைத் தேர்ந்தெடுக்கிறது (ஏதேனும் இருந்தால்). சாத்தியமான தேர்வுகள் ச்டன் (NAT, RFC 5389 க்கான அமர்வு பயண பயன்பாடுகள்) மற்றும் ICE (ஊடாடும் இணைப்பு நிறுவனம், RFC 5245).</string>
-    <string name="stun_server_uri">STUN/TURN சேவையகம் யூரி</string>
     <string name="invalid_stun_server">தவறான ச்டன்/டர்ன் சர்வர் யூரி \'%1$s\' \'</string>
     <string name="stun_username">ச்டன்/டர்ன் பயனர்பெயர்</string>
     <string name="stun_username_help">ச்டன்/டர்ன் சேவையகத்தால் தேவைப்பட்டால் பயனர்பெயர்</string>
@@ -89,21 +83,17 @@
     <string name="auto">தானியங்கி</string>
     <string name="voicemail_uri">குரல் அஞ்சல் யூரி</string>
     <string name="voicemain_uri_help">குரல் அஞ்சல் செய்திகளைச் சரிபார்க்க யூரி ஐ சிப் செய்யுங்கள். காலியாக இருந்தால், குரல் அஞ்சல் செய்திகள் (செய்தி காத்திருப்பு அறிகுறிகள்) சந்தா செலுத்தப்படவில்லை.</string>
-    <string name="invalid_voicemail_uri">தவறான குரல் அஞ்சல் யூரி \'%1$s\'</string>
     <string name="country_code">நாட்டின் குறியீடு</string>
     <string name="country_code_help">E.164 இந்த கணக்கின் நாடு குறியீடு. உள்வரும் அழைப்பு அல்லது செய்தியின் யூரி USERPART இலிருந்து \'+\' அடையாளத்துடன் தொடங்காத ஒரு தொலைபேசி எண்ணைக் கொண்டிருந்தால், தொடர்பு தேடல் தோல்வியுற்றால், இந்த நாட்டின் குறியீட்டில் எண் முன்னொட்டு மற்றும் தொடர்பு தேடல் மீண்டும் முயற்சிக்கப்படுகிறது. தொலைபேசி எண் \'0\' ஒற்றை இலக்கத்துடன் தொடங்கினால், எண் முன்னொட்டப்படுவதற்கு முன்பு \'0\' இலக்கத்தை அகற்றும்.</string>
-    <string name="country_code_hint">+குறியீடு</string>
     <string name="invalid_country_code">தவறான நாட்டு குறியீடு \'%1$s\'</string>
     <string name="telephony_provider">தொலைபேசி வழங்குநர்</string>
     <string name="telephony_provider_help">தொலைபேசி எண்களுக்கான அழைப்புகளில் பயன்படுத்தப்படும் SIP யூரி புரவலன் பகுதி. தொழிற்சாலை இயல்புநிலை என்பது கணக்கின் களமாகும். வழங்கப்படாவிட்டால், தொலைபேசி எண்களை அழைக்க இந்த கணக்கைப் பயன்படுத்த முடியாது.</string>
-    <string name="telephony_provider_hint">சிப் யூரி புரவலன் பகுதி</string>
     <string name="invalid_sip_uri_hostpart">தவறான SIP யூரி புரவலன் பகுதி \'%1$s\'</string>
     <string name="default_account">இயல்புநிலை கணக்கு</string>
     <string name="default_account_help">சரிபார்க்கப்பட்டால், பரெசிப் தொடங்கும்போது இந்த கணக்கு தேர்ந்தெடுக்கப்படுகிறது.</string>
     <string name="accounts">கணக்குகள்</string>
     <string name="new_account">சிப் புதிய கணக்கு முகவரி</string>
     <string name="accounts_help">சிப் புதிய கணக்கு முகவரி வடிவம்: &lt;பயனர்&gt;@&lt;டொமைன்&gt; [: &lt;port&gt;] [; போக்குவரத்து = யுடிபி | டி.சி.பி | டி.எல்.எச்]. &lt;Port&gt; வழங்கப்பட்டு போக்குவரத்து நெறிமுறை வழங்கப்படாவிட்டால், போக்குவரத்து நெறிமுறை இயல்புநிலையாக UDP க்கு. &lt;port&gt; வழங்கப்படாவிட்டால் மற்றும் போக்குவரத்து நெறிமுறை வழங்கப்பட்டால், &lt;PORT&gt; இயல்புநிலை 5060 அல்லது 5061 (TLS) க்கு. எதுவும் வழங்கப்படவில்லை மற்றும் வெளிச்செல்லும் பதிலாள் குறிப்பிடப்படவில்லை என்றால், கணக்கின் பதிவாளர் (ஏதேனும் இருந்தால்) டொமைனின் டிஎன்எச் தகவல்களை மட்டுமே அடிப்படையாகக் கொண்டது.</string>
-    <string name="user_domain">பயனர்@டொமைன்</string>
     <string name="invalid_aor">தவறான பயனர்@டொமைன் [: போர்ட்] [; போக்குவரத்து = யுடிபி | டி.சி.பி | டி.எல்.எச்] \'%1$s\' \'</string>
     <string name="account_exists">கணக்கு \'%1$s\' ஏற்கனவே உள்ளது.</string>
     <string name="account_allocation_failure">புதிய கணக்கை ஒதுக்கத் தவறிவிட்டது.</string>
@@ -219,7 +209,6 @@
     <string name="favorite">பிடித்த</string>
     <string name="invalid_contact">தவறான தொடர்பு பெயர் \'%1$s\'</string>
     <string name="contact_already_exists">\'%1$s\' ஐ தொடர்பு கொள்ளுங்கள்.</string>
-    <string name="invalid_contact_uri">தவறான SIP யூரி</string>
     <string name="android_contact_help">சரிபார்க்கப்பட்டால், இந்த தொடர்பு ஆண்ட்ராய்டு தொடர்புகளில் சேர்க்கப்படும்.</string>
     <string name="avatar_image">சுயவிவர படம்</string>
     <string name="contacts">தொடர்புகள்</string>
@@ -234,7 +223,6 @@
     <string name="ok">சரி</string>
     <string name="yes">ஆம்</string>
     <string name="no">இல்லை</string>
-    <string name="help">உதவி</string>
     <string name="confirmation">உறுதிப்படுத்தல்</string>
     <string name="anonymous">அநாமதேய</string>
     <string name="unknown">தெரியவில்லை</string>
@@ -250,7 +238,6 @@
     <string name="allow_video_recv">\'%1$s\' இலிருந்து வீடியோவைப் பெறுவதை ஏற்றுக்கொள்கிறீர்களா?</string>
     <string name="diverted_by_dots">திருப்பி விடப்பட்டது…</string>
     <string name="transferring_call_to_dots">அழைப்பை மாற்றுவது…</string>
-    <string name="invalid_sip_uri">தவறான SIP யூரி \'%1$s\'</string>
     <string name="no_telephony_provider">கணக்கு \'%1$s\' தொலைபேசி வழங்குநர் இல்லை</string>
     <string name="hangup">ஏங்கப்</string>
     <string name="video_call">வீடியோ அழைப்பு</string>
@@ -314,13 +301,11 @@
     <string name="restore_unzip_failed">பயன்பாட்டு தரவை மீட்டெடுப்பதில் தோல்வி. ஆண்ட்ராய்டு பதிப்பு 14 மற்றும் அதற்கு மேற்பட்டவை %1$s பதிப்பு %2$s க்கு முன் காப்புப் பிரதி எடுக்கப்பட்ட தரவை மீட்டமைக்க அனுமதிக்காது.</string>
     <string name="no_notifications">\"அறிவிப்புகள்\" இசைவு இல்லாமல் இந்த பயன்பாட்டை நீங்கள் பயன்படுத்த முடியாது.</string>
     <string name="no_calls">குரல் அழைப்புகளுக்கு BARESIP க்கு \"மைக்ரோஃபோன்\" இசைவு தேவை.</string>
-    <string name="no_bluetooth">\"அருகிலுள்ள சாதனங்கள்\" இசைவு இல்லாமல் ஊடலை இணைப்பைக் கண்டறிய பாரெசிப்பால் முடியவில்லை.</string>
     <string name="no_video_calls">வீடியோ அழைப்புகளைச் செய்ய அல்லது பதிலளிக்க \"கேமரா\" இசைவு வழங்கவும்.</string>
     <string name="no_backup">\"சேமிப்பு\" இசைவு இல்லாமல் காப்புப்பிரதியை உருவாக்க முடியாது.</string>
     <string name="no_restore">\"சேமிப்பு\" அனுமதியின்றி காப்புப்பிரதியை மீட்டெடுக்க முடியாது.</string>
     <string name="no_android_contacts">\"தொடர்புகள்\" அனுமதியின்றி நீங்கள் ஆண்ட்ராய்டு தொடர்புகளை அணுக முடியாது.</string>
     <string name="no_cameras">காணொளி நிழற்படபதிப்பான்கள் எதுவும் இல்லை!</string>
-    <string name="show_password">கடவுச்சொல்லைக் காட்டு</string>
     <string name="no_network">பிணைய இணைப்பு இல்லை!</string>
     <string name="audio_focus_denied">ஆடியோ கவனம் மறுக்கப்பட்டது!</string>
     <string name="permissions_rationale">அனுமதிகள் பகுத்தறிவு</string>

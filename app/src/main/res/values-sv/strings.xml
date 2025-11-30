@@ -5,7 +5,6 @@
     <string name="send_message">Skicka meddelande</string>
     <string name="contact_action_question">Vill du ringa eller skicka meddelande till \'%1$s\'\?</string>
     <string name="contacts">Kontakter</string>
-    <string name="invalid_contact_uri">Ogiltig SIP-URI</string>
     <string name="contact_name">Namn</string>
     <string name="new_contact">Ny kontakt</string>
     <string name="contact">Kontakt</string>
@@ -39,7 +38,6 @@
     <string name="delete_account">Vill du ta bort kontot \'%1$s\'\?</string>
     <string name="account_exists">Kontot \'%1$s\' finns redan.</string>
     <string name="invalid_aor">Ogiltig användare@domän[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
-    <string name="user_domain">användare@domän</string>
     <string name="new_account">SIP URI för nytt konto</string>
     <string name="accounts">Konton</string>
     <string name="default_account">Förvalt konto</string>
@@ -47,7 +45,6 @@
     <string name="dtmf_inband">Inuti RTP</string>
     <string name="dtmf_mode_help">Väljer hur DTMF-toner för 0-9, #, * och A-D skickas.</string>
     <string name="dtmf_mode">DTMF-läge</string>
-    <string name="prefer_ipv6_media">Föredra IPv6-media</string>
     <string name="media_encryption">Mediakryptering</string>
     <string name="invalid_stun_password">Ogiltigt lösenord \'%1$s\'</string>
     <string name="stun_password_help">Lösenord om STUN/TURN-servern kräver det</string>
@@ -55,7 +52,6 @@
     <string name="invalid_stun_username">Ogiltigt användarnamn \'%1$s\'</string>
     <string name="stun_username_help">Användarnamn om STUN/TURN-servern kräver det</string>
     <string name="invalid_stun_server">Ogiltig STUN/TURN-server-URI \'%1$s\'</string>
-    <string name="stun_server_uri">STUN/TURN-server-URI</string>
     <string name="stun_server_help">En STUN/TURN-server-URI på formatet schema:värd[:port][\?transport=udp|tcp], där schema är \'stun\', \'stuns\', \'turn\', eller \'turns\'. Förvald STUN-server för STUN- och ICE-protokollen är \'stun:stun.l.google.com:19302\' som är Googles publika STUN-server. Det finns ingen förvald TURN-server.</string>
     <string name="media_nat">NAT-passering av media</string>
     <string name="media_nat_help">Väljer protokoll för NAT-passering av media. Möjliga val är STUN (Session Traversal Utilities for NAT, RFC 5389) och ICE (Interactive Connectivity Establishment, RFC 5245).</string>
@@ -68,7 +64,6 @@
     <string name="send">Skicka</string>
     <string name="status">Status</string>
     <string name="error">Fel</string>
-    <string name="help">Hjälp</string>
     <string name="backup">Säkerhetskopiera</string>
     <string name="restore">Återställ</string>
     <string name="about">Om</string>
@@ -77,7 +72,6 @@
     <string name="outgoing_call_to_dots">Ring till …</string>
     <string name="incoming_call_from_dots">Samtal från …</string>
     <string name="transferring_call_to_dots">Kopplar samtal till …</string>
-    <string name="invalid_sip_uri">Ogiltig SIP-URI \'%1$s\'</string>
     <string name="hangup">Lägg på</string>
     <string name="mic">Mikrofon på/av</string>
     <string name="call_transfer">Koppla samtal</string>
@@ -104,7 +98,6 @@
     <string name="unverify">Ta bort verifiering</string>
     <string name="call_is_secure">Detta samtal är SÄKERT och motparten är VERIFIERAD! Vill du ta bort verifieringen av motparten\?</string>
     <string name="peer_not_verified">Detta samtal är SÄKERT, men motparten är INTE verifierad!</string>
-    <string name="show_password">Visa lösenord</string>
     <string name="stun_username">STUN/TURN-användarnamn</string>
     <string name="stun_server">STUN/TURN-server</string>
     <string name="video_codecs_help">Lista över videokodekar i prioritetsordning. Dra för att ordna om, tryck länge för att aktivera eller inaktivera.</string>
@@ -130,7 +123,6 @@
     <string name="invalid_authentication_username">Ogiltigt användarnamn för autentisering \'%1$s\'</string>
     <string name="invalid_display_name">Ogiltigt visat namn \'%1$s\'</string>
     <string name="display_name_help">Namn som, om det anges, används i From-URI i utgående SIP-förfrågningar.</string>
-    <string name="your_name">Ditt namn</string>
     <string name="display_name">Visat namn</string>
     <string name="account">Konto</string>
     <string name="about_title_plus">Om baresip+</string>
@@ -221,7 +213,6 @@ där även problem kan rapporteras.</p>
     <string name="transfer_request_to">Begäran att koppla samtalet till</string>
     <string name="account_allocation_failure">Kunde inte skapa ett nytt konto.</string>
     <string name="default_account_help">Kryssa i för att välja detta konto när baresip startar.</string>
-    <string name="invalid_voicemail_uri">Ogiltig URI till röstbrevlåda \'%1$s\'</string>
     <string name="voicemain_uri_help">SIP-URI för att kontrollera röstmeddelanden. Om fältet lämnas tomt kommer röstmeddelanden (Message Waiting Indications) inte kontrolleras.</string>
     <string name="voicemail_uri">URI till röstbrevlåda</string>
     <string name="auto">Automatiskt</string>
@@ -326,9 +317,7 @@ där även problem kan rapporteras.</p>
     <string name="tls_ca_file_help">Om denna ruta är markerad har en fil läst in eller kommer att läst in som innehåller TLS-certifikat från certifikatutfärdare som inte ingår i Android OS. I Android version 9 läst in en fil med namnet ”ca_certs.crt” från mappen Hämtningar.</string>
     <string name="verify_server_help">Om denna ruta är markerad verifierar baresip TLS-certifikat för SIP-användaragenter och SIP-proxyservrar när TLS-transport används.</string>
     <string name="tls_certificate_file_help">Om denna ruta är markerad har en fil som innehåller TLS-certifikatet och den privata nyckeln för denna baresip-instans läsas in eller kommer att läsas in. I Android version 9 läses in en fil med namnet ”cert.pem” från mappen Download. Av säkerhetsskäl bör du radera filen efter läsin.</string>
-    <string name="prefer_ipv6_media_help">Kryssa i för att erbjuda media via IPv6 (om tillgängligt) när mediaprotokoll för motparten inte kan avgöras automatiskt.</string>
     <string name="confirmation">Bekräftelse</string>
-    <string name="user_id">Användar-ID</string>
     <string name="notice">Notis</string>
     <string name="info">Info</string>
     <string name="alert">Varning</string>
@@ -364,7 +353,6 @@ där även problem kan rapporteras.</p>
     <string name="peer">Motpart</string>
     <string name="telephony_provider">Telefonileverantör</string>
     <string name="invalid_sip_uri_hostpart">Ogiltigt värdnamn i SIP-URI \'%1$s\'</string>
-    <string name="telephony_provider_hint">SIP-URI:s värdnamn</string>
     <string name="direction">Riktning</string>
     <string name="calls_duration">Längd</string>
     <string name="sip_or_tel_uri">SIP- eller tel-URI</string>
@@ -375,7 +363,6 @@ där även problem kan rapporteras.</p>
     <string name="both">Båda</string>
     <string name="no_android_contacts">Det går inte att komma åt Androids kontakter utan behörigheten \"Kontakter\".</string>
     <string name="country_code">Landsnummer</string>
-    <string name="country_code_hint">+nummer</string>
     <string name="invalid_country_code">Ogiltigt landsnummer \'%1$s\'</string>
     <string name="country_code_help">Det här kontots landsnummer, enligt E.164. Om telefonnumret i From-URI för ett inkommande samtal, eller meddelande, inte börjar med en \'+\'-symbol och en matchande kontakt inte kan hittas, då läggs landsnumret till telefonnumret och en kontaktsökning görs igen. Om telefonnumret börjar med siffran \'0\' tas denna siffra bort innan landsnumret läggs till.</string>
     <string name="anonymous">Anonym</string>
@@ -385,7 +372,6 @@ där även problem kan rapporteras.</p>
     <string name="attended">Vägledd</string>
     <string name="blind">Blind</string>
     <string name="contacts_consent">Om Androids kontakter används då kan de användas som SIP- eller tel-URI-referenser för samtal och för att skicka meddelanden. baresip sparar inte Androids kontakter och delar dem inte heller med någon. För att Androids kontakter ska bli tillgängliga i baresip kräver Google att du accepterar användningen som beskrivs här och i appens <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">integritetspolicy</a>. </string>
-    <string name="account_nickname">Kontots namn</string>
     <string name="rtcp_mux_help">Kryssa i för att låta RTP- och RTCP-paket använda samma port (RFC 5761).</string>
     <string name="codec_action">Ändra ordning</string>
     <string name="rtcp_mux">RTCP-multiplex</string>
@@ -405,7 +391,6 @@ där även problem kan rapporteras.</p>
     <string name="audio_permissions">baresip behöver behörighet för ”Mikrofon” för röstsamtal, behörighet för ”Närliggande enheter” för Bluetooth-mikrofon-/högtalardetektering, behörighet för ’Meddelanden’ för att publicera meddelanden och i Android 9 behörighet för ”Lagring” för säkerhetskopierings-/återställningsåtgärder.</string>
     <string name="audio_delay">Fördröjt ljud</string>
     <string name="invalid_audio_delay">Ogiltigt värde för fördröjt ljud \'%1$s\'. Giltiga värden är från 100 till 3000.</string>
-    <string name="no_bluetooth">baresip kan inte upptäcka blåtandsanslutningar utan behörigheten \"Enheter i närheten\".</string>
     <string name="permissions_rationale">Behörigheters motivering</string>
     <string name="reg_int_help">Avgör hur ofta (i sekunder) baresip skickar REGISTER-förfrågningar. Giltiga värden är från 60 till 3600.</string>
     <string name="audio_delay_help">Tid (i millisekunder) att vänta på ljud från motparten när ett samtal upprättats. Sätt till ett högre värde om du saknar ljud från motparten i början av samtalet.</string>

@@ -177,7 +177,6 @@
     <string name="restore">復元</string>
     <string name="backup">バックアップ</string>
     <string name="confirmation">確認</string>
-    <string name="help">ヘルプ</string>
     <string name="error">エラー</string>
     <string name="status">状態</string>
     <string name="send">送信</string>
@@ -235,7 +234,6 @@
     <string name="voicemail_uri">VoicemailのURI</string>
     <string name="authentication_username">認証ユーザー名</string>
     <string name="display_name_help">必要であればFrom URIで使用される名前を入力</string>
-    <string name="your_name">Votre nom</string>
     <string name="display_name">表示名</string>
     <string name="account">アカウント</string>
     <string name="about_title_plus">baresip+について</string>
@@ -244,7 +242,6 @@
     <string name="invalid_stun_password">無効な表示名 %1$s です</string>
     <string name="missed_call_from">着信失敗</string>
     <string name="yes">はい</string>
-    <string name="show_password">パスワード表示</string>
     <string name="authentication_password">認証パスワード</string>
     <string name="invalid_authentication_password">無効な認証パスワード %1$s です</string>
     <string name="outbound_proxies">発信プレフィクス</string>
@@ -256,16 +253,12 @@
     <string name="video_codecs">ビデオコーデック</string>
     <string name="media_nat">メディアのNAT探索</string>
     <string name="stun_server">STUN/TURNサーバー</string>
-    <string name="stun_server_uri">STUN/TURNサーバーのURI</string>
     <string name="invalid_stun_server">無効なSTUN/TURNサーバーのURI %1$s です</string>
-    <string name="invalid_voicemail_uri">無効なVoicemail URI %1$s です</string>
     <string name="invalid_aor">無効なuser@domain[:port][;transport=udp|tcp|tls] %1$s です</string>
-    <string name="prefer_ipv6_media">IPv6メディアを優先</string>
     <string name="answer_mode">応答モード</string>
     <string name="manual">マニュアル</string>
     <string name="auto">自動</string>
     <string name="default_account">既定のアカウント</string>
-    <string name="user_domain">user@domain</string>
     <string name="account_exists">アカウント %1$s は既に存在します</string>
     <string name="account_allocation_failure">新しいアカウントの割り当てに失敗しました。</string>
     <string name="chat">チャットメッセージ</string>
@@ -296,11 +289,8 @@
     <string name="reset_config">工場出荷時設定にリセット</string>
     <string name="read_cert_error">ダウンロード・ディレクトリから \'cert.pem\' の読み込みに失敗しました。</string>
     <string name="read_ca_certs_error">ダウンロード・ディレクトリから \'ca_certs.crt\' の読み込みに失敗しました。</string>
-    <string name="invalid_contact_uri">無効なSIP URI %1$s です</string>
     <string name="alert">警告</string>
     <string name="notice">通知</string>
-    <string name="user_id">ユーザーID</string>
-    <string name="invalid_sip_uri">無効なSIP URI %1$s です</string>
     <string name="callee">呼び出し先</string>
     <string name="hold">保留</string>
     <string name="call_transfer">通話転送</string>
@@ -334,8 +324,6 @@
     <string name="no_cameras">対応しているビデオカメラがありません</string>
     <string name="stun_username_help">STUN/TURN サーバーで必要な場合のユーザー名</string>
     <string name="stun_password_help">STUN/TURN サーバーで必要な場合のパスワード</string>
-    <string name="prefer_ipv6_media_help">チェックを入れると、ピアのメディアプロトコルが自動的に決定できない場合に、IPv6メディアプロトコルの使用をオファーします(使用可能な場合)
-    </string>
     <string name="answer_mode_help">着信した電話にどのように応答するかを選択します。</string>
     <string name="start_automatically_help">チェックを入れると、デバイスの再起動後に自動的にbaresipが起動します</string>
     <string name="aec">音響エコーキャンセル</string>

@@ -3,7 +3,6 @@
     <string name="about_title">Om</string>
     <string name="account">Konto</string>
     <string name="display_name">Visningsnavn</string>
-    <string name="your_name">Ditt navn</string>
     <string name="display_name_help">Navn (hvis noe) brukt i skjema-URI for utgående forespørsler.</string>
     <string name="authentication_username">Brukernavn for identitetsbekreftelse</string>
     <string name="authentication_username_help">Brukernavn for identitetsbekreftelse av SIP-forespørsler er påkrevd. Forvalgt verdi er kontoens brukernavn.</string>
@@ -16,7 +15,6 @@
     <string name="media_encryption">Mediakryptering</string>
     <string name="default_account">Forvalgt konto</string>
     <string name="accounts">Kontoer</string>
-    <string name="user_domain">bruker@domene</string>
     <string name="invalid_aor">Ugyldig bruker@domene[:port][;transport=udp|tcp|tls] \"%1$s\"</string>
     <string name="account_exists">Kontoen \"%1$s\" finnes allerede.</string>
     <string name="account_allocation_failure">Klarte ikke å tildele ny konto.</string>
@@ -69,7 +67,6 @@
     <string name="no">Nei</string>
     <string name="accept">Godta</string>
     <string name="deny">Nekt</string>
-    <string name="user_id">Bruker-ID</string>
     <string name="password">Passord</string>
     <string name="add">Legg til</string>
     <string name="delete">Slett</string>
@@ -138,10 +135,8 @@
     <string name="debug_help">Gjør feilrettings- og infonivå-loggmeldinger tilgjengelige i Logcat.</string>
     <string name="reset_config_help">Tilbakestiller oppsettet til fabrikkforvalgte verdier.</string>
     <string name="contact_already_exists">Kontakten \"%1$s\" finnes allerede.</string>
-    <string name="invalid_contact_uri">Ugyldig SIP URI</string>
     <string name="contact_action_question">Ønsker du å ringe eller sende melding til \"%1$s\"\?</string>
     <string name="contacts_exceeded">Ditt har nådd ditt maksimale antall kontakter på %1$d.</string>
-    <string name="invalid_sip_uri">Ugyldig SIP URI \'%1$s\'</string>
     <string name="callee">Ringer</string>
     <string name="hangup">Legg på</string>
     <string name="hold">Sett på vent</string>
@@ -186,20 +181,15 @@
     <string name="restore_failed">Klarte ikke å sikkerhetskopiere programdata til nedlastingsmappe. Sjekk \"Programmer → baresip → Tilganger → Lagring og at sikkerhetskopifilen \'%1$s\' finnes i mappen, og om det er tilfelle, at du har oppgitt rett dekrypteringspassord.</string>
     <string name="audio_modules_title">Lydmoduler</string>
     <string name="audio_modules_help">Lydkodeker tilbudt av de avkryssede modulene er tilgjengelig for bruk av kontoene.</string>
-    <string name="help">Hjelp</string>
     <string name="new_account">Ny konto</string>
     <string name="no_calls">Du kan ikke utføre eller besvare anrop uten mikrofontilgang.</string>
     <string name="accounts_help">Det er mulig å sette kontoportnummer og transportprotokoll som username@domain[:port][;transport=udp|tcp|tls] ved opprettelse av en ny konto. UDP brukes hvis kun port angis. Port 5060 eller 5061 (TLS) brukes hvis kun transportprotokoll angis. Kontoens registrar (hvis noen) angis kun basert på info fra domenets DNS hvis hverken port, transportprotokoll, og heller ikke utgående mellomtjener angis.</string>
-    <string name="prefer_ipv6_media">Foretrekk IPv6-media</string>
-    <string name="prefer_ipv6_media_help">Tilby bruk av IPv6-mediaprotokoll (hvis tilgjengelig) når likemanns mediaprotokoll ikke kan bestemmes.</string>
-    <string name="invalid_voicemail_uri">Ugyldig talepostkasse-URI \"%1$s\"</string>
     <string name="invalid_proxy_server_uri">Ugyldig mellomtjener-URI \"%1$s\"</string>
     <string name="invalid_authentication_password">Ugyldig identitetsbekreftelsespassord \"%1$s\"</string>
     <string name="invalid_authentication_username">Ugylidg identitetsbekreftelsesbrukernavn \"%1$s\"</string>
     <string name="invalid_display_name">Ugyldig visningsnavn \"%1$s\"</string>
     <string name="invalid_stun_server">Ugyldig STUN-tjener \"%1$s\"</string>
     <string name="call_info_not_available">Ingen info tilgjengelig</string>
-    <string name="show_password">Vis passord</string>
     <string name="no_cameras">Du har ikke noen støttede videokameraer.</string>
     <string name="restart_request">Start forespørsel på ny</string>
     <string name="video_request">Videoforespørsel</string>

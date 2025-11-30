@@ -111,14 +111,12 @@
     </string>
     <!-- Account Activity -->
     <string name="account">Tili</string>
-    <string name="account_nickname">Tilin lempinimi</string>
     <string name="account_nickname_help">Lempinimi (jos annettu) millä tämä tili identifioidaan
         baresip sovelluksessa.</string>
     <string name="nickname">Lempinimi</string>
     <string name="invalid_account_nickname">Virheellinen tilin lempinimi \'%1$s\'</string>
     <string name="non_unique_account_nickname">Lempinimi \'%1$s\' on jo olemassa</string>
     <string name="display_name">Tilin käyttäjän nimi</string>
-    <string name="your_name">Tilin käyttäjän nimi</string>
     <string name="display_name_help">Tilin käyttäjän nimi, joka esiintyy
         SIP-sanomien From URI:ssa (vapaaehtoinen).</string>
     <string name="invalid_display_name">Virheellinen tilin käyttäjän nimi \'%1$s\'</string>
@@ -172,7 +170,6 @@
         STUN- ja ICE-protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
         julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.
     </string>
-    <string name="stun_server_uri">STUN/TURN-palvelimen URI</string>
     <string name="invalid_stun_server">Virheellinen STUN/TURN-palvelimen URI \'%1$s\'</string>
     <string name="stun_username">STUN/TURN-käyttäjätunnus</string>
     <string name="stun_username_help">Käyttäjätunnus jos STUN/TURN-palvelin vaatii sellaisen</string>
@@ -193,11 +190,6 @@
 \n • SRTP tarkoittaa, että RTP/AVP-protokollaa tarjotaan
         lähteviin puheluihin ja että RTP/SAVP- tai RTP/SAVPF-protokollaa
         käytetään, jos sellaista tarjotaan tulevissa puheluissa.
-    </string>
-    <string name="prefer_ipv6_media">Suosi IPv6-mediaprotokollaa</string>
-    <string name="prefer_ipv6_media_help">Jos merkitty, tarjoa IPv6-mediaprotokollaa (mikäli
-        se on käytettävissä), jos puhelun molempien osapuolten tukemaa mediaprotokollaa
-        ei saada automaattisesti selvitettyä.
     </string>
     <string name="rtcp_mux">RTCP-multipleksaus</string>
     <string name="rtcp_mux_help">Jos merkitty, RTP- and RTCP-paketit multipleksataan samaan porttiin
@@ -223,7 +215,6 @@
         puhepostiviestien kuunteluun.  Jos URI:a ei ole annettu, tietoa
         mahdollista puhepostiviesteistä (Message Waiting Indications) ei tilata.
     </string>
-    <string name="invalid_voicemail_uri">Virheellinen puhepostin URI \'%1$s\'</string>
     <string name="country_code">Maakoodi</string>
     <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos tulevan puhelun tai viestin
         From URI:n käyttäjäosa sisältää puhelinnumeron, joka ei ala \'+\' merkillä, ja jos sitä
@@ -231,14 +222,12 @@
         uudelleen. Jos puhelinnumero alkaa yhdellä numerolla \'0\', niin numero \'0\'
         poistetaan ennen maakoodin lisäämistä.
     </string>
-    <string name="country_code_hint">+koodi</string>
     <string name="invalid_country_code">Virheellinen maakoodi \'%1$s\'</string>
     <string name="telephony_provider">Puhelinpalvelun tarjoaja</string>
     <string name="telephony_provider_help">SIP URI:n domain-osa, jota käytetään soitettaessa
         puhelinnumeroihin. Tehdasasetus on tilin domain-osa.  Jos tyhjä, niin tätä tiliä ei
         voi käyttää soitettaessa puhelinnumeroihin.
     </string>
-    <string name="telephony_provider_hint">SIP URI:n domain osa</string>
     <string name="numeric_keypad">Numeronäppäimistö</string>"
     <string name="numeric_keypad_help">Jos valittu, \"Puhelu ulos …\" kentässä käytetään
         numeronäppäimistöä.</string>"
@@ -257,7 +246,6 @@
         Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
         rekisteröintipalvelin päätellään pelkästään domainin DNS-informaation perusteella.
     </string>
-    <string name="user_domain">käyttäjä@domain</string>
     <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls] \'%1$s\'
     </string>
     <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
@@ -478,7 +466,6 @@
         kanssa yhteystietolistan alussa</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
-    <string name="invalid_contact_uri">Virheellinen SIP:n URI</string>
     <string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
     <string name="avatar_image">Profiilikuva</string>
     <!-- Contacts Activity -->
@@ -498,7 +485,6 @@
     <string name="no">Ei</string>
     <string name="accept">Hyväksy</string>
     <string name="deny">Estä</string>
-    <string name="user_id">Käyttäjätunnus</string>
     <string name="password">Salasana</string>
     <string name="add">Lisää</string>
     <string name="delete">Poista</string>
@@ -506,7 +492,6 @@
     <string name="send">Lähetä</string>
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
-    <string name="help">Apua</string>
     <string name="confirmation">Vahvistus</string>
     <string name="anonymous">Anonyymi</string>
     <string name="unknown">Tuntematon</string>
@@ -523,7 +508,6 @@
     <string name="incoming_call_from_dots">Puhelu sisään …</string>
     <string name="diverted_by_dots">Siirtäjä …</string>
     <string name="transferring_call_to_dots">Puhelun siirto …</string>
-    <string name="invalid_sip_uri">Virheellinen SIP URI \'%1$s\'</string>
     <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
     <string name="callee">Puhelun kohde</string>
@@ -607,13 +591,10 @@
         %2$s.</string>
     <string name="no_notifications">Et voi käyttää tätä sovellusta ilman Ilmoitukset-lupaa.</string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-lupaa.</string>
-    <string name="no_bluetooth">baresip ei voi havaita Bluetooth-yhteyttä ilman
-        \"Lähellä olevat laitteet\" lupaa.</string>
     <string name="no_video_calls">Salli Kamera-lupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
     <string name="no_backup">Et voi tallentaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>
     <string name="no_restore">Et voi palauttaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>
     <string name="no_cameras">Ei tuettuja videokameroita.</string>
-    <string name="show_password">Näytä salasana</string>
     <string name="no_network">Ei verkkoyhteyttä!</string>
     <string name="no_aec">Ei laitteistolla tuettua kaiun poistoa!</string>
     <string name="call_details">Puhelutiedot</string>

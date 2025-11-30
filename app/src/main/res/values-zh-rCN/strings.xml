@@ -3,13 +3,11 @@
     <string name="about_title">关于 baresip</string>
     <string name="about_title_plus">关于 baresip+</string>
     <string name="account">账号</string>
-    <string name="account_nickname">账号昵称</string>
     <string name="nickname">昵称</string>
     <string name="invalid_account_nickname">账号昵称“%1$s”无效</string>
     <string name="non_unique_account_nickname">昵称“%1$s”已存在</string>
     <string name="account_nickname_help">昵称（如果有）用于在 baresip 应用中识别此账号。</string>
     <string name="display_name">显示名称</string>
-    <string name="your_name">您的名称</string>
     <string name="display_name_help">名称（如果有）用于在出站请求中的 From URI。</string>
     <string name="invalid_display_name">显示名称“%1$s”无效</string>
     <string name="authentication_username">身份验证用户名</string>
@@ -32,7 +30,6 @@
     <string name="media_nat_help">选择媒体 NAT 穿越协议（如果有）。可能的选择是 STUN（ NAT 会话穿越实用程序，RFC 5389）和 ICE（交互式连接建立，RFC 5245）。</string>
     <string name="stun_server">STUN/TURN 服务器</string>
     <string name="stun_server_help">STUN/TURN 服务器 URI 的格式为 scheme:host[:port][?transport=udp|tcp]，其中 scheme 为“stun”、“stuns”、“turn”或“turns”。STUN 和 ICE 协议的出厂默认 STUN 服务器是指向公共 Google STUN 服务器的“stun:stun.l.google.com:19302”。没有出厂默认的 TURN 服务器。</string>
-    <string name="stun_server_uri">STUN/TURN 服务器 URI</string>
     <string name="invalid_stun_server">STUN/TURN 服务器 URI“%1$s”无效</string>
     <string name="stun_username">STUN/TURN 用户名</string>
     <string name="stun_username_help">用户名（如果 STUN/TURN 服务器需要）</string>
@@ -42,8 +39,6 @@
     <string name="invalid_stun_password">密码“%1$s”无效</string>
     <string name="media_encryption">媒体加密</string>
     <string name="media_encryption_help">选择媒体传输加密协议（如果有）。\n • ZRTP（推荐）意味着在建立呼叫后尝试通过 ZRTP 进行端到端媒体加密协商。\n • DTLS-SRTPF 意味着在传出呼叫中提供 UDP/TLS/RTP/SAVPF，如果在传入呼叫中提供 RTP/SAVP、RTP/SAVPF、UDP/TLS/RTP/SAVP 或 UDP/TLS/RTP/SAVPF 则使用。\n • SRTP-MANDF 意味着在传出呼叫中提供 RTP/SAVPF，在传入呼叫中也必须提供。\n • SRTP-MAND 意味着在传出呼叫中提供 RTP/SAVP，在传入呼叫中也必须提供。\n • SRTP 意味着在传出呼叫中提供 RTP/AVP，如果在传入呼叫中提供 RTP/SAVP 或 RTP/SAVPF 则使用。</string>
-    <string name="prefer_ipv6_media">首选 IPv6 媒体</string>
-    <string name="prefer_ipv6_media_help">如果选中，当无法自动确定对方的媒体协议时，提供使用 IPv6 媒体协议（如果可用）。</string>
     <string name="rtcp_mux">RTCP 多路复用</string>
     <string name="rtcp_mux_help">如果选中，RTP 和 RTCP 数据包会在单个端口上多路复用（RFC 5761）。</string>
     <string name="rel_100">可靠临时响应</string>
@@ -61,14 +56,11 @@
     <string name="auto">自动</string>
     <string name="voicemail_uri">语音信箱 URI</string>
     <string name="voicemain_uri_help">用于检查语音信箱消息的 SIP URI。如果留空，则不订阅语音信箱消息（消息等待指示）。</string>
-    <string name="invalid_voicemail_uri">语音信箱 URI“%1$s”无效</string>
     <string name="country_code">国家/地区代码</string>
     <string name="country_code_help">此账号的 E.164 国家/地区代码。如果来电或消息的 From URI 用户部分包含不以“+”符号开头的电话号码，并且如果联系人查找失败，则该号码将以该国家/地区代码作为前缀，并再次尝试联系人查找。如果电话号码以单数字“0”开头，则在号码前缀之前移除数字“0”。</string>
-    <string name="country_code_hint">+代码</string>
     <string name="invalid_country_code">国家/地区代码“%1$s”无效</string>
     <string name="telephony_provider">电话服务提供者</string>
     <string name="telephony_provider_help">用于拨打电话号码的 SIP URI 主机部分。出厂默认为账号的域名。如果未提供，则此账号不能用于拨打电话号码。</string>
-    <string name="telephony_provider_hint">SIP URI 主机部分</string>
     <string name="numeric_keypad">数字键盘</string>"
     <string name="numeric_keypad_help">如果选中，当“呼叫…”字段聚焦时，将显示数字键盘。</string>"
     <string name="invalid_sip_uri_hostpart">SIP URI 主机部分“%1$s”无效</string>
@@ -77,7 +69,6 @@
     <string name="accounts">账号</string>
     <string name="new_account">新账号的 SIP URI</string>
     <string name="accounts_help">新账号的 SIP URI 格式为 &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]。如果指定了 &lt;port&gt;，但未指定传输协议，则传输协议默认为 UDP。如果未指定 &lt;port&gt;，但指定了传输协议，则 &lt;port&gt; 默认为 5060 或 5061（TLS）。如果二者均未指定，也没有指定出站代理，则将仅根据域名的 DNS 信息确定账号的注册服务器（如果有）。</string>
-    <string name="user_domain">user@domain</string>
     <string name="invalid_aor">user@domain[:port][;transport=udp|tcp|tls]“%1$s”无效</string>
     <string name="account_exists">账号“%1$s”已存在。</string>
     <string name="account_allocation_failure">无法分配新账号。</string>
@@ -225,7 +216,6 @@
     <string name="favorite_help">如果选中，联系人将显示在联系人列表顶部的其他收藏中。</string>
     <string name="invalid_contact">联系人名称“%1$s”无效</string>
     <string name="contact_already_exists">联系人“%1$s”已存在。</string>
-    <string name="invalid_contact_uri">SIP URI 无效</string>
     <string name="android_contact_help">如果选中，此联系人将添加到 Android 联系人中。</string>
     <string name="avatar_image">头像</string>
     <string name="contacts">联系人</string>
@@ -242,7 +232,6 @@
     <string name="no">否</string>
     <string name="accept">接受</string>
     <string name="deny">拒绝</string>
-    <string name="user_id">用户 ID</string>
     <string name="password">密码</string>
     <string name="add">添加</string>
     <string name="delete">删除</string>
@@ -250,7 +239,6 @@
     <string name="send">发送</string>
     <string name="status">状态</string>
     <string name="error">错误</string>
-    <string name="help">帮助</string>
     <string name="confirmation">确认</string>
     <string name="anonymous">匿名</string>
     <string name="unknown">未知</string>
@@ -264,7 +252,6 @@
     <string name="incoming_call_from_dots">通话来自…</string>
     <string name="transferring_call_to_dots">正在转接通话至…</string>
     <string name="diverted_by_dots">已转接…</string>
-    <string name="invalid_sip_uri">SIP URI“%1$s”无效</string>
     <string name="no_telephony_provider">账号“%1$s”没有电话服务提供者</string>
     <string name="callee">被叫方</string>
     <string name="hangup">挂断</string>
@@ -332,13 +319,11 @@
     <string name="restore_unzip_failed">无法恢复应用程序数据。Android 14 及更高版本不允许恢复在 %1$s %2$s 版本之前备份的数据。</string>
     <string name="no_notifications">没有“通知”权限，您无法使用此应用程序。</string>
     <string name="no_calls">baresip 需要“麦克风”权限才能进行语音通话。</string>
-    <string name="no_bluetooth">没有“附近的设备”权限，baresip 将无法检测蓝牙连接。</string>
     <string name="no_video_calls">授予“相机”权限即可拨打或接听视频通话。</string>
     <string name="no_backup">没有“存储”权限，您无法创建备份。</string>
     <string name="no_restore">没有“存储”权限，您无法恢复备份。</string>
     <string name="no_android_contacts">没有“联系人”权限，您无法访问 Android 联系人。</string>
     <string name="no_cameras">没有支持的视频相机！</string>
-    <string name="show_password">显示密码</string>
     <string name="no_network">无网络连接！</string>
     <string name="no_aec">无硬件声学回声消除！</string>
     <string name="audio_focus_denied">音频焦点被拒绝！</string>

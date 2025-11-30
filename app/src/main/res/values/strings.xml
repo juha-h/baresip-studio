@@ -115,14 +115,12 @@
     </string>
     <!-- Account Activity -->
     <string name="account">Account</string>
-    <string name="account_nickname">Account Nickname</string>
     <string name="account_nickname_help">Nickname (if any) used to identify this account within
         baresip app.</string>
     <string name="nickname">Nickname</string>
     <string name="invalid_account_nickname">Invalid Account Nickname \'%1$s\'</string>
     <string name="non_unique_account_nickname">Nickname \'%1$s\' already exists</string>
     <string name="display_name">Display Name</string>
-    <string name="your_name">Your Name</string>
     <string name="display_name_help">Name (if any) used in From URI of outbound requests.</string>
     <string name="invalid_display_name">Invalid Display Name \'%1$s\'</string>
     <string name="authentication_username">Authentication Username</string>
@@ -168,7 +166,6 @@
         for STUN and ICE protocols is \'stun:stun.l.google.com:19302\' pointing to public Google
         STUN server. There is no factory default TURN server.
     </string>
-    <string name="stun_server_uri">STUN/TURN Server URI</string>
     <string name="invalid_stun_server">Invalid STUN/TURN Server URI \'%1$s\'</string>
     <string name="stun_server_default" translatable="false">stun:stun.l.google.com:19302</string>
     <string name="stun_username">STUN/TURN Username</string>
@@ -188,8 +185,6 @@
 \n • SRTP means that RTP/AVP is offered in outgoing call and that RTP/SAVP or RTP/SAVPF is used
             if offered in incoming call.
     </string>
-    <string name="prefer_ipv6_media">Prefer IPv6 Media</string>
-    <string name="prefer_ipv6_media_help">If checked, offer to use IPv6 media protocol (if available) when media protocol of peer cannot be automatically determined.</string>
     <string name="rtcp_mux">RTCP Multiplexing</string>
     <string name="rtcp_mux_help">If checked, RTP and RTCP packets are multiplexed on a single port (RFC 5761).</string>
     <string name="rel_100">Reliable Provisional Responses</string>
@@ -210,7 +205,6 @@
     <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
     </string>
-    <string name="invalid_voicemail_uri">Invalid Voicemail URI \'%1$s\'</string>
     <string name="country_code">Country Code</string>
     <string name="country_code_help">E.164 country code of this account.  If From URI userpart of
         incoming call or message contains a telephone number that does not start with \'+\' sign and if contact
@@ -218,14 +212,12 @@
         tried again. If the telephone number starts with a single digit \'0\', digit \'0\' is removed
         before the number is prefixed.
     </string>
-    <string name="country_code_hint">+code</string>
     <string name="invalid_country_code">Invalid Country Code \'%1$s\'</string>
     <string name="telephony_provider">Telephony Provider</string>
     <string name="telephony_provider_help">SIP URI host part used in calls to telephone numbers.
         Factory default is account\'s domain. If not given, this account cannot be used to call
         telephone numbers.
     </string>
-    <string name="telephony_provider_hint">SIP URI host part</string>
     <string name="numeric_keypad">Numeric Keypad</string>"
     <string name="numeric_keypad_help">If checked, numeric keypad is shown when \"Call to …\"
         field is focused.</string>"
@@ -243,7 +235,6 @@
         If neither is given and no outbound proxy is specified, account\'s registrar (if any) is
         determined solely based on domain\'s DNS information.
     </string>
-    <string name="user_domain">user@domain</string>
     <string name="invalid_aor">Invalid user@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="account_exists">Account \'%1$s\' already exists.</string>
     <string name="account_allocation_failure">"Failed to allocate new account.</string>
@@ -452,7 +443,6 @@
         on top of contacts list.</string>
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
-    <string name="invalid_contact_uri">Invalid SIP URI</string>
     <string name="android_contact_help">If checked, this contact is added to Android contacts.</string>
     <string name="avatar_image">Profile image</string>
     <!-- Contacts Activity -->
@@ -471,7 +461,6 @@
     <string name="no">No</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
-    <string name="user_id">User ID</string>
     <string name="password">Password</string>
     <string name="sip_uri" translatable="false">SIP URI</string>
     <string name="add">Add</string>
@@ -480,7 +469,6 @@
     <string name="send">Send</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
-    <string name="help">Help</string>
     <string name="confirmation">Confirmation</string>
     <string name="anonymous">Anonymous</string>
     <string name="unknown">Unknown</string>
@@ -500,7 +488,6 @@
     <string name="incoming_call_from_dots">Call from …</string>
     <string name="diverted_by_dots">Diverted by …</string>
     <string name="transferring_call_to_dots">Transferring call to …</string>
-    <string name="invalid_sip_uri">Invalid SIP URI \'%1$s\'</string>
     <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
     <string name="callee">Callee</string>
     <string name="hangup">Hangup</string>
@@ -584,15 +571,12 @@
     <string name="no_notifications">You are not able to use this application without \"Notifications\"
         permission.</string>
     <string name="no_calls">baresip needs \"Microphone\" permission for voice calls.</string>
-    <string name="no_bluetooth">baresip is not able to detect Bluetooth connectivity without
-        \"Nearby devices\" permission.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
     <string name="no_backup">You are not able create backup without \"Storage\" permission.</string>
     <string name="no_restore">You are not able restore backup without \"Storage\" permission.</string>
     <string name="no_android_contacts">You are not able to access Android contacts without
         \"Contacts\" permission.</string>
     <string name="no_cameras">No supported video cameras!</string>
-    <string name="show_password">Show Password</string>
     <string name="no_network">No network connection!</string>
     <string name="no_aec">No hardware Acoustic Echo Cancellation!</string>
     <string name="audio_focus_denied">Audio focus denied!</string>

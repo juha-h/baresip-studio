@@ -4,20 +4,16 @@
     <string name="about_title_plus">Über baresip+</string>
     <string name="account">Konto</string>
     <string name="display_name">Anzeigename</string>
-    <string name="your_name">Ihr Name</string>
     <string name="non_unique_account_nickname">Der Nickname \'%1$s\' existiert bereits</string>
     <string name="account_nickname_help">Der Nickname (falls vorhanden), der zur Identifikation des Kontos innerhalb der baresip App genutzt wird.</string>
     <string name="nickname">Nickname</string>
-    <string name="account_nickname">Nickname des Kontos</string>
     <string name="invalid_account_nickname">Ungültiger Konto Nickname \'%1$s\'</string>
     <string name="redirect_mode">Rufumleitungsmodus</string>
     <string name="telephony_provider">Telefonieanbieter</string>
     <string name="reject">Zurückweisen</string>
-    <string name="user_domain">benutzer@domain</string>
     <string name="transfer_request_to">Anrufübertragungsanfrage an</string>
     <string name="message_from">Nachricht von</string>
     <string name="about">Über</string>
-    <string name="show_password">Passwort anzeigen</string>
     <string name="register_help">Wenn angeklickt wird das Registrieren aktiviert und REGISTER-Anfragen werden in dem durch das Registrierenintervall angegebenen Intervall gesendet.</string>
     <string name="reg_int">Registrierenintervall</string>
     <string name="reg_int_help">Gibt an, wie oft (in Sekunden) baresip REGISTER-Anfragen sendet. Gültige Werte: 60 bis 3600.</string>
@@ -27,12 +23,10 @@
     <string name="stun_password_help">Passwort, wenn der STUN/TURN Server eines verlangt</string>
     <string name="invalid_stun_password">Ungültiges Passwort \'%1$s\'</string>
     <string name="media_encryption">Verschlüsselung</string>
-    <string name="prefer_ipv6_media">Bevorzuge IPv6 Medien</string>
     <string name="manual">Manuell</string>
     <string name="auto">Automatisch</string>
     <string name="voicemail_uri">Sprachnachrichten URI</string>
     <string name="country_code">Ländercode</string>
-    <string name="prefer_ipv6_media_help">Wenn angeklickt, IPv6 Medienprotokoll (falls verfügbar) verwenden, wenn das Medienprotokoll der Gegenstelle nicht automatisch ermittelt werden kann.</string>
     <string name="voicemain_uri_help">SIP URI zur Überprüfung von Sprachnachrichten. Wenn leer gelassen, werden Voicemail-Nachrichten (Message Waiting Indications) nicht abonniert.</string>
     <string name="account_exists">Konto \'%1$s\' existiert bereits.</string>
     <string name="account_allocation_failure">Neues Konto konnte nicht zugeordnet werden.</string>
@@ -58,7 +52,6 @@
     <string name="dtmf_mode">DTMF Modus</string>
     <string name="answer_mode_help">Bestimmt wie eingehende Rufe beantwortet werden.</string>
     <string name="telephony_provider_help">SIP URI-Hostteil bei Anrufen zu Telefonnummern. Voreinstellung ist die Domain des Kontos. Wenn nicht angegeben, kann dieses Konto nicht verwendet werden, um Telefonnummern anzurufen.</string>
-    <string name="telephony_provider_hint">SIP URI-Hostteil</string>
     <string name="invalid_sip_uri_hostpart">Ungültiger SIP URI-Hostteil \'%1$s \'</string>
     <string name="default_account_help">Wenn angeklickt, wird dieses Konto beim Start von Baresip vorausgewählt.</string>
     <string name="default_account">Voreingestelltes Konto</string>
@@ -80,7 +73,6 @@
     <string name="invalid_proxy_server_uri">Ungültige Proxy Server URI \'%1$s\'</string>
     <string name="register">Registrieren</string>
     <string name="media_nat_help">Wählt ein oder kein media NAT traversal protocol. Mögliche Werte sind STUN (Session Traversal Utilities for NAT, RFC 5389) und ICE (Interactive Connectivity Establishment, RFC 5245).</string>
-    <string name="invalid_voicemail_uri">Ungültige Sprachnachrichten URI \'%1$s \'</string>
     <string name="accounts">Konten</string>
     <string name="new_account">SIP URI des neuen Kontos</string>
     <string name="decrypt_password">Passwort entschlüsseln</string>
@@ -127,7 +119,6 @@
     <string name="cancel">Abbrechen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
-    <string name="help">Hilfe</string>
     <string name="confirmation">Bestätigung</string>
     <string name="restart">Neustarten</string>
     <string name="restore">Wiederherstellen</string>
@@ -136,7 +127,6 @@
     <string name="incoming_call_from_dots">Anruf von …</string>
     <string name="diverted_by_dots">Umgeleitet von …</string>
     <string name="transferring_call_to_dots">Anruf weiterleiten an …</string>
-    <string name="invalid_sip_uri">Ungültiger SIP URI \'%1$s\'</string>
     <string name="callee">Adresse/Telefonnummer</string>
     <string name="hangup">Auflegen</string>
     <string name="video_call">Videoanruf</string>
@@ -155,13 +145,11 @@
     <string name="call_failed">Anruf fehlgeschlagen</string>
     <string name="call_closed">Anruf beendet</string>
     <string name="call_not_secure">Dieser Anruf ist NICHT sicher!</string>
-    <string name="no_bluetooth">baresip Ist nicht im Stande eine Bluetooth Verbindung zu erkennen ohne \"Geräte in der Nähe\" Berechtigung.</string>
     <string name="no_video_calls">Geben Sie \"Kamera\" Berechtigung, um Videoanrufe zu machen oder zu empfangen.</string>
     <string name="no_android_contacts">Sie können auf Android-Kontakte ohne \"Kontakte\" Berechtigung nicht zugreifen.</string>
     <string name="audio_and_video_permissions">baresip+ benötigt die \"Mikrofon\"-Berechtigung für Sprachanrufe, die \"Kamera\"-Berechtigung für Videoanrufe, die \"Geräte in der Nähe\"-Berechtigung für Bluetooth-Mikrofon/Hörer-Erkennung, die \"Benachrichtigungen\"-Berechtigung für die Benachrichtigungen und bei Android 9 die \"Speicher\"-Berechtigung zur Datensicherung/ Wiederherstellung.</string>
     <string name="invalid_contact">Ungültiger Kontaktname \'%1$s\'</string>
     <string name="favorite">Favorit</string>
-    <string name="invalid_contact_uri">Ungültiger SIP URI</string>
     <string name="android_contact_help">Wenn angeklickt, wird der Kontakt zum Android Adressbuch hinzugefügt.</string>
     <string name="delete_history">Löschen</string>
     <string name="calls_duration">Dauer</string>
@@ -189,7 +177,6 @@
     <string name="no_notifications">Sie können diese Anwendung nicht ohne \"Benachrichtigungen\"-Berechtigung verwenden.</string>
     <string name="invalid_sip_or_tel_uri">Ungültiger SIP or tel URI \'%1$s\'</string>
     <string name="deny">Verweigern</string>
-    <string name="user_id">Benutzer ID</string>
     <string name="no_network">Keine Netzwerk Verbindung!</string>
     <string name="outbound_proxies">Proxies für ausgehende Verbindungen</string>
     <string name="battery_optimizations_help">Deaktivieren Sie die Akku-Optimierungen (empfohlen), wenn Sie die Wahrscheinlichkeit reduzieren möchten, dass Android den Zugriff von Baresip auf das Netzwerk einschränkt oder Baresip in den Standby-Zustand versetzt.</string>
@@ -338,7 +325,6 @@
     <string name="invalid_opus_packet_loss">Ungültiger Opus Paketverlustprozentsatz</string>
     <string name="default_call_volume">Standardmäßige Anruflautstärke</string>
     <string name="stun_server">STUN/TURN Server</string>
-    <string name="stun_server_uri">STUN/TURN Server URI</string>
     <string name="dtmf_inband">RTP Ergeignisse im Frequenzband</string>
     <string name="audio_codecs">Audio Codecs</string>
     <string name="tls_ca_file">TLS CA Datei</string>
@@ -408,7 +394,6 @@
     <string name="media_nat">NAT Durchquerung von Medien</string>
     <string name="default_call_volume_help">Falls aktiviert, liegt die standardmäßige Anruflautstärke auf einer Skala von 1-10.</string>
     <string name="video_size">Größe der Videoframes</string>
-    <string name="country_code_hint">+code</string>
     <string name="video_fps">Videoframes pro Sekunde</string>
     <string name="video_fps_help">Bildwiederholungsrate, die während einem SDP-Handshake angeboten werden wird. Gültige Werte von 10 bis 30.</string>
     <string name="video_size_help">Größe der gesendeten Videoframes (Breite x Höhe)</string>
