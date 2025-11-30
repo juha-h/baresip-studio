@@ -13,13 +13,14 @@ android {
         targetSdk = 36
         versionCode = 459
         versionName = "72.0.0"
+        @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
                 arguments.addAll(listOf("-DANDROID_STL=c++_shared"))
-                version = "3.25.1"
             }
         }
+
         ndk {
             // noinspection ChromeOsAbiSupport
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
@@ -29,9 +30,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
     }
     splits {
         abi {
@@ -64,6 +62,7 @@ android {
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.31.6"
         }
     }
     namespace = "com.tutpro.baresip"
