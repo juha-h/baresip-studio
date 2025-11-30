@@ -58,7 +58,6 @@
     <string name="register">Registrar</string>
     <string name="register_help">Si está marcado, el registro está habilitado y las solicitudes de REGISTRO se envían en el intervalo especificado por Intervalo de registro.</string>
     <string name="audio_codecs">Códecs de audio</string>
-    <string name="audio_codecs_help">Lista de códecs de audio por orden de prioridad. Arrastre para reordenar, deslice a la derecha para activar o desactivar.</string>
     <string name="media_nat">Media NAT transversal</string>
     <string name="media_nat_help">Selecciona el protocolo transversal de NAT media (si lo hay). Las posibles opciones son STUN
         (Utilidades de recorrido de sesión para NAT, RFC 5389) e ICE (conectividad interactiva
@@ -95,24 +94,18 @@
     <string name="decrypt_password">Contraseña para descifrar</string>
     <string name="delete_account">¿Quiere eliminar la cuenta «%1$s»\?</string>
     <!-- Baresip Service -->
-    <string name="answer">Contestar</string>
-    <string name="reject">Rechazar</string>
     <string name="transfer_request">Solicitud de transferencia</string>
-    <string name="message_from">Mensaje de</string>
     <!-- Calls Activity -->
     <string name="call_history">Historial de llamadas</string>
     <string name="call">Llamada</string>
     <string name="calls_calls">llamadas</string>
     <string name="calls_call">llamar</string>
-    <string name="calls_call_message_question">¿Quiere llamar o enviar un mensaje a «%1$s»\?</string>
     <string name="calls_add_delete_question">¿Quiere añadir a «%1$s» a los contactos o eliminar %2$s del historial de llamadas\?</string>
     <string name="calls_delete_question">¿Quiere eliminar «%1$s» %2$s del historial de llamadas\?</string>
-    <string name="delete_history">Eliminar</string>
     <string name="disable_history">Desactivar</string>
     <string name="enable_history">Activar</string>
     <string name="delete_history_alert">¿Quiere eliminar el historial de llamadas de la cuenta «%1$s»\?</string>
     <!-- Chat Activity -->
-    <string name="chat">Mensajes de chat</string>
     <string name="chat_with">Chatear con %1$s</string>
     <string name="new_message">Mensaje nuevo</string>
     <string name="long_message_question">¿Quiere eliminar el mensaje o añadir el par «%1$s» a los contactos\?</string>
@@ -125,11 +118,9 @@
     <string name="today">Hoy</string>
     <string name="you">Usted</string>
     <string name="new_chat_peer">Nuevo compañero de chat</string>
-    <string name="invalid_chat_peer_uri">URI de chat no válido</string>
     <string name="long_chat_question">¿Quieres eliminar el chat con un compañero? \'%1$s\' o
         agregar pares a los contactos?</string>
     <string name="short_chat_question">¿Quiere eliminar el chat con «%1$s»\?</string>
-    <string name="delete_chats">Eliminar</string>
     <string name="delete_chats_alert">¿Quiere eliminar el historial de chat de la cuenta «%1$s»\?</string>
     <!-- Config Activity -->
     <string name="configuration">Configuración</string>
@@ -156,7 +147,6 @@
     <string name="tls_certificate_file_help">Si se marca, se ha cargado o se cargará un archivo que contiene el certificado TLS y la clave privada de esta instancia de baresip. En las versiones Android 9, se carga un archivo llamado \'cert.pem\' desde la carpeta Download. Por razones de seguridad, elimine el archivo después de cargarlo.</string>
     <string name="tls_ca_file">Archivo de CA de TLS</string>
     <string name="tls_ca_file_help">Si está marcada, se ha cargado o se cargará un archivo que contiene certificados TLS de dichas Autoridades de Certificación que no están incluidas en el SO Android. En las versión de Android 9, se carga un archivo llamado \'ca_certs.crt\' desde la carpeta Download.</string>
-    <string name="aec">Cancelación de eco acústico</string>
     <string name="opus_bit_rate">Tasa de bits de Opus</string>
     <string name="opus_bit_rate_help">Velocidad de bits máxima promedio utilizada por la transmisión de audio Opus.
         Los valores válidos son 6000-510000. El valor predeterminado de fábrica es 28000.</string>
@@ -174,7 +164,6 @@
     <string name="read_cert_error">Fallo al leer el archivo \'cert.pem\'.</string>
     <string name="read_ca_certs_error">Error al leer el archivo \'ca_certs.crt\'.</string>
     <!-- Contact Activity -->
-    <string name="contact">Contacto</string>
     <string name="new_contact">Contacto nuevo</string>
     <string name="contact_name">Nombre</string>
     <string name="invalid_contact">El nombre de contacto «%1$s» no es válido</string>
@@ -184,7 +173,6 @@
     <string name="contact_action_question">¿Quieres llamar o enviar un mensaje a \'%1$s\'?</string>
     <string name="send_message">Enviar mensaje</string>
     <string name="contact_delete_question">¿Quiere eliminar el contacto «%1$s»\?</string>
-    <string name="contacts_exceeded">Su número máximo de contactos %1$d se ha excedido.</string>
     <!-- Generic -->
     <string name="alert">Alerta</string>
     <string name="info">Información</string>
@@ -195,11 +183,9 @@
     <string name="no">No</string>
     <string name="accept">Aceptar</string>
     <string name="deny">Denegar</string>
-    <string name="password">Contraseña</string>
     <string name="add">Añadir</string>
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
-    <string name="send">Enviar</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
     <!-- Main Activity -->
@@ -210,16 +196,11 @@
     <string name="quit">Salir</string>
     <string name="outgoing_call_to_dots">Llamar a …</string>
     <string name="incoming_call_from_dots">Llamada de …</string>
-    <string name="transferring_call_to_dots">Transfiriendo llamada a …</string>
-    <string name="callee">Destinatario</string>
-    <string name="hangup">Colgar</string>
-    <string name="hold">Retención/desconexión de llamadas</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Información de llamada</string>
     <string name="duration">Duración: %1$d (segs)</string>
     <string name="codecs">Códecs</string>
     <string name="rate">Velocidad actual: %1$s (Kbits/s)</string>
-    <string name="voicemail">Mensaje de voz</string>
     <string name="voicemail_messages">Mensajes de correo de voz</string>
     <string name="you_have">Tiene</string>
     <string name="one_new_message">un mensaje nuevo</string>
@@ -229,8 +210,6 @@
     <string name="and">y</string>
     <string name="no_messages">No tiene mensajes</string>
     <string name="listen">Escuchar</string>
-    <string name="messages">Mensajes</string>
-    <string name="dialpad">Teclado</string>
     <string name="call_already_active">Ya tiene una llamada activa.</string>
     <string name="start_failed">Baresip no se ha podido iniciar. Esto puede deberse a un valor de configuración no válido. Compruebe la dirección de escucha, el archivo de certificado TLS y el archivo TLS CA. Luego reinicie baresip.</string>
     <string name="registering_failed">Registro de \`%1$s\` ha fallado.</string>
@@ -255,7 +234,6 @@
     <string name="no_calls">baresip necesita permiso de \"Micrófono\" para las llamadas de voz.</string>
     <string name="invalid_authentication_password">Contraseña incorrecta%1$s</string>
     <string name="invalid_authentication_username">Nombre de usuario no válido \'%1$s\'</string>
-    <string name="video_codecs_help">Lista de códecs de vídeo por orden de prioridad. Arrastre para reordenar, deslice a la derecha para activar o desactivar.</string>
     <string name="no_cameras">No tiene ninguna cámara de video compatible.</string>
     <string name="no_video_calls">Concede permiso a \"Cámara\" para realizar o responder videollamadas.</string>
     <string name="restart_request">Solicitud de reinicio</string>
@@ -264,7 +242,6 @@
     <string name="transfer">Transferir</string>
     <string name="transfer_destination">Destino de transferencia</string>
     <string name="call_transfer">Transferencia de llamadas</string>
-    <string name="mic">Micrófono encendido/apagado</string>
     <string name="allow_video_recv">¿Aceptar la recepción de vídeo de \'%1$s\'\?</string>
     <string name="allow_video_send">¿Acepta el envío de video a \'%1$s\'\?</string>
     <string name="allow_video">¿Aceptar el envío y la recepción de vídeo con \'%1$s\'\?</string>
@@ -368,7 +345,6 @@ También se pueden comunicar problemas.
     <string name="telephony_provider_help">Parte del host SIP URI utilizada en las llamadas a números de teléfono. Por defecto es el dominio de la cuenta. Si no se indica, esta cuenta no puede utilizarse para llamar a números de teléfono.</string>
     <string name="invalid_country_code">Código del país \"%1$s\" no válido</string>
     <string name="invalid_sip_uri_hostpart">Parte del host SIP URI \'%1$s\' no válida</string>
-    <string name="codec_action">Reordenar</string>
     <string name="contacts_help">Elige si se utilizan contactos de Baresip, contactos de Android o ambos. Si se utilizan ambos y existe un contacto con el mismo nombre en ambos contactos, se elegirá el contacto bareip.</string>
     <string name="consent_request">Solicitud de autorización</string>
     <string name="sip_or_tel_uri">SIP o teléfono URI</string>

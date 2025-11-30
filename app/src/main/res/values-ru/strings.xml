@@ -4,7 +4,6 @@
     <string name="add">Добавить</string>
     <string name="add_contact">Добавить контакт</string>
     <string name="alert">Внимание</string>
-    <string name="answer">Ответить</string>
     <string name="audio_codecs">Аудио кодеки</string>
     <string name="authentication_password">Пароль аутентификации</string>
     <string name="authentication_username">Имя пользователя</string>
@@ -16,26 +15,21 @@
     <string name="call_history">История звонков</string>
     <string name="call_info">Информация о звонке</string>
     <string name="call_is_secure">Этот вызов БЕЗОПАСЕН, и собеседник ПОДТВЕРЖДЕН! Вы хотите отменить верификацию собеседника\?</string>
-    <string name="callee">Вызываемый</string>
     <string name="calls_add_delete_question">Вы хитите добавить \'%1$s\' в контакты или удалить %2$s из истории звинков?</string>
     <string name="calls_call">вызов</string>
-    <string name="calls_call_message_question">Хотите послать сообщение \'%1$s\'?</string>
     <string name="calls_calls">Вызовы</string>
     <string name="calls_delete_question">Хотите удалить \'%1$s\' %2$s из истории вызовов?</string>
     <string name="cancel">Отмена</string>
-    <string name="chat">Чат</string>
     <string name="chat_with">Чат с %1$s</string>
     <string name="chats">История чата</string>
     <string name="codecs">Кодеки</string>
     <string name="config_restart">Хотите перегрузить для активации новых установок?</string>
     <string name="configuration">Настройки</string>
-    <string name="contact">Контакт</string>
     <string name="contact_action_question">Хотите позвонить или послать сообщение \'%1$s\'?</string>
     <string name="contact_already_exists">Контакт \'%1$s\' уже существует.</string>
     <string name="contact_delete_question">Хотите удалить контакт \'%1$s\'?</string>
     <string name="contact_name">Имя</string>
     <string name="contacts">Контакты</string>
-    <string name="contacts_exceeded">Максимальное число контактов %1$d исчерпано.</string>
     <string name="debug">Отладка</string>
     <string name="decrypt_password">Расшифровать пароль</string>
     <string name="default_account">Аккаунт по умолчанию</string>
@@ -44,12 +38,9 @@
     <string name="default_call_volume_help">Если установлено громкость вызова 1-10.</string>
     <string name="delete">Удалить</string>
     <string name="delete_account">Хотите удалить аккаунт \'%1$s\'?</string>
-    <string name="delete_chats">Удалить</string>
     <string name="delete_chats_alert">Хотите удалить историю чата с \'%1$s\'?</string>
-    <string name="delete_history">Удалить</string>
     <string name="delete_history_alert">Хотите удалить историю вызовов с \'%1$s\'?</string>
     <string name="deny">Запрет</string>
-    <string name="dialpad">Клавиатура</string>
     <string name="disable_history">Отключить</string>
     <string name="display_name">Отображаемое имя</string>
     <string name="display_name_help">Имя используемое в From URI исходящих вызовов.</string>
@@ -62,16 +53,12 @@
     <string name="error">Ошибка</string>
     <string name="failed_to_load_module">Не могу загрузить модуль.</string>
     <string name="failed_to_set_dns_servers">Не могу установиь ДНС сервера</string>
-    <string name="hangup">Прервать вызов</string>
-    <string name="hold">Удержание/возобновление вызова</string>
     <string name="incoming_call_from_dots">Вызов от …</string>
     <string name="info">Информация</string>
-    <string name="invalid_chat_peer_uri">Недопустимый URI узла чата</string>
     <string name="invalid_contact">Неверное имя контакта \'%1$s\'</string>
     <string name="invalid_dns_servers">Неверный ДНС сервер</string>
     <string name="invalid_listen_address">Неверный адрес</string>
     <string name="invalid_opus_bitrate">Неверный Opus bitrate</string>
-    <string name="send">Послать</string>
     <string name="send_message">Послать сообщение</string>
     <string name="sending_failed">Не удалось отправить сообщение</string>
     <string name="short_chat_question">Хотите удалить чат с \'%1$s\'?</string>
@@ -79,14 +66,12 @@
     <string name="start_automatically">Запускать автоматически</string>
     <string name="start_automatically_help">Если выбрано, baresip запускается автоматически после (пере)запуска устройства.</string>
     <string name="status">Статус</string>
-    <string name="voicemail">Голосовая почта</string>
     <string name="voicemail_messages">Сообщения голосовой почты</string>
     <string name="voicemail_uri">URI голововой почты</string>
     <string name="yes">Да</string>
     <string name="you">Вы</string>
     <string name="you_have">Вы имеете</string>
     <string name="about_title">О baresip</string>
-    <string name="audio_codecs_help">Список аудиокодеков в порядке приоритета. Перетащите, чтобы изменить порядок, щелкните длинным щелчком, чтобы включить или выключить.</string>
     <string name="audio_modules_title">Аудио модули</string>
     <string name="authentication_password_help">Пароль аутентификации до 64 символов. Если указано имя пользователя для аутентификации, но нет пароля, он будет запрошен при запуске baresip.</string>
     <string name="backup">Резервное копирование</string>
@@ -98,8 +83,6 @@
 \n • SRTP-MAND означает, что RTP/SAVP предлагается при исходящем вызове и требуется при входящем вызове.
 \n • SRTP означает, что RTP/AVP предлагается в исходящем вызове и что RTP/SAVP или RTP/SAVPF используется, если предлагается во входящем вызове.</string>
     <string name="message_failed">Неудачно</string>
-    <string name="message_from">Сообщение от</string>
-    <string name="messages">Сообщения</string>
     <string name="new_account">SIP URI или Новый аккаунт</string>
     <string name="new_chat_peer">Новый партнер чата</string>
     <string name="new_contact">Новый контакт</string>
@@ -112,11 +95,9 @@
     <string name="old_messages">старые сообщения</string>
     <string name="one_new_message">одно новое сообщение</string>
     <string name="one_old_message">одно старое сообщение</string>
-    <string name="password">Пароль</string>
     <string name="quit">Выход</string>
     <string name="rate">Текущая скорость: %1$s (Кбит/с)</string>
     <string name="register">Регистрация</string>
-    <string name="reject">Отклонить</string>
     <string name="reset_config">Сброс к заводским настройкам</string>
     <string name="restart">Перезагрузка</string>
     <string name="restore">Восстановление</string>
@@ -128,7 +109,6 @@
     <string name="account_allocation_failure">Не могу создать новый аккаунт.</string>
     <string name="account_exists">Профиль \'%1$s\' уже существует.</string>
     <string name="accounts">Профили</string>
-    <string name="aec">Подавление акустического эха</string>
     <string name="and">и</string>
     <string name="answer_mode">Режим ответа</string>
     <string name="answer_mode_help">Выберите как отвечать на входящие вызовы.</string>
@@ -142,7 +122,6 @@
     <string name="today">Сегодня</string>
     <string name="transfer_request_query">Принять перевод этого вызова на \'%1$s\'\?</string>
     <string name="transfer_request">Запрос перевода на</string>
-    <string name="transferring_call_to_dots">Перевод на …</string>
     <string name="unverify">Отменить подтверждение</string>
     <string name="invalid_opus_packet_loss">Неверный процент потерь Opus</string>
     <string name="media_nat">Прохождение медиа NAT</string>
@@ -193,7 +172,6 @@
     <string name="invalid_stun_server">Недействительный URI сервера STUN/TURN \'%1$s\'</string>
     <string name="stun_server_help">URI сервера STUN/TURN в виде схема:хост[:порт][\?transport=udp|tcp], где схема — \'stun\', \'turn\' или \'turns\'. STUN-сервер по умолчанию для протоколов STUN и ICE — \'stun:stun.l.google.com:19302\' — общедоступный STUN-сервер Google. TURN-сервер по умолчанию не используется.</string>
     <string name="stun_server">STUN/TURN сервер</string>
-    <string name="video_codecs_help">Список видеокодеков в порядке приоритета. Перетащите его, чтобы изменить порядок, щелкните длинным щелчком, чтобы включить или выключить.</string>
     <string name="video_codecs">Видео кодеки</string>
     <string name="register_help">При отметке включается регистрация и REGISTER-запросы отправляются с указанным интервалом.</string>
     <string name="invalid_proxy_server_uri">Недействительный URI прокси-сервера \'%1$s\'</string>
@@ -295,12 +273,10 @@
     <string name="allow_video_recv">Разрешить приём видео с сайта \'%1$s\'\?</string>
     <string name="allow_video_send">Разрешить передачу видео на \'%1$s\'\?</string>
     <string name="rtcp_mux">Мультиплексирование RTCP</string>
-    <string name="codec_action">Переупорядочить</string>
     <string name="consent_request">Запрос согласия</string>
     <string name="sip_or_tel_uri">SIP или tel URI</string>
     <string name="invalid_sip_or_tel_uri">Неверный SIP или tel URI \'%1$s\'</string>
     <string name="diverted_by_dots">Отклонено…</string>
-    <string name="mic">Включение/отключение микрофона</string>
     <string name="call_is_on_hold">Вызов на удержании</string>
     <string name="attended">С участием</string>
     <string name="lost">Потеряно</string>

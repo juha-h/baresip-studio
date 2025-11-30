@@ -20,8 +20,6 @@
     <string name="registering_failed">O registro de %1$s falhou.</string>
     <string name="start_failed">Baresip falhou ao iniciar. Isso pode ser devido a um valor inválido das Configurações. Verifique Endereço de Escuta, Arquivo de Certificado TLS e Arquivo CA TLS. Em seguida, reinicie o baresip.</string>
     <string name="call_already_active">Você já tem uma chamada ativa.</string>
-    <string name="dialpad">Teclado de Discagem</string>
-    <string name="messages">Mensagens</string>
     <string name="listen">Ouvir</string>
     <string name="no_messages">Você não tem mensagens</string>
     <string name="and">e</string>
@@ -31,15 +29,10 @@
     <string name="one_new_message">uma nova mensagem</string>
     <string name="you_have">Você tem</string>
     <string name="voicemail_messages">Mensagens do Correio de Voz</string>
-    <string name="voicemail">Correio de Voz</string>
     <string name="rate">Taxa atual: %1$s (Kbits/s)</string>
     <string name="duration">Duração: %1$d (segs)</string>
     <string name="call_info_not_available">Nenhuma informação disponível</string>
     <string name="call_info">Informações da Chamada</string>
-    <string name="hold">Chamada em espera/liberar</string>
-    <string name="hangup">Desligar</string>
-    <string name="callee">Destinatário</string>
-    <string name="transferring_call_to_dots">Transferindo chamada para …</string>
     <string name="incoming_call_from_dots">Chamada de …</string>
     <string name="outgoing_call_to_dots">Chamando …</string>
     <string name="quit">Sair</string>
@@ -47,11 +40,9 @@
     <string name="about">Sobre</string>
     <string name="restore">Restaurar</string>
     <string name="error">Erro</string>
-    <string name="send">Enviar</string>
     <string name="edit">Editar</string>
     <string name="delete">Excluir</string>
     <string name="add">Adicionar</string>
-    <string name="password">Senha</string>
     <string name="deny">Recusar</string>
     <string name="accept">Aceitar</string>
     <string name="no">Não</string>
@@ -61,7 +52,6 @@
     <string name="notice">Aviso</string>
     <string name="info">Informações</string>
     <string name="alert">Alerta</string>
-    <string name="contacts_exceeded">O seu número máximo de %1$d contatos foi excedido.</string>
     <string name="contact_delete_question">Você quer excluir o contato \'%1$s\'\?</string>
     <string name="send_message">Enviar Mensagem</string>
     <string name="contact_action_question">Você quer ligar ou enviar mensagem para \'%1$s\'\?</string>
@@ -70,7 +60,6 @@
     <string name="invalid_contact">Nome de contato \'%1$s\' inválido</string>
     <string name="contact_name">Nome</string>
     <string name="new_contact">Novo Contato</string>
-    <string name="contact">Contato</string>
     <string name="config_restart">Você precisa reiniciar o baresip para aplicar as novas configurações. Reiniciar agora\?</string>
     <string name="read_ca_certs_error">Houve uma falha ao ler o arquivo \'ca_certs.crt\'.</string>
     <string name="read_cert_error">Houve uma falha ao ler o arquivo \'cert.pem\'.</string>
@@ -86,7 +75,6 @@
     <string name="opus_packet_loss">Perda de pacotes Opus esperada</string>
     <string name="opus_bit_rate_help">Taxa de bits máxima média usada pelo fluxo de áudio do Opus. Os valores válidos são 6000-510000. O padrão de fábrica é 28000.</string>
     <string name="opus_bit_rate">Taxa de Bits Opus</string>
-    <string name="aec">Cancelamento de Eco Acústico</string>
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
     <string name="audio_modules_help">Codecs de áudio providos pelos módulos selecionados estão disponíveis para uso das contas.</string>
     <string name="audio_modules_title">Módulos de Áudio</string>
@@ -105,10 +93,8 @@
     <string name="start_automatically">Iniciar Automaticamente</string>
     <string name="configuration">Ajustes</string>
     <string name="delete_chats_alert">Você quer excluir o histórico de chat da conta \'%1$s\'\?</string>
-    <string name="delete_chats">Excluir</string>
     <string name="short_chat_question">Você quer excluir o chat com \'%1$s\'\?</string>
     <string name="long_chat_question">Você quer excluir o chat com o par \'%1$s\' ou adicionar o par aos contatos\?</string>
-    <string name="invalid_chat_peer_uri">Par do chat URI é inválido</string>
     <string name="new_chat_peer">Novo Par de Chat</string>
     <string name="you">Você</string>
     <string name="today">Hoje</string>
@@ -120,22 +106,16 @@
     <string name="long_message_question">Você quer excluir a mensagem ou adicionar o ponto \'%1$s\' aos contatos\?</string>
     <string name="new_message">Nova mensagem</string>
     <string name="chat_with">Falar com %1$s</string>
-    <string name="chat">Mensagem do Chat</string>
     <string name="delete_history_alert">Você quer excluir o histórico de chamadas da conta \'%1$s\'\?</string>
     <string name="enable_history">Habilitar</string>
     <string name="disable_history">Desabilitar</string>
-    <string name="delete_history">Excluir</string>
     <string name="calls_delete_question">Você quer apagar %1$s\' %2$s do histórico de chamadas\?</string>
     <string name="calls_add_delete_question">Você quer adicionar \'%1$s\' aos contatos ou deletar %2$s do histórico de chamadas\?</string>
-    <string name="calls_call_message_question">Você quer ligar ou enviar mensagem para \'%1$s\'\?</string>
     <string name="calls_call">chamada</string>
     <string name="calls_calls">chamadas</string>
     <string name="call">Chamada</string>
     <string name="call_history">Histórico de Chamadas</string>
-    <string name="message_from">Mensagem de</string>
     <string name="transfer_request">Pedido de Transferência</string>
-    <string name="answer">Atender</string>
-    <string name="reject">Rejeitar</string>
     <string name="delete_account">Você quer excluir a conta \'%1$s\'\?</string>
     <string name="decrypt_password">Descriptografar Senha</string>
     <string name="encrypt_password">Criptografar Senha</string>
@@ -165,7 +145,6 @@
     <string name="stun_server">Servidor STUN/TURN</string>
     <string name="media_nat_help">Selecione o protocolo de NAT transversal de mídia (se houver). Escolhas possíveis são STUN (Session Traversal Utilities para NAT, RFC 5389) e ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
-    <string name="audio_codecs_help">Lista dos codecs de áudio em ordem de prioridade. Faça um clique longo para ativar ou desativar.</string>
     <string name="audio_codecs">Codecs de Áudio</string>
     <string name="register_help">Se marcado, o registro é ativado e as solicitações de REGISTRO são enviadas no intervalo determinado pelo Intervalo de registro.</string>
     <string name="register">Registro</string>
@@ -245,7 +224,6 @@
     <string name="invalid_stun_username">Nome do usuário inválido \'%1$s\'</string>
     <string name="stun_username_help">Nome do usuário, caso seja necessário pelo servidor STUN/TURN</string>
     <string name="stun_username">Nome do Usuário STUN/TURN</string>
-    <string name="video_codecs_help">Lista dos codecs de vídeo em ordem de prioridade. Faça um clique longo para ativar ou desativar.</string>
     <string name="video_codecs">Codecs de Vídeo</string>
     <string name="transfer_request_query">Você aceita transferir esta chamada para \'%1$s\'\?</string>
     <string name="transfer_failed">A transferência falhou</string>
@@ -316,7 +294,6 @@
     <string name="dtmf_mode">Modo DTMF</string>
     <string name="reset">Redefinir</string>
     <string name="reset_config_alert">Tem certeza de que deseja redefinir as configurações para os valores predefinidos de fábrica\?</string>
-    <string name="mic">Microfone ligado/desligado</string>
     <string name="no_network">Nenhuma conexão de rede!</string>
     <string name="missed_calls_count">%1$d chamadas perdidas</string>
     <string name="missed_calls">Chamadas perdidas</string>
@@ -359,7 +336,6 @@
     <string name="invalid_account_nickname">Apelido inválido da conta \'%1$s\'</string>
     <string name="non_unique_account_nickname">O apelido \'%1$s\' já existe</string>
     <string name="nickname">Apelido</string>
-    <string name="codec_action">Reordenar</string>
     <string name="rtcp_mux">Multiplexagem RTCP</string>
     <string name="rtcp_mux_help">Se marcada, os pacotes RTP e RTCP são multiplexados numa única porta (RFC 5761).</string>
     <string name="no_notifications">Você não pode usar este aplicativo sem a permissão \"Notificações\".</string>

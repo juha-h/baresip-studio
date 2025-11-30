@@ -242,8 +242,6 @@
     <string name="decrypt_password">Decrypt Password</string>
     <string name="delete_account">Do you want to delete account \'%1$s\'\?</string>
     <!-- Baresip Service -->
-    <string name="answer">Answer</string>
-    <string name="reject">Reject</string>
     <string name="reply">Reply</string>
     <string name="save">Save</string>
     <string name="is_calling">is calling</string>
@@ -251,7 +249,6 @@
     <string name="missed_calls">Missed calls</string>
     <string name="missed_calls_count">%1$d missed calls</string>
     <string name="transfer_request_to">Call transfer request to</string>
-    <string name="message_from">Message from</string>
     <string name="call_auto_rejected">Auto-rejected call from \`%1$s\`</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
@@ -264,11 +261,9 @@
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
     <string name="playing_recording">Playing recording …</string>
-    <string name="calls_call_message_question">Do you want to call or send message to \'%1$s\'\?</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history\?</string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history\?</string>
-    <string name="delete_history">Delete</string>
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
     <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'\?</string>
@@ -277,7 +272,6 @@
     <string name="call_missed">Call missed</string>
     <string name="call_rejected">Call rejected</string>
     <!-- Chat Activity -->
-    <string name="chat">Chat Messages</string>
     <string name="chat_with">Chat with %1$s</string>
     <string name="new_message">New message</string>
     <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts\?</string>
@@ -290,20 +284,13 @@
     <string name="today">Today</string>
     <string name="you">You</string>
     <string name="new_chat_peer">New Chat Peer</string>
-    <string name="invalid_chat_peer_uri">Invalid chat peer URI</string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
         add peer to contacts\?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'\?</string>
-    <string name="delete_chats">Delete</string>
     <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'\?</string>
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audio Codecs</string>
-    <string name="audio_codecs_help">List of audio codecs in priority order. Drag to reorder,
-        long click to enable or disable.</string>
     <string name="video_codecs">Video Codecs</string>
-    <string name="video_codecs_help">List of video codecs in priority order. Drag to reorder,
-        long click to enable or disable.</string>
-    <string name="codec_action">Reorder</string>
     <!-- Settings Activity -->
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
@@ -361,22 +348,18 @@
     <string name="audio_modules_help">Audio codecs provided by the checked modules are
         available for use by the accounts.</string>
     <string name="failed_to_load_module">Failed to load module.</string>
-    <string name="aec">Acoustic Echo Cancellation</string>
     <string name="microphone_gain">Microphone Gain</string>
     <string name="microphone_gain_help">Multiply microphone volume by this decimal number.  Minimum
         value is 1.0 (factory default) that disables microphone gain. Larger values may negatively
         affect audio quality.</string>
     <string name="invalid_microphone_gain">Invalid Microphone Gain value</string>
-    <string name="_1.0" translatable="false">1.0</string>
     <string name="opus_bit_rate">Opus Bit Rate</string>
     <string name="opus_bit_rate_help">Average maximum bit rate used by Opus audio stream.
         Valid values are 6000-510000. Factory default is 28000.</string>
-    <string name="_28000" translatable="false">28000</string>
     <string name="opus_packet_loss">Expected Opus packet-loss</string>
     <string name="opus_packet_loss_help">Expected Opus audio stream packet loss percentage,
         from 0–100. Factory default value is 1. Value 0 also turns off Opus Forward Error
         Correction (FEC).</string>
-    <string name="_0" translatable="false">0</string>
     <string name="invalid_opus_bitrate">Invalid Opus bitrate</string>
     <string name="invalid_opus_packet_loss">Invalid Opus Packet Loss Percentage</string>
     <string name="audio_delay">Audio Delay</string>
@@ -433,7 +416,6 @@
         <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Privacy Policy</a>.
     </string>
     <!-- Contact Activity -->
-    <string name="contact">Contact</string>
     <string name="new_contact">New Contact</string>
     <string name="contact_name">Name</string>
     <string name="sip_or_tel_uri">SIP or tel URI</string>
@@ -450,7 +432,6 @@
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'\?</string>
     <string name="send_message">Send Message</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'\?</string>
-    <string name="contacts_exceeded">Your maximum number of contacts %1$d has been exceeded.</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -461,12 +442,10 @@
     <string name="no">No</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
-    <string name="password">Password</string>
     <string name="sip_uri" translatable="false">SIP URI</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="send">Send</string>
     <string name="status">Status</string>
     <string name="error">Error</string>
     <string name="confirmation">Confirmation</string>
@@ -487,18 +466,13 @@
     <string name="outgoing_call_to_dots">Call to …</string>
     <string name="incoming_call_from_dots">Call from …</string>
     <string name="diverted_by_dots">Diverted by …</string>
-    <string name="transferring_call_to_dots">Transferring call to …</string>
     <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
-    <string name="callee">Callee</string>
-    <string name="hangup">Hangup</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>
     <string name="allow_video">Accept sending and receiving video with \'%1$s\'\?</string>
     <string name="allow_video_send">Accept sending of video to \'%1$s\'\?</string>
     <string name="allow_video_recv">Accept receiving video from \'%1$s\'\?</string>
-    <string name="hold">Call Hold/Unhold</string>
     <string name="call_is_on_hold">Call is on hold</string>
-    <string name="mic">Microphone On/Off</string>
     <string name="rec_in_call">Recording can be turned on or off only when call is not
         connected</string>
     <string name="call_transfer">Call Transfer</string>
@@ -518,7 +492,6 @@
     <string name="packets">Packets</string>
     <string name="lost">Lost</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
-    <string name="voicemail">Voicemail</string>
     <string name="voicemail_messages">Voicemail Messages</string>
     <string name="you_have">You have</string>
     <string name="one_new_message">one new message</string>
@@ -528,8 +501,6 @@
     <string name="and">and</string>
     <string name="no_messages">You have no messages</string>
     <string name="listen">Listen</string>
-    <string name="messages">Messages</string>
-    <string name="dialpad">Dialpad</string>
     <string name="call_already_active">You already have an active call.</string>
     <string name="start_failed">Baresip failed to start. This may be due to an invalid Settings value.
         Check Listen Address, TLS Certificate File, and TLS CA File.  Then restart baresip.

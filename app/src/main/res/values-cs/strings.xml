@@ -108,25 +108,21 @@
     <string name="authentication_username_help">Uživatelské jméno pro ověřování, pokud je vyžadováno ověřování požadavků SIP. Výchozí hodnotou je uživatelské jméno účtu.</string>
     <string name="telephony_provider">Poskytovatel telefonních služeb</string>
     <string name="time">Čas</string>
-    <string name="delete_chats">Odstranit</string>
     <string name="display_name">Zobrazované jméno</string>
     <string name="display_name_help">Název (pokud existuje) použitý v URI odchozích požadavků.</string>
     <string name="invalid_authentication_username">Neplatné uživatelské jméno pro ověřování \'%1$s\'</string>
     <string name="authentication_password_help">Ověřovací heslo až 64 znaků. Pokud je zadáno Uživatelské jméno pro ověřování, ale není zadáno Heslo, bude po spuštění baresipu požadováno.</string>
     <string name="peer">Účastník</string>
     <string name="direction">Směr</string>
-    <string name="calls_call_message_question">Chcete zavolat nebo odeslat zprávu \'%1$s\'\?</string>
     <string name="calls_add_delete_question">Chcete přidat \'%1$s\' do kontaktů nebo odstranit %2$s z historie hovorů\?</string>
     <string name="delete_history_alert">Chcete odstranit historii volání účtu \"%1$s\"\?</string>
     <string name="calls_duration">Trvání</string>
     <string name="long_chat_question">Chcete smazat chat s účastníkem \'%1$s\' nebo přidat účastníka do kontaktů\?</string>
     <string name="long_message_question">Chcete odstranit zprávu nebo přidat účastníka \'%1$s\' do kontaktů\?</string>
     <string name="disable_history">Zakázat</string>
-    <string name="chat">Zprávy chatu</string>
     <string name="new_message">Nová zpráva</string>
     <string name="short_message_question">Chcete zprávu odstranit\?</string>
     <string name="calls_delete_question">Chcete odstranit \'%1$s\' %2$s z historie hovorů\?</string>
-    <string name="delete_history">Smazat</string>
     <string name="chat_with">Chatovat s %1$s</string>
     <string name="sending_failed">Odeslání zprávy se nezdařilo</string>
     <string name="you">Vy</string>
@@ -136,15 +132,11 @@
     <string name="chats">Historie chatu</string>
     <string name="today">Dnes</string>
     <string name="message_failed">Nepodařilo se</string>
-    <string name="audio_codecs_help">Seznam zvukových kodeků v prioritním pořadí. Přetažením změníte pořadí, dlouhým dotykem je povolíte nebo zakážete.</string>
     <string name="invalid_dns_servers">Neplatné servery DNS</string>
-    <string name="invalid_chat_peer_uri">Neplatné URI účastníka chatu</string>
     <string name="delete_chats_alert">Chcete odstranit historii chatu účtu \'%1$s\'\?</string>
     <string name="audio_codecs">Zvukové kodeky</string>
     <string name="tls_certificate_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikát TLS a soukromý klíč této instance baresipu. Ve verzi systému Android 9 se soubor s názvem \'cert.pem\' načte ze složky Download. Z bezpečnostních důvodů tento soubor po načtení odstraňte.</string>
-    <string name="video_codecs_help">Seznam kodeků videa v prioritním pořadí. Přetažením změníte pořadí, dlouhým dotykem je povolíte nebo zakážete.</string>
     <string name="invalid_listen_address">Neplatná naslouchací adresa</string>
-    <string name="codec_action">Uspořádat</string>
     <string name="configuration">Nastavení</string>
     <string name="battery_optimizations">Optimalizace baterie</string>
     <string name="listen_address">Naslouchací adresa</string>
@@ -185,8 +177,6 @@
     <string name="account_exists">Účet \'%1$s\' již existuje.</string>
     <string name="decrypt_password">Dešifrovat heslo</string>
     <string name="accounts_help">SIP URI nového účtu v následující podobě: &lt;uživatel&gt;@&lt;doména&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Pokud je zadán &lt;port&gt; a transportní protokol není zadán, je výchozí transportní protokol UDP. Pokud není zadán &lt;port&gt; a je zadán transportní protokol, je výchozí hodnota &lt;port&gt; 5060 nebo 5061 (TLS). Pokud není zadán ani jeden z těchto parametrů a není zadán žádný odchozí proxy server, je registrátor účtu (pokud existuje) určen pouze na základě DNS informací o doméně.</string>
-    <string name="answer">Přijmout</string>
-    <string name="reject">Odmítnout</string>
     <string name="account_allocation_failure">Nepodařilo se vytvořit nový účet.</string>
     <string name="delete_account">Chcete odstranit účet \'%1$s\'\?</string>
     <string name="missed_call_from">Zmeškaný hovor od</string>
@@ -194,7 +184,6 @@
     <string name="call">Hovor</string>
     <string name="transfer_request_to">Žádost o přepojení hovoru na</string>
     <string name="enable_history">Povolit</string>
-    <string name="message_from">Zpráva od</string>
     <string name="call_history">Historie volání</string>
     <string name="calls_calls">volání</string>
     <string name="call_details">Podrobnosti o volání</string>
@@ -205,7 +194,6 @@
     <string name="opus_packet_loss">Očekávaná ztráta paketů Opus</string>
     <string name="opus_packet_loss_help">Očekávaná procentuální ztráta paketů zvukového toku Opus od 0 do 100. Výchozí hodnota je 1. Hodnota 0 také vypíná funkci Opus Forward Error Correction (FEC).</string>
     <string name="audio_modules_title">Zvukové moduly</string>
-    <string name="aec">Potlačení akustické ozvěny</string>
     <string name="default_call_volume">Výchozí hlasitost volání</string>
     <string name="dark_theme_help">Vynutit tmavé téma</string>
     <string name="failed_to_load_module">Nepodařilo se načíst modul.</string>
@@ -230,7 +218,6 @@
     <string name="contacts">Kontakty</string>
     <string name="new_contact">Nový kontakt</string>
     <string name="config_restart">Pro aktivaci nových nastavení je třeba restartovat baresip. Restartovat nyní\?</string>
-    <string name="contact">Kontakt</string>
     <string name="consent_request">Žádost o souhlas</string>
     <string name="sip_or_tel_uri">SIP nebo tel. URI</string>
     <string name="contacts_consent">Pokud jsou vybrány kontakty Android, lze je použít při volání a zasílání zpráv jako odkazy na SIP a tel. URI. Aplikace baresip neukládá kontakty Android ani je s nikým nesdílí. Aby byly kontakty pro Android dostupné v baresip, Google vyžaduje, abyste souhlasili s jejich používáním, jak je popsáno zde v <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy aplikace. txt">Zásadách ochrany osobních údajů</a>.</string>
@@ -245,18 +232,15 @@
     <string name="add">Přidat</string>
     <string name="send_message">Odeslat zprávu</string>
     <string name="contact_action_question">Chcete zavolat nebo odeslat zprávu \'%1$s\'\?</string>
-    <string name="contacts_exceeded">Maximální počet kontaktů %1$d byl překročen.</string>
     <string name="cancel">Zrušit</string>
     <string name="yes">Ano</string>
     <string name="deny">Odmítnout</string>
-    <string name="send">Odeslat</string>
     <string name="info">Informace</string>
     <string name="notice">Oznámení</string>
     <string name="ok">OK</string>
     <string name="accept">Přijmout</string>
     <string name="delete">Smazat</string>
     <string name="no">Ne</string>
-    <string name="password">Heslo</string>
     <string name="error">Chyba</string>
     <string name="confirmation">Potvrzení</string>
     <string name="edit">Upravit</string>
@@ -274,15 +258,11 @@
     <string name="incoming_call_from_dots">Volání z …</string>
     <string name="lost">Ztracené</string>
     <string name="call_transfer">Přepojení hovoru</string>
-    <string name="transferring_call_to_dots">Přesměrování hovoru na …</string>
     <string name="no_telephony_provider">Účet \'%1$s\' nemá žádného poskytovatele telefonních služeb</string>
-    <string name="callee">Číslo nebo adresu</string>
     <string name="video_request">Žádost o video</string>
     <string name="allow_video">Akceptovat odesílání a příjem videa s \'%1$s\'\?</string>
     <string name="allow_video_send">Přijmout odeslání videa na \'%1$s\'\?</string>
     <string name="allow_video_recv">Přijímat video od \'%1$s\'\?</string>
-    <string name="hold">Přidržení/Uvolnění hovoru</string>
-    <string name="hangup">Zavěsit</string>
     <string name="video_call">Video hovor</string>
     <string name="call_is_on_hold">Hovor je přidržen</string>
     <string name="attended">S konzultací</string>
@@ -295,11 +275,9 @@
     <string name="rate">Aktuální rychlost: %1$s (Kbits/s)</string>
     <string name="average_rate">Průměrná rychlost: %1$s (Kbits/s)</string>
     <string name="packets">Pakety</string>
-    <string name="mic">Mikrofon zap/vyp</string>
     <string name="rec_in_call">Nahrávání lze zapnout nebo vypnout pouze v případě, kdy hovor není spojen</string>
     <string name="blind">Naslepo</string>
     <string name="transfer_failed">Přepojení selhalo</string>
-    <string name="dialpad">Číselník</string>
     <string name="call_closed">Volání ukončeno</string>
     <string name="no_cameras">Žádná podporovaná videokamera!</string>
     <string name="dtmf">DTMF</string>
@@ -310,7 +288,6 @@
     <string name="listen">Poslouchat</string>
     <string name="verify">Ověřit žádost</string>
     <string name="verify_sas">Chcete ověřit SAS &lt;%1$s&gt;\?</string>
-    <string name="voicemail">Hlasová schránka</string>
     <string name="you_have">Máte</string>
     <string name="one_new_message">jednu novou zprávu</string>
     <string name="one_old_message">jednu starou zprávu</string>
@@ -319,7 +296,6 @@
     <string name="registering_failed">Registrace %1$s se nezdařila.</string>
     <string name="voicemail_messages">Hlasové zprávy</string>
     <string name="old_messages">staré zprávy</string>
-    <string name="messages">Zprávy</string>
     <string name="transfer_request">Požadavek na přepojení</string>
     <string name="transfer_request_query">Souhlasíte s přepojením tohoto hovoru na \'%1$s\'\?</string>
     <string name="call_is_secure">Toto volání je BEZPEČNÉ a účastník je OVĚŘENÝ! Chcete zrušit ověření účastníka\?</string>
