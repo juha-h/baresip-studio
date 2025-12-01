@@ -67,7 +67,7 @@ fun NavGraphBuilder.contactsScreenRoute(
     navController: NavController,
     viewModel: ViewModel
 ) {
-    composable("contacts") { backStackEntry ->
+    composable("contacts") { _ ->
         ContactsScreen(navController = navController, viewModel = viewModel)
     }
 }
