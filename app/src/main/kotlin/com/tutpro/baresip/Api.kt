@@ -59,6 +59,7 @@ object Api {
     external fun account_dtmfmode(acc: Long): Int
     external fun account_set_dtmfmode(acc: Long, mode: Int): Int
     external fun account_extra(acc: Long): String
+    @Suppress("unused")
     external fun account_debug(acc: Long)
 
     external fun uag_reset_transp(register: Boolean, reinvite: Boolean)
@@ -69,13 +70,16 @@ object Api {
     external fun ua_alloc(uri: String): Long
     external fun ua_destroy(uap: Long)
     external fun ua_register(uap: Long): Int
+    @Suppress("unused")
     external fun ua_isregistered(uap: Long): Boolean
     external fun ua_unregister(uap: Long)
     external fun ua_accept(uap: Long, msg: Long)
     external fun ua_hangup(uap: Long, callp: Long, code: Int, reason: String)
     external fun ua_call_alloc(uap: Long, xcallp: Long, video: Int): Long
     external fun ua_answer(uap: Long, callp: Long, video: Int)
+    @Suppress("unused")
     external fun ua_add_custom_header(uap: Long, name: String, body: String)
+    @Suppress("unused")
     external fun ua_debug(uap: Long)
 
     external fun sip_treply(msg: Long, code: Int, reason: String)
@@ -84,10 +88,12 @@ object Api {
 
     external fun call_connect(callp: Long, peer_uri: String): Int
     external fun call_hold(callp: Long, hold: Boolean): Int
+    @Suppress("unused")
     external fun call_ismuted(callp: Long): Boolean
     external fun call_transfer(callp: Long, peer_uri: String): Int
     external fun call_send_digit(callp: Long, digit: Char): Int
     external fun call_notify_sipfrag(callp: Long, code: Int, reason: String)
+    @Suppress("unused")
     external fun call_start_audio(callp: Long)
     external fun call_audio_codecs(callp: Long): String
     external fun call_duration(callp: Long): Int
@@ -112,6 +118,7 @@ object Api {
     external fun net_add_address_ifname(ip_addr: String, if_name: String): Int
     external fun net_rm_address(ip_addr: String): Int
     external fun net_debug()
+    @Suppress("unused")
     external fun net_dns_debug()
 
     external fun config_verify_server_set(verify: Boolean)

@@ -75,6 +75,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 import androidx.core.graphics.toColorInt
+import androidx.navigation.NavController
 
 object Utils {
 
@@ -1103,7 +1104,7 @@ object Utils {
         return output
     }
 
-    fun createTextAvatar(context: Context, letter: String, colorHex: String): Bitmap {
+    fun createTextAvatar(letter: String, colorHex: String): Bitmap {
         // Standard notification large icon size is usually 64dp or 48dp.
         // We use a decent resolution (e.g. 128x128) and let Android scale it down.
         val size = 128
@@ -1145,7 +1146,8 @@ object Utils {
         return bitmap
     }
 
-    /*fun listFilesInDirectory(directoryPath: String): List<File> {
+    @Suppress("unused")
+    fun listFilesInDirectory(directoryPath: String): List<File> {
         val directory = File(directoryPath)
         if (!directory.exists()) {
             Log.w(TAG, "Directory does not exist: $directoryPath")
@@ -1164,9 +1166,10 @@ object Utils {
             return emptyList()
         }
         return files.filter { it.isFile }
-    }*/
+    }
 
-    /*@SuppressLint("RestrictedApi")
+    @SuppressLint("RestrictedApi")
+    @Suppress("unused", "DEPRECATION")
     fun printBackStack(navController: NavController) {
         Log.e(TAG, "---- Current Navigation Back Stack ----")
         navController.currentBackStack.value.forEachIndexed { index, navBackStackEntry ->
@@ -1177,6 +1180,6 @@ object Utils {
             Log.e(TAG, "$index: Route='${route}', Args=[$arguments], ID=${navBackStackEntry.id}")
         }
         Log.e(TAG, "--------------------------------------")
-    }*/
+    }
 
 }

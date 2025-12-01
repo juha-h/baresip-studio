@@ -906,7 +906,7 @@ class BaresipService: Service() {
                             val personBuilder = Person.Builder().setName(caller)
                             val contactColor = callerContact?.color() ?: "#B0B0B0"
                             val initial = if (caller.isNotEmpty()) caller.take(1) else "?"
-                            val textAvatarBitmap = Utils.createTextAvatar(this, initial,contactColor)
+                            val textAvatarBitmap = Utils.createTextAvatar(initial,contactColor)
                             var icon = IconCompat.createWithBitmap(textAvatarBitmap)
                             if (callerContact is Contact.BaresipContact) {
                                 if (callerContact.avatarImage != null)
@@ -1202,7 +1202,7 @@ class BaresipService: Service() {
             val personBuilder = Person.Builder().setName(sender)
             val contactColor = senderContact?.color() ?: "#B0B0B0"
             val initial = if (sender.isNotEmpty()) sender.take(1) else "?"
-            val textAvatarBitmap = Utils.createTextAvatar(this, initial,contactColor)
+            val textAvatarBitmap = Utils.createTextAvatar(initial,contactColor)
             var icon = IconCompat.createWithBitmap(textAvatarBitmap)
             if (senderContact is Contact.BaresipContact) {
                 if (senderContact.avatarImage != null)

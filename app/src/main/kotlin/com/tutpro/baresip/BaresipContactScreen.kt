@@ -423,7 +423,7 @@ private fun Avatar(
                     Canvas(modifier = Modifier.fillMaxSize()) {
                         drawCircle(SolidColor(Color(color)))
                     }
-                    val text = if (name.isNotBlank()) name.substring(0, 1).uppercase() else "?"
+                    val text = if (name.isNotBlank()) name.take(1).uppercase() else "?"
                     Text(text, fontSize = 72.sp, color = Color.White)
                 }
             } else {
