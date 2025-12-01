@@ -1,6 +1,3 @@
-//
-// Created by Administrator on 2025/9/19.
-//
 #include "common.h"
 
 JavaVM *jni_jvm = NULL;

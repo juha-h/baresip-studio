@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 2025/9/19.
-//
-
 #ifndef BARESIP_STUDIO_ANDROID_CAMERA2_H
 #define BARESIP_STUDIO_ANDROID_CAMERA2_H
 

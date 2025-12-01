@@ -1,6 +1,3 @@
-//
-// Created by Administrator on 2025/9/19.
-//
 #include <jni.h>
 #include <libyuv.h>
 #include <string.h>
@@ -69,7 +66,6 @@ static bool jni_init_ids()
     /* Camera2 class info */
     GET_CLASS(CAMERA_CLASS_PATH, CAMERA, jobjs.cam2.cls);
     GET_METHOD_ID(jobjs.cam2.cls, CAMERA, "<init>", "(IIIJ)V", jobjs.cam2.m_init);
-    //    GET_METHOD_ID(jobjs.cam2.cls, CAMERA, "<init>","(IIIIIJ)V",jobjs.cam2.m_init);
     GET_METHOD_ID(jobjs.cam2.cls, CAMERA, "startCamera", "(Landroid/view/Surface;I)V",
             jobjs.cam2.m_start);
     GET_METHOD_ID(jobjs.cam2.cls, CAMERA, "stopCamera", "()V", jobjs.cam2.m_stop);
