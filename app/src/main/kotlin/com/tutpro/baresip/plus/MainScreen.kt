@@ -1387,6 +1387,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
 private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
+    val selectedAor: String by viewModel.selectedAor.collectAsState()
 
     Row( modifier = Modifier
         .fillMaxWidth()
@@ -1443,7 +1444,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 onClick = {
                     showSuggestions.value = false
                     abandonAudioFocus(ctx)
-                    val ua: UserAgent = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                    val ua: UserAgent = UserAgent.ofAor(selectedAor)!!
                     val call = ua.currentCall()
                     if (call != null) {
                         val callp = call.callp
@@ -1467,7 +1468,6 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
         if (showHangupButton.value) {
 
-            val selectedAor: String by viewModel.selectedAor.collectAsState()
             val ua = UserAgent.ofAor(selectedAor)!!
 
             IconButton(
@@ -1827,7 +1827,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         val char = newText.last()
                         if (char.isDigit() || char == '*' || char == '#') {
                             Log.d(TAG, "Got DTMF digit '$char'")
-                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                            val ua = UserAgent.ofAor(selectedAor)!!
                             ua.currentCall()?.sendDigit(char)
                         }
                     }
@@ -1941,18 +1941,22 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 )
             }
 
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    answer(ctx, viewModel, true)
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.VideoCall,
+            val ua = UserAgent.ofAor(selectedAor)!!
+            val call = ua.currentCall()
+            if (call!!.hasVideo()) {
+                IconButton(
                     modifier = Modifier.size(48.dp),
-                    tint = colorResource(R.color.colorTrafficGreen),
-                    contentDescription = null,
-                )
+                    onClick = {
+                        answer(ctx, viewModel, true)
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.VideoCall,
+                        modifier = Modifier.size(48.dp),
+                        tint = colorResource(R.color.colorTrafficGreen),
+                        contentDescription = null,
+                    )
+                }
             }
             
             IconButton(
