@@ -1,4 +1,5 @@
 [versions]
+lifecycleProcess = "2.10.0"
 swiperefreshlayout = "1.1.0"
 cardview = "1.0.0"
 constraintlayout = "2.2.1"
@@ -12,9 +13,7 @@ gradleVersion = "8.13.1"
 kotlin = "2.2.21"
 kotlinStdlibJdk8 = "2.2.0"
 kotlinxCoroutinesAndroid = "1.10.2"
-lifecycleExtensions = "2.2.0"
 lifecycleViewmodelKtx = "2.10.0"
-localbroadcastmanager = "1.1.0"
 material = "1.13.0"
 media = "1.7.1"
 navigationCompose = "2.9.6"
@@ -27,6 +26,7 @@ composeMaterial3 = "1.4.0"
 composeMaterialIcons = "1.7.8"
 
 [libraries]
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
@@ -36,9 +36,7 @@ androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensions" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
 androidx-media = { module = "androidx.media:media", version.ref = "media" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }

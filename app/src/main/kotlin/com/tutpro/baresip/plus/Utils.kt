@@ -40,7 +40,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ProcessLifecycleOwner
 import java.io.*
 import java.lang.reflect.Method
 import java.net.InetAddress
@@ -68,6 +67,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.ProcessLifecycleOwner
 
 object Utils {
 
