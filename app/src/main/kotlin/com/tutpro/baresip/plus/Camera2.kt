@@ -98,7 +98,7 @@ class Camera2(
         val plane1: ByteBuffer? = if (planes.size > 1) planes[1].buffer else null
         val plane2: ByteBuffer? = if (planes.size > 2) planes[2].buffer else null
 
-        PushFrame(
+        pushFrame(
             userData,
             plane0,
             planes[0].rowStride,
@@ -181,7 +181,8 @@ class Camera2(
         }
     }
 
-    external fun PushFrame(
+    @Suppress("KotlinJniMissingFunction")
+    external fun pushFrame(
         userData: Long,
         plane0: ByteBuffer, rowStride0: Int, pixStride0: Int,
         plane1: ByteBuffer?, rowStride1: Int, pixStride1: Int,

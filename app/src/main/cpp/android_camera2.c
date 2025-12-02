@@ -72,7 +72,7 @@ static bool jni_init_ids()
 
     /* native PushFrame */
     {
-        JNINativeMethod m[] = {{"PushFrame",
+        JNINativeMethod m[] = {{"pushFrame",
                 "(JLjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;II)V",
                 (void *)&OnGetFrame}};
         if ((*jni_env)->RegisterNatives(jni_env, jobjs.cam2.cls, m, 1)) {
