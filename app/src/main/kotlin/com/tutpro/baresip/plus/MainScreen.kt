@@ -83,7 +83,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
-import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material.icons.filled.VideoCameraBack
 import androidx.compose.material.icons.filled.VideoCameraFront
 import androidx.compose.material.icons.filled.Videocam
@@ -169,13 +168,13 @@ import com.tutpro.baresip.plus.CustomElements.DropdownMenu
 import com.tutpro.baresip.plus.CustomElements.PasswordDialog
 import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
-import kotlinx.coroutines.delay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Timer
 import kotlin.concurrent.schedule
+import kotlinx.coroutines.delay
 
 private val showVideoLayout = mutableStateOf(false)
 
@@ -1951,8 +1950,8 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                     },
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.VideoCall,
-                        modifier = Modifier.size(48.dp),
+                        imageVector = Icons.Filled.Videocam,
+                        modifier = Modifier.size(52.dp),
                         tint = colorResource(R.color.colorTrafficGreen),
                         contentDescription = null,
                     )
