@@ -1936,7 +1936,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 Icon(
                     imageVector = Icons.Filled.Call,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficGreen),
                     contentDescription = null,
                 )
             }
@@ -1950,7 +1950,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 Icon(
                     imageVector = Icons.Filled.VideoCall,
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified,
+                    tint = colorResource(R.color.colorTrafficGreen),
                     contentDescription = null,
                 )
             }
