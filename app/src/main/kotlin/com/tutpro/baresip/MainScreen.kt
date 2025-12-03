@@ -1296,16 +1296,12 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 }
             }
         }
-        if (securityIconTint.intValue != -1) {
-            Icon(
-                imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
-                    Icons.Filled.LockOpen
-                else
-                    Icons.Filled.Lock,
-                contentDescription = null,
+        if (securityIconTint.intValue != -1)
+            Box(
                 modifier = Modifier
-                    .size(28.dp)
                     .padding(top = 4.dp)
+                    .size(32.dp)
+                    .clip(CircleShape)
                     .clickable {
                         when (securityIconTint.intValue) {
                             R.color.colorTrafficRed -> {
@@ -1313,13 +1309,11 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
                                 showAlert.value = true
                             }
-
                             R.color.colorTrafficYellow -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.peer_not_verified)
                                 showAlert.value = true
                             }
-
                             R.color.colorTrafficGreen -> {
                                 dialogTitle.value = ctx.getString(R.string.info)
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
@@ -1342,9 +1336,18 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                             }
                         }
                     },
-                tint = colorResource(securityIconTint.intValue)
-            )
-        }
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
+                        Icons.Filled.LockOpen
+                    else
+                        Icons.Filled.Lock,
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
+                    tint = colorResource(securityIconTint.intValue)
+                )
+            }
     }
 }
 
