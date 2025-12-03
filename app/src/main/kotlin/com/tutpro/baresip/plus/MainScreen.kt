@@ -83,6 +83,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
+import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material.icons.filled.VideoCameraBack
 import androidx.compose.material.icons.filled.VideoCameraFront
 import androidx.compose.material.icons.filled.Videocam
@@ -1389,8 +1390,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
     val selectedAor: String by viewModel.selectedAor.collectAsState()
 
     Row( modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 6.dp),
+        .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
@@ -1405,7 +1405,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Call,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(if (callButtonEnabled.value)
                         R.color.colorTrafficGreen
                     else
@@ -1416,24 +1416,24 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
         if (showCallVideoButton.value) {
             Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.Filled.Videocam,
-                modifier = Modifier
-                    .size(52.dp)
-                    .clickable(
-                        enabled = callVideoButtonEnabled.value,
-                        onClick = {
-                            showSuggestions.value = false
-                            callClick(ctx, viewModel, true)
-                        }
-                    ),
-                tint = colorResource(if (callVideoButtonEnabled.value)
-                    R.color.colorTrafficGreen
-                else
-                    R.color.colorTrafficYellow),
-                contentDescription = null,
-            )
-            Spacer(modifier = Modifier.size(6.dp))
+            IconButton(
+                modifier = Modifier.size(48.dp),
+                enabled = callVideoButtonEnabled.value,
+                onClick = {
+                    showSuggestions.value = false
+                    callClick(ctx, viewModel, true)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Videocam,
+                    modifier = Modifier.size(42.dp),
+                    tint = colorResource(if (callVideoButtonEnabled.value)
+                        R.color.colorTrafficGreen
+                    else
+                        R.color.colorTrafficYellow),
+                    contentDescription = null,
+                )
+            }
         }
 
         if (showCancelButton.value) {
@@ -1457,7 +1457,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
@@ -1484,7 +1484,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
@@ -1492,7 +1492,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
 
             if (videoIcon.value != Video.NONE)
                 IconButton(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(48.dp).padding(start=4.dp),
                     onClick = {
                         val call = ua.currentCall()
                         if (call != null) {
@@ -1505,8 +1505,8 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         imageVector = if (videoIcon.value == Video.OFF)
                             Icons.Filled.VideocamOff
                         else // Video.ON, Video.PENDING
-                            Icons.Filled.Videocam,
-                        modifier = Modifier.size(48.dp),
+                            Icons.Filled.VideoCall,
+                        modifier = Modifier.size(42.dp),
                         tint = if (videoIcon.value == Video.PENDING)
                             colorResource(R.color.colorTrafficYellow)
                         else
@@ -1514,7 +1514,6 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         contentDescription = null,
                     )
                 }
-
 
             IconButton(
                 modifier = Modifier.size(48.dp),
@@ -1542,7 +1541,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Outlined.PauseCircle,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = if (callOnHold.value)
                         MaterialTheme.colorScheme.error
                     else
@@ -1571,7 +1570,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowCircleRight,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = if (callTransfer.value)
                         MaterialTheme.colorScheme.error
                     else
@@ -1600,14 +1599,14 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                             )
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = stringResource(R.string.call_transfer),
                                     fontSize = 20.sp,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 var transferUri by remember { mutableStateOf("") }
                                 val suggestions by remember { contactNames }
@@ -1647,12 +1646,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            start = 4.dp,
-                                            end = 4.dp,
-                                            top = 12.dp,
-                                            bottom = 2.dp
-                                        )
+                                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
                                         .focusRequester(focusRequester),
                                     label = { Text(stringResource(R.string.transfer_destination)) },
                                     textStyle = TextStyle(fontSize = 18.sp),
@@ -1667,7 +1661,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         .fillMaxWidth()
                                         .shadow(8.dp, RoundedCornerShape(8.dp))
                                         .background(
-                                            color = MaterialTheme.colorScheme.surfaceContainer,
+                                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .animateContentSize()
@@ -1719,7 +1713,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.blind),
-                                                color = MaterialTheme.colorScheme.error,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1733,7 +1727,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.attended),
-                                                color = MaterialTheme.colorScheme.error,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1934,7 +1928,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Call,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficGreen),
                     contentDescription = null,
                 )
@@ -1951,7 +1945,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Videocam,
-                        modifier = Modifier.size(52.dp),
+                        modifier = Modifier.size(42.dp),
                         tint = colorResource(R.color.colorTrafficGreen),
                         contentDescription = null,
                     )
@@ -1966,7 +1960,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
