@@ -222,11 +222,10 @@ private fun Uris(
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = "Send Message",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(end = 24.dp).clickable {
+
+                // Chat Button
+                IconButton(
+                    onClick = {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
@@ -242,12 +241,17 @@ private fun Uris(
                             }
                         }
                     }
-                )
-                Icon(
-                    imageVector = Icons.Outlined.Call,
-                    contentDescription = "Call",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.clickable {
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = "Send Message",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                // Call Button
+                IconButton(
+                    onClick = {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
@@ -263,7 +267,13 @@ private fun Uris(
                             }
                         }
                     }
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Call,
+                        contentDescription = "Call",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }
