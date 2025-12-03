@@ -1,0 +1,4 @@
+- Show video answer button only if incoming call has video
+- Fixed color of answer and answer video buttons
+- Added help text to Android contact switch
+- New translations (Chinese)
