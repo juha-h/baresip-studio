@@ -553,6 +553,7 @@ private fun TopAppBar(
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
 
+            Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = recImage,
                 modifier = Modifier
@@ -647,8 +648,6 @@ private fun TopAppBar(
                     MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
-
-            Spacer(modifier = Modifier.width(8.dp))
 
             IconButton(
                 onClick = { menuExpanded = !menuExpanded }
@@ -1341,8 +1340,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row( modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 6.dp),
+        .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
@@ -1357,7 +1355,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Call,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(if (callButtonEnabled.value)
                         R.color.colorTrafficGreen
                     else
@@ -1387,7 +1385,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
@@ -1413,7 +1411,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
@@ -1446,7 +1444,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Outlined.PauseCircle,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = if (callOnHold.value)
                         MaterialTheme.colorScheme.error
                     else
@@ -1476,7 +1474,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowCircleRight,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = if (callTransfer.value)
                         MaterialTheme.colorScheme.error
                     else
@@ -1507,14 +1505,14 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                             )
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = stringResource(R.string.call_transfer),
                                     fontSize = 20.sp,
-                                    color = MaterialTheme.colorScheme.error,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                                 var transferUri by remember { mutableStateOf("") }
                                 val suggestions by remember { contactNames }
@@ -1569,7 +1567,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         .fillMaxWidth()
                                         .shadow(8.dp, RoundedCornerShape(8.dp))
                                         .background(
-                                            color = MaterialTheme.colorScheme.surfaceContainer,
+                                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .animateContentSize()
@@ -1621,7 +1619,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.blind),
-                                                color = MaterialTheme.colorScheme.error,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1635,7 +1633,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.attended),
-                                                color = MaterialTheme.colorScheme.error,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.padding(8.dp),
                                             )
                                             Switch(
@@ -1837,7 +1835,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Call,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficGreen),
                     contentDescription = null,
                 )
@@ -1853,7 +1851,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(42.dp),
                     tint = colorResource(R.color.colorTrafficRed),
                     contentDescription = null,
                 )
