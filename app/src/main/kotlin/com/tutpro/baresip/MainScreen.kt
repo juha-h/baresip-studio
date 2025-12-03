@@ -52,6 +52,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -113,6 +114,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -554,10 +556,12 @@ private fun TopAppBar(
         actions = {
 
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = recImage,
+
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
                             if (Call.call("connected") == null) {
@@ -565,35 +569,39 @@ private fun TopAppBar(
                                 recImage = if (BaresipService.isRecOn) {
                                     Api.module_load("sndfile")
                                     recOnImage
-                                }
-                                else {
+                                } else {
                                     Api.module_unload("sndfile")
                                     recOffImage
                                 }
+                            } else {
+                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
                             }
-                            else
-                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT)
-                                    .show()
                         },
                         onLongClick = {
                             alertTitle.value = ctx.getString(R.string.call_recording_title)
                             alertMessage.value = ctx.getString(R.string.call_recording_tip)
                             showAlert.value = true
                         }
-                    ),
-                tint = if (BaresipService.isRecOn)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
+                    )
+            ) {
+                Icon(
+                    imageVector = recImage,
+                    contentDescription = null,
+                    tint = if (BaresipService.isRecOn)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.width(22.dp))
 
-            Icon(
-                imageVector = currentMicIcon,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
                             if (Call.call("connected") != null) {
@@ -601,8 +609,7 @@ private fun TopAppBar(
                                 if (BaresipService.isMicMuted) {
                                     viewModel.updateMicIcon(Icons.Filled.MicOff)
                                     Api.calls_mute(true)
-                                }
-                                else {
+                                } else {
                                     viewModel.updateMicIcon(Icons.Filled.Mic)
                                     Api.calls_mute(false)
                                 }
@@ -612,21 +619,27 @@ private fun TopAppBar(
                             alertTitle.value = ctx.getString(R.string.microphone_title)
                             alertMessage.value = ctx.getString(R.string.microphone_tip)
                             showAlert.value = true
-                        },
-                    ),
-                tint = if (BaresipService.isMicMuted)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
+                        }
+                    )
+            ) {
+                Icon(
+                    imageVector = currentMicIcon,
+                    contentDescription = null,
+                    tint = if (BaresipService.isMicMuted)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Icon(
-                imageVector = Icons.Filled.SpeakerPhone,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
@@ -640,14 +653,19 @@ private fun TopAppBar(
                             alertTitle.value = ctx.getString(R.string.speakerphone_title)
                             alertMessage.value = ctx.getString(R.string.speakerphone_tip)
                             showAlert.value = true
-                        },
-                    ),
-                tint = if (isSpeakerOn.value)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
+                        }
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.SpeakerPhone,
+                    contentDescription = null,
+                    tint = if (isSpeakerOn.value)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
 
             IconButton(
                 onClick = { menuExpanded = !menuExpanded }
