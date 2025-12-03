@@ -192,7 +192,9 @@ sealed class Contact {
                 if (contact.thumbnailUri == null &&  thumb != null)
                     contact.thumbnailUri = thumb
                 if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
-                    contact.uris.add("tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}")
+                    val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
+                    if (uri !in contact.uris)
+                        contact.uris.add(uri)
                     // contact.types.add(typeToString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)))
                 }
                 else if (mime == ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
