@@ -525,9 +525,8 @@ private fun TopAppBar(
 
     val recOffImage = Icons.Filled.VoiceOverOff
     val recOnImage = Icons.Filled.RecordVoiceOver
-    var recImage by remember { mutableStateOf(recOffImage) }
+    var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
     val isSpeakerOn = remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
-
     var menuExpanded by remember { mutableStateOf(false) }
 
     val about = stringResource(R.string.about)
@@ -557,8 +556,7 @@ private fun TopAppBar(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Box(
-                contentAlignment = Alignment.Center,
+            Box(contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
@@ -566,13 +564,12 @@ private fun TopAppBar(
                         onClick = {
                             if (Call.call("connected") == null) {
                                 BaresipService.isRecOn = !BaresipService.isRecOn
-                                recImage = if (BaresipService.isRecOn) {
+                                if (BaresipService.isRecOn) {
                                     Api.module_load("sndfile")
-                                    recOnImage
                                 } else {
                                     Api.module_unload("sndfile")
-                                    recOffImage
                                 }
+                                isRecOn = BaresipService.isRecOn
                             } else {
                                 Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
                             }
@@ -585,9 +582,9 @@ private fun TopAppBar(
                     )
             ) {
                 Icon(
-                    imageVector = recImage,
+                    imageVector = if (isRecOn) recOnImage else recOffImage,
                     contentDescription = null,
-                    tint = if (BaresipService.isRecOn)
+                    tint = if (isRecOn)
                         MaterialTheme.colorScheme.error
                     else
                         MaterialTheme.colorScheme.onPrimary,
