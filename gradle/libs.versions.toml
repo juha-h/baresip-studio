@@ -1,24 +1,23 @@
 [versions]
-activityCompose = "1.12.0"
+activityCompose = "1.12.1"
 coilCompose = "2.7.0"
-composeBom = "2025.11.01"
+composeBom = "2025.12.00"
 coreKtx = "1.17.0"
-exifinterface = "1.4.1"
+exifinterface = "1.4.2"
 fragmentKtx = "1.8.9"
 gradleVersion = "8.13.1"
 kotlin = "2.2.21"
 kotlinStdlibJdk8 = "2.2.0"
 kotlinxCoroutinesAndroid = "1.10.2"
-lifecycleExtensions = "2.2.0"
+lifecycleProcess = "2.10.0"
 lifecycleViewmodelKtx = "2.10.0"
-localbroadcastmanager = "1.1.0"
 material = "1.13.0"
 media = "1.7.1"
 navigationCompose = "2.9.6"
 preferenceKtx = "1.2.1"
-ui = "1.9.5"
-foundationAndroid = "1.9.5"
-runtimeLivedata = "1.9.5"
+ui = "1.10.0"
+foundationAndroid = "1.10.0"
+runtimeLivedata = "1.10.0"
 composeMaterial3 = "1.4.0"
 navigationRuntimeAndroid = "2.9.6"
 composeMaterialIcons = "1.7.8"
@@ -30,9 +29,8 @@ androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensions" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
 androidx-media = { module = "androidx.media:media", version.ref = "media" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
