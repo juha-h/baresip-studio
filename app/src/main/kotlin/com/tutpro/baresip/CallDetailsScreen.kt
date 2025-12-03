@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.CallMade
@@ -40,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -71,7 +74,9 @@ fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewMod
 private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -159,7 +164,8 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
     }
     val lazyListState = rememberLazyListState()
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp
@@ -170,16 +176,12 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
     ) {
         items(details) { detail ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = if (callUp(detail.direction))
-                        Icons.AutoMirrored.Filled.CallMade
-                    else
-                        Icons.AutoMirrored.Filled.CallReceived,
-                    tint = colorResource(id = callTint(detail.direction)),
-                    contentDescription = "Direction",
-                    modifier = Modifier.width(64.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
                         .clickable {
-                            Toast.makeText(ctx,
+                            Toast.makeText(
+                                ctx,
                                 when (detail.direction) {
                                     CALL_DOWN_GREEN, CALL_UP_GREEN -> ctx.getString(R.string.call_answered)
                                     CALL_DOWN_BLUE -> ctx.getString(R.string.call_answered_elsewhere)
@@ -189,9 +191,19 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
                                 },
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }
-                )
-                Spacer(modifier = Modifier.width(38.dp))
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (callUp(detail.direction))
+                            Icons.AutoMirrored.Filled.CallMade
+                        else
+                            Icons.AutoMirrored.Filled.CallReceived,
+                        tint = colorResource(id = callTint(detail.direction)),
+                        contentDescription = "Direction"
+                    )
+                }
+                Spacer(modifier = Modifier.width(78.dp))
                 val durationText = startTime(detail)
                 Spacer(modifier = Modifier.weight(1f))
                 Duration(ctx, detail, durationText)
@@ -255,7 +267,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
         Text(
             text = durationText,
             color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(end = 12.dp)
+            modifier = Modifier
+                .padding(end = 12.dp)
                 .clickable(onClick = {
                     if (!decPlayer.isPlaying && !encPlayer.isPlaying) {
                         decPlayer.reset()
@@ -290,8 +303,12 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                     try {
                                         val file = recording[0]
                                         val encFile = File(file)
-                                            .copyTo(File(BaresipService.filesPath +
-                                                    "/tmp/encode.wav"), true)
+                                            .copyTo(
+                                                File(
+                                                    BaresipService.filesPath +
+                                                            "/tmp/encode.wav"
+                                                ), true
+                                            )
                                         val encUri = encFile.toUri()
                                         setDataSource(ctx, encUri)
                                         prepareAsync()
@@ -312,8 +329,12 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                             try {
                                 val file = recording[1]
                                 val decFile = File(file)
-                                    .copyTo(File(BaresipService.filesPath +
-                                            "/tmp/decode.wav"), true)
+                                    .copyTo(
+                                        File(
+                                            BaresipService.filesPath +
+                                                    "/tmp/decode.wav"
+                                        ), true
+                                    )
                                 val decUri = decFile.toUri()
                                 setDataSource(ctx, decUri)
                                 prepareAsync()
@@ -325,7 +346,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                 Log.e(TAG, "decPlayer Exception: $e")
                             }
                         }
-                    } else if (decPlayer.isPlaying && encPlayer.isPlaying) {
+                    }
+                    else if (decPlayer.isPlaying && encPlayer.isPlaying) {
                         decPlayer.stop()
                         encPlayer.stop()
                     }
