@@ -61,6 +61,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -129,6 +130,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -602,9 +604,8 @@ private fun TopAppBar(
 
     val recOffImage = Icons.Filled.VoiceOverOff
     val recOnImage = Icons.Filled.RecordVoiceOver
-    var recImage by remember { mutableStateOf(recOffImage) }
-    var isSpeakerOn by remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
-
+    val isSpeakerOn = remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
+    var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
     var menuExpanded by remember { mutableStateOf(false) }
 
     val about = stringResource(R.string.about)
@@ -632,44 +633,51 @@ private fun TopAppBar(
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
 
-            Icon(
-                imageVector = recImage,
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
                             if (Call.call("connected") == null) {
                                 BaresipService.isRecOn = !BaresipService.isRecOn
-                                recImage = if (BaresipService.isRecOn) {
+                                if (BaresipService.isRecOn) {
                                     Api.module_load("sndfile")
-                                    recOnImage
                                 } else {
                                     Api.module_unload("sndfile")
-                                    recOffImage
                                 }
-                            } else
-                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT)
-                                    .show()
+                                isRecOn = BaresipService.isRecOn
+                            } else {
+                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                            }
                         },
                         onLongClick = {
                             alertTitle.value = ctx.getString(R.string.call_recording_title)
                             alertMessage.value = ctx.getString(R.string.call_recording_tip)
                             showAlert.value = true
                         }
-                    ),
-                tint = if (BaresipService.isRecOn)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
+                    )
+            ) {
+                Icon(
+                    imageVector = if (isRecOn) recOnImage else recOffImage,
+                    contentDescription = null,
+                    tint = if (isRecOn)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.width(22.dp))
 
-            Icon(
-                imageVector = currentMicIcon,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
                             if (Call.call("connected") != null) {
@@ -687,45 +695,53 @@ private fun TopAppBar(
                             alertTitle.value = ctx.getString(R.string.microphone_title)
                             alertMessage.value = ctx.getString(R.string.microphone_tip)
                             showAlert.value = true
-                        },
-                    ),
-                tint = if (BaresipService.isMicMuted)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
+                        }
+                    )
+            ) {
+                Icon(
+                    imageVector = currentMicIcon,
+                    contentDescription = null,
+                    tint = if (BaresipService.isMicMuted)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Icon(
-                imageVector = Icons.Filled.SpeakerPhone,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
-                                Log.d(
-                                    TAG, "Toggling speakerphone when dev/mode is " +
-                                            "${am.communicationDevice!!.type}/${am.mode}"
+                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
+                                        "${am.communicationDevice!!.type}/${am.mode}"
                                 )
-                            isSpeakerOn = !Utils.isSpeakerPhoneOn(am)
+                            isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
                         },
                         onLongClick = {
                             alertTitle.value = ctx.getString(R.string.speakerphone_title)
                             alertMessage.value = ctx.getString(R.string.speakerphone_tip)
                             showAlert.value = true
-                        },
-                    ),
-                tint = if (isSpeakerOn)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.SpeakerPhone,
+                    contentDescription = null,
+                    tint = if (isSpeakerOn.value)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
 
             IconButton(
                 onClick = { menuExpanded = !menuExpanded }
@@ -1198,7 +1214,8 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(top = 4.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically)
+    {
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -1330,16 +1347,12 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 }
             }
         }
-        if (securityIconTint.intValue != -1) {
-            Icon(
-                imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
-                    Icons.Filled.LockOpen
-                else
-                    Icons.Filled.Lock,
-                contentDescription = null,
+        if (securityIconTint.intValue != -1)
+            Box(
                 modifier = Modifier
-                    .size(28.dp)
                     .padding(top = 4.dp)
+                    .size(32.dp)
+                    .clip(CircleShape)
                     .clickable {
                         when (securityIconTint.intValue) {
                             R.color.colorTrafficRed -> {
@@ -1347,13 +1360,11 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
                                 showAlert.value = true
                             }
-
                             R.color.colorTrafficYellow -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.peer_not_verified)
                                 showAlert.value = true
                             }
-
                             R.color.colorTrafficGreen -> {
                                 dialogTitle.value = ctx.getString(R.string.info)
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
@@ -1376,9 +1387,18 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                             }
                         }
                     },
-                tint = colorResource(securityIconTint.intValue)
-            )
-        }
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
+                        Icons.Filled.LockOpen
+                    else
+                        Icons.Filled.Lock,
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
+                    tint = colorResource(securityIconTint.intValue)
+                )
+            }
     }
 }
 

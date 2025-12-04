@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -225,11 +224,9 @@ private fun Uris(
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = "Send Message",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.clickable {
+                // Chat Button
+                IconButton(
+                    onClick = {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
@@ -245,13 +242,17 @@ private fun Uris(
                             }
                         }
                     }
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = "Send Message",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
                 Spacer(modifier = Modifier.width(14.dp))
-                Icon(
-                    imageVector = Icons.Outlined.Videocam,
-                    contentDescription = "Video Call",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(32.dp).clickable {
+                // Video Call Button
+                IconButton(
+                    onClick = {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
@@ -267,13 +268,17 @@ private fun Uris(
                             }
                         }
                     }
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Videocam,
+                        contentDescription = "Video Call",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
-                Icon(
-                    imageVector = Icons.Outlined.Call,
-                    contentDescription = "Call",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.clickable {
+                // Call Button
+                IconButton(
+                    onClick = {
                         val aor = viewModel.selectedAor.value
                         val ua = UserAgent.ofAor(aor)
                         if (ua == null)
@@ -289,7 +294,13 @@ private fun Uris(
                             }
                         }
                     }
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Call,
+                        contentDescription = "Call",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }
