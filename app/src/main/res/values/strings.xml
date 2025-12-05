@@ -261,6 +261,7 @@
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
     <string name="playing_recording">Playing recording …</string>
+    <string name="stop">Stop</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history\?</string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history\?</string>
