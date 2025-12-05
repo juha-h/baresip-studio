@@ -40,6 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,15 +51,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.CallRow.Details
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
+import java.io.FileInputStream
 import java.text.DateFormat
 import java.util.GregorianCalendar
 
@@ -254,8 +257,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
 
     val showDialog = remember { mutableStateOf(false) }
     val recording = detail.recording
-    val decPlayer = MediaPlayer()
-    val encPlayer = MediaPlayer()
+    val mediaPlayer = remember { MediaPlayer() }
+    val scope = rememberCoroutineScope()
 
     AlertDialog(
         showDialog = showDialog,
@@ -263,93 +266,99 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
         message = "",
     )
 
-    if (recording[0] != "") {
+    val isRawState = recording[0] != "" && recording[1] != ""
+    val isMergedState = recording[0] != "" && recording[1] == ""
+
+    if (isRawState || isMergedState) {
         Text(
             text = durationText,
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier
                 .padding(end = 12.dp)
                 .clickable(onClick = {
-                    if (!decPlayer.isPlaying && !encPlayer.isPlaying) {
-                        decPlayer.reset()
-                        encPlayer.reset()
-                        Log.d(TAG, "Playing recordings ${recording[0]} and ${recording[1]}")
-                        decPlayer.apply {
-                            setAudioAttributes(
-                                AudioAttributes.Builder()
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                                    .build()
-                            )
-                            setOnPreparedListener {
-                                encPlayer.apply {
-                                    setAudioAttributes(
-                                        AudioAttributes.Builder()
-                                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                                            .build()
-                                    )
-                                    setOnPreparedListener {
-                                        it.start()
-                                        decPlayer.start()
-                                        Log.d(TAG, "Started players")
-                                        showDialog.value = true
-                                    }
-                                    setOnCompletionListener {
-                                        Log.d(TAG, "Stopping encPlayer")
-                                        it.stop()
-                                        showDialog.value = false
-                                    }
-                                    try {
-                                        val file = recording[0]
-                                        val encFile = File(file)
-                                            .copyTo(
-                                                File(
-                                                    BaresipService.filesPath +
-                                                            "/tmp/encode.wav"
-                                                ), true
-                                            )
-                                        val encUri = encFile.toUri()
-                                        setDataSource(ctx, encUri)
-                                        prepareAsync()
-                                    } catch (e: IllegalArgumentException) {
-                                        Log.e(TAG, "encPlayer IllegalArgumentException: $e")
-                                    } catch (e: IOException) {
-                                        Log.e(TAG, "encPlayer IOException: $e")
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "encPlayer Exception: $e")
+                    if (!mediaPlayer.isPlaying) {
+                        mediaPlayer.reset()
+                        scope.launch(Dispatchers.IO) {
+                            var finalFile: File? = null
+
+                            if (isRawState) {
+                                val fileIn = File(recording[0])
+                                val fileOut = File(recording[1])
+                                val mergedFileName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
+                                val mergedFile = File(BaresipService.filesPath + "/tmp", mergedFileName)
+
+                                if (mergedFile.exists()) {
+                                    Log.d(TAG, "Using already merged file: ${mergedFile.name}")
+                                    finalFile = mergedFile
+                                } else {
+                                    File(BaresipService.filesPath + "/tmp").mkdirs()
+                                    if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile)) {
+                                        finalFile = mergedFile
                                     }
                                 }
+
+                                // If merge successful, update state and delete originals
+                                if (finalFile != null && finalFile.exists()) {
+                                    // Update the object state
+                                    // We put the merged path in [0] and clear [1]
+                                    recording[0] = finalFile.absolutePath
+                                    recording[1] = ""
+
+                                    // Delete the original raw files
+                                    try {
+                                        if (fileIn.exists()) fileIn.delete()
+                                        if (fileOut.exists()) fileOut.delete()
+
+                                        // Persist changes so the app remembers the file is merged
+                                        CallHistoryNew.save()
+                                    } catch (e: Exception) {
+                                        Log.w(TAG, "MergeWav: Failed to delete original files: ${e.message}")
+                                    }
+                                }
+                            } else {
+                                // We are already in merged state
+                                Log.d(TAG, "Using already merged file: ${recording[0]}")
+                                finalFile = File(recording[0])
                             }
-                            setOnCompletionListener {
-                                Log.d(TAG, "Stopping decPlayer")
-                                it.stop()
-                                showDialog.value = false
-                            }
-                            try {
-                                val file = recording[1]
-                                val decFile = File(file)
-                                    .copyTo(
-                                        File(
-                                            BaresipService.filesPath +
-                                                    "/tmp/decode.wav"
-                                        ), true
-                                    )
-                                val decUri = decFile.toUri()
-                                setDataSource(ctx, decUri)
-                                prepareAsync()
-                            } catch (e: IllegalArgumentException) {
-                                Log.e(TAG, "decPlayer IllegalArgumentException: $e")
-                            } catch (e: IOException) {
-                                Log.e(TAG, "decPlayer IOException: $e")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "decPlayer Exception: $e")
+
+                            withContext(Dispatchers.Main) {
+                                if (finalFile != null && finalFile.exists()) {
+                                    try {
+                                        mediaPlayer.apply {
+                                            setAudioAttributes(
+                                                AudioAttributes.Builder()
+                                                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                                    .build()
+                                            )
+                                            val fis = FileInputStream(finalFile)
+                                            setDataSource(fis.fd)
+                                            fis.close()
+                                            setOnPreparedListener {
+                                                it.start()
+                                                Log.d(TAG, "Started playback")
+                                                showDialog.value = true
+                                            }
+                                            setOnCompletionListener {
+                                                Log.d(TAG, "Playback complete")
+                                                showDialog.value = false
+                                                it.reset()
+                                            }
+                                            prepareAsync()
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "Playback failed: $e")
+                                        Toast.makeText(ctx, "Playback error", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    Toast.makeText(ctx, "Failed to process audio file", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
-                    }
-                    else if (decPlayer.isPlaying && encPlayer.isPlaying) {
-                        decPlayer.stop()
-                        encPlayer.stop()
+                    } else {
+                        mediaPlayer.stop()
+                        mediaPlayer.reset()
+                        showDialog.value = false
                     }
                 })
         )

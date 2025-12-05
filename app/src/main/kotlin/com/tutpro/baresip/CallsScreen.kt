@@ -478,8 +478,7 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
 
 private fun removeFromHistory(callHistory: MutableState<List<CallRow>>, callRow: CallRow) {
     for (details in callRow.details) {
-        if (details.recording[0] != "")
-            CallHistoryNew.deleteRecording(details.recording)
+        CallHistoryNew.deleteRecording(details.recording)
         BaresipService.callHistory.removeAll {
             it.startTime == details.startTime && it.stopTime == details.stopTime
         }

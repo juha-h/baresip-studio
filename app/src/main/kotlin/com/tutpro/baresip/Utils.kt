@@ -52,6 +52,8 @@ import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.net.URL
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.security.cert.CertificateException
@@ -1144,6 +1146,108 @@ object Utils {
         canvas.drawText(letter.uppercase(), size / 2f, (size / 2f) + (yOffset / 2) + (bounds.height()/4), textPaint)
 
         return bitmap
+    }
+
+    /**
+     * Merges two mono WAV files into a single stereo WAV file.
+     * @param file1 The first WAV file (Left channel)* @param file2 The second WAV file (Right channel)
+     * @param outFile The destination file
+     * @return True if successful, False otherwise
+     */
+    fun mergeWavFiles(file1: File, file2: File, outFile: File): Boolean {
+
+        Log.d(TAG, "MergeWav: Input1 size=${file1.length()}, Input2 size=${file2.length()}")
+
+        try {
+            val in1 = FileInputStream(file1)
+            val in2 = FileInputStream(file2)
+            val out = FileOutputStream(outFile)
+
+            val header1 = ByteArray(44)
+            val header2 = ByteArray(44)
+
+            if (in1.read(header1) != 44 || in2.read(header2) != 44) {
+                Log.e(TAG, "MergeWav: Failed to read headers")
+                return false
+            }
+
+            // Parse data sizes from the input headers (Little Endian, offset 40)
+            val dataSize1 = ByteBuffer.wrap(header1, 40, 4).order(ByteOrder.LITTLE_ENDIAN).int
+            val dataSize2 = ByteBuffer.wrap(header2, 40, 4).order(ByteOrder.LITTLE_ENDIAN).int
+
+            Log.d(TAG, "MergeWav: DataChunk1=$dataSize1, DataChunk2=$dataSize2")
+
+            // Since we are converting 2x Mono to 1x Stereo, the size doubles.
+            // If one file is shorter, we will pad it with silence (0s).
+            val maxDataSize = kotlin.math.max(dataSize1, dataSize2)
+            val totalDataSize = maxDataSize * 2
+
+            Log.d(TAG, "MergeWav: Calculated Target DataSize=$totalDataSize")
+
+            // Prepare new header based on header1
+            val newHeader = header1.clone()
+            newHeader[22] = 2 // Channels = Stereo
+            newHeader[32] = 4 // BlockAlign = 2 * 16bit / 8 = 4
+
+            val sampleRate = ByteBuffer.wrap(header1, 24, 4).order(ByteOrder.LITTLE_ENDIAN).int
+            val byteRate = sampleRate * 2 * 2 // SampleRate * Channels * Bits/8
+
+            ByteBuffer.wrap(newHeader, 28, 4).order(ByteOrder.LITTLE_ENDIAN).putInt(byteRate)
+            ByteBuffer.wrap(newHeader, 40, 4).order(ByteOrder.LITTLE_ENDIAN).putInt(totalDataSize)
+            ByteBuffer.wrap(newHeader, 4, 4).order(ByteOrder.LITTLE_ENDIAN).putInt(totalDataSize + 36)
+
+            out.write(newHeader)
+
+            val buffer1 = ByteArray(2)
+            val buffer2 = ByteArray(2)
+            val silence = ByteArray(2) // Default 0s
+
+            // Loop until the LONGEST file is finished
+            var bytesRead1: Int
+            var bytesRead2: Int
+            var totalBytesWritten = 0
+
+            // We use a do-while or simpler loop structure to handle uneven lengths
+            while (true) {
+                bytesRead1 = in1.read(buffer1)
+                bytesRead2 = in2.read(buffer2)
+
+                // If both are done, stop
+                if (bytesRead1 == -1 && bytesRead2 == -1) break
+
+                // Write Left Channel (File 1)
+                if (bytesRead1 != -1) {
+                    out.write(buffer1, 0, bytesRead1)
+                    totalBytesWritten += bytesRead1
+                } else {
+                    // File 1 ended, write silence
+                    out.write(silence)
+                    totalBytesWritten += 2
+                }
+
+                // Write Right Channel (File 2)
+                if (bytesRead2 != -1) {
+                    out.write(buffer2, 0, bytesRead2)
+                    totalBytesWritten += bytesRead2
+                } else {
+                    // File 2 ended, write silence
+                    out.write(silence)
+                    totalBytesWritten += 2
+                }
+            }
+
+            Log.d(TAG, "MergeWav: Finished. Actual bytes written: $totalBytesWritten")
+
+            in1.close()
+            in2.close()
+            out.close()
+
+            return true
+
+        } catch (e: Exception) {
+            Log.e(TAG, "MergeWav Failed: $e")
+            return false
+        }
     }
 
     @Suppress("unused")

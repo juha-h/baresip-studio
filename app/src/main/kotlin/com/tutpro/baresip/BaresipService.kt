@@ -73,6 +73,10 @@ import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import com.tutpro.baresip.Utils.toCircle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.Charset
@@ -1095,9 +1099,31 @@ class BaresipService: Service() {
                                 history.stopTime = GregorianCalendar()
                                 history.startTime = if (completedElsewhere) history.stopTime else call.startTime
                                 history.rejected = call.rejected
-                                if (call.startTime != null && call.dumpfiles[0] != "")
-                                    history.recording = call.dumpfiles
-                                history.add()
+
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    if (call.startTime != null && call.dumpfiles[0] != "") {
+                                        delay(500)
+                                        val rxFile = File(call.dumpfiles[0])
+                                        val txFile = File(call.dumpfiles[1])
+                                        val mergedFile = File(filesPath, "${rxFile.nameWithoutExtension}_stereo.wav")
+
+                                        if (Utils.mergeWavFiles(rxFile, txFile, mergedFile)) {
+                                            Log.d(TAG, "Automatic merge succeeded.")
+                                            history.recording = arrayOf(mergedFile.absolutePath, "")
+                                            try {
+                                                rxFile.delete()
+                                                txFile.delete()
+                                            } catch (e: Exception) {
+                                                Log.w(TAG, "Could not delete temporary raw files after merge: ${e.message}")
+                                            }
+                                        } else {
+                                            Log.e(TAG, "Automatic merge failed. Storing raw file paths as fallback.")
+                                            history.recording = call.dumpfiles
+                                        }
+                                    }
+                                    history.add()
+                                }
+
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (!Utils.isVisible()) {

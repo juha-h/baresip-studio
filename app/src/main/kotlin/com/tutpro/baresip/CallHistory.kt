@@ -22,8 +22,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
         val aorSpecificHistory = BaresipService.callHistory.filter { it.aor == this.aor }
         if (aorSpecificHistory.size > CALL_HISTORY_SIZE) {
             val oldestToRemove = aorSpecificHistory.first()
-            if (oldestToRemove.recording[0].isNotEmpty())
-                deleteRecording(oldestToRemove.recording)
+            deleteRecording(oldestToRemove.recording)
             BaresipService.callHistory.remove(oldestToRemove)
         }
         save()
@@ -44,8 +43,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
             for (i in BaresipService.callHistory.indices.reversed()) {
                 val h = BaresipService.callHistory[i]
                 if (h.aor == aor) {
-                    if (h.recording[0] != "")
-                        deleteRecording(h.recording)
+                    deleteRecording(h.recording)
                     BaresipService.callHistory.removeAt(i)
                 }
             }
