@@ -265,29 +265,32 @@ private fun MainScreen(
         }
     }
 
+    val encryptPasswordTitle = stringResource(R.string.encrypt_password)
     val backupRequestLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             result.data?.data?.also { uri ->
                 downloadsOutputUri = uri
-                passwordTitle.value = ctx.getString(R.string.encrypt_password)
+                passwordTitle.value = encryptPasswordTitle
                 showPasswordDialog.value = true
             }
         }
     }
 
+    val noticeTitle = stringResource(R.string.notice)
+    val noBackupMessage = stringResource(R.string.no_backup)
     fun launchBackupRequest() {
         if (Build.VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
-                alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value = ctx.getString(R.string.no_backup)
+                alertTitle.value = noticeTitle
+                alertMessage.value = noBackupMessage
                 showAlert.value = true
             }
             else {
                 val path = Utils.downloadsPath("baresip.bs")
                 downloadsOutputUri = File(path).toUri()
-                passwordTitle.value = ctx.getString(R.string.encrypt_password)
+                passwordTitle.value = encryptPasswordTitle
                 showPasswordDialog.value = true
             }
         }
@@ -308,29 +311,31 @@ private fun MainScreen(
         }
     }
 
+    val decryptPasswordTitle = stringResource(R.string.decrypt_password)
     val restoreRequestLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             result.data?.data?.also { uri ->
                 downloadsInputUri = uri
-                passwordTitle.value = ctx.getString(R.string.decrypt_password)
+                passwordTitle.value = decryptPasswordTitle
                 showPasswordDialog.value = true
             }
         }
     }
-    
+
+    val noRestoreMessage = stringResource(R.string.no_restore)
     fun launchRestoreRequest() {
         if (Build.VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(READ_EXTERNAL_STORAGE))) {
-                alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value = ctx.getString(R.string.no_restore)
+                alertTitle.value = noticeTitle
+                alertMessage.value = noRestoreMessage
                 showAlert.value = true
             }
             else {
                 val path = Utils.downloadsPath("baresip.bs")
                 downloadsInputUri = File(path).toUri()
-                passwordTitle.value = ctx.getString(R.string.decrypt_password)
+                passwordTitle.value = decryptPasswordTitle
                 showPasswordDialog.value = true
             }
         }
@@ -403,7 +408,7 @@ private fun MainScreen(
             title = passwordTitle.value,
             okAction = {
                 if (password.value != "") {
-                    if (passwordTitle.value == ctx.getString(R.string.encrypt_password))
+                    if (passwordTitle.value == encryptPasswordTitle)
                         backup(ctx, password.value)
                     else
                         restore(ctx, password.value, onRestartClick)
@@ -556,6 +561,8 @@ private fun TopAppBar(
 
             Spacer(modifier = Modifier.width(8.dp))
 
+            val callRecordingTitle = stringResource(R.string.call_recording_title)
+            val callRecordingMessage = stringResource(R.string.call_recording_tip)
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(48.dp)
@@ -575,8 +582,8 @@ private fun TopAppBar(
                             }
                         },
                         onLongClick = {
-                            alertTitle.value = ctx.getString(R.string.call_recording_title)
-                            alertMessage.value = ctx.getString(R.string.call_recording_tip)
+                            alertTitle.value = callRecordingTitle
+                            alertMessage.value = callRecordingMessage
                             showAlert.value = true
                         }
                     )
@@ -594,6 +601,8 @@ private fun TopAppBar(
 
             Spacer(modifier = Modifier.width(22.dp))
 
+            val microPhoneTitle = stringResource(R.string.microphone_title)
+            val microPhoneMessage = stringResource(R.string.microphone_tip)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -613,8 +622,8 @@ private fun TopAppBar(
                             }
                         },
                         onLongClick = {
-                            alertTitle.value = ctx.getString(R.string.microphone_title)
-                            alertMessage.value = ctx.getString(R.string.microphone_tip)
+                            alertTitle.value = microPhoneTitle
+                            alertMessage.value = microPhoneMessage
                             showAlert.value = true
                         }
                     )
@@ -632,6 +641,8 @@ private fun TopAppBar(
 
             Spacer(modifier = Modifier.width(16.dp))
 
+            val speakerPhoneTitle = stringResource(R.string.speakerphone_title)
+            val speakerPhoneMessage = stringResource(R.string.speakerphone_tip)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -647,8 +658,8 @@ private fun TopAppBar(
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
                         },
                         onLongClick = {
-                            alertTitle.value = ctx.getString(R.string.speakerphone_title)
-                            alertMessage.value = ctx.getString(R.string.speakerphone_tip)
+                            alertTitle.value = speakerPhoneTitle
+                            alertMessage.value = speakerPhoneMessage
                             showAlert.value = true
                         }
                     )
@@ -2673,6 +2684,8 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
         if (it.name.startsWith("dump"))
             Utils.deleteFile(it)
     }
+
+    Utils.createEmptyFile(BaresipService.filesPath + "/restored")
 
     dialogTitle.value = ctx.getString(R.string.info)
     dialogMessage.value = ctx.getString(R.string.restored)
