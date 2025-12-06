@@ -463,6 +463,13 @@ class BaresipService: Service() {
                     }
                 }
 
+                val restored = File(filesPath, "restored")
+                if (restored.exists()) {
+                    CallHistoryNew.clearRecordings()
+                    CallHistoryNew.save()
+                    restored.delete()
+                }
+
                 Message.restore()
 
                 hotSpotAddresses = Utils.hotSpotAddresses()
@@ -1099,17 +1106,20 @@ class BaresipService: Service() {
                                 history.stopTime = GregorianCalendar()
                                 history.startTime = if (completedElsewhere) history.stopTime else call.startTime
                                 history.rejected = call.rejected
-
+                                if (call.dumpfiles[0] != "") {
+                                    history.recording = call.dumpfiles
+                                }
+                                history.add()
                                 CoroutineScope(Dispatchers.IO).launch {
                                     if (call.startTime != null && call.dumpfiles[0] != "") {
                                         delay(500)
                                         val rxFile = File(call.dumpfiles[0])
                                         val txFile = File(call.dumpfiles[1])
                                         val mergedFile = File(filesPath, "${rxFile.nameWithoutExtension}_stereo.wav")
-
                                         if (Utils.mergeWavFiles(rxFile, txFile, mergedFile)) {
                                             Log.d(TAG, "Automatic merge succeeded.")
                                             history.recording = arrayOf(mergedFile.absolutePath, "")
+                                            CallHistoryNew.save()
                                             try {
                                                 rxFile.delete()
                                                 txFile.delete()
@@ -1121,9 +1131,7 @@ class BaresipService: Service() {
                                             history.recording = call.dumpfiles
                                         }
                                     }
-                                    history.add()
                                 }
-
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (!Utils.isVisible()) {
