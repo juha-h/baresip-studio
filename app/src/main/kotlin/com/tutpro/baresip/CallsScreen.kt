@@ -41,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -60,6 +61,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -86,11 +90,26 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     val account = Account.ofAor(aor)!!
 
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
-
     var isHistoryLoaded by remember { mutableStateOf(false) }
-    LaunchedEffect(aor) {
+
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(aor, refreshTrigger) {
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                refreshTrigger++
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     BackHandler(enabled = true) {
@@ -199,7 +218,6 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                             }
                             showDialog.value = true
                         }
-
                         disable, enable -> {
                             account.callHistory = !account.callHistory
                             Account.saveAccounts()
@@ -478,12 +496,12 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
 
 private fun removeFromHistory(callHistory: MutableState<List<CallRow>>, callRow: CallRow) {
     for (details in callRow.details) {
-        CallHistoryNew.deleteRecording(details.recording)
+        CallHistoryNew.deleteRecordingFiles(details.recording)
         BaresipService.callHistory.removeAll {
             it.startTime == details.startTime && it.stopTime == details.stopTime
         }
     }
-    CallHistoryNew.deleteRecording(callRow.recording)
+    CallHistoryNew.deleteRecordingFiles(callRow.recording)
     val updatedList = callHistory.value.filterNot { it == callRow }
     callHistory.value = updatedList
     CallHistoryNew.save()

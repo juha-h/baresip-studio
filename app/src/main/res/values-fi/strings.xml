@@ -272,6 +272,7 @@
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
     <string name="playing_recording">Tallenteen kuuntelu …</string>
+    <string name="stop">Lopeta</string>
     <string name="calls_add_delete_question">Haluatko luoda uuden yhteystiedon \'%1$s\' tai poistaa
         %2$s puheluhistoriasta\?
     </string>

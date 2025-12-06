@@ -64,7 +64,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.CallRow.Details
-import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -266,6 +265,8 @@ private fun startTime(detail: Details): String {
 private fun Duration(ctx: Context, detail: Details, durationText: String) {
 
     val showDialog = remember { mutableStateOf(false) }
+    // NOTE: If detail.recording is modified elsewhere, this reference sees the change
+    // because Array is mutable, but Compose won't trigger a redraw.
     val recording = detail.recording
     val mediaPlayer = remember { MediaPlayer() }
     val scope = rememberCoroutineScope()
@@ -282,10 +283,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
         }
     )
 
-    val isRawState = recording[0] != "" && recording[1] != ""
-    val isMergedState = recording[0] != "" && recording[1] == ""
-
-    if (isRawState || isMergedState) {
+    val hasRecording = recording[0] != ""
+    if (hasRecording) {
         Text(
             text = durationText,
             color = MaterialTheme.colorScheme.error,
@@ -296,48 +295,64 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                         mediaPlayer.reset()
                         scope.launch(Dispatchers.IO) {
                             var finalFile: File? = null
+                            // RE-EVALUATE STATE INSIDE THE CLICK LISTENER
+                            val currentIsRaw = recording[0] != "" && recording[1] != ""
+                            val currentIsMerged = recording[0] != "" && recording[1] == ""
 
-                            if (isRawState) {
+                            if (currentIsRaw) {
                                 val fileIn = File(recording[0])
                                 val fileOut = File(recording[1])
-                                val mergedFileName =
-                                    "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
-                                val mergedFile = File(BaresipService.filesPath + "/tmp", mergedFileName)
+                                // SAFETY CHECK: If the raw file is gone, the background service
+                                // likely finished merging just now.
+                                if (!fileIn.exists()) {
+                                    // Try to find the merged file based on naming convention as fallback
+                                    val expectedMergedName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
+                                    val fallbackMerged = File(BaresipService.filesPath + "/recordings", expectedMergedName)
+                                    if (fallbackMerged.exists()) {
+                                        Log.d(TAG, "Raw file missing, found merged fallback: ${fallbackMerged.name}")
+                                        finalFile = fallbackMerged
+                                        // Update state to match reality
+                                        recording[0] = fallbackMerged.absolutePath
+                                        recording[1] = ""
+                                    } else {
+                                        Log.e(TAG, "Raw file missing and fallback not found: ${recording[0]}")
+                                    }
+                                } else {
+                                    // Normal Raw processing
+                                    val mergedFileName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
+                                    val mergedFile = File(BaresipService.filesPath + "/recordings", mergedFileName)
 
-                                if (mergedFile.exists()) {
-                                    Log.d(TAG, "Using already merged file: ${mergedFile.name}")
-                                    finalFile = mergedFile
-                                }
-                                else {
-                                    File(BaresipService.filesPath + "/tmp").mkdirs()
-                                    if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile)) {
+                                    if (mergedFile.exists()) {
+                                        Log.d(TAG, "Using already merged file: ${mergedFile.name}")
                                         finalFile = mergedFile
+                                    } else {
+                                        if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile)) {
+                                            finalFile = mergedFile
+                                        }
+                                    }
+
+                                    // If merge successful, update state and delete originals
+                                    if (finalFile != null && finalFile.exists()) {
+                                        recording[0] = finalFile.absolutePath
+                                        recording[1] = ""
+                                        try {
+                                            if (fileIn.exists()) fileIn.delete()
+                                            if (fileOut.exists()) fileOut.delete()
+                                            CallHistoryNew.save()
+                                        } catch (e: Exception) {
+                                            Log.w(TAG, "MergeWav: Failed to delete original files: ${e.message}")
+                                        }
                                     }
                                 }
-
-                                // If merge successful, update state and delete originals
-                                if (finalFile != null && finalFile.exists()) {
-                                    // Update the object state
-                                    // We put the merged path in [0] and clear [1]
-                                    recording[0] = finalFile.absolutePath
-                                    recording[1] = ""
-
-                                    // Delete the original raw files
-                                    try {
-                                        if (fileIn.exists()) fileIn.delete()
-                                        if (fileOut.exists()) fileOut.delete()
-
-                                        // Persist changes so the app remembers the file is merged
-                                        CallHistoryNew.save()
-                                    } catch (e: Exception) {
-                                        Log.w(TAG, "MergeWav: Failed to delete original files: ${e.message}")
-                                    }
+                            } else if (currentIsMerged) {
+                                // We are in merged state
+                                val f = File(recording[0])
+                                if (f.exists()) {
+                                    Log.d(TAG, "Using already merged file: ${recording[0]}")
+                                    finalFile = f
+                                } else {
+                                    Log.e(TAG, "Merged file record exists but file is missing: ${recording[0]}")
                                 }
-                            }
-                            else {
-                                // We are already in merged state
-                                Log.d(TAG, "Using already merged file: ${recording[0]}")
-                                finalFile = File(recording[0])
                             }
 
                             withContext(Dispatchers.Main) {
@@ -369,14 +384,12 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                         Log.e(TAG, "Playback failed: $e")
                                         Toast.makeText(ctx, "Playback error", Toast.LENGTH_SHORT).show()
                                     }
-                                }
-                                else {
+                                } else {
                                     Toast.makeText(ctx, "Failed to process audio file", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         mediaPlayer.stop()
                         mediaPlayer.reset()
                         showDialog.value = false
