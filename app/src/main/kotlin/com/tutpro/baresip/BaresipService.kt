@@ -465,6 +465,7 @@ class BaresipService: Service() {
 
                 val restored = File(filesPath, "restored")
                 if (restored.exists()) {
+                    Log.d(TAG, "Clearing recordings")
                     CallHistoryNew.clearRecordings()
                     CallHistoryNew.save()
                     restored.delete()
