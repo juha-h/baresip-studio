@@ -50,6 +50,18 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
             save()
         }
 
+        fun remove(startTime: GregorianCalendar?, stopTime: GregorianCalendar) {
+            val iterator = BaresipService.callHistory.iterator()
+            while (iterator.hasNext()) {
+                val h = iterator.next()
+                if (h.startTime == startTime && h.stopTime == stopTime) {
+                    deleteRecordingFiles(h.recording)
+                    iterator.remove()
+                }
+            }
+            save()
+        }
+
         fun save() {
             Log.d(TAG, "Saving history of ${BaresipService.callHistory.size} calls")
             val file = File(BaresipService.filesPath + "/call_history")

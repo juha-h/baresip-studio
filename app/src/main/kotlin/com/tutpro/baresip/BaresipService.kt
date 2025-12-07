@@ -1116,7 +1116,14 @@ class BaresipService: Service() {
                                         delay(500)
                                         val rxFile = File(call.dumpfiles[0])
                                         val txFile = File(call.dumpfiles[1])
-                                        val mergedFile = File(filesPath, "${rxFile.nameWithoutExtension}_stereo.wav")
+                                        val mergedFileName = rxFile.name
+                                            .replace("dump", "rec")
+                                            .replace("=>", "-")
+                                            .replace("sip:", "")
+                                            .replace("-enc", "")
+                                            .replace("*", "#")
+                                            .replace(";user=phone", "")
+                                        val mergedFile = File(filesPath, mergedFileName)
                                         if (Utils.mergeWavFiles(rxFile, txFile, mergedFile)) {
                                             Log.d(TAG, "Automatic merge succeeded.")
                                             history.recording = arrayOf(mergedFile.absolutePath, "")

@@ -5,8 +5,12 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.format.DateUtils
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +54,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,7 +90,7 @@ fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewMod
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
-
+    val detailsState = remember { callRow.details.toMutableStateList() }
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -122,13 +128,31 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
             }
         },
         content = { contentPadding ->
-            CallDetailsContent(LocalContext.current, contentPadding, callRow)
+            CallDetailsContent(
+                LocalContext.current,
+                contentPadding,
+                callRow,
+                detailsState,
+                onDelete = { detail ->
+                    detailsState.remove(detail)
+                    // If the list becomes empty, you might want to pop back
+                    if (detailsState.isEmpty()) {
+                        navController.popBackStack()
+                    }
+                }
+            )
         },
     )
 }
 
 @Composable
-private fun CallDetailsContent(ctx: Context, contentPadding: PaddingValues, callRow: CallRow) {
+private fun CallDetailsContent(
+    ctx: Context,
+    contentPadding: PaddingValues,
+    callRow: CallRow,
+    details: SnapshotStateList<Details>,
+    onDelete: (Details) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,7 +161,7 @@ private fun CallDetailsContent(ctx: Context, contentPadding: PaddingValues, call
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Peer(ctx, callRow)
-        Details(ctx, callRow.details)
+        Details(ctx, details, onDelete)
     }
 }
 
@@ -155,7 +179,7 @@ private fun Peer(ctx: Context, callRow: CallRow) {
 }
 
 @Composable
-private fun Details(ctx: Context, details: ArrayList<Details>) {
+private fun Details(ctx: Context, details: SnapshotStateList<Details>, onDelete: (Details) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = stringResource(R.string.direction),
             fontSize = 16.sp,
@@ -216,7 +240,7 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
                     )
                 }
                 Spacer(modifier = Modifier.width(78.dp))
-                val durationText = startTime(detail)
+                val durationText = startTime(detail, onDelete)
                 Spacer(modifier = Modifier.weight(1f))
                 Duration(ctx, detail, durationText)
             }
@@ -225,7 +249,8 @@ private fun Details(ctx: Context, details: ArrayList<Details>) {
 }
 
 @Composable
-private fun startTime(detail: Details): String {
+
+private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
     val startTime = detail.startTime
     val stopTime = detail.stopTime
     val startTimeText: String
@@ -257,31 +282,110 @@ private fun startTime(detail: Details): String {
             durationText = DateUtils.formatElapsedTime(duration)
         }
     }
-    Text(text = startTimeText)
+    val showDialog = remember { mutableStateOf(false) }
+    val positiveAction = remember { mutableStateOf({}) }
+
+    CustomElements.AlertDialog(
+        showDialog = showDialog,
+        title = stringResource(R.string.confirmation),
+        message = stringResource(R.string.delete_call_alert),
+        positiveButtonText = stringResource(R.string.delete),
+        onPositiveClicked = {
+            CallHistoryNew.remove(detail.startTime, detail.stopTime)
+            onDelete(detail)
+        },
+        negativeButtonText = stringResource(R.string.cancel)
+    )
+
+    Text(
+        text = startTimeText,
+        modifier = Modifier.combinedClickable(
+            onClick = {},
+            onLongClick = {
+                positiveAction.value = {
+                    CallHistoryNew.remove(startTime, stopTime)
+                }
+                showDialog.value = true
+            }
+        )
+    )
+
     return durationText
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Duration(ctx: Context, detail: Details, durationText: String) {
 
-    val showDialog = remember { mutableStateOf(false) }
+    val showPlaybackDialog = remember { mutableStateOf(false) }
+    val showDownloadDialog = remember { mutableStateOf(false) }
+
     // NOTE: If detail.recording is modified elsewhere, this reference sees the change
-    // because Array is mutable, but Compose won't trigger a redraw.
     val recording = detail.recording
     val mediaPlayer = remember { MediaPlayer() }
     val scope = rememberCoroutineScope()
 
+    // 1. Setup the File Saver Launcher
+    val saveLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("audio/x-wav")
+    ) { uri ->
+        uri?.let { destinationUri ->
+            scope.launch(Dispatchers.IO) {
+                try {
+                    val sourceFile = File(recording[0])
+                    if (sourceFile.exists()) {
+                        ctx.contentResolver.openOutputStream(destinationUri)?.use { output ->
+                            FileInputStream(sourceFile).use { input ->
+                                input.copyTo(output)
+                            }
+                        }
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(ctx, ctx.getString(R.string.recording_saved),
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(ctx, "Source file not found",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to save file: $e")
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(ctx, "Save failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
     PlaybackDialog(
-        showDialog = showDialog,
+        showDialog = showPlaybackDialog,
         mediaPlayer = mediaPlayer,
         onStop = {
             if (mediaPlayer.isPlaying) {
                 mediaPlayer.stop()
             }
             mediaPlayer.reset()
-            showDialog.value = false
+            showPlaybackDialog.value = false
         }
     )
+
+    // 2. Download Confirmation Dialog
+    if (showDownloadDialog.value) {
+        CustomElements.AlertDialog(
+            showDialog = showDownloadDialog,
+            title = stringResource(R.string.save_recording),
+            message = stringResource(R.string.save_recording_question),
+            positiveButtonText = stringResource(R.string.save),
+            onPositiveClicked = {
+                showDownloadDialog.value = false
+                val suggestedName = File(recording[0]).name
+                saveLauncher.launch(suggestedName)
+            },
+            negativeButtonText = stringResource(R.string.cancel)
+        )
+    }
 
     val hasRecording = recording[0] != ""
     if (hasRecording) {
@@ -290,111 +394,114 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier
                 .padding(end = 12.dp)
-                .clickable(onClick = {
-                    if (!mediaPlayer.isPlaying) {
-                        mediaPlayer.reset()
-                        scope.launch(Dispatchers.IO) {
-                            var finalFile: File? = null
-                            // RE-EVALUATE STATE INSIDE THE CLICK LISTENER
-                            val currentIsRaw = recording[0] != "" && recording[1] != ""
-                            val currentIsMerged = recording[0] != "" && recording[1] == ""
+                .combinedClickable(
+                    onLongClick = {
+                        showDownloadDialog.value = true
+                    },
+                    onClick = {
+                        if (!mediaPlayer.isPlaying) {
+                            mediaPlayer.reset()
+                            scope.launch(Dispatchers.IO) {
+                                var finalFile: File? = null
+                                // RE-EVALUATE STATE INSIDE THE CLICK LISTENER
+                                val currentIsRaw = recording[0] != "" && recording[1] != ""
+                                val currentIsMerged = recording[0] != "" && recording[1] == ""
 
-                            if (currentIsRaw) {
-                                val fileIn = File(recording[0])
-                                val fileOut = File(recording[1])
-                                // SAFETY CHECK: If the raw file is gone, the background service
-                                // likely finished merging just now.
-                                if (!fileIn.exists()) {
-                                    // Try to find the merged file based on naming convention as fallback
-                                    val expectedMergedName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
-                                    val fallbackMerged = File(BaresipService.filesPath + "/recordings", expectedMergedName)
-                                    if (fallbackMerged.exists()) {
-                                        Log.d(TAG, "Raw file missing, found merged fallback: ${fallbackMerged.name}")
-                                        finalFile = fallbackMerged
-                                        // Update state to match reality
-                                        recording[0] = fallbackMerged.absolutePath
-                                        recording[1] = ""
+                                if (currentIsRaw) {
+                                    val fileIn = File(recording[0])
+                                    val fileOut = File(recording[1])
+                                    // SAFETY CHECK: If the raw file is gone, the background service
+                                    // likely finished merging just now.
+                                    if (!fileIn.exists()) {
+                                        // Try to find the merged file based on naming convention as fallback
+                                        val expectedMergedName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
+                                        val fallbackMerged = File(BaresipService.filesPath + "/recordings", expectedMergedName)
+                                        if (fallbackMerged.exists()) {
+                                            Log.d(TAG, "Raw file missing, found merged fallback: ${fallbackMerged.name}")
+                                            finalFile = fallbackMerged
+                                            // Update state to match reality
+                                            recording[0] = fallbackMerged.absolutePath
+                                            recording[1] = ""
+                                        } else {
+                                            Log.e(TAG, "Raw file missing and fallback not found: ${recording[0]}")
+                                        }
                                     } else {
-                                        Log.e(TAG, "Raw file missing and fallback not found: ${recording[0]}")
-                                    }
-                                } else {
-                                    // Normal Raw processing
-                                    val mergedFileName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
-                                    val mergedFile = File(BaresipService.filesPath + "/recordings", mergedFileName)
-
-                                    if (mergedFile.exists()) {
-                                        Log.d(TAG, "Using already merged file: ${mergedFile.name}")
-                                        finalFile = mergedFile
-                                    } else {
-                                        if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile)) {
+                                        // Normal Raw processing
+                                        val mergedFileName = "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
+                                        val mergedFile = File(BaresipService.filesPath + "/recordings", mergedFileName)
+                                        if (mergedFile.exists()) {
+                                            Log.d(TAG, "Using already merged file: ${mergedFile.name}")
                                             finalFile = mergedFile
+                                        } else {
+                                            if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile)) {
+                                                finalFile = mergedFile
+                                            }
+                                        }
+
+                                        // If merge successful, update state and delete originals
+                                        if (finalFile != null && finalFile.exists()) {
+                                            recording[0] = finalFile.absolutePath
+                                            recording[1] = ""
+                                            try {
+                                                if (fileIn.exists()) fileIn.delete()
+                                                if (fileOut.exists()) fileOut.delete()
+                                                CallHistoryNew.save()
+                                            } catch (e: Exception) {
+                                                Log.w(TAG, "MergeWav: Failed to delete original files: ${e.message}")
+                                            }
                                         }
                                     }
+                                } else if (currentIsMerged) {
+                                    val f = File(recording[0])
+                                    if (f.exists()) {
+                                        Log.d(TAG, "Using already merged file: ${recording[0]}")
+                                        finalFile = f
+                                    } else {
+                                        Log.e(TAG, "Merged file record exists but file is missing: ${recording[0]}")
+                                    }
+                                }
 
-                                    // If merge successful, update state and delete originals
+                                withContext(Dispatchers.Main) {
                                     if (finalFile != null && finalFile.exists()) {
-                                        recording[0] = finalFile.absolutePath
-                                        recording[1] = ""
                                         try {
-                                            if (fileIn.exists()) fileIn.delete()
-                                            if (fileOut.exists()) fileOut.delete()
-                                            CallHistoryNew.save()
+                                            mediaPlayer.apply {
+                                                setAudioAttributes(
+                                                    AudioAttributes.Builder()
+                                                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                                                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                                                        .build()
+                                                )
+                                                val fis = FileInputStream(finalFile)
+                                                setDataSource(fis.fd)
+                                                fis.close()
+                                                setOnPreparedListener {
+                                                    it.start()
+                                                    showPlaybackDialog.value = true
+                                                }
+                                                setOnCompletionListener {
+                                                    showPlaybackDialog.value = false
+                                                    it.reset()
+                                                }
+                                                prepareAsync()
+                                            }
                                         } catch (e: Exception) {
-                                            Log.w(TAG, "MergeWav: Failed to delete original files: ${e.message}")
+                                            Log.e(TAG, "Playback failed: $e")
+                                            Toast.makeText(ctx, "Playback error",
+                                                Toast.LENGTH_SHORT).show()
                                         }
+                                    } else {
+                                        Toast.makeText(ctx, "Failed to process audio file",
+                                            Toast.LENGTH_SHORT).show()
                                     }
                                 }
-                            } else if (currentIsMerged) {
-                                // We are in merged state
-                                val f = File(recording[0])
-                                if (f.exists()) {
-                                    Log.d(TAG, "Using already merged file: ${recording[0]}")
-                                    finalFile = f
-                                } else {
-                                    Log.e(TAG, "Merged file record exists but file is missing: ${recording[0]}")
-                                }
                             }
-
-                            withContext(Dispatchers.Main) {
-                                if (finalFile != null && finalFile.exists()) {
-                                    try {
-                                        mediaPlayer.apply {
-                                            setAudioAttributes(
-                                                AudioAttributes.Builder()
-                                                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                                                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                                                    .build()
-                                            )
-                                            val fis = FileInputStream(finalFile)
-                                            setDataSource(fis.fd)
-                                            fis.close()
-                                            setOnPreparedListener {
-                                                it.start()
-                                                Log.d(TAG, "Started playback")
-                                                showDialog.value = true
-                                            }
-                                            setOnCompletionListener {
-                                                Log.d(TAG, "Playback complete")
-                                                showDialog.value = false
-                                                it.reset()
-                                            }
-                                            prepareAsync()
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "Playback failed: $e")
-                                        Toast.makeText(ctx, "Playback error", Toast.LENGTH_SHORT).show()
-                                    }
-                                } else {
-                                    Toast.makeText(ctx, "Failed to process audio file", Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                        } else {
+                            mediaPlayer.stop()
+                            mediaPlayer.reset()
+                            showPlaybackDialog.value = false
                         }
-                    } else {
-                        mediaPlayer.stop()
-                        mediaPlayer.reset()
-                        showDialog.value = false
                     }
-                })
+                )
         )
     } else {
         Text(text = durationText, modifier = Modifier.padding(end = 12.dp))
@@ -410,8 +517,6 @@ private fun PlaybackDialog(
     if (showDialog.value) {
         // State to hold progress (0.0f to 1.0f)
         var currentProgress by remember { mutableFloatStateOf(0f) }
-
-        // Formatted time strings
         var currentPositionText by remember { mutableStateOf("00:00") }
         var totalDurationText by remember { mutableStateOf("00:00") }
 
@@ -445,9 +550,7 @@ private fun PlaybackDialog(
                 ) {
                     LinearProgressIndicator(
                         progress = { currentProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp),
+                        modifier = Modifier.fillMaxWidth().height(8.dp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -461,9 +564,7 @@ private fun PlaybackDialog(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
-                        onStop()
-                    }
+                    onClick = { onStop() }
                 ) {
                     Text(stringResource(R.string.stop))
                 }
