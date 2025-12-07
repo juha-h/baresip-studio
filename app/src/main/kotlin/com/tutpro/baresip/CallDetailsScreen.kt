@@ -135,10 +135,8 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                 detailsState,
                 onDelete = { detail ->
                     detailsState.remove(detail)
-                    // If the list becomes empty, you might want to pop back
-                    if (detailsState.isEmpty()) {
+                    if (detailsState.isEmpty())
                         navController.popBackStack()
-                    }
                 }
             )
         },
@@ -168,7 +166,8 @@ private fun CallDetailsContent(
 @Composable
 private fun Peer(ctx: Context, callRow: CallRow) {
     val account = Account.ofAor(callRow.aor)!!
-    val headerText = stringResource(R.string.peer) + " " + Utils.friendlyUri(ctx, callRow.peerUri, account)
+    val headerText = stringResource(R.string.peer) + " " +
+            Utils.friendlyUri(ctx, callRow.peerUri, account)
     Text(
         text = headerText,
         modifier = Modifier.fillMaxWidth(),
@@ -363,9 +362,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
         showDialog = showPlaybackDialog,
         mediaPlayer = mediaPlayer,
         onStop = {
-            if (mediaPlayer.isPlaying) {
+            if (mediaPlayer.isPlaying)
                 mediaPlayer.stop()
-            }
             mediaPlayer.reset()
             showPlaybackDialog.value = false
         }
@@ -433,9 +431,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                             Log.d(TAG, "Using already merged file: ${mergedFile.name}")
                                             finalFile = mergedFile
                                         } else {
-                                            if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile)) {
+                                            if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile))
                                                 finalFile = mergedFile
-                                            }
                                         }
 
                                         // If merge successful, update state and delete originals

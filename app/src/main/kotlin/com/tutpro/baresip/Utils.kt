@@ -1269,9 +1269,8 @@ object Utils {
 
     fun createEmptyFile(path: String): File {
         val file = File(path)
-        if (file.exists()) {
+        if (file.exists())
             file.delete()
-        }
         file.createNewFile()
         return file
     }

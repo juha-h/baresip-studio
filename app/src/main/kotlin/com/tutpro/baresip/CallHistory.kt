@@ -100,9 +100,8 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
         }
 
         fun clearRecordings() {
-            for (h in BaresipService.callHistory) {
+            for (h in BaresipService.callHistory)
                 h.recording = arrayOf("", "")
-            }
         }
 
         @Suppress("UNUSED")

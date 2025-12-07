@@ -45,6 +45,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -92,7 +93,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
     var isHistoryLoaded by remember { mutableStateOf(false) }
 
-    var refreshTrigger by remember { mutableStateOf(0) }
+    var refreshTrigger by remember { mutableIntStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(aor, refreshTrigger) {
@@ -102,9 +103,8 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
+            if (event == Lifecycle.Event.ON_RESUME)
                 refreshTrigger++
-            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
