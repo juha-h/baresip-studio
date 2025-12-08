@@ -16,7 +16,6 @@ import android.os.Process
 import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.widget.Chronometer
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -121,7 +120,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -137,7 +135,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
@@ -1276,37 +1273,14 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
             }
         }
         if (showCallTimer.value) {
-            val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
-            val chronometerInstance = remember { mutableStateOf<Chronometer?>(null) }
-            AndroidView(
-                factory = { context ->
-                    Chronometer(context).apply {
-                        textSize = 16F
-                        setTextColor(textColor)
-                        base = SystemClock.elapsedRealtime() - (callDuration * 1000L)
-                        chronometerInstance.value = this
-                    }
-                },
-                update = { chronometerView ->
-                    val newBase = SystemClock.elapsedRealtime() - (callDuration * 1000L)
-                    if (chronometerView.base != newBase) {
-                        chronometerView.base = newBase
-                    }
-                    chronometerView.start()
-                    Log.d(TAG, "Chronometer started/updated")
-                },
-                modifier = Modifier.padding(start = 6.dp,
-                    top = 4.dp,
-                    end = if (securityIconTint.intValue != -1) 6.dp else 0.dp),
+            CallTimer(
+                initialDurationSeconds = callDuration.toLong(),
+                modifier = Modifier.padding(
+                    start = 6.dp,
+                    top = 6.dp,
+                    end = if (securityIconTint.intValue != -1) 6.dp else 0.dp
+                )
             )
-            DisposableEffect(Unit) {
-                onDispose {
-                    chronometerInstance.value?.let {
-                        it.stop()
-                        Log.d(TAG, "Chronometer stopped in onDispose")
-                    }
-                }
-            }
         }
         if (securityIconTint.intValue != -1)
             Box(
@@ -1361,6 +1335,35 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 )
             }
     }
+}
+
+@Composable
+private fun CallTimer(
+    initialDurationSeconds: Long,
+    modifier: Modifier = Modifier
+) {
+    val startTime = remember(initialDurationSeconds) {
+        SystemClock.elapsedRealtime() - (initialDurationSeconds * 1000L)
+    }
+
+    var timeText by remember { mutableStateOf("") }
+
+    LaunchedEffect(startTime) {
+        while (true) {
+            val now = SystemClock.elapsedRealtime()
+            val elapsedMillis = now - startTime
+            val seconds = if (elapsedMillis > 0) elapsedMillis / 1000 else 0
+            timeText = android.text.format.DateUtils.formatElapsedTime(seconds)
+            delay(1000L)
+        }
+    }
+
+    Text(
+        text = timeText,
+        fontSize = 16.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = modifier
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
