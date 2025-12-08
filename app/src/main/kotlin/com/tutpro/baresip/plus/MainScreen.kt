@@ -422,6 +422,7 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
         if (isConnected) {
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 focusDtmf.value = true
+                delay(300)
                 keyboardController?.show()
             }
             else
