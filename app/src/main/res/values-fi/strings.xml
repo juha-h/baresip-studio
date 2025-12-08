@@ -254,8 +254,6 @@
     <string name="decrypt_password">Palauta salasanalla</string>
     <string name="delete_account">Haluatko poistaa tilin \'%1$s\'\?</string>
     <!-- Baresip Service -->
-    <string name="reply">Vastaa</string>
-    <string name="save">Talleta</string>
     <string name="is_calling">soittaa</string>
     <string name="missed_call_from">Vastaamaton puhelu soittajalta</string>
     <string name="missed_calls">Vastaamattomia puheluita</string>
@@ -271,7 +269,6 @@
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
-    <string name="playing_recording">Tallenteen kuuntelu …</string>
     <string name="calls_add_delete_question">Haluatko luoda uuden yhteystiedon \'%1$s\' tai poistaa
         %2$s puheluhistoriasta\?
     </string>
@@ -283,6 +280,12 @@
     <string name="call_answered_elsewhere">Puheluun vastattu muualla</string>
     <string name="call_missed">Puheluun ei vastattu</string>
     <string name="call_rejected">Puhelu hylätty</string>
+    <!-- Call Details Activity -->
+    <string name="playing_recording">Tallenteen kuuntelu …</string>
+    <string name="save_recording">Talleta tallenne</string>
+    <string name="save_recording_question">Haluatko tallentaa tämän tallenteen?</string>
+    <string name="recording_saved">Tallenne tallennettu</string>
+    <string name="delete_call_alert">Haluatko poistaa tämän puhelun historiata?</string>
     <!-- Chat Activity -->
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
@@ -459,6 +462,9 @@
     <string name="info">Tieto</string>
     <string name="notice">Huomio</string>
     <string name="cancel">Peruuta</string>
+    <string name="stop">Lopeta</string>
+    <string name="reply">Vastaa</string>
+    <string name="save">Talleta</string>
     <string name="ok">OK</string>
     <string name="yes">Kyllä</string>
     <string name="no">Ei</string>

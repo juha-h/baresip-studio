@@ -78,6 +78,12 @@ import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import com.tutpro.baresip.plus.Utils.toCircle
+import kotlin.concurrent.schedule
+import kotlin.math.roundToInt
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
@@ -86,8 +92,6 @@ import java.nio.charset.StandardCharsets
 import java.util.GregorianCalendar
 import java.util.Timer
 import java.util.TimerTask
-import kotlin.concurrent.schedule
-import kotlin.math.roundToInt
 
 class BaresipService: Service() {
 
@@ -466,6 +470,14 @@ class BaresipService: Service() {
                         new.recording = old.recording
                         new.add()
                     }
+                }
+
+                val restored = File(filesPath, "restored")
+                if (restored.exists()) {
+                    Log.d(TAG, "Clearing recordings")
+                    CallHistoryNew.clearRecordings()
+                    CallHistoryNew.save()
+                    restored.delete()
                 }
 
                 Message.restore()
@@ -1154,9 +1166,39 @@ class BaresipService: Service() {
                                 history.stopTime = GregorianCalendar()
                                 history.startTime = if (completedElsewhere) history.stopTime else call.startTime
                                 history.rejected = call.rejected
-                                if (call.startTime != null && call.dumpfiles[0] != "")
+                                if (call.dumpfiles[0] != "") {
                                     history.recording = call.dumpfiles
+                                }
                                 history.add()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    if (call.startTime != null && call.dumpfiles[0] != "") {
+                                        delay(500)
+                                        val rxFile = File(call.dumpfiles[0])
+                                        val txFile = File(call.dumpfiles[1])
+                                        val mergedFileName = rxFile.name
+                                            .replace("dump", "rec")
+                                            .replace("=>", "-")
+                                            .replace("sip:", "")
+                                            .replace("-enc", "")
+                                            .replace("*", "#")
+                                            .replace(";user=phone", "")
+                                        val mergedFile = File(filesPath, mergedFileName)
+                                        if (Utils.mergeWavFiles(rxFile, txFile, mergedFile)) {
+                                            Log.d(TAG, "Automatic merge succeeded.")
+                                            history.recording = arrayOf(mergedFile.absolutePath, "")
+                                            CallHistoryNew.save()
+                                            try {
+                                                rxFile.delete()
+                                                txFile.delete()
+                                            } catch (e: Exception) {
+                                                Log.w(TAG, "Could not delete temporary raw files after merge: ${e.message}")
+                                            }
+                                        } else {
+                                            Log.e(TAG, "Automatic merge failed. Storing raw file paths as fallback.")
+                                            history.recording = call.dumpfiles
+                                        }
+                                    }
+                                }
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (!Utils.isVisible()) {

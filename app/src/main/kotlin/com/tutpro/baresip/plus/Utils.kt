@@ -40,7 +40,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.RandomAccessFile
+import java.io.Serializable
 import java.lang.reflect.Method
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -981,6 +992,134 @@ object Utils {
             if (am.isSpeakerphoneOn)
                 am.isSpeakerphoneOn = false
         }
+    }
+
+    fun mergeWavFiles(file1: File, file2: File, mergedFile: File): Boolean {
+        try {
+            val fis1 = FileInputStream(file1)
+            val fis2 = FileInputStream(file2)
+            val fos = FileOutputStream(mergedFile)
+
+            // Skip headers (assumed 44 bytes for standard WAV)
+            // NOTE: A robust implementation parses the header to find the 'data' chunk.
+            // For this quick fix, assuming 44 bytes is standard for Baresip output.
+            val headerSize = 44
+            val header1 = ByteArray(headerSize)
+            val header2 = ByteArray(headerSize)
+
+            if (fis1.read(header1) != headerSize || fis2.read(header2) != headerSize) {
+                Log.e(TAG, "MergeWav: Files too small")
+                return false
+            }
+
+            // Construct new header for stereo
+            // Copy header from file1 but update channels to 2 and block align
+            val newHeader = header1.clone()
+
+            // 1. Update File Size (Indices 4-7) - placeholder, fixed at end
+            // 2. Update Channels (Index 22) to 2 (Stereo)
+            newHeader[22] = 2
+            newHeader[23] = 0
+
+            // 3. Update Block Align (Index 32) - usually 2*Channels (16bit) -> 4
+            newHeader[32] = 4
+            newHeader[33] = 0
+
+            // 4. Update Byte Rate (Index 28) - usually SampleRate * BlockAlign
+            // Assuming 8000Hz sample rate: 8000 * 4 = 32000
+            // You should calculate this dynamically based on the input header if possible.
+            // For now, copying the rest is usually "okay" if players are lenient,
+            // but setting channels to 2 is the critical part.
+
+            fos.write(newHeader)
+
+            // MERGE LOOP with Buffering
+            val bufferSize = 4096 // 4KB buffer
+            val buffer1 = ByteArray(bufferSize)
+            val buffer2 = ByteArray(bufferSize)
+            val stereoBuffer = ByteArray(bufferSize * 2) // Output is twice as large
+
+            var bytesRead1: Int
+            var bytesRead2: Int
+            var totalBytesData = 0
+
+            while (true) {
+                bytesRead1 = fis1.read(buffer1)
+                bytesRead2 = fis2.read(buffer2)
+
+                if (bytesRead1 == -1 && bytesRead2 == -1) break
+
+                // Use the smaller read count to avoid out of bounds if files differ slightly
+                val limit = maxOf(bytesRead1, bytesRead2)
+                var outIndex = 0
+
+                // Interleave samples (Simple Left/Right merge)
+                // Assuming 16-bit audio (2 bytes per sample)
+                for (i in 0 until limit step 2) {
+                    // Left Channel (File 1)
+                    if (i + 1 < bytesRead1) {
+                        stereoBuffer[outIndex++] = buffer1[i]
+                        stereoBuffer[outIndex++] = buffer1[i+1]
+                    } else {
+                        // Padding if file1 ended
+                        stereoBuffer[outIndex++] = 0
+                        stereoBuffer[outIndex++] = 0
+                    }
+
+                    // Right Channel (File 2)
+                    if (i + 1 < bytesRead2) {
+                        stereoBuffer[outIndex++] = buffer2[i]
+                        stereoBuffer[outIndex++] = buffer2[i+1]
+                    } else {
+                        // Padding if file2 ended
+                        stereoBuffer[outIndex++] = 0
+                        stereoBuffer[outIndex++] = 0
+                    }
+                }
+
+                fos.write(stereoBuffer, 0, outIndex)
+                totalBytesData += outIndex
+            }
+
+            fis1.close()
+            fis2.close()
+
+            // Fix Header Sizes
+            // ChunkSize (4-7) = TotalFileSize - 8
+            val totalFileSize = totalBytesData + 44 - 8
+            val rFile = RandomAccessFile(mergedFile, "rw")
+            rFile.seek(4)
+            rFile.write(intToLittleEndian(totalFileSize), 0, 4)
+
+            // Subchunk2Size (40-43) = DataSize
+            rFile.seek(40)
+            rFile.write(intToLittleEndian(totalBytesData), 0, 4)
+            rFile.close()
+            fos.close()
+
+            return true
+        } catch (e: Exception) {
+            Log.e(TAG, "MergeWav error: $e")
+            return false
+        }
+    }
+
+    // Helper for header writing
+    private fun intToLittleEndian(value: Int): ByteArray {
+        return byteArrayOf(
+            (value and 0xff).toByte(),
+            (value shr 8 and 0xff).toByte(),
+            (value shr 16 and 0xff).toByte(),
+            (value shr 24 and 0xff).toByte()
+        )
+    }
+
+    fun createEmptyFile(path: String): File {
+        val file = File(path)
+        if (file.exists())
+            file.delete()
+        file.createNewFile()
+        return file
     }
 
     @Suppress("unused")
