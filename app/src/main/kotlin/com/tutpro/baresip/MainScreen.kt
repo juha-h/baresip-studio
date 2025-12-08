@@ -392,6 +392,7 @@ private fun MainScreen(
         if (isConnected) {
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 focusDtmf.value = true
+                delay(300)
                 keyboardController?.show()
             }
             else
