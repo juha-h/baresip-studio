@@ -1,0 +1,5 @@
+- After restore, cleared recorded call indications from calls and call details screens
+- On call details screen, added possibility to save call recording by long click on call duration and to delete call history by long click on call time value
+- Added progress bar and stop button to play recording dialog
+- Fixed possible race condition when screen is rotated
+- New translations (Chinese)
