@@ -303,7 +303,8 @@ private fun MainScreen(
             onNegativeClicked = onNegativeClicked.value
         )
 
-    if (showPasswordDialog.value)
+    if (showPasswordDialog.value) {
+        val encryptPasswordTitle = stringResource(R.string.encrypt_password)
         PasswordDialog(
             ctx = ctx,
             showPasswordDialog = showPasswordDialog,
@@ -312,7 +313,7 @@ private fun MainScreen(
             title = passwordTitle.value,
             okAction = {
                 if (password.value != "") {
-                    if (passwordTitle.value == ctx.getString(R.string.encrypt_password))
+                    if (passwordTitle.value == encryptPasswordTitle)
                         backup(ctx, password.value)
                     else
                         restore(ctx, password.value, onRestartClick)
@@ -325,6 +326,7 @@ private fun MainScreen(
                 }
             }
         )
+    }
 
     if (showPasswordsDialog.value) {
         if (passwordAccounts.isNotEmpty()) {
