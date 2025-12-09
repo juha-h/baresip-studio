@@ -1,0 +1,3 @@
+- Use compose based call timer
+- Fixed possible race condition when screen is rotated
+- New translations (Chinese)
