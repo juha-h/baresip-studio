@@ -1410,9 +1410,9 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         val callp = call.callp
                         Log.d(
                             TAG,
-                            "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}"
+                            "AoR ${ua.account.aor} canceling call $callp with ${callUri.value}"
                         )
-                        Api.ua_hangup(ua.uap, callp, 0, "")
+                        Api.ua_hangup(ua.uap, callp, 487, "Request Terminated")
                     }
                 },
             ) {
@@ -1438,7 +1438,7 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                         val call = uaCalls.first()
                         val callp = call.callp
                         Log.d(TAG, "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}")
-                        Api.ua_hangup(ua.uap, callp, 0, "")
+                        Api.ua_hangup(ua.uap, callp, 487, "Request Terminated")
                     }
                 }
             ) {
@@ -2388,7 +2388,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val callp = params[1] as Long
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
-                Api.ua_hangup(uap, callp, 0, "")
+                Api.ua_hangup(uap, callp, 487, "Request Terminated")
             call(ctx, viewModel, ua, ev[1])
             showCall(ctx, viewModel, ua)
         }
