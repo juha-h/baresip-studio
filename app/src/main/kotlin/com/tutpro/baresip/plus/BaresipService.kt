@@ -445,12 +445,6 @@ class BaresipService: Service() {
                         Config.initialize(applicationContext)
                 }
 
-                if (!File(filesDir, "tmp").exists())
-                    File(filesDir, "tmp").mkdir()
-
-                if (!File(filesDir, "recordings").exists())
-                    File(filesDir, "recordings").mkdir()
-
                 if (contactsMode != "android")
                     Contact.restoreBaresipContacts()
                 if (contactsMode != "baresip") {
@@ -472,13 +466,20 @@ class BaresipService: Service() {
                     }
                 }
 
+                val recordings = File(filesDir, "recordings")
+
                 val restored = File(filesPath, "restored")
                 if (restored.exists()) {
                     Log.d(TAG, "Clearing recordings")
                     CallHistoryNew.clearRecordings()
                     CallHistoryNew.save()
+                    if (recordings.exists())
+                        recordings.deleteRecursively()
                     restored.delete()
                 }
+
+                File(filesDir, "recordings").mkdir()
+                File(filesDir, "tmp").mkdir()
 
                 Message.restore()
 
