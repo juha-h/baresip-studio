@@ -1,6 +1,6 @@
 project(baresip)
 
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.18...4.0)
 
 add_link_options("LINKER:--build-id=none")
 
