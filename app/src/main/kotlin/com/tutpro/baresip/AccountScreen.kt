@@ -967,6 +967,31 @@ private fun AccountContent(
     }
 
     @Composable
+    fun BlockUnknown() {
+        val block by viewModel.blockUnknown.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = stringResource(R.string.block_unknown),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.block_unknown)
+                        alertMessage.value = ctx.getString(R.string.block_unknown_help)
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            Switch(
+                checked = block,
+                onCheckedChange = { viewModel.blockUnknown.value = it }
+            )
+        }
+    }
+
+    @Composable
     fun Voicemail() {
         val vmUri by viewModel.vmUri.collectAsState()
         Row(
@@ -1142,6 +1167,7 @@ private fun AccountContent(
         Dtmf()
         Answer()
         Redirect()
+        BlockUnknown()
         Voicemail()
         CountryCode()
         TelProvider()
@@ -1447,6 +1473,12 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         Api.account_set_sip_autoredirect(acc.accp, newAutoRedirect)
         acc.autoRedirect = newAutoRedirect
         Log.d(TAG, "New autoRedirect is ${acc.autoRedirect}")
+    }
+
+    val newBlockUnknown = viewModel.blockUnknown.value
+    if (newBlockUnknown != acc.blockUnknown) {
+        acc.blockUnknown = newBlockUnknown
+        Log.d(TAG, "New blockUnknown is ${acc.blockUnknown}")
     }
 
     var newVmUri = viewModel.vmUri.value.trim()

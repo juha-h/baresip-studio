@@ -850,34 +850,38 @@ class BaresipService: Service() {
                     "incoming call" -> {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
-                        val toastMsg = if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
+                        val blockUnknown = ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri
+                        val toastMsg = if (Call.inCall() || blockUnknown)
+                            String.format(getString(R.string.call_auto_rejected),
+                                Utils.friendlyUri(this, peerUri, ua.account))
+                        else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else if (!requestAudioFocus(applicationContext))
                             // request fails if there is an active telephony call
                             getString(R.string.audio_focus_denied)
-                        else if (Call.inCall())
-                            String.format(getString(R.string.call_auto_rejected),
-                                Utils.friendlyUri(this, peerUri, ua.account))
                         else
                             ""
                         if (toastMsg != "") {
-                            Log.d(TAG, "Auto-rejecting incoming call $uap/$peerUri")
+                            Log.d(TAG, "Auto-rejecting incoming call to $uap from $peerUri")
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(bevent)
                             toast(toastMsg)
-                            val name = "callwaiting_$toneCountry"
-                            val resourceId = applicationContext.resources.getIdentifier(
-                                name,
-                                "raw",
-                                applicationContext.packageName)
-                            if (resourceId != 0) {
-                                playUnInterrupted(resourceId, 1)
-                            } else {
-                                Log.e(TAG, "Callwaiting tone $name.wav not found\")")
-                            }
-                            if (ua.account.callHistory) {
-                                CallHistoryNew(aor, peerUri, "in").add()
-                                ua.account.missedCalls = true
+                            if (!blockUnknown) {
+                                val name = "callwaiting_$toneCountry"
+                                val resourceId = applicationContext.resources.getIdentifier(
+                                    name,
+                                    "raw",
+                                    applicationContext.packageName
+                                )
+                                if (resourceId != 0) {
+                                    playUnInterrupted(resourceId, 1)
+                                } else {
+                                    Log.e(TAG, "Callwaiting tone $name.wav not found\")")
+                                }
+                                if (ua.account.callHistory) {
+                                    CallHistoryNew(aor, peerUri, "in").add()
+                                    ua.account.missedCalls = true
+                                }
                             }
                             return
                         }
@@ -1204,6 +1208,18 @@ class BaresipService: Service() {
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             Log.w(TAG, "messageEvent did not find ua $uap")
+            return
+        }
+
+        if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
+            Log.d(TAG, "Auto-rejecting incoming message by $uap from $peerUri")
+            toast(String.format(
+                    getString(R.string.message_auto_rejected),
+                    Utils.friendlyUri(this, peerUri, ua.account)
+                )
+            )
+            // Api.sip_treply(callp, 486, "Busy Here")
+            // Api.bevent_stop(bevent)
             return
         }
 
