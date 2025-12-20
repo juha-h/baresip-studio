@@ -324,6 +324,12 @@
         using.  If IPv4 or IPv6 is chosen, baresip uses only IPv4 or IPv6 addresses.  If neither is
         chosen, baresip uses both IPv4 and IPv6 addresses.
     </string>
+    <string name="transport_protocols">Transport Protocols</string>
+    <string name="transport_protocols_help">Comma separated list of supported SIP request/response
+        transport protocols. If left empty, default value is \'udp,tcp,tls,ws,wss\' that includes
+        all supported transport protocols.
+    </string>
+    <string name="invalid_transport_protocols">Invalid Transport Protocols list</string>
     <string name="dns_servers">DNS Servers</string>
     <string name="dns_servers_help">Comma separated list of addresses of DNS servers.  If not given,
         DNS server addresses are obtained dynamically from the system. Each DNS address is of form

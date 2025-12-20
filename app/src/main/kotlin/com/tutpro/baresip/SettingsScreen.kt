@@ -398,6 +398,34 @@ private fun SettingsContent(
     }
 
     @Composable
+    fun TransportProtocols() {
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            val transportProtocols by viewModel.transportProtocols.collectAsState()
+            OutlinedTextField(
+                value = transportProtocols,
+                onValueChange = {
+                    viewModel.transportProtocols.value = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = ctx.getString(R.string.transport_protocols)
+                        alertMessage.value = ctx.getString(R.string.transport_protocols_help)
+                        showAlert.value = true
+                    },
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(stringResource(R.string.transport_protocols)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
     fun DnsServers() {
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
@@ -1193,6 +1221,7 @@ private fun SettingsContent(
         item { StartAutomatically() }
         item { ListenAddress() }
         item { AddressFamily() }
+        item { TransportProtocols() }
         item { DnsServers() }
         item { TlsCertificateFile(activity) }
         item { VerifyServer() }
@@ -1242,6 +1271,23 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
     if (Config.variable("net_af").lowercase() != viewModel.addressFamily.value) {
         Config.replaceVariable("net_af", viewModel.addressFamily.value)
+        save = true
+        restart = true
+    }
+
+    val transportProtocols = viewModel.transportProtocols.value
+        .lowercase(Locale.ROOT).replace(" ", "")
+    if (transportProtocols != viewModel.oldTransportProtocols) {
+        if (!checkTransportProtocols(transportProtocols)) {
+            alertTitle.value = ctx.getString(R.string.notice)
+            alertMessage.value = "${ctx.getString(R.string.invalid_transport_protocols)}: " +
+                    transportProtocols
+            showAlert.value = true
+            return false
+        }
+        Config.removeVariable("sip_transports")
+        if (transportProtocols.isNotEmpty())
+            Config.replaceVariable("sip_transports", transportProtocols)
         save = true
         restart = true
     }
@@ -1412,6 +1458,15 @@ private fun addMissingPorts(addressList: String): String {
                 "$result,[$addr]:53"
         }
     return result.substring(1)
+}
+
+private fun checkTransportProtocols(transportProtocols: String): Boolean {
+    if (transportProtocols.isEmpty())
+        return true
+    for (protocol in transportProtocols.split(","))
+        if (protocol !in listOf("udp", "tcp", "tls", "ws", "wss"))
+            return false
+    return true
 }
 
 private fun checkDnsServers(dnsServers: String): Boolean {
