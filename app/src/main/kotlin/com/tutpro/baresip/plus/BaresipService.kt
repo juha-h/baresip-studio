@@ -1894,7 +1894,6 @@ class BaresipService: Service() {
         }
     }
 
-    @Suppress("unused")
     private external fun baresipStart(
         path: String,
         addresses: String,
@@ -1902,7 +1901,6 @@ class BaresipService: Service() {
         software: String
     )
 
-    @Suppress("unused")
     external fun baresipStop(force: Boolean)
 
     @SuppressLint("MutableCollectionMutableState")

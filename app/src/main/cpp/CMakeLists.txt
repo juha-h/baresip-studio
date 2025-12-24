@@ -140,7 +140,8 @@ target_include_directories(baresip PRIVATE
 
 add_definitions(-DHAVE_PTHREAD)
 
-target_link_libraries(baresip
+target_link_libraries(
+        baresip
         android
         EGL
         GLESv2
