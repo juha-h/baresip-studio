@@ -338,6 +338,12 @@
         on valittu, baresip käyttää ainoastaan IPv4- tai IPv6-osoitteita. Jos kumpaakaan ei ole
         valittu, baresip käyttää sekä IPv4- että IPv6-osoitteita.
     </string>
+    <string name="transport_protocols">Kuljetusprotokollat</string>
+    <string name="transport_protocols_help">Pilkulla toisistaan erotettu lista tuettuja SIP sanomien
+        kuljetusprotokollia.  Jos jätetään tyhjäksi, oletusarvo on \'udp,tcp,tls,ws,wss\', joka
+        kaikki tuetut siirtoprotokollat.
+    </string>
+    <string name="invalid_transport_protocols">Virheellinen kuljetusprotokollalista</string>s
     <string name="dns_servers">DNS-palvelimet</string>
     <string name="dns_servers_help">Pilkulla toisistaan erotettu luettelo DNS-palvelijoiden
         osoitteita. Jos jätetään antamatta (oletus), osoitteet hankitaan dynaamisesti järjestelmästä.

@@ -58,6 +58,10 @@ object Config {
             BaresipService.addressFamily = addressFamily
         }
 
+        val transportProtocols = previousVariable("sip_transports")
+        if (transportProtocols != "")
+            config = "${config}sip_transports $transportProtocols\n"
+
         val sipCertificate = previousVariable("sip_certificate")
         if (sipCertificate != "")
             config = "${config}sip_certificate $sipCertificate\n"

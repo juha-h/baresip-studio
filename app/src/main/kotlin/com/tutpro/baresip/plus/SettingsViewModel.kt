@@ -18,8 +18,11 @@ class SettingsViewModel: ViewModel() {
     val autoStart = MutableStateFlow(false)
     val listenAddress = MutableStateFlow("")
     val addressFamily = MutableStateFlow("")
-    val dnsServers = MutableStateFlow("")
 
+    val transportProtocols = MutableStateFlow("")
+    val oldTransportProtocols = Config.variable("sip_transports")
+
+    val dnsServers = MutableStateFlow("")
     val oldDnsServers = if (Config.variable("dyn_dns") == "yes")
         ""
     else {
@@ -60,6 +63,8 @@ class SettingsViewModel: ViewModel() {
         val itemPosition =
             mutableIntStateOf(familyValues.indexOf(Config.variable("net_af").lowercase()))
         addressFamily.value = familyValues[itemPosition.intValue]
+
+        transportProtocols.value = oldTransportProtocols
 
         dnsServers.value = oldDnsServers
 
