@@ -368,4 +368,18 @@
     <string name="colorblind_help">Используйте удобные для слепых значки состояния регистрации</string>
     <string name="proximity_sensing">Датчик приближения</string>"&gt;
     <string name="proximity_sensing_help">Если флажок установлен, функция определения приближения активна во время вызовов.</string>
+    <string name="block_unknown">Блокировать неизвестных</string>
+    <string name="block_unknown_help">Блокировать звонки и сообщения от участников которые не найдены в контактах.</string>
+    <string name="is_calling">звонит</string>
+    <string name="message_auto_rejected">Отклонённое сообщение от %1$s</string>
+    <string name="save_recording">Сохранить запись</string>
+    <string name="save_recording_question">Вы хотите сохранить эту запись?</string>
+    <string name="recording_saved">Запись сохранена</string>
+    <string name="delete_call_alert">Вы хотите удалить этот звонок из истории?</string>
+    <string name="transport_protocols">Протоколы передачи</string>
+    <string name="transport_protocols_help">Список поддерживаемых транспортных протоколов передачи SIP-запросов/ответов, разделенных запятыми. Если поле оставить пустым, по умолчанию будет использоваться значение \'udp,tcp,tls,ws,wss\', включающее все поддерживаемые протоколы передачи.</string>
+    <string name="invalid_transport_protocols">Неправильный список протоколов передачи</string>
+    <string name="dynamic_colors">Динамические цвета</string>
+    <string name="dynamic_colors_help">Использовать динамические цвета, если они включены в настройках Android</string>
+    <string name="stop">Стоп</string>
 </resources>
