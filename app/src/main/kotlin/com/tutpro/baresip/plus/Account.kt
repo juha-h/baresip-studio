@@ -28,6 +28,7 @@ class Account(val accp: Long) {
     var dtmfMode = Api.account_dtmfmode(accp)
     var answerMode = Api.account_answermode(accp)
     var autoRedirect = Api.account_sip_autoredirect(accp)
+    var blockUnknown = false
     var vmUri = Api.account_vm_uri(accp)
     var vmNew = 0
     var vmOld = 0
@@ -84,6 +85,7 @@ class Account(val accp: Long) {
         if (Utils.paramExists(extra, "regint"))
             configuredRegInt = Utils.paramValue(extra, "regint").toInt()
         callHistory = Utils.paramValue(extra, "call_history") == ""
+        blockUnknown= Utils.paramExists(extra, "block_unknown")
         if (Utils.paramExists(extra, "country_code"))
             countryCode = Utils.paramValue(extra, "country_code")
         if (Utils.paramExists(extra, "tel_provider"))
@@ -171,6 +173,9 @@ class Account(val accp: Long) {
 
         if (autoRedirect)
             res += ";sip_autoredirect=yes"
+
+        if (blockUnknown)
+            res += ";block_unknown=yes"
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;inreq_allowed=yes;call_transfer=yes"
 

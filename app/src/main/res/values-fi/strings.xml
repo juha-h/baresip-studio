@@ -207,6 +207,8 @@
     <string name="answer_mode_help">Valitsee tulevien puheluiden vastaustavan.</string>
     <string name="manual">Manuaalinen</string>
     <string name="auto">Automaattinen</string>
+    <string name="block_unknown">Estä tuntemattomat</string>
+    <string name="block_unknown_help">Estä puhelut ja viestit, joiden lähdettä ei löydy yhteystiedoista.</string>
     <string name="redirect_mode">Uudelleenohjaustapa</string>
     <string name="redirect_mode_help">Valitsee toteutetaanko puhelun uudelleenohjauspyyntö
         automaattisesti vai kysytäänkö vahvistusta.</string>
@@ -543,9 +545,9 @@
     <string name="call_failed">Puhelu epäonnistui</string>
     <string name="call_closed">Puhelu on päättynyt</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
-    <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta kohdetta ei ole
+    <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta puhelun toista osapuolta ei ole
         todennettu!</string>
-    <string name="call_is_secure">Tämä puhelu on turvallinen ja kohde on
+    <string name="call_is_secure">Tämä puhelu on turvallinen ja puhelun toinen osapuoli on
     todennettu! Haluatko poistaa todennuksen\?</string>
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot (äänityksiä lukuunottamatta)
