@@ -827,6 +827,22 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1set_1regint(
     return account_set_regint((struct account *)acc, regint);
 }
 
+JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_Api_account_1check_1origin(
+        JNIEnv *env, jobject obj, jlong acc)
+{
+    (void)env;
+    (void)obj;
+    return account_check_origin((struct account *)acc);
+}
+
+JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_account_1set_1check_1origin(
+        JNIEnv *env, jobject obj, jlong acc, jboolean value)
+{
+    (void)env;
+    (void)obj;
+    account_set_check_origin((struct account *)acc, value);
+}
+
 JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_Api_account_1mediaenc(
         JNIEnv *env, jobject obj, jlong acc)
 {

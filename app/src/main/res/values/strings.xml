@@ -155,6 +155,10 @@
     <string name="reg_int_help">Tells how often (in seconds) baresip sends REGISTER requests.
         Valid values are from 60 to 3600.</string>
     <string name="invalid_reg_int">Invalid Registration Interval \'%1$s\'</string>
+    <string name="check_origin">Check Origin</string>
+    <string name="check_origin_help">If checked, inbound requests are allowed only from IP addresses
+        where register requests were sent.
+    </string>
     <string name="media_nat">Media NAT Traversal</string>
     <string name="media_nat_help">Selects media NAT traversal protocol (if any).  Possible choices are STUN
         (Session Traversal Utilities for NAT, RFC 5389) and ICE (Interactive Connectivity
@@ -327,7 +331,8 @@
     <string name="transport_protocols">Transport Protocols</string>
     <string name="transport_protocols_help">Comma separated list of supported SIP request/response
         transport protocols. If left empty, default value is \'udp,tcp,tls,ws,wss\' that includes
-        all supported transport protocols.
+        all supported transport protocols.  List only the ones you need.  Use of UDP is not
+        recommended for security and other reasons.
     </string>
     <string name="invalid_transport_protocols">Invalid Transport Protocols list</string>
     <string name="dns_servers">DNS Servers</string>

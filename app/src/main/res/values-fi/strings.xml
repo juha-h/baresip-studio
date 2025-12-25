@@ -159,6 +159,10 @@
     <string name="reg_int_help">Kertoo kuinka usein baresip lähettää REGISTER-sanomia. Arvon on
         oltava välillä 60-3600 (sekunttia).</string>
     <string name="invalid_reg_int">Virheellinen Rekisteröintitaajuus \'%1$s\'</string>
+    <string name="check_origin">Tarkista lähdeosoite</string>
+    <string name="check_origin_help">Merkitty, sisään tulevat SIP-sanomat sallitaan vain niistä
+        lähdeosoitteista, joihin REGISTER-sanomat lähetettiin.
+    </string>
     <string name="media_nat">Media NAT hallinta</string>
     <string name="media_nat_help">Valitsee media NAT hallintaprotokollan
         (vapaaehtoinen). Vaihtoehtoja ovat STUN (Session Traversal Utilities
@@ -339,9 +343,10 @@
         valittu, baresip käyttää sekä IPv4- että IPv6-osoitteita.
     </string>
     <string name="transport_protocols">Kuljetusprotokollat</string>
-    <string name="transport_protocols_help">Pilkulla toisistaan erotettu lista tuettuja SIP sanomien
+    <string name="transport_protocols_help">Pilkulla toisistaan erotettu lista tuettuja SIP-sanomien
         kuljetusprotokollia.  Jos jätetään tyhjäksi, oletusarvo on \'udp,tcp,tls,ws,wss\', joka
-        kaikki tuetut siirtoprotokollat.
+        sisältää kaikki tuetut kuljetusprotokollat.  Listaa vain ne joita tarvitset.  UDP-protokollan
+        käyttöä ei suositella turvallisuus- ja muista syistä.
     </string>
     <string name="invalid_transport_protocols">Virheellinen kuljetusprotokollalista</string>s
     <string name="dns_servers">DNS-palvelimet</string>

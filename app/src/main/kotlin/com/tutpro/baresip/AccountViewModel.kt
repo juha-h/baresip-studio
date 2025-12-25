@@ -13,6 +13,7 @@ class AccountViewModel: ViewModel() {
     val outbound2 = MutableStateFlow("")
     val register = MutableStateFlow(false)
     val regInt = MutableStateFlow("")
+    val checkOrigin = MutableStateFlow(false)
     val mediaEnc = MutableStateFlow("")
     val mediaNat = MutableStateFlow("")
     val stunServer = MutableStateFlow("")
@@ -45,6 +46,7 @@ class AccountViewModel: ViewModel() {
         outbound2.value = if (acc.outbound.size > 1) acc.outbound[1] else ""
         register.value = acc.regint > 0
         regInt.value = acc.configuredRegInt.toString()
+        checkOrigin.value = acc.checkOrigin
         mediaEnc.value = acc.mediaEnc
         mediaNat.value = acc.mediaNat
         stunServer.value = acc.stunServer

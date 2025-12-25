@@ -237,12 +237,19 @@ private fun SettingsContent(
     onRestartApp: () -> Unit
 ) {
 
+    val alertTitleText = stringResource(R.string.alert)
+    val errorTitleText = stringResource(R.string.error)
+    val noticeTitleText = stringResource(R.string.notice)
+    val confirmationText = stringResource(R.string.confirmation)
+    val okButtonText = stringResource(R.string.ok)
+    val cancelButtonText = stringResource(R.string.cancel)
+
     if (showAlert.value) {
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
-            positiveButtonText = stringResource(R.string.ok),
+            positiveButtonText = okButtonText,
         )
     }
 
@@ -259,18 +266,21 @@ private fun SettingsContent(
 
     @Composable
     fun StartAutomatically() {
+        val startAutomaticallyTitle = stringResource(R.string.start_automatically)
+        val startAutomaticallyHelp = stringResource(R.string.start_automatically_help)
+        val appearOnTopPermissionMessage = stringResource(R.string.appear_on_top_permission)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
-            Text(text = stringResource(R.string.start_automatically),
+            Text(text = startAutomaticallyTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.start_automatically)
-                        alertMessage.value = ctx.getString(R.string.start_automatically_help)
+                        alertTitle.value = startAutomaticallyTitle
+                        alertMessage.value = startAutomaticallyHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -281,14 +291,14 @@ private fun SettingsContent(
                 onCheckedChange = {
                     if (it) {
                         if (!isAppearOnTopPermissionGranted(ctx)) {
-                            dialogTitle.value = ctx.getString(R.string.notice)
-                            dialogMessage.value = ctx.getString(R.string.appear_on_top_permission)
-                            positiveText.value = ctx.getString(R.string.ok)
+                            dialogTitle.value = noticeTitleText
+                            dialogMessage.value = appearOnTopPermissionMessage
+                            positiveText.value = okButtonText
                             onPositiveClicked.value = {
                                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                                 ctx.startActivity(intent)
                             }
-                            negativeText.value = ctx.getString(R.string.cancel)
+                            negativeText.value = cancelButtonText
                             onNegativeClicked.value = {
                                 negativeText.value = ""
                             }
@@ -306,50 +316,21 @@ private fun SettingsContent(
     }
 
     @Composable
-    fun ListenAddress() {
+    fun AddressFamily() {
+        val addressFamilyTitle = stringResource(R.string.address_family)
+        val addressFamilyHelp = stringResource(R.string.address_family_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            val ctx = LocalContext.current
-            val listenAddress by viewModel.listenAddress.collectAsState()
-            OutlinedTextField(
-                value = listenAddress,
-                placeholder = { Text(stringResource(R.string._0_0_0_0_5060)) },
-                onValueChange = {
-                    viewModel.listenAddress.value = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        alertTitle.value = ctx.getString(R.string.listen_address)
-                        alertMessage.value = ctx.getString(R.string.listen_address_help)
-                        showAlert.value = true
-                    },
-                singleLine = true,
-                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.listen_address)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
-        }
-    }
-
-    @Composable
-    fun AddressFamily() {
-        Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val addressFamily by viewModel.addressFamily.collectAsState()
-            Text(text = stringResource(R.string.address_family),
+            Text(text = addressFamilyTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.address_family)
-                        alertMessage.value = ctx.getString(R.string.address_family_help)
+                        alertTitle.value = addressFamilyTitle
+                        alertMessage.value = addressFamilyHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -398,13 +379,45 @@ private fun SettingsContent(
     }
 
     @Composable
+    fun ListenAddress() {
+        val listenAddressTitle = stringResource(R.string.listen_address)
+        val listenAddressHelp = stringResource(R.string.listen_address_help)
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            val listenAddress by viewModel.listenAddress.collectAsState()
+            OutlinedTextField(
+                value = listenAddress,
+                placeholder = { Text(stringResource(R.string._0_0_0_0_5060)) },
+                onValueChange = {
+                    viewModel.listenAddress.value = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = listenAddressTitle
+                        alertMessage.value = listenAddressHelp
+                        showAlert.value = true
+                    },
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(listenAddressTitle) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
+    @Composable
     fun TransportProtocols() {
+        val transportProtocolsTitle = stringResource(R.string.transport_protocols)
+        val transportProtocolsHelp = stringResource(R.string.transport_protocols_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val transportProtocols by viewModel.transportProtocols.collectAsState()
             OutlinedTextField(
                 value = transportProtocols,
@@ -414,12 +427,12 @@ private fun SettingsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.transport_protocols)
-                        alertMessage.value = ctx.getString(R.string.transport_protocols_help)
+                        alertTitle.value = transportProtocolsTitle
+                        alertMessage.value = transportProtocolsHelp
                         showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.transport_protocols)) },
+                label = { Text(transportProtocolsTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -427,12 +440,13 @@ private fun SettingsContent(
 
     @Composable
     fun DnsServers() {
+        val dnsServersTitle = stringResource(R.string.dns_servers)
+        val dnsServersHelp = stringResource(R.string.dns_servers_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val dnsServers by viewModel.dnsServers.collectAsState()
             OutlinedTextField(
                 value = dnsServers,
@@ -442,12 +456,12 @@ private fun SettingsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.dns_servers)
-                        alertMessage.value = ctx.getString(R.string.dns_servers_help)
+                        alertTitle.value = dnsServersTitle
+                        alertMessage.value = dnsServersHelp
                         showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.dns_servers)) },
+                label = { Text(dnsServersTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -457,6 +471,10 @@ private fun SettingsContent(
     fun TlsCertificateFile(activity: Activity) {
 
         val ctx = LocalContext.current
+
+        val readCertError = stringResource(R.string.read_cert_error)
+        val tlsCertificateFileTitle = stringResource(R.string.tls_certificate_file)
+        val tlsCertificateFileHelp = stringResource(R.string.tls_certificate_file_help)
 
         val requestPermissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
@@ -478,8 +496,8 @@ private fun SettingsContent(
                         save = true
                         restart = true
                     } catch (e: Error) {
-                        alertTitle.value = ctx.getString(R.string.error)
-                        alertMessage.value = ctx.getString(R.string.read_cert_error) + ": " + e.message
+                        alertTitle.value = errorTitleText
+                        alertMessage.value = readCertError + ": " + e.message
                         showAlert.value = true
                         viewModel.tlsCertificateFile.value = false
                     }
@@ -499,12 +517,12 @@ private fun SettingsContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
-            Text(text = stringResource(R.string.tls_certificate_file),
+            Text(text = tlsCertificateFileTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.tls_certificate_file)
-                        alertMessage.value = ctx.getString(R.string.tls_certificate_file_help)
+                        alertTitle.value = tlsCertificateFileTitle
+                        alertMessage.value = tlsCertificateFileHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -525,8 +543,8 @@ private fun SettingsContent(
                                     val downloadsPath = Utils.downloadsPath("cert.pem")
                                     val content = Utils.getFileContents(downloadsPath)
                                     if (content == null) {
-                                        alertTitle.value = ctx.getString(R.string.error)
-                                        alertMessage.value = ctx.getString(R.string.read_cert_error)
+                                        alertTitle.value = errorTitleText
+                                        alertMessage.value = readCertError
                                         showAlert.value = true
                                         return@Switch
                                     }
@@ -569,17 +587,18 @@ private fun SettingsContent(
 
     @Composable
     fun VerifyServer() {
+        val verifyServerTitle = stringResource(R.string.verify_server)
+        val verifyServerHelp = stringResource(R.string.verify_server_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.verify_server),
+            Text(text = verifyServerTitle,
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.verify_server)
-                        alertMessage.value = ctx.getString(R.string.verify_server_help)
+                        alertTitle.value = verifyServerTitle
+                        alertMessage.value = verifyServerHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -597,6 +616,11 @@ private fun SettingsContent(
 
         val ctx = LocalContext.current
 
+        val tlsCaFileTitle = stringResource(R.string.tls_ca_file)
+        val tlsCaFileHelp = stringResource(R.string.tls_ca_file_help)
+        val readCaCertsError = stringResource(R.string.read_ca_certs_error)
+        val noReadPermissionMessage = stringResource(R.string.no_read_permission)
+
         val requestPermissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) {}
@@ -613,8 +637,8 @@ private fun SettingsContent(
                         inputStream.close()
                         restart = true
                     } catch (e: Error) {
-                        alertTitle.value = ctx.getString(R.string.error)
-                        alertMessage.value = ctx.getString(R.string.read_ca_certs_error) + ": " + e.message
+                        alertTitle.value = errorTitleText
+                        alertMessage.value = readCaCertsError + ": " + e.message
                         showAlert.value = true
                         viewModel.caFile.value = false
                     }
@@ -630,11 +654,11 @@ private fun SettingsContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
-            Text(text = stringResource(R.string.tls_ca_file),
+            Text(text = tlsCaFileTitle,
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.tls_ca_file)
-                        alertMessage.value = ctx.getString(R.string.tls_ca_file_help)
+                        alertTitle.value = tlsCaFileTitle
+                        alertMessage.value = tlsCaFileHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -654,8 +678,8 @@ private fun SettingsContent(
                                     val downloadsPath = Utils.downloadsPath("ca_certs.crt")
                                     val content = Utils.getFileContents(downloadsPath)
                                     if (content == null) {
-                                        alertTitle.value = ctx.getString(R.string.error)
-                                        alertMessage.value = ctx.getString(R.string.read_ca_certs_error)
+                                        alertTitle.value = errorTitleText
+                                        alertMessage.value = readCaCertsError
                                         showAlert.value = true
                                         return@Switch
                                     }
@@ -664,9 +688,9 @@ private fun SettingsContent(
                                     restart = true
                                 }
                                 shouldShowRequestPermissionRationale(activity, permission) -> {
-                                    dialogTitle.value = ctx.getString(R.string.notice)
-                                    dialogMessage.value = ctx.getString(R.string.no_read_permission)
-                                    positiveText.value = ctx.getString(R.string.ok)
+                                    dialogTitle.value = noticeTitleText
+                                    dialogMessage.value = noReadPermissionMessage
+                                    positiveText.value = okButtonText
                                     onPositiveClicked.value = {
                                         requestPermissionLauncher.launch(permission)
                                     }
@@ -691,26 +715,27 @@ private fun SettingsContent(
 
     @Composable
     fun UserAgent() {
+        val userAgentTitle = stringResource(R.string.user_agent)
+        val userAgentHelp = stringResource(R.string.user_agent_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
             val userAgent by viewModel.userAgent.collectAsState()
             OutlinedTextField(
                 value = userAgent,
-                placeholder = { Text(stringResource(R.string.user_agent)) },
+                placeholder = { Text(userAgentTitle) },
                 onValueChange = { viewModel.userAgent.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.user_agent)
-                        alertMessage.value = ctx.getString(R.string.user_agent_help)
+                        alertTitle.value = userAgentTitle
+                        alertMessage.value = userAgentHelp
                         showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.user_agent)) },
+                label = { Text(userAgentTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -735,6 +760,14 @@ private fun SettingsContent(
 
     @Composable
     fun Contacts(activity: Activity) {
+        val contactsTitle = stringResource(R.string.contacts)
+        val contactsHelp = stringResource(R.string.contacts_help)
+        val consentRequestTitle = stringResource(R.string.consent_request)
+        val contactsConsentMessage = stringResource(R.string.contacts_consent)
+        val positiveButtonText = stringResource(R.string.accept)
+        val negativeButtonText = stringResource(R.string.deny)
+        val both = stringResource(R.string.both)
+        val noAndroidContactsMessage = stringResource(R.string.no_android_contacts)
         val showAlertDialog = remember { mutableStateOf(false) }
         Row(
             Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
@@ -742,12 +775,12 @@ private fun SettingsContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
-            Text(text = stringResource(R.string.contacts),
+            Text(text = contactsTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.contacts)
-                        alertMessage.value = ctx.getString(R.string.contacts_help)
+                        alertTitle.value = contactsTitle
+                        alertMessage.value = contactsHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -758,7 +791,7 @@ private fun SettingsContent(
             val contactNames = listOf(
                 "baresip",
                 "Android",
-                ctx.getString(R.string.both)
+                both
             )
             val contactsMode by viewModel.contactsMode.collectAsState()
             val contactValues = listOf("baresip",  "android", "both")
@@ -797,9 +830,9 @@ private fun SettingsContent(
                                 isDropDownExpanded.value = false
                                 val mode = contactValues[index]
                                 if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
-                                    dialogTitle.value = ctx.getString(R.string.consent_request)
-                                    dialogMessage.value = ctx.getString(R.string.contacts_consent)
-                                    positiveText.value = ctx.getString(R.string.accept)
+                                    dialogTitle.value = consentRequestTitle
+                                    dialogMessage.value = contactsConsentMessage
+                                    positiveText.value = positiveButtonText
                                     onPositiveClicked.value = {
                                         showDialog.value = false
                                         viewModel.contactsMode.value = mode
@@ -831,7 +864,7 @@ private fun SettingsContent(
                                                 )
                                         }
                                     }
-                                    negativeText.value = ctx.getString(R.string.deny)
+                                    negativeText.value = negativeButtonText
                                     onNegativeClicked.value = {
                                         itemPosition.intValue = contactValues.indexOf(contactsMode)
                                         negativeText.value = ""
@@ -851,9 +884,9 @@ private fun SettingsContent(
             if (showAlertDialog.value)
                 AlertDialog(
                     showDialog = showAlertDialog,
-                    title = stringResource(R.string.notice),
-                    message = stringResource(R.string.no_android_contacts),
-                    positiveButtonText = stringResource(R.string.ok),
+                    title = noticeTitleText,
+                    message = noAndroidContactsMessage,
+                    positiveButtonText = okButtonText,
                     onPositiveClicked = { requestPermissionsLauncher.launch(
                         arrayOf(
                             Manifest.permission.READ_CONTACTS,
@@ -867,7 +900,9 @@ private fun SettingsContent(
     }
 
     @Composable
-    fun Ringtone(ctx: Context) {
+    fun Ringtone() {
+        val ringToneTitle = stringResource(R.string.ringtone)
+        val selectRingToneMessage = stringResource(R.string.select_ringtone)
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result: ActivityResult ->
@@ -887,7 +922,7 @@ private fun SettingsContent(
             horizontalArrangement = Arrangement.Start
         ) {
             Text(
-                text = stringResource(R.string.ringtone),
+                text = ringToneTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -898,7 +933,7 @@ private fun SettingsContent(
                         )
                         intent.putExtra(
                             RingtoneManager.EXTRA_RINGTONE_TITLE,
-                            ctx.getString(R.string.select_ringtone)
+                            selectRingToneMessage
                         )
                         intent.putExtra(
                             RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
@@ -916,6 +951,8 @@ private fun SettingsContent(
 
     @Composable
     fun BatteryOptimizations() {
+        val batteryOptimizationsTitle = stringResource(R.string.battery_optimizations)
+        val batteryOptimizationsHelp = stringResource(R.string.battery_optimizations_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -929,12 +966,12 @@ private fun SettingsContent(
                 viewModel.batteryOptimizations.value =
                     !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
             }
-            Text(text = stringResource(R.string.battery_optimizations),
+            Text(text = batteryOptimizationsTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.battery_optimizations)
-                        alertMessage.value = ctx.getString(R.string.battery_optimizations_help)
+                        alertTitle.value = batteryOptimizationsTitle
+                        alertMessage.value = batteryOptimizationsHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -953,18 +990,19 @@ private fun SettingsContent(
 
     @Composable
     fun DarkTheme() {
+        val darkThemeTitle = stringResource(R.string.dark_theme)
+        val darkThemeHelp = stringResource(R.string.dark_theme_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.dark_theme),
+            Text(text = darkThemeTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.dark_theme)
-                        alertMessage.value = ctx.getString(R.string.dark_theme_help)
+                        alertTitle.value = darkThemeTitle
+                        alertMessage.value = darkThemeHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -979,17 +1017,18 @@ private fun SettingsContent(
 
     @Composable
     fun DynamicColors() {
+        val dynamicColorsTitle = stringResource(R.string.dynamic_colors)
+        val dynamicColorsHelp = stringResource(R.string.dynamic_colors_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.dynamic_colors),
+            Text(text = dynamicColorsTitle,
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.dynamic_colors)
-                        alertMessage.value = ctx.getString(R.string.dynamic_colors_help)
+                        alertTitle.value = dynamicColorsTitle
+                        alertMessage.value = dynamicColorsHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1004,18 +1043,19 @@ private fun SettingsContent(
 
     @Composable
     fun ColorBlind() {
+        val colorBlindTitle = stringResource(R.string.colorblind)
+        val colorBlindHelp = stringResource(R.string.colorblind_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.colorblind),
+            Text(text = colorBlindTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.colorblind)
-                        alertMessage.value = ctx.getString(R.string.colorblind_help)
+                        alertTitle.value = colorBlindTitle
+                        alertMessage.value = colorBlindHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1029,18 +1069,19 @@ private fun SettingsContent(
     }
     @Composable
     fun ProximitySensing() {
+        val proximitySensingTitle = stringResource(R.string.proximity_sensing)
+        val proximitySensingHelp = stringResource(R.string.proximity_sensing_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.proximity_sensing),
+            Text(text = proximitySensingTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.proximity_sensing)
-                        alertMessage.value = ctx.getString(R.string.proximity_sensing_help)
+                        alertTitle.value = proximitySensingTitle
+                        alertMessage.value = proximitySensingHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1056,18 +1097,21 @@ private fun SettingsContent(
     @RequiresApi(29)
     @Composable
     fun DefaultDialer() {
+        val defaultPhoneAppTitle = stringResource(R.string.default_phone_app)
+        val defaultPhoneAppHelp = stringResource(R.string.default_phone_app_help)
+        val dialerRoleNotAvailableMessage = stringResource(R.string.dialer_role_not_available)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
-            Text(text = stringResource(R.string.default_phone_app),
+            Text(text = defaultPhoneAppTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.default_phone_app)
-                        alertMessage.value = ctx.getString(R.string.default_phone_app_help)
+                        alertTitle.value = defaultPhoneAppTitle
+                        alertMessage.value = defaultPhoneAppHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1086,8 +1130,8 @@ private fun SettingsContent(
                     viewModel.defaultDialer.value = it
                     if (it) {
                         if (!roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)) {
-                            alertTitle.value = ctx.getString(R.string.alert)
-                            alertMessage.value = ctx.getString(R.string.dialer_role_not_available)
+                            alertTitle.value = alertTitleText
+                            alertMessage.value = dialerRoleNotAvailableMessage
                             showAlert.value = true
                         }
                         else
@@ -1107,17 +1151,18 @@ private fun SettingsContent(
 
     @Composable
     fun Debug() {
+        val debugTitle = stringResource(R.string.debug)
+        val debugHelp = stringResource(R.string.debug_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.debug),
+            Text(text = debugTitle,
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.debug)
-                        alertMessage.value = ctx.getString(R.string.debug_help)
+                        alertTitle.value = debugTitle
+                        alertMessage.value = debugHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1132,18 +1177,19 @@ private fun SettingsContent(
 
     @Composable
     fun SipTrace() {
+        val sipTraceTitle = stringResource(R.string.sip_trace)
+        val sipTraceHelp = stringResource(R.string.sip_trace_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.sip_trace),
+            Text(text = sipTraceTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.sip_trace)
-                        alertMessage.value = ctx.getString(R.string.sip_trace_help)
+                        alertTitle.value = sipTraceTitle
+                        alertMessage.value = sipTraceHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1158,18 +1204,21 @@ private fun SettingsContent(
 
     @Composable
     fun Reset(onRestartApp: () -> Unit) {
+        val resetConfigTitle = stringResource(R.string.reset_config)
+        val resetConfigHelp = stringResource(R.string.reset_config_help)
+        val resetConfigAlert = stringResource(R.string.reset_config_alert)
+        val resetButtonText = stringResource(R.string.reset)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
-            Text(text = stringResource(R.string.reset_config),
+            Text(text = resetConfigTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.reset_config)
-                        alertMessage.value = ctx.getString(R.string.reset_config_help)
+                        alertTitle.value = resetConfigTitle
+                        alertMessage.value = resetConfigHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1178,14 +1227,14 @@ private fun SettingsContent(
             Switch(
                 checked = reset,
                 onCheckedChange = {
-                    dialogTitle.value = ctx.getString(R.string.confirmation)
-                    dialogMessage.value = ctx.getString(R.string.reset_config_alert)
-                    positiveText.value = ctx.getString(R.string.reset)
+                    dialogTitle.value = confirmationText
+                    dialogMessage.value = resetConfigAlert
+                    positiveText.value = resetButtonText
                     onPositiveClicked.value = {
                         Config.reset()
                         onRestartApp()
                     }
-                    negativeText.value = ctx.getString(R.string.cancel)
+                    negativeText.value = cancelButtonText
                     onNegativeClicked.value = {
                         reset = false
                         negativeText.value = ""
@@ -1195,8 +1244,6 @@ private fun SettingsContent(
             )
         }
     }
-
-    val ctx = LocalContext.current
 
     if (Config.variable("auto_start") == "yes" &&
             !isAppearOnTopPermissionGranted(LocalContext.current)) {
@@ -1219,8 +1266,8 @@ private fun SettingsContent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item { StartAutomatically() }
-        item { ListenAddress() }
         item { AddressFamily() }
+        item { ListenAddress() }
         item { TransportProtocols() }
         item { DnsServers() }
         item { TlsCertificateFile(activity) }
@@ -1229,7 +1276,7 @@ private fun SettingsContent(
         item { UserAgent() }
         item { AudioSettings(navController) }
         item { Contacts(activity) }
-        item { Ringtone(ctx) }
+        item { Ringtone() }
         item { BatteryOptimizations() }
         item { DarkTheme() }
         if (VERSION.SDK_INT >= 31) {
@@ -1248,6 +1295,8 @@ private fun SettingsContent(
 
 private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
+    val noticeTitle = ctx.getString(R.string.notice)
+
     if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
         Config.replaceVariable(
             "auto_start",
@@ -1259,7 +1308,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     val listenAddr = viewModel.listenAddress.value.trim()
     if (listenAddr != Config.variable("sip_listen")) {
         if ((listenAddr != "") && !Utils.checkIpPort(listenAddr)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_listen_address)}: $listenAddr"
             showAlert.value = true
             return false
@@ -1279,7 +1328,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         .lowercase(Locale.ROOT).replace(" ", "")
     if (transportProtocols != viewModel.oldTransportProtocols) {
         if (!checkTransportProtocols(transportProtocols)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_transport_protocols)}: " +
                     transportProtocols
             showAlert.value = true
@@ -1296,7 +1345,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         .lowercase(Locale.ROOT).replace(" ", ""))
     if (dnsServers != viewModel.oldDnsServers) {
         if (!checkDnsServers(dnsServers)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_dns_servers)}: $dnsServers"
             showAlert.value = true
             return false
@@ -1307,7 +1356,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
                 Config.addVariable("dns_server", server)
             Config.replaceVariable("dyn_dns", "no")
             if (Api.net_use_nameserver(dnsServers) != 0) {
-                alertTitle.value = ctx.getString(R.string.notice)
+                alertTitle.value = noticeTitle
                 alertMessage.value = "${ctx.getString(R.string.failed_to_set_dns_servers)}: $dnsServers"
                 showAlert.value = true
                 return false
@@ -1330,7 +1379,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     val userAgent = viewModel.userAgent.value.trim()
     if (userAgent != Config.variable("user_agent")) {
         if (userAgent != "" && !Utils.checkServerVal(userAgent)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_user_agent)}: " +
                     userAgent
             showAlert.value = true

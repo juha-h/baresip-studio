@@ -2,6 +2,7 @@ poll_method epoll
 call_local_timeout 120
 call_max_calls 4
 call_hold_other_calls yes
+filter_registrar udp,tcp,tls,ws,wss
 audio_player aaudio,nil
 audio_source aaudio,nil
 audio_alert aaudio,nil
