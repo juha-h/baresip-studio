@@ -200,12 +200,13 @@ private fun CallVolume() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.default_call_volume),
+        val defaultCallVolumeTitle = stringResource(R.string.default_call_volume)
+        val defaultCallVolumeHelp = stringResource(R.string.default_call_volume_help)
+        Text(text = defaultCallVolumeTitle,
             modifier = Modifier.weight(1f)
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.default_call_volume)
-                    alertMessage.value = ctx.getString(R.string.default_call_volume_help)
+                    alertTitle.value = defaultCallVolumeTitle
+                    alertMessage.value = defaultCallVolumeHelp
                     showAlert.value = true
                 },
             fontSize = 18.sp)
@@ -262,12 +263,13 @@ private fun MicGain() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val ctx = LocalContext.current
+            val microphoneGainTitle = stringResource(R.string.microphone_gain)
+            val microphoneGainHelp = stringResource(R.string.microphone_gain_help)
             var micGain by remember { mutableStateOf(oldMicGain) }
             newMicGain = micGain
             OutlinedTextField(
                 value = micGain,
-                placeholder = { Text(stringResource(R.string.microphone_gain)) },
+                placeholder = { Text(microphoneGainTitle) },
                 onValueChange = {
                     micGain = it
                     newMicGain = micGain
@@ -275,12 +277,12 @@ private fun MicGain() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.microphone_gain)
-                        alertMessage.value = ctx.getString(R.string.microphone_gain_help)
+                        alertTitle.value = microphoneGainTitle
+                        alertMessage.value = microphoneGainHelp
                         showAlert.value = true
                     },
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.microphone_gain)) },
+                label = { Text(microphoneGainTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -293,12 +295,13 @@ private fun SpeakerPhone() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.speaker_phone),
+        val speakerPhoneTitle = stringResource(R.string.speaker_phone)
+        val speakerPhoneHelp = stringResource(R.string.speaker_phone_help)
+        Text(text = speakerPhoneTitle,
             modifier = Modifier.weight(1f)
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.speaker_phone)
-                    alertMessage.value = ctx.getString(R.string.speaker_phone_help)
+                    alertTitle.value = speakerPhoneTitle
+                    alertMessage.value = speakerPhoneHelp
                     showAlert.value = true
                 },
             fontSize = 18.sp)
@@ -319,12 +322,13 @@ private fun AudioModules() {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start,
     ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.audio_modules_title),
+        val audioModulesTitle = stringResource(R.string.audio_modules_title)
+        val audioModulesHelp = stringResource(R.string.audio_modules_help)
+        Text(text = audioModulesTitle,
             fontSize = 18.sp,
             modifier = Modifier.clickable {
-                alertTitle.value = ctx.getString(R.string.audio_modules_title)
-                alertMessage.value = ctx.getString(R.string.audio_modules_help)
+                alertTitle.value = audioModulesTitle
+                alertMessage.value = audioModulesHelp
                 showAlert.value = true
             })
         for (module in Config.audioModules) {
@@ -332,7 +336,7 @@ private fun AudioModules() {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 18.dp, end = 10.dp)
             ) {
-                Text(text = String.format(ctx.getString(R.string.bullet_item), module), fontSize = 18.sp)
+                Text(text = String.format(stringResource(R.string.bullet_item), module), fontSize = 18.sp)
                 Spacer(modifier = Modifier.weight(1f))
                 var checked by remember { mutableStateOf(oldAudioModules.contains("${module}.so")) }
                 Switch(
@@ -354,12 +358,13 @@ private fun OpusBitRate() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val ctx = LocalContext.current
+        val opusBitRateTitle = stringResource(R.string.opus_bit_rate)
+        val opusBitRateHelp = stringResource(R.string.opus_bit_rate_help)
         var opusBitrate by remember { mutableStateOf(oldOpusBitrate) }
         newOpusBitrate = opusBitrate
         OutlinedTextField(
             value = opusBitrate,
-            placeholder = { Text(stringResource(R.string.opus_bit_rate)) },
+            placeholder = { Text(opusBitRateTitle) },
             onValueChange = {
                 opusBitrate = it
                 newOpusBitrate = opusBitrate
@@ -367,12 +372,12 @@ private fun OpusBitRate() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.opus_bit_rate)
-                    alertMessage.value = ctx.getString(R.string.opus_bit_rate_help)
+                    alertTitle.value = opusBitRateTitle
+                    alertMessage.value = opusBitRateHelp
                     showAlert.value = true
                 },
             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-            label = { Text(stringResource(R.string.opus_bit_rate)) },
+            label = { Text(opusBitRateTitle) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
     }
@@ -385,12 +390,13 @@ private fun OpusPacketLoss() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val ctx = LocalContext.current
+        val opusPacketLossTitle = stringResource(R.string.opus_packet_loss)
+        val opusPacketLossHelp = stringResource(R.string.opus_packet_loss_help)
         var opusPacketLoss by remember { mutableStateOf(oldOpusPacketLoss) }
         newOpusPacketLoss = opusPacketLoss
         OutlinedTextField(
             value = opusPacketLoss,
-            placeholder = { Text(stringResource(R.string.opus_packet_loss)) },
+            placeholder = { Text(opusPacketLossTitle) },
             onValueChange = {
                 opusPacketLoss = it
                 newOpusPacketLoss = opusPacketLoss
@@ -398,12 +404,12 @@ private fun OpusPacketLoss() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.opus_packet_loss)
-                    alertMessage.value = ctx.getString(R.string.opus_packet_loss_help)
+                    alertTitle.value = opusPacketLossTitle
+                    alertMessage.value = opusPacketLossHelp
                     showAlert.value = true
                 },
             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-            label = { Text(stringResource(R.string.opus_packet_loss)) },
+            label = { Text(opusPacketLossTitle) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
     }
@@ -416,12 +422,13 @@ private fun AudioDelay() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val ctx = LocalContext.current
+        val audioDelayTitle = stringResource(R.string.audio_delay)
+        val audioDelayHelp = stringResource(R.string.audio_delay_help)
         var audioDelay by remember { mutableStateOf(BaresipService.audioDelay.toString()) }
         newAudioDelay = audioDelay
         OutlinedTextField(
             value = audioDelay,
-            placeholder = { Text(stringResource(R.string.audio_delay)) },
+            placeholder = { Text(audioDelayTitle) },
             onValueChange = {
                 audioDelay = it
                 newAudioDelay = audioDelay
@@ -429,12 +436,12 @@ private fun AudioDelay() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.audio_delay)
-                    alertMessage.value = ctx.getString(R.string.audio_delay_help)
+                    alertTitle.value = audioDelayTitle
+                    alertMessage.value = audioDelayHelp
                     showAlert.value = true
                 },
             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-            label = { Text(stringResource(R.string.audio_delay)) },
+            label = { Text(audioDelayTitle) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
     }
@@ -447,12 +454,13 @@ private fun ToneCountry() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val ctx = LocalContext.current
-        Text(text = stringResource(R.string.tone_country),
+        val toneCountryTitle = stringResource(R.string.tone_country)
+        val toneCountryHelp = stringResource(R.string.tone_country_help)
+        Text(text = toneCountryTitle,
             modifier = Modifier.weight(1f)
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.tone_country)
-                    alertMessage.value = ctx.getString(R.string.tone_country_help)
+                    alertTitle.value = toneCountryTitle
+                    alertMessage.value = toneCountryHelp
                     showAlert.value = true
                 },
             fontSize = 18.sp)
