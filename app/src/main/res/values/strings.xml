@@ -582,7 +582,7 @@
         notifications, and in Android 9 \"Storage\" permissions for Backup/Restore operations.</string>
     <string name="call_recording_title">Call Recording</string>
     <string name="call_recording_tip">If activated, new incoming and outgoing calls will be recorded.
-        Recordings can be played on Call Details page</string>
+        Recordings can be played on Call Details page.</string>
     <string name="microphone_title">Microphone</string>
     <string name="microphone_tip">If activated during call, microphone is muted.</string>
     <string name="speakerphone_title">Speakerphone</string>
