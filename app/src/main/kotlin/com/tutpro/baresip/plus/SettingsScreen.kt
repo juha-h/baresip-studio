@@ -414,7 +414,7 @@ private fun SettingsContent(
         val transportProtocolsTitle = stringResource(R.string.transport_protocols)
         val transportProtocolsHelp = stringResource(R.string.transport_protocols_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 10.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -443,7 +443,7 @@ private fun SettingsContent(
         val dnsServersTitle = stringResource(R.string.dns_servers)
         val dnsServersHelp = stringResource(R.string.dns_servers_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 10.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
