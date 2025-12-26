@@ -596,8 +596,7 @@
         havaitsemista varten, Ilmoitukset-luvan ilmoitusten näyttämistä varten ja Android versiossa 9
         Tallennustila-luvan Talleta/Palauta-toimintoja varten.</string>
     <string name="call_recording_title">Puheluiden talletus</string>
-    <string name="call_recording_tip">Jos aktivoitu, uudet soitetut ja vastatut puhelut talletetaan.
-        Tallennukset voi kuunnella Puhelutiedot-sivulla.</string>
+    <string name="call_recording_tip">Jos aktivoitu, uudet soitetut ja vastatut puhelut talletetaan. Tallennukset voi kuunnella Puhelutiedot-sivulla.</string>
     <string name="microphone_title">Mikrofoni</string>
     <string name="microphone_tip">Jos aktivoidaan puhelun aikana, mikrofoni suljetaan.</string>
     <string name="speakerphone_title">Kaiutin</string>
