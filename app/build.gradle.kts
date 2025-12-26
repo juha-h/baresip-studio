@@ -20,7 +20,6 @@ android {
                 arguments.addAll(listOf("-DANDROID_STL=c++_shared"))
             }
         }
-
         ndk {
             // noinspection ChromeOsAbiSupport
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
