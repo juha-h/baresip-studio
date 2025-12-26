@@ -81,7 +81,7 @@
     <string name="missed_calls">未接来电</string>
     <string name="missed_calls_count">%1$d 个未接来电</string>
     <string name="transfer_request_to">通话转接请求至</string>
-    <string name="call_auto_rejected">自动拒接来自 %1$s 的通话</string>
+    <string name="call_auto_rejected">已自动拒绝来自 %1$s 的通话</string>
     <string name="call_history">通话记录</string>
     <string name="call_details">通话详情</string>
     <string name="call">呼叫</string>
@@ -100,7 +100,7 @@
     <string name="call_answered">通话已接听</string>
     <string name="call_answered_elsewhere">通话已在别处接听</string>
     <string name="call_missed">通话未接</string>
-    <string name="call_rejected">通话已拒接</string>
+    <string name="call_rejected">通话遭拒</string>
     <string name="chat_with">与 %1$s 聊天</string>
     <string name="new_message">新消息</string>
     <string name="long_message_question">您要删除消息还是将对方“%1$s”添加到联系人中？</string>
@@ -411,4 +411,10 @@
     <string name="recording_saved">录音已保存</string>
     <string name="delete_call_alert">是否要从通话记录中删除此通话？</string>
     <string name="stop">停止</string>
+    <string name="block_unknown_help">屏蔽非联系人列表中的联系人的通话和消息。</string>
+    <string name="block_unknown">屏蔽未知联系人</string>
+    <string name="message_auto_rejected">已自动拒绝来自 %1$s 的消息</string>
+    <string name="transport_protocols">传输协议</string>
+    <string name="transport_protocols_help">以英文逗号分隔的受支持的 SIP 请求/响应传输协议列表。如果留空，则默认值为“udp,tcp,tls,ws,wss”，其中包含所有受支持的传输协议。</string>
+    <string name="invalid_transport_protocols">传输协议列表无效</string>
 </resources>
