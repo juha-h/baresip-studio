@@ -114,8 +114,6 @@ fun AccountsScreen(navController: NavController) {
 @Composable
 fun AccountsContent(contentPadding: PaddingValues, navController: NavController) {
 
-    val ctx = LocalContext.current
-
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
     val positiveAction = remember { mutableStateOf({}) }
@@ -166,13 +164,11 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                                 navController.navigate("account/$aor/old")
                             }
                     )
+                    val deleteAccountMessage = stringResource(R.string.delete_account)
                     SmallFloatingActionButton(
                         modifier = Modifier.padding(end = 8.dp),
                         onClick = {
-                            message.value = String.format(
-                                ctx.getString(R.string.delete_account),
-                                text
-                            )
+                            message.value = String.format(deleteAccountMessage, text)
                             positiveAction.value = {
                                 CallHistoryNew.clear(aor)
                                 Message.clearMessagesOfAor(aor)
@@ -237,7 +233,7 @@ fun NewAccount(navController: NavController) {
         }
 
         val ua = UserAgent.uaAlloc(
-            "<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;mwi=no"
+            "<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;check_origin=no;mwi=no"
         )
         if (ua == null) {
             alertTitle.value = ctx.getString(R.string.notice)
@@ -246,8 +242,8 @@ fun NewAccount(navController: NavController) {
             return null
         }
 
-        // Api.account_debug(ua.account.accp)
         val acc = ua.account
+        acc.checkOrigin = true
         Log.d(TAG, "Allocated UA ${ua.uap} with SIP URI ${acc.luri}")
         Account.saveAccounts()
         return acc
@@ -263,6 +259,8 @@ fun NewAccount(navController: NavController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         val ctx = LocalContext.current
+        val newAccountTitle = stringResource(R.string.new_account)
+        val accountsHelp = stringResource(R.string.accounts_help)
         OutlinedTextField(
             value = newAor,
             placeholder = { Text(text = stringResource(R.string.new_account)) },
@@ -272,8 +270,8 @@ fun NewAccount(navController: NavController) {
                 .padding(end = 8.dp)
                 .verticalScroll(rememberScrollState())
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.new_account)
-                    alertMessage.value = ctx.getString(R.string.accounts_help)
+                    alertTitle.value = newAccountTitle
+                    alertMessage.value = accountsHelp
                     showAlert.value = true
                 },
             singleLine = false,

@@ -218,7 +218,6 @@ private fun AccountContent(
 ) {
     val ctx = LocalContext.current
     val aor = ua.account.aor
-    val luri = ua.account.luri
 
     val mediaNat by viewModel.mediaNat.collectAsState()
     val showStun by remember { derivedStateOf { mediaNat.isNotEmpty() } }
@@ -233,7 +232,7 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             OutlinedTextField(
-                value = luri,
+                value = ua.account.luri,
                 enabled = false,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
@@ -254,6 +253,8 @@ private fun AccountContent(
 
     @Composable
     fun Nickname() {
+        val nickNameTitle = stringResource(R.string.nickname)
+        val nickNameHelp = stringResource(R.string.account_nickname_help)
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -262,18 +263,18 @@ private fun AccountContent(
             val nickName by viewModel.nickName.collectAsState()
             OutlinedTextField(
                 value = nickName,
-                placeholder = { Text(stringResource(R.string.nickname)) },
+                placeholder = { Text(nickNameTitle) },
                 onValueChange = { viewModel.nickName.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.nickname)
-                        alertMessage.value = ctx.getString(R.string.account_nickname_help)
+                        alertTitle.value = nickNameTitle
+                        alertMessage.value = nickNameHelp
                         showAlert.value = true
                     },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.nickname)) },
+                label = { Text(nickNameTitle) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     keyboardType = KeyboardType.Text),
@@ -283,7 +284,8 @@ private fun AccountContent(
 
     @Composable
     fun DisplayName() {
-        val ctx = LocalContext.current
+        val displayNameTitle = stringResource(R.string.display_name)
+        val displayNameHelp = stringResource(R.string.display_name_help)
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -292,18 +294,18 @@ private fun AccountContent(
             val displayName by viewModel.displayName.collectAsState()
             OutlinedTextField(
                 value = displayName,
-                placeholder = { Text(stringResource(R.string.display_name)) },
+                placeholder = { Text(displayNameTitle) },
                 onValueChange = { viewModel.displayName.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.display_name)
-                        alertMessage.value = ctx.getString(R.string.display_name_help)
+                        alertTitle.value = displayNameTitle
+                        alertMessage.value = displayNameHelp
                         showAlert.value = true
                     },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.display_name)) },
+                label = { Text(displayNameTitle) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text
@@ -314,7 +316,8 @@ private fun AccountContent(
 
     @Composable
     fun AuthUser() {
-        val ctx = LocalContext.current
+        val authenticationUserNameTitle = stringResource(R.string.authentication_username)
+        val authenticationUserNameHelp = stringResource(R.string.authentication_username_help)
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -323,17 +326,17 @@ private fun AccountContent(
             val authUser by viewModel.authUser.collectAsState()
             OutlinedTextField(
                 value = authUser,
-                placeholder = { Text(stringResource(R.string.authentication_username)) },
+                placeholder = { Text(authenticationUserNameTitle) },
                 onValueChange = { viewModel.authUser.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.authentication_username)
-                        alertMessage.value = ctx.getString(R.string.authentication_username_help)
+                        alertTitle.value = authenticationUserNameTitle
+                        alertMessage.value = authenticationUserNameHelp
                         showAlert.value = true
                     },
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.authentication_username)) },
+                label = { Text(authenticationUserNameTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -341,7 +344,8 @@ private fun AccountContent(
 
     @Composable
     fun AuthPass() {
-        val ctx = LocalContext.current
+        val authenticationPasswordTitle = stringResource(R.string.authentication_password)
+        val authenticationPasswordHelp = stringResource(R.string.authentication_password_help)
         val showPassword = remember { mutableStateOf(false) }
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
@@ -351,7 +355,7 @@ private fun AccountContent(
             val authPass by viewModel.authPass.collectAsState()
             OutlinedTextField(
                 value = authPass,
-                placeholder = { Text(stringResource(R.string.authentication_password)) },
+                placeholder = { Text(authenticationPasswordTitle) },
                 onValueChange = { viewModel.authPass.value = it },
                 singleLine = true,
                 visualTransformation = if (showPassword.value)
@@ -375,12 +379,12 @@ private fun AccountContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.authentication_password)
-                        alertMessage.value = ctx.getString(R.string.authentication_password_help)
+                        alertTitle.value = authenticationPasswordTitle
+                        alertMessage.value = authenticationPasswordHelp
                         showAlert.value = true
                     },
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.authentication_password)) },
+                label = { Text(authenticationPasswordTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -412,14 +416,15 @@ private fun AccountContent(
 
     @Composable
     fun Outbound() {
-        val ctx = LocalContext.current
+        val outboundProxiesTitle = stringResource(R.string.outbound_proxies)
+        val outboundProxiesHelp = stringResource(R.string.outbound_proxies_help)
         Text(text = stringResource(R.string.outbound_proxies),
             fontSize = 18.sp,
             modifier = Modifier
                 .padding(top = 8.dp)
                 .clickable {
-                    alertTitle.value = ctx.getString(R.string.outbound_proxies)
-                    alertMessage.value = ctx.getString(R.string.outbound_proxies_help)
+                    alertTitle.value = outboundProxiesTitle
+                    alertMessage.value = outboundProxiesHelp
                     showAlert.value = true
                 }
         )
@@ -429,14 +434,15 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val outbound1 by viewModel.outbound1.collectAsState()
+            val sipUriOfProxyServerTitle = stringResource(R.string.sip_uri_of_proxy_server)
             OutlinedTextField(
                 value = outbound1,
-                placeholder = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
+                placeholder = { Text(sipUriOfProxyServerTitle) },
                 onValueChange = { viewModel.outbound1.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.sip_uri_of_proxy_server)) },
+                label = { Text(sipUriOfProxyServerTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -446,14 +452,15 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val outbound2 by viewModel.outbound2.collectAsState()
+            val anotherProxyServerTitle = stringResource(R.string.sip_uri_of_another_proxy_server)
             OutlinedTextField(
                 value = outbound2,
-                placeholder = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                placeholder = { Text(anotherProxyServerTitle) },
                 onValueChange = { viewModel.outbound2.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.sip_uri_of_another_proxy_server)) },
+                label = { Text(anotherProxyServerTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -461,18 +468,19 @@ private fun AccountContent(
 
     @Composable
     fun Register() {
-        val ctx = LocalContext.current
+        val registerTitle = stringResource(R.string.register)
+        val registerHelp = stringResource(R.string.register_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.register),
+            Text(text = registerTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.register)
-                        alertMessage.value = ctx.getString(R.string.register_help)
+                        alertTitle.value = registerTitle
+                        alertMessage.value = registerHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp,
@@ -487,7 +495,8 @@ private fun AccountContent(
 
     @Composable
     fun RegInt() {
-        val ctx = LocalContext.current
+        val regIntTitle = stringResource(R.string.reg_int)
+        val regIntHelp = stringResource(R.string.reg_int_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -496,19 +505,46 @@ private fun AccountContent(
             val regInt by viewModel.regInt.collectAsState()
             OutlinedTextField(
                 value = regInt,
-                placeholder = { Text(stringResource(R.string.reg_int)) },
+                placeholder = { Text(regIntTitle) },
                 onValueChange = { viewModel.regInt.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.reg_int)
-                        alertMessage.value = ctx.getString(R.string.reg_int_help)
+                        alertTitle.value = regIntTitle
+                        alertMessage.value = regIntHelp
                         showAlert.value = true
                     },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.reg_int)) },
+                label = { Text(regIntTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
+    }
+
+    @Composable
+    fun CheckOrigin() {
+        val checkOriginTitle = stringResource(R.string.check_origin)
+        val checkOriginHelp = stringResource(R.string.check_origin_help)
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = checkOriginTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = checkOriginTitle
+                        alertMessage.value = checkOriginHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp,
+            )
+            val checkOrigin by viewModel.checkOrigin.collectAsState()
+            Switch(
+                checked = checkOrigin,
+                onCheckedChange = { viewModel.checkOrigin.value = it }
             )
         }
     }
@@ -558,18 +594,19 @@ private fun AccountContent(
 
     @Composable
     fun MediaEnc() {
-        val ctx = LocalContext.current
+        val mediaEncryptionTitle = stringResource(R.string.media_encryption)
+        val mediaEncryptionHelp = stringResource(R.string.media_encryption_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.media_encryption),
+            Text(text = mediaEncryptionTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.media_encryption)
-                        alertMessage.value = ctx.getString(R.string.media_encryption_help)
+                        alertTitle.value = mediaEncryptionTitle
+                        alertMessage.value = mediaEncryptionHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -615,18 +652,19 @@ private fun AccountContent(
 
     @Composable
     fun MediaNat() {
-        val ctx = LocalContext.current
+        val mediaNatTitle = stringResource(R.string.media_nat)
+        val mediaNatHelp = stringResource(R.string.media_nat_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.media_nat),
+            Text(mediaNatTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.media_nat)
-                        alertMessage.value = ctx.getString(R.string.media_nat_help)
+                        alertTitle.value = mediaNatTitle
+                        alertMessage.value = mediaNatHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -673,6 +711,8 @@ private fun AccountContent(
 
     @Composable
     fun StunServer() {
+        val stunServerTitle = stringResource(R.string.stun_server)
+        val stunServerHelp = stringResource(R.string.stun_server_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -681,17 +721,17 @@ private fun AccountContent(
             val stunServer by viewModel.stunServer.collectAsState()
             OutlinedTextField(
                 value = stunServer,
-                placeholder = { Text(stringResource(R.string.stun_server)) },
+                placeholder = { Text(stunServerTitle) },
                 onValueChange = { viewModel.stunServer.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.stun_server)
-                        alertMessage.value = ctx.getString(R.string.stun_server_help)
+                        alertTitle.value = stunServerTitle
+                        alertMessage.value = stunServerHelp
                         showAlert.value = true
                     },
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.stun_server)) },
+                label = { Text(stunServerTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -699,6 +739,8 @@ private fun AccountContent(
 
     @Composable
     fun StunUser() {
+        val stunUsernameTitle = stringResource(R.string.stun_username)
+        val stunUsernameHelp = stringResource(R.string.stun_username_help)
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -707,17 +749,17 @@ private fun AccountContent(
             val stunUser by viewModel.stunUser.collectAsState()
             OutlinedTextField(
                 value = stunUser,
-                placeholder = { Text(stringResource(R.string.stun_username)) },
+                placeholder = { Text(stunUsernameTitle) },
                 onValueChange = { viewModel.stunUser.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.stun_username)
-                        alertMessage.value = ctx.getString(R.string.stun_username_help)
+                        alertTitle.value = stunUsernameTitle
+                        alertMessage.value = stunUsernameHelp
                         showAlert.value = true
                     },
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.stun_username)) },
+                label = { Text(stunUsernameTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -725,6 +767,8 @@ private fun AccountContent(
 
     @Composable
     fun StunPass() {
+        val stunPasswordTitle = stringResource(R.string.stun_password)
+        val stunPasswordHelp = stringResource(R.string.stun_password_help)
         val showPassword = remember { mutableStateOf(false) }
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
@@ -734,7 +778,7 @@ private fun AccountContent(
             val stunPass by viewModel.stunPass.collectAsState()
             OutlinedTextField(
                 value = stunPass,
-                placeholder = { Text(stringResource(R.string.stun_password)) },
+                placeholder = { Text(stunPasswordTitle) },
                 onValueChange = { viewModel.stunPass.value = it },
                 singleLine = true,
                 visualTransformation = if (showPassword.value)
@@ -756,12 +800,12 @@ private fun AccountContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.stun_password)
-                        alertMessage.value = ctx.getString(R.string.stun_password_help)
+                        alertTitle.value = stunPasswordTitle
+                        alertMessage.value = stunPasswordHelp
                         showAlert.value = true
                     },
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.stun_password)) },
+                label = { Text(stunPasswordTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -769,18 +813,20 @@ private fun AccountContent(
 
     @Composable
     fun RtcpMux() {
+        val rtcpMuxTitle = stringResource(R.string.rtcp_mux)
+        val rtcpMuxHelp = stringResource(R.string.rtcp_mux_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val rtcpMux by viewModel.rtcpMux.collectAsState()
-            Text(text = stringResource(R.string.rtcp_mux),
+            Text(text = rtcpMuxTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.rtcp_mux)
-                        alertMessage.value = ctx.getString(R.string.rtcp_mux_help)
+                        alertTitle.value = rtcpMuxTitle
+                        alertMessage.value = rtcpMuxHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -794,18 +840,21 @@ private fun AccountContent(
 
     @Composable
     fun Rel100() {
+        val rel100Title = stringResource(R.string.rel_100)
+        val rel100Help = stringResource(R.string.rel_100_help)
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val rel100 by viewModel.rel100.collectAsState()
-            Text(text = stringResource(R.string.rel_100),
+            Text(
+                text = rel100Title,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.rel_100)
-                        alertMessage.value = ctx.getString(R.string.rel_100_help)
+                        alertTitle.value = rel100Title
+                        alertMessage.value = rel100Help
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -819,21 +868,26 @@ private fun AccountContent(
 
     @Composable
     fun Dtmf() {
+        val dtmfModeTitle = stringResource(R.string.dtmf_mode)
+        val dtmfModeHelp = stringResource(R.string.dtmf_mode_help)
+        val dtmfInbandText = stringResource(R.string.dtmf_inband)
+        val dtmfInfoText = stringResource(R.string.dtmf_info)
+        val dtmfAutoText = stringResource(R.string.dtmf_auto)
         val dtmfMode by viewModel.dtmfMode.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to ctx.getString(R.string.dtmf_inband),
-                Api.DTMFMODE_SIP_INFO to ctx.getString(R.string.dtmf_info),
-                Api.DTMFMODE_AUTO to ctx.getString(R.string.dtmf_auto))
-            Text(text = stringResource(R.string.dtmf_mode),
+            val dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to dtmfInbandText,
+                Api.DTMFMODE_SIP_INFO to dtmfInfoText,
+                Api.DTMFMODE_AUTO to dtmfAutoText)
+            Text(text = dtmfModeTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.dtmf_mode)
-                        alertMessage.value = ctx.getString(R.string.dtmf_mode_help)
+                        alertTitle.value = dtmfModeTitle
+                        alertMessage.value = dtmfModeHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -876,22 +930,27 @@ private fun AccountContent(
         }
     }
 
+    val manualText = stringResource(R.string.manual)
+    val autoText = stringResource(R.string.auto)
+
     @Composable
     fun Answer() {
+        val answerModeTitle = stringResource(R.string.answer_mode)
+        val answerModeHelp = stringResource(R.string.answer_mode_help)
         val answerMode by viewModel.answerMode.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to ctx.getString(R.string.manual),
-                Api.ANSWERMODE_AUTO to ctx.getString(R.string.auto))
-            Text(text = stringResource(R.string.answer_mode),
+            val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to manualText,
+                Api.ANSWERMODE_AUTO to autoText)
+            Text(text = answerModeTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.answer_mode)
-                        alertMessage.value = ctx.getString(R.string.answer_mode_help)
+                        alertTitle.value = answerModeTitle
+                        alertMessage.value = answerModeHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -932,20 +991,22 @@ private fun AccountContent(
 
     @Composable
     fun Redirect() {
+        val redirectModeTitle = stringResource(R.string.redirect_mode)
+        val redirectModeHelp = stringResource(R.string.redirect_mode_help)
         val autoRedirect by viewModel.autoRedirect.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val redirectModeMap = mapOf(false to ctx.getString(R.string.manual),
-                true to ctx.getString(R.string.auto))
-            Text(text = stringResource(R.string.redirect_mode),
+            val redirectModeMap = mapOf(false to manualText,
+                true to autoText)
+            Text(text = redirectModeTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.redirect_mode)
-                        alertMessage.value = ctx.getString(R.string.redirect_mode_help)
+                        alertTitle.value = redirectModeTitle
+                        alertMessage.value = redirectModeHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -988,18 +1049,20 @@ private fun AccountContent(
 
     @Composable
     fun BlockUnknown() {
+        val blockUnknownTitle = stringResource(R.string.block_unknown)
+        val blockUnknownHelp = stringResource(R.string.block_unknown_help)
         val block by viewModel.blockUnknown.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.block_unknown),
+            Text(text = blockUnknownTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.block_unknown)
-                        alertMessage.value = ctx.getString(R.string.block_unknown_help)
+                        alertTitle.value = blockUnknownTitle
+                        alertMessage.value = blockUnknownHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1013,6 +1076,8 @@ private fun AccountContent(
 
     @Composable
     fun Voicemail() {
+        val voicemailUriTitle = stringResource(R.string.voicemail_uri)
+        val voicemailUriHelp = stringResource(R.string.voicemain_uri_help)
         val vmUri by viewModel.vmUri.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
@@ -1021,18 +1086,18 @@ private fun AccountContent(
         ) {
             OutlinedTextField(
                 value = vmUri,
-                placeholder = { Text(stringResource(R.string.voicemail_uri)) },
+                placeholder = { Text(voicemailUriTitle) },
                 onValueChange = { viewModel.vmUri.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.voicemail_uri)
-                        alertMessage.value = ctx.getString(R.string.voicemain_uri_help)
+                        alertTitle.value = voicemailUriTitle
+                        alertMessage.value = voicemailUriHelp
                         showAlert.value = true
                     },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.voicemail_uri)) },
+                label = { Text(voicemailUriTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1040,6 +1105,8 @@ private fun AccountContent(
 
     @Composable
     fun CountryCode() {
+        val countryCodeTitle = stringResource(R.string.country_code)
+        val countryCodeHelp = stringResource(R.string.country_code_help)
         val countryCode by viewModel.countryCode.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
@@ -1048,18 +1115,18 @@ private fun AccountContent(
         ) {
             OutlinedTextField(
                 value = countryCode,
-                placeholder = { Text(stringResource(R.string.country_code)) },
+                placeholder = { Text(countryCodeTitle) },
                 onValueChange = { viewModel.countryCode.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.country_code)
-                        alertMessage.value = ctx.getString(R.string.country_code_help)
+                        alertTitle.value = countryCodeTitle
+                        alertMessage.value = countryCodeHelp
                         showAlert.value = true
                     },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.country_code)) },
+                label = { Text(countryCodeTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1067,6 +1134,8 @@ private fun AccountContent(
 
     @Composable
     fun TelProvider() {
+        val telephonyProviderTitle = stringResource(R.string.telephony_provider)
+        val telephonyProviderHelp = stringResource(R.string.telephony_provider_help)
         val telProvider by viewModel.telProvider.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
@@ -1075,18 +1144,18 @@ private fun AccountContent(
         ) {
             OutlinedTextField(
                 value = telProvider,
-                placeholder = { Text(stringResource(R.string.telephony_provider)) },
+                placeholder = { Text(telephonyProviderTitle) },
                 onValueChange = { viewModel.telProvider.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.telephony_provider)
-                        alertMessage.value = ctx.getString(R.string.telephony_provider_help)
+                        alertTitle.value = telephonyProviderTitle
+                        alertMessage.value = telephonyProviderHelp
                         showAlert.value = true
                     },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
-                label = { Text(stringResource(R.string.telephony_provider)) },
+                label = { Text(telephonyProviderTitle) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
@@ -1094,18 +1163,20 @@ private fun AccountContent(
 
     @Composable
     fun NumericKeypad() {
+        val numericKeypadTitle = stringResource(R.string.numeric_keypad)
+        val numericKeypadHelp = stringResource(R.string.numeric_keypad_help)
         val numericKeypad by viewModel.numericKeypad.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.numeric_keypad),
+            Text(text = numericKeypadTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.numeric_keypad)
-                        alertMessage.value = ctx.getString(R.string.numeric_keypad_help)
+                        alertTitle.value = numericKeypadTitle
+                        alertMessage.value = numericKeypadHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1119,18 +1190,20 @@ private fun AccountContent(
 
     @Composable
     fun DefaultAccount() {
+        val defaultAccountTitle = stringResource(R.string.default_account)
+        val defaultAccountHelp = stringResource(R.string.default_account_help)
         val defaultAccount by viewModel.defaultAccount.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = stringResource(R.string.default_account),
+            Text(text = defaultAccountTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        alertTitle.value = ctx.getString(R.string.default_account)
-                        alertMessage.value = ctx.getString(R.string.default_account_help)
+                        alertTitle.value = defaultAccountTitle
+                        alertMessage.value = defaultAccountHelp
                         showAlert.value = true
                     },
                 fontSize = 18.sp
@@ -1173,7 +1246,10 @@ private fun AccountContent(
             AskPassword(ctx, navController, ua)
         Outbound()
         Register()
-        RegInt()
+        if (viewModel.register.collectAsState().value) {
+            RegInt()
+            CheckOrigin()
+        }
         AudioCodecs(navController, aor)
         VideoCodecs(navController, aor)
         MediaEnc()
@@ -1198,7 +1274,9 @@ private fun AccountContent(
 }
 
 private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgent): Boolean {
+
     val acc = ua.account
+    val noticeTitle = ctx.getString(R.string.notice)
 
     val nn = viewModel.nickName.value.trim()
     if (nn != acc.nickName) {
@@ -1208,14 +1286,14 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 Log.d(TAG, "New nickname is ${acc.nickName}")
             }
             else {
-                alertTitle.value = ctx.getString(R.string.notice)
+                alertTitle.value = noticeTitle
                 alertMessage.value = String.format(ctx.getString(R.string.non_unique_account_nickname), nn)
                 showAlert.value = true
                 return false
             }
         }
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_account_nickname), nn)
             showAlert.value = true
             return false
@@ -1233,7 +1311,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             }
         }
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_display_name), dn)
             showAlert.value = true
             return false
@@ -1254,7 +1332,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             }
         }
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_authentication_username), au)
             showAlert.value = true
             return false
@@ -1275,7 +1353,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 BaresipService.aorPasswords.remove(acc.aor)
             }
             else {
-                alertTitle.value = ctx.getString(R.string.notice)
+                alertTitle.value = noticeTitle
                 alertMessage.value = String.format(ctx.getString(R.string.invalid_authentication_password), ap)
                 showAlert.value = true
                 return false
@@ -1301,7 +1379,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             ob.add(ob1)
         }
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_proxy_server_uri), ob1)
             showAlert.value = true
             return false
@@ -1314,7 +1392,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         if (checkOutboundUri(ob2))
             ob.add(ob2)
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_proxy_server_uri), ob2)
             showAlert.value = true
             return false
@@ -1345,7 +1423,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         0
     }
     if (regInt !in 60..3600) {
-        alertTitle.value = ctx.getString(R.string.notice)
+        alertTitle.value = noticeTitle
         alertMessage.value = String.format(ctx.getString(R.string.invalid_reg_int), "$regInt")
         showAlert.value = true
         return false
@@ -1366,6 +1444,13 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     else {
         if (regInt != acc.configuredRegInt)
             acc.configuredRegInt = regInt
+    }
+
+    if (acc.regint == 0)
+        Api.account_set_check_origin(ua.account.accp, false)
+    else {
+        Api.account_set_check_origin(ua.account.accp, viewModel.checkOrigin.value)
+        acc.checkOrigin = Api.account_check_origin(ua.account.accp)
     }
 
     val newMediaEnc = viewModel.mediaEnc.value
@@ -1423,7 +1508,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 Log.e(TAG, "Setting of STUN/TURN user $newStunUser failed")
         }
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_username),
                 newStunUser)
             showAlert.value = true
@@ -1440,7 +1525,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 Log.e(TAG, "Setting of stun pass failed")
         }
         else {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_password),
                 newStunPass)
             showAlert.value = true
@@ -1508,7 +1593,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
             if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
             if (!Utils.checkUri(newVmUri)) {
-                alertTitle.value = ctx.getString(R.string.notice)
+                alertTitle.value = noticeTitle
                 alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri),
                     newVmUri)
                 showAlert.value = true
@@ -1538,7 +1623,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     val hostPart = viewModel.telProvider.value.trim()
     if (hostPart != acc.telProvider) {
         if (hostPart != "" && !Utils.checkHostPortParams(hostPart)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_uri_hostpart), hostPart)
             showAlert.value = true
             return false
@@ -1554,6 +1639,8 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     }
 
     if (viewModel.defaultAccount.value) ua.makeDefault()
+
+    Api.account_debug(acc.accp)
 
     Account.saveAccounts()
 
@@ -1620,8 +1707,11 @@ private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
                                     900
                                 }
 
-                            "register" ->
+                            "register" -> {
                                 acc.regint = if (text == "yes") acc.configuredRegInt else 0
+                                if (acc.regint > 0)
+                                    acc.checkOrigin = true
+                            }
 
                             "audio-codec" ->
                                 if (text in audioCodecs)

@@ -35,6 +35,8 @@ object Api {
     external fun account_video_codec(acc: Long, ix: Int): String
     external fun account_regint(acc: Long): Int
     external fun account_set_regint(acc: Long, regint: Int): Int
+    external fun account_check_origin(acc: Long): Boolean
+    external fun account_set_check_origin(acc: Long, check: Boolean)
     external fun account_stun_uri(acc: Long): String
     external fun account_set_stun_uri(acc: Long, uri: String): Int
     external fun account_stun_user(acc: Long): String

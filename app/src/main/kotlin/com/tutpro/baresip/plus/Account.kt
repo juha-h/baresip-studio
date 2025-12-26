@@ -21,6 +21,7 @@ class Account(val accp: Long) {
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
     var regint = Api.account_regint(accp)
+    var checkOrigin = true
     var configuredRegInt = REGISTRATION_INTERVAL
     var mediaEnc = Api.account_mediaenc(accp)
     var rtcpMux = Api.account_rtcp_mux(accp)
@@ -112,6 +113,8 @@ class Account(val accp: Long) {
             if (outbound.size > 1) res += ";outbound2=\"${outbound[1]}\""
             res = "$res;sipnat=outbound"
         }
+
+        if (!checkOrigin) res += ";check_origin=no"
 
         if (mediaNat != "") res += ";medianat=${mediaNat}"
 
