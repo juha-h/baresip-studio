@@ -1,0 +1,4 @@
+- Added Block Unknown account setting that allows blocking of calls and messages from peers not found in contacts
+- Added Check Origin account setting that allows blocking of SIP requests whose source IP address does not match IP address where register requests are sent
+- Added supported Transport Protocols setting
+- New translations (Chinese and Russian)
