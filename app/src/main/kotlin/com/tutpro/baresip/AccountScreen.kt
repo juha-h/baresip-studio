@@ -550,11 +550,36 @@ private fun AccountContent(
     }
 
     @Composable
+    fun BlockUnknown() {
+        val blockUnknownTitle = stringResource(R.string.block_unknown)
+        val blockUnknownHelp = stringResource(R.string.block_unknown_help)
+        val block by viewModel.blockUnknown.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = blockUnknownTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = blockUnknownTitle
+                        alertMessage.value = blockUnknownHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            Switch(
+                checked = block,
+                onCheckedChange = { viewModel.blockUnknown.value = it }
+            )
+        }
+    }
+
+    @Composable
     fun AudioCodecs(navController: NavController, aor: String) {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -577,7 +602,7 @@ private fun AccountContent(
         val mediaEncryptionTitle = stringResource(R.string.media_encryption)
         val mediaEncryptionHelp = stringResource(R.string.media_encryption_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 2.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1028,33 +1053,6 @@ private fun AccountContent(
     }
 
     @Composable
-    fun BlockUnknown() {
-        val blockUnknownTitle = stringResource(R.string.block_unknown)
-        val blockUnknownHelp = stringResource(R.string.block_unknown_help)
-        val block by viewModel.blockUnknown.collectAsState()
-        Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(text = blockUnknownTitle,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        alertTitle.value = blockUnknownTitle
-                        alertMessage.value = blockUnknownHelp
-                        showAlert.value = true
-                    },
-                fontSize = 18.sp
-            )
-            Switch(
-                checked = block,
-                onCheckedChange = { viewModel.blockUnknown.value = it }
-            )
-        }
-    }
-
-    @Composable
     fun Voicemail() {
         val voicemailUriTitle = stringResource(R.string.voicemail_uri)
         val voicemailUriHelp = stringResource(R.string.voicemain_uri_help)
@@ -1230,6 +1228,7 @@ private fun AccountContent(
             RegInt()
             CheckOrigin()
         }
+        BlockUnknown()
         AudioCodecs(navController, aor)
         MediaEnc()
         MediaNat()
@@ -1243,7 +1242,6 @@ private fun AccountContent(
         Dtmf()
         Answer()
         Redirect()
-        BlockUnknown()
         Voicemail()
         CountryCode()
         TelProvider()
