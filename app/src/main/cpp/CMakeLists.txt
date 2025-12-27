@@ -64,7 +64,7 @@ set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
 
 add_library(native-lib SHARED ${CMAKE_SOURCE_DIR}/baresip.c)
 
-target_include_directories(baresip PRIVATE
+target_include_directories(native-lib PRIVATE
         ${distribution_DIR}/openssl/include
         ${distribution_DIR}/re/include
         ${distribution_DIR}/baresip/include)
