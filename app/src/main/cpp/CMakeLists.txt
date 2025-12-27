@@ -62,9 +62,9 @@ add_library(lib_baresip STATIC IMPORTED)
 set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/baresip/lib/${ANDROID_ABI}/libbaresip.a)
 
-add_library(native-lib SHARED ${CMAKE_SOURCE_DIR}/baresip.c)
+add_library(baresip SHARED ${CMAKE_SOURCE_DIR}/baresip.c)
 
-target_include_directories(native-lib PRIVATE
+target_include_directories(baresip PRIVATE
         ${distribution_DIR}/openssl/include
         ${distribution_DIR}/re/include
         ${distribution_DIR}/baresip/include)
@@ -72,7 +72,7 @@ target_include_directories(native-lib PRIVATE
 add_definitions(-DHAVE_PTHREAD)
 
 target_link_libraries(
-        native-lib
+        baresip
         android
         aaudio
         lib_baresip
