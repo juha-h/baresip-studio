@@ -177,9 +177,6 @@ class Account(val accp: Long) {
         if (autoRedirect)
             res += ";sip_autoredirect=yes"
 
-        if (blockUnknown)
-            res += ";block_unknown=yes"
-
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;inreq_allowed=yes;call_transfer=yes"
 
         var extra = ""
@@ -189,6 +186,9 @@ class Account(val accp: Long) {
 
         if (!callHistory)
             extra += ";call_history=no"
+
+        if (blockUnknown)
+            extra += ";block_unknown=yes"
 
         extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
 
