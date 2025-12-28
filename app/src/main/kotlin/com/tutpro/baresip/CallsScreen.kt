@@ -155,6 +155,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
     val delete = stringResource(R.string.delete)
     val disable = stringResource(R.string.disable_history)
     val enable = stringResource(R.string.enable_history)
+    val blocked = stringResource(R.string.blocked)
 
     val showDialog = remember { mutableStateOf(false) }
     val positiveAction = remember { mutableStateOf({}) }
@@ -207,7 +208,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             CustomElements.DropdownMenu(
                 expanded,
                 { expanded = false },
-                listOf(delete, if (account.callHistory) disable else enable),
+                if (account.callHistory) listOf(delete, disable, blocked) else listOf(enable),
                 onItemClick = { selectedItem ->
                     expanded = false
                     when (selectedItem) {
@@ -221,6 +222,9 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                         disable, enable -> {
                             account.callHistory = !account.callHistory
                             Account.saveAccounts()
+                        }
+                        blocked -> {
+                            navController.navigate("blocked/${account.aor}")
                         }
                     }
                 }

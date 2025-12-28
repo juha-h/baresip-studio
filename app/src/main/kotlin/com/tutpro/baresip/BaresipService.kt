@@ -457,6 +457,8 @@ class BaresipService: Service() {
                     }
                 }
 
+                Blocked.restore()
+
                 val recordings = File(filesDir, "recordings")
 
                 val restored = File(filesPath, "restored")
@@ -866,7 +868,14 @@ class BaresipService: Service() {
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(bevent)
                             toast(toastMsg)
-                            if (!blockUnknown) {
+                            if (blockUnknown)
+                                Blocked(
+                                    ua.account.aor,
+                                    peerUri,
+                                    "invite",
+                                    GregorianCalendar().timeInMillis
+                                ).add()
+                            else {
                                 val name = "callwaiting_$toneCountry"
                                 val resourceId = applicationContext.resources.getIdentifier(
                                     name,
@@ -1872,6 +1881,7 @@ class BaresipService: Service() {
         val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
+
         val darkTheme = mutableStateOf(false)
         val dynamicColors = mutableStateOf(false)
         var messages by mutableStateOf(emptyList<Message>())
@@ -1882,6 +1892,8 @@ class BaresipService: Service() {
 
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<CallHistoryNew>()
+
+        var blocked = ArrayList<Blocked>()
 
         var contactsMode = "baresip"
         var addressFamily = ""
