@@ -12,11 +12,13 @@ class Blocked (
     val request: String,
     val timeStamp: Long
 ) {
-    private val blockedSize = 3
+    private val blockedSize = 128
 
     fun add() {
         BaresipService.blocked.add(this)
-        val aorBlocked = BaresipService.blocked.filter { it.aor == this.aor }
+        val aorBlocked = BaresipService.blocked.filter {
+            it.aor == this.aor && it.request == this.request
+        }
         if (aorBlocked.size > blockedSize) {
             val oldestToRemove = aorBlocked.first()
             BaresipService.blocked.remove(oldestToRemove)
@@ -53,7 +55,7 @@ class Blocked (
                     BaresipService.blocked = ArrayList(blockedList)
                     Log.d(TAG, "Restored ${BaresipService.blocked.size} blocked calls and messages")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Deserialization exception: - $e")
+                    Log.e(TAG, "Deserialization exception: $e")
                 }
             }
         }

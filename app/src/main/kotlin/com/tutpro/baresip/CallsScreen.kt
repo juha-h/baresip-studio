@@ -208,7 +208,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             CustomElements.DropdownMenu(
                 expanded,
                 { expanded = false },
-                if (account.callHistory) listOf(delete, disable, blocked) else listOf(enable),
+                if (account.callHistory) listOf(disable, delete, blocked) else listOf(enable),
                 onItemClick = { selectedItem ->
                     expanded = false
                     when (selectedItem) {
@@ -216,6 +216,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                             positiveAction.value = {
                                 CallHistoryNew.clear(account.aor)
                                 callHistory.value = emptyList()
+                                Blocked.clear(account.aor)
                             }
                             showDialog.value = true
                         }
@@ -224,7 +225,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                             Account.saveAccounts()
                         }
                         blocked -> {
-                            navController.navigate("blocked/${account.aor}")
+                            navController.navigate("blocked/invite/${account.aor}")
                         }
                     }
                 }

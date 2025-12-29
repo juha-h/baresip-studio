@@ -853,8 +853,11 @@ class BaresipService: Service() {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
                         val blockUnknown = ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri
-                        val toastMsg = if (Call.inCall() || blockUnknown)
+                        val toastMsg = if (Call.inCall())
                             String.format(getString(R.string.call_auto_rejected),
+                                Utils.friendlyUri(this, peerUri, ua.account))
+                        else if (blockUnknown)
+                            String.format(getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account))
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
@@ -868,13 +871,15 @@ class BaresipService: Service() {
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(bevent)
                             toast(toastMsg)
-                            if (blockUnknown)
-                                Blocked(
-                                    ua.account.aor,
-                                    peerUri,
-                                    "invite",
-                                    GregorianCalendar().timeInMillis
-                                ).add()
+                            if (blockUnknown) {
+                                if (ua.account.callHistory)
+                                    Blocked(
+                                        ua.account.aor,
+                                        peerUri,
+                                        "invite",
+                                        GregorianCalendar().timeInMillis
+                                    ).add()
+                            }
                             else {
                                 val name = "callwaiting_$toneCountry"
                                 val resourceId = applicationContext.resources.getIdentifier(
@@ -1222,8 +1227,14 @@ class BaresipService: Service() {
 
         if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
             Log.d(TAG, "Auto-rejecting incoming message by $uap from $peerUri")
+            Blocked(
+                ua.account.aor,
+                peerUri,
+                "message",
+                GregorianCalendar().timeInMillis
+            ).add()
             toast(String.format(
-                    getString(R.string.message_auto_rejected),
+                    getString(R.string.message_blocked),
                     Utils.friendlyUri(this, peerUri, ua.account)
                 )
             )

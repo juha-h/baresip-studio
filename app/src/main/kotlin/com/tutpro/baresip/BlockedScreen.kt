@@ -63,17 +63,21 @@ import java.util.GregorianCalendar
 
 fun NavGraphBuilder.blockedScreenRoute(navController: NavController) {
     composable(
-        route = "blocked/{aor}",
-        arguments = listOf(navArgument("aor") { type = NavType.StringType })
+        route = "blocked/{request}/{aor}",
+        arguments = listOf(
+            navArgument("aor") { type = NavType.StringType },
+            navArgument("request") { type = NavType.StringType }
+        )
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
-        BlockedScreen(navController, aor)
+        val request = backStackEntry.arguments?.getString("request")!!
+        BlockedScreen(navController, request, aor)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BlockedScreen(navController: NavController, aor: String) {
+private fun BlockedScreen(navController: NavController, request: String, aor: String) {
 
     val account = Account.ofAor(aor)!!
 
@@ -84,7 +88,7 @@ private fun BlockedScreen(navController: NavController, aor: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(aor, refreshTrigger) {
-        blocked.value = loadBlocked(aor)
+        blocked.value = loadBlocked(request, aor)
         isBlockedLoaded = true
     }
 
@@ -100,7 +104,7 @@ private fun BlockedScreen(navController: NavController, aor: String) {
     }
 
     BackHandler(enabled = true) {
-        navController.popBackStack()
+        navController.navigateUp()
     }
 
     Scaffold(
@@ -115,7 +119,7 @@ private fun BlockedScreen(navController: NavController, aor: String) {
                     .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
-                TopAppBar(navController, account)
+                TopAppBar(navController, account, request, blocked)
             }
         },
         content = { contentPadding ->
@@ -124,8 +128,7 @@ private fun BlockedScreen(navController: NavController, aor: String) {
                     LocalContext.current,
                     navController,
                     contentPadding,
-                    account,
-                    blocked
+                    account, blocked
                 )
         },
     )
@@ -133,12 +136,14 @@ private fun BlockedScreen(navController: NavController, aor: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(navController: NavController, account: Account) {
-
+private fun TopAppBar(
+    navController: NavController,
+    account: Account,
+    request: String,
+    blocked: MutableState<List<Blocked>>
+) {
     var expanded by remember { mutableStateOf(false) }
-
     val delete = stringResource(R.string.delete)
-
     val showDialog = remember { mutableStateOf(false) }
     val positiveAction = remember { mutableStateOf({}) }
 
@@ -154,7 +159,10 @@ private fun TopAppBar(navController: NavController, account: Account) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(R.string.blocked_calls),
+                text = if (request == "invite")
+                    stringResource(R.string.blocked_calls)
+                else
+                    stringResource(R.string.blocked_messages),
                 fontWeight = FontWeight.Bold
             )
         },
@@ -196,6 +204,7 @@ private fun TopAppBar(navController: NavController, account: Account) {
                         delete -> {
                             positiveAction.value = {
                                 Blocked.clear(account.aor)
+                                blocked.value = emptyList()
                             }
                             showDialog.value = true
                         }
@@ -241,8 +250,7 @@ private fun Account(account: Account) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Blocked(ctx: Context, navController: NavController, blocked: MutableState<List<Blocked>>)
-{
+private fun Blocked(ctx: Context, navController: NavController, blocked: MutableState<List<Blocked>>) {
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
     val positiveButtonText = remember { mutableStateOf("") }
@@ -290,8 +298,11 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
                         showDialog.value = true
                     })
             ) {
-                Text(text = peerUri,
-                    modifier = Modifier.padding(start = 8.dp),
+                Text(text = "\u2022",
+                    modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                    fontSize = 18.sp)
+
+                Text(text = peerUri.replace("sip:", ""),
                     fontSize = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -315,14 +326,14 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
     }
 }
 
-private fun loadBlocked(aor: String): MutableList<Blocked> {
+private fun loadBlocked(request: String, aor: String): MutableList<Blocked> {
     val res = mutableListOf<Blocked>()
     for (i in BaresipService.blocked.indices.reversed()) {
         val b = BaresipService.blocked[i]
-        if (b.aor == aor && b.request == "invite") {
+        if (b.aor == aor && b.request == request) {
             res.add(Blocked("", b.peerUri, "", b.timeStamp))
         }
     }
-    Log.d(TAG, "Loaded ${res.size} blocked calls")
+    Log.d(TAG, "Loaded ${res.size} blocked $request requests")
     return res
 }
