@@ -74,7 +74,7 @@ private fun ContactScreen(ctx: Context, viewModel: ViewModel, navController: Nav
     val contact = Contact.androidContact(name)
     if (contact == null) {
         Log.e(TAG, "No Android contact found with name $name")
-        navController.popBackStack()
+        navController.navigateUp()
     }
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -99,12 +99,7 @@ private fun ContactScreen(ctx: Context, viewModel: ViewModel, navController: Nav
 @Composable
 private fun TopAppBar(title: String, navController: NavController) {
     TopAppBar(
-        title = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold
-            )
-        },
+        title = { Text(text = title, fontWeight = FontWeight.Bold) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -112,7 +107,7 @@ private fun TopAppBar(title: String, navController: NavController) {
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
