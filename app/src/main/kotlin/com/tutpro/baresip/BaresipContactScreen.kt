@@ -52,6 +52,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -124,7 +125,7 @@ private fun ContactScreen(
 ) {
 
     val ctx = LocalContext.current
-
+    var clicks by remember { mutableIntStateOf(0) }
     var screenState by remember { mutableStateOf(ScreenState()) }
 
     val title = if (screenState.new)
@@ -170,23 +171,31 @@ private fun ContactScreen(
     }
 
     val onBack: () -> Unit = {
-        screenState.tmpAvatarFile?.let { tempFile ->
-            if (tempFile.exists()) {
-                Log.d(TAG, "Back pressed, deleting temp avatar: ${tempFile.name}")
-                Utils.deleteFile(tempFile)
+        clicks++
+        if (clicks == 1) {
+            screenState.tmpAvatarFile?.let { tempFile ->
+                if (tempFile.exists()) {
+                    Log.d(TAG, "Back pressed, deleting temp avatar: ${tempFile.name}")
+                    Utils.deleteFile(tempFile)
+                }
             }
+            navController.popBackStack()
         }
-        navController.popBackStack()
     }
 
     val onCheck: () -> Unit = {
-        val result = checkOnClick(
-            ctx = ctx,
-            currentState = screenState,
-            uriOrNameArg = uriOrNameArg,
-        )
-        if (result)
-            navController.popBackStack()
+        clicks++
+        if (clicks == 1) {
+            val result = checkOnClick(
+                ctx = ctx,
+                currentState = screenState,
+                uriOrNameArg = uriOrNameArg,
+            )
+            if (result)
+                navController.popBackStack()
+            else
+                clicks = 0
+        }
     }
 
     BackHandler(enabled = true) {
