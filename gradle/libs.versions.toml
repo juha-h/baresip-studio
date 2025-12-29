@@ -8,6 +8,7 @@ fragmentKtx = "1.8.9"
 gradleVersion = "8.13.2"
 kotlin = "2.3.0"
 kotlinStdlibJdk8 = "2.2.0"
+kotlinSerializationPlugin = "2.3.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 lifecycleProcess = "2.10.0"
@@ -54,3 +55,4 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerializationPlugin" }
