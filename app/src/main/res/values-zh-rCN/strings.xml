@@ -419,4 +419,11 @@
     <string name="invalid_transport_protocols">传输协议列表无效</string>
     <string name="check_origin">检查来源</string>
     <string name="check_origin_help">如果选中，则仅允许来自发送注册请求的 IP 地址的入站请求。</string>
+    <string name="blocked">已屏蔽</string>
+    <string name="blocked_calls">已屏蔽的通话</string>
+    <string name="blocked_messages">已屏蔽的消息</string>
+    <string name="blocked_delete_alert">是否要删除“%1$s”的屏蔽请求？</string>
+    <string name="blocked_contact_question">是否要将对方“%1$s”添加到联系人？</string>
+    <string name="call_blocked">已自动拒绝来自 %1$s 的已屏蔽通话</string>
+    <string name="message_blocked">已自动拒绝来自 %1$s 的已屏蔽消息</string>
 </resources>
