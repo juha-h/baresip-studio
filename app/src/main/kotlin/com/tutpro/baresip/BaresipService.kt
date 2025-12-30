@@ -1898,12 +1898,12 @@ class BaresipService: Service() {
         var messages by mutableStateOf(emptyList<Message>())
         val messageUpdate = MutableLiveData<Long>()
         val registrationUpdate = MutableLiveData<Long>()
+
         val serviceEvent = MutableLiveData<Event<Long>>()
         val serviceEvents = mutableListOf<ServiceEvent>()
 
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<CallHistoryNew>()
-
         var blocked = ArrayList<Blocked>()
 
         var contactsMode = "baresip"
