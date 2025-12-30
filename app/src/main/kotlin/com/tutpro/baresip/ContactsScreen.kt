@@ -257,7 +257,7 @@ private fun ContactsContent(
                                         neutralAction.value = {
                                             if (ua != null) {
                                                 handleIntent(ctx, viewModel, intent, "message")
-                                                navController.popBackStack()
+                                                navController.navigateUp()
                                             }
                                         }
                                         showDialog.value = true

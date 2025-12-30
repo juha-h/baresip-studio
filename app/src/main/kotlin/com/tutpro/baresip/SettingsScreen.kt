@@ -102,13 +102,13 @@ fun NavGraphBuilder.settingsScreenRoute(
             ctx = ctx,
             navController = navController,
             settingsViewModel = viewModel,
-            onBack = { navController.popBackStack() },
+            onBack = { navController.navigateUp() },
             checkOnClick = {
                 if (checkOnClick(ctx, viewModel)) {
                     if (restart)
                         showRestartDialog.value = true
                     else
-                        navController.popBackStack()
+                        navController.navigateUp()
                 }
             },
             onRestartApp = onRestartApp
@@ -206,7 +206,7 @@ private fun SettingsScreen(
                 },
                 negativeButtonText = stringResource(R.string.cancel),
                 onNegativeClicked = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             )
         }

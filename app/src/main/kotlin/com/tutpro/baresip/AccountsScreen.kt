@@ -93,7 +93,7 @@ fun AccountsScreen(navController: NavController) {
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                        IconButton(onClick = { navController.navigateUp() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,

@@ -64,14 +64,14 @@ fun NavGraphBuilder.audioScreenRoute(
         val ctx = LocalContext.current
         AudioScreen(
             onBack = {
-                navController.popBackStack()
+                navController.navigateUp()
             },
             checkOnClick = {
                 val result = checkOnClick(ctx) // Your existing logic that returns true/false
                 navController.previousBackStackEntry
                     ?.savedStateHandle
                     ?.set("audio_settings_result", result)
-                navController.popBackStack()
+                navController.navigateUp()
             },
         )
     }

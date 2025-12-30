@@ -175,9 +175,7 @@ private fun TopAppBar(
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
             IconButton(
-                onClick = {
-                    navController.popBackStack()
-                }
+                onClick = { navController.navigateUp() }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
