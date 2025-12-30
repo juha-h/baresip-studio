@@ -114,13 +114,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     BackHandler(enabled = true) {
         account.missedCalls = false
-        navController.popBackStack()
+        navController.navigateUp()
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -187,7 +185,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             IconButton(
                 onClick = {
                     account.missedCalls = false
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             ) {
                 Icon(
@@ -259,9 +257,7 @@ private fun CallsContent(
 private fun Account(account: Account) {
     Text(
         text = stringResource(R.string.account) + " " + account.text(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center
@@ -347,7 +343,7 @@ private fun Calls(
                                 neutralAction.value = {
                                     if (ua != null) {
                                         handleIntent(ctx, viewModel, intent, "message")
-                                        navController.popBackStack()
+                                        navController.navigateUp()
                                     }
                                 }
                                 showDialog.value = true
