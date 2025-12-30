@@ -1,0 +1,2 @@
+- Added screens to show blocked calls and messages
+- Avoid showing of empty screen when back or check icons are touched repeatedly
