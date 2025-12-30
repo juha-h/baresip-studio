@@ -266,6 +266,14 @@
     <string name="missed_calls_count">%1$d vastaamatonta puhelua</string>
     <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
     <string name="call_auto_rejected">Automaattisesti hylätty puhelu soittajalta \`%1$s\`</string>
+    <string name="call_blocked">Estetty puhelu hylätty soittajalta \`%1$s\`</string>
+    <string name="message_blocked">Estetty viesti hylätty lähettäjältä \`%1$s\`</string>
+    <!-- Blocked Activity -->
+    <string name="blocked">Estetyt</string>
+    <string name="blocked_calls">Estetyt puhelut</string>
+    <string name="blocked_messages">Estetyt viestit</string>
+    <string name="blocked_delete_alert">Haluatko poistaa tilin \'%1$s\' estetyt pyynnöt\?</string>
+    <string name="blocked_contact_question">Haluatko lisätä osoitteen \'%1$s\' yhteystietoihin\?</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>

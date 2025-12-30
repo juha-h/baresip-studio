@@ -97,12 +97,12 @@ fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
         AccountScreen(
             viewModel = viewModel,
             navController = navController,
-            onBack = { navController.popBackStack() },
+            onBack = { navController.navigateUp() },
             checkOnClick = {
                 val ok = checkOnClick(ctx, viewModel, ua)
                 if (ok) {
                     if (reRegister) ua.reRegister()
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             },
             aor = aor,
@@ -404,12 +404,12 @@ private fun AccountContent(
                     Api.account_set_auth_pass(ua.account.accp, password.value)
                     password.value = ""
                     ua.reRegister()
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             },
             cancelAction = {
                 ua.reRegister()
-                navController.popBackStack()
+                navController.navigateUp()
             }
         )
     }

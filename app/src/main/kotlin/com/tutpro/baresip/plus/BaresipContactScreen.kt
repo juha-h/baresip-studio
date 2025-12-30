@@ -124,7 +124,6 @@ private fun ContactScreen(
 ) {
 
     val ctx = LocalContext.current
-
     var screenState by remember { mutableStateOf(ScreenState()) }
 
     val title = if (screenState.new)
@@ -176,7 +175,7 @@ private fun ContactScreen(
                 Utils.deleteFile(tempFile)
             }
         }
-        navController.popBackStack()
+        navController.navigateUp()
     }
 
     val onCheck: () -> Unit = {
@@ -186,7 +185,7 @@ private fun ContactScreen(
             uriOrNameArg = uriOrNameArg,
         )
         if (result)
-            navController.popBackStack()
+            navController.navigateUp()
     }
 
     BackHandler(enabled = true) {

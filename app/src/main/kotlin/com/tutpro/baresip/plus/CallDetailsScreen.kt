@@ -92,9 +92,7 @@ fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewMod
 private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
     val detailsState = remember { callRow.details.toMutableStateList() }
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -117,7 +115,7 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                     ),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
-                        IconButton(onClick = navController::popBackStack) {
+                        IconButton(onClick = navController::navigateUp) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
@@ -136,7 +134,7 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
                 onDelete = { detail ->
                     detailsState.remove(detail)
                     if (detailsState.isEmpty())
-                        navController.popBackStack()
+                        navController.navigateUp()
                 }
             )
         },

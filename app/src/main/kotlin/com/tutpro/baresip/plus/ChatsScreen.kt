@@ -163,6 +163,7 @@ private fun TopAppBar(
 
     var menuExpanded by remember { mutableStateOf(false) }
     val delete = stringResource(R.string.delete)
+    val blocked = stringResource(R.string.blocked)
     val showDialog = remember { mutableStateOf(false) }
     val positiveAction = remember { mutableStateOf({}) }
 
@@ -176,12 +177,7 @@ private fun TopAppBar(
     )
 
     TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.chats),
-                fontWeight = FontWeight.Bold
-            )
-        },
+        title = { Text(text = stringResource(R.string.chats), fontWeight = FontWeight.Bold) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -189,7 +185,7 @@ private fun TopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
@@ -209,7 +205,7 @@ private fun TopAppBar(
             DropdownMenu (
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false },
-                items = listOf(delete),
+                items = listOf(delete, blocked),
                 onItemClick = { selectedItem ->
                     menuExpanded = false
                     when (selectedItem) {
@@ -221,6 +217,9 @@ private fun TopAppBar(
                                 account.unreadMessages = false
                             }
                             showDialog.value = true
+                        }
+                        blocked -> {
+                            navController.navigate("blocked/message/${account.aor}")
                         }
                     }
                 }

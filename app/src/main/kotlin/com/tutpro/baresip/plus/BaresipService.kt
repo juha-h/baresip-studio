@@ -466,6 +466,8 @@ class BaresipService: Service() {
                     }
                 }
 
+                Blocked.restore()
+
                 val recordings = File(filesDir, "recordings")
 
                 val restored = File(filesPath, "restored")
@@ -884,8 +886,11 @@ class BaresipService: Service() {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
                         val blockUnknown = ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri
-                        val toastMsg = if (Call.inCall() || blockUnknown)
+                        val toastMsg = if (Call.inCall())
                             String.format(getString(R.string.call_auto_rejected),
+                                Utils.friendlyUri(this, peerUri, ua.account))
+                        else if (blockUnknown)
+                            String.format(getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account))
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
@@ -899,7 +904,16 @@ class BaresipService: Service() {
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(bevent)
                             toast(toastMsg)
-                            if (!blockUnknown) {
+                            if (blockUnknown) {
+                                if (ua.account.callHistory)
+                                    Blocked(
+                                        ua.account.aor,
+                                        peerUri,
+                                        "invite",
+                                        GregorianCalendar().timeInMillis
+                                    ).add()
+                            }
+                            else {
                                 val name = "callwaiting_$toneCountry"
                                 val resourceId = applicationContext.resources.getIdentifier(
                                     name,
@@ -1272,8 +1286,14 @@ class BaresipService: Service() {
 
         if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
             Log.d(TAG, "Auto-rejecting incoming message by $uap from $peerUri")
+            Blocked(
+                ua.account.aor,
+                peerUri,
+                "message",
+                GregorianCalendar().timeInMillis
+            ).add()
             toast(String.format(
-                    getString(R.string.message_auto_rejected),
+                    getString(R.string.message_blocked),
                     Utils.friendlyUri(this, peerUri, ua.account)
                 )
             )
@@ -1934,19 +1954,23 @@ class BaresipService: Service() {
         val baresipContacts = mutableStateOf(emptyList<Contact.BaresipContact>())
         val androidContacts = mutableStateOf(emptyList<Contact.AndroidContact>())
         val contactNames = mutableStateOf(emptyList<String>())
+
         val darkTheme = mutableStateOf(false)
         val dynamicColors = mutableStateOf(false)
         var messages by mutableStateOf(emptyList<Message>())
         val messageUpdate = MutableLiveData<Long>()
+        val registrationUpdate = MutableLiveData<Long>()
+
+        val serviceEvent = MutableLiveData<Event<Long>>()
+        val serviceEvents = mutableListOf<ServiceEvent>()
 
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<CallHistoryNew>()
-        val registrationUpdate = MutableLiveData<Long>()
+        var blocked = ArrayList<Blocked>()
+
         var contactsMode = "baresip"
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
-        val serviceEvent = MutableLiveData<Event<Long>>()
-        val serviceEvents = mutableListOf<ServiceEvent>()
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var audioFocusRequest: AudioFocusRequestCompat? = null

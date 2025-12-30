@@ -254,7 +254,14 @@
     <string name="missed_calls_count">%1$d missed calls</string>
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="call_auto_rejected">Auto-rejected call from \`%1$s\`</string>
-    <string name="message_auto_rejected">Auto-rejected message from \`%1$s\`</string>
+    <string name="call_blocked">Auto-rejected blocked call from \`%1$s\`</string>
+    <string name="message_blocked">Auto-rejected blocked message from \`%1$s\`</string>
+    <!-- Blocked Activity -->
+    <string name="blocked">Blocked</string>
+    <string name="blocked_calls">Blocked Calls</string>
+    <string name="blocked_messages">Blocked Messages</string>
+    <string name="blocked_delete_alert">Do you want to delete blocked requests of \'%1$s\'\?</string>
+    <string name="blocked_contact_question">Do you want to add peer \'%1$s\' to contacts\?</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call_details">Call Details</string>

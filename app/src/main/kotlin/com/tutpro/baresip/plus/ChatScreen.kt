@@ -629,7 +629,7 @@ private fun backAction(navController: NavController, account: Account, peerUri: 
     val aor = account.aor
     Message.updateMessagesFromPearRead(aor, peerUri)
     account.unreadMessages = Message.unreadMessages(aor)
-    navController.popBackStack()
+    navController.navigateUp()
 }
 
 private fun loadPeerMessages(aor: String, peerUri: String): List<Message> {

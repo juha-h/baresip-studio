@@ -114,13 +114,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     BackHandler(enabled = true) {
         account.missedCalls = false
-        navController.popBackStack()
+        navController.navigateUp()
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -155,6 +153,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
     val delete = stringResource(R.string.delete)
     val disable = stringResource(R.string.disable_history)
     val enable = stringResource(R.string.enable_history)
+    val blocked = stringResource(R.string.blocked)
 
     val showDialog = remember { mutableStateOf(false) }
     val positiveAction = remember { mutableStateOf({}) }
@@ -186,7 +185,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             IconButton(
                 onClick = {
                     account.missedCalls = false
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             ) {
                 Icon(
@@ -207,7 +206,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
             CustomElements.DropdownMenu(
                 expanded,
                 { expanded = false },
-                listOf(delete, if (account.callHistory) disable else enable),
+                if (account.callHistory) listOf(disable, delete, blocked) else listOf(enable),
                 onItemClick = { selectedItem ->
                     expanded = false
                     when (selectedItem) {
@@ -215,12 +214,16 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                             positiveAction.value = {
                                 CallHistoryNew.clear(account.aor)
                                 callHistory.value = emptyList()
+                                Blocked.clear(account.aor)
                             }
                             showDialog.value = true
                         }
                         disable, enable -> {
                             account.callHistory = !account.callHistory
                             Account.saveAccounts()
+                        }
+                        blocked -> {
+                            navController.navigate("blocked/invite/${account.aor}")
                         }
                     }
                 }
@@ -254,9 +257,7 @@ private fun CallsContent(
 private fun Account(account: Account) {
     Text(
         text = stringResource(R.string.account) + " " + account.text(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center
@@ -342,7 +343,7 @@ private fun Calls(
                                 neutralAction.value = {
                                     if (ua != null) {
                                         handleIntent(ctx, viewModel, intent, "message")
-                                        navController.popBackStack()
+                                        navController.navigateUp()
                                     }
                                 }
                                 showDialog.value = true

@@ -312,6 +312,7 @@ class MainActivity : ComponentActivity() {
                     androidContactScreenRoute(navController, viewModel)
                     callsScreenRoute(navController, viewModel)
                     callDetailsScreenRoute(navController, viewModel)
+                    blockedScreenRoute(navController)
                     chatsScreenRoute(navController)
                     chatScreenRoute(navController, viewModel)
                 }

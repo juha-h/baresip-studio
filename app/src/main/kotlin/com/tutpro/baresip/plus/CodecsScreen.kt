@@ -61,7 +61,7 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
         val media = backStackEntry.arguments?.getString("media")!!
         val account = UserAgent.ofAor(aor)?.account!!
         CodecsScreen(
-            onBack = { navController.popBackStack() },
+            onBack = { navController.navigateUp() },
             checkOnClick = { updatedCodecs ->
                 val enabledCodecNames = updatedCodecs.filter { it.enabled.value }.map { it.name }
                 val codecList = Utils.implode(enabledCodecNames, ",")
@@ -80,7 +80,7 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
                 }
                 else
                     Log.e(TAG, "Failed to set $aor codecs.")
-                navController.popBackStack()
+                navController.navigateUp()
             },
             aor = aor,
             media = media
