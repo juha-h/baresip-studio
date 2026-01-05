@@ -12,18 +12,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -33,7 +30,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -68,12 +64,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
-import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
+import androidx.compose.material.icons.filled.Search
 
 const val avatarSize: Int = 96
 
@@ -94,6 +90,7 @@ private fun ContactsScreen(
 ) {
 
     val ctx = LocalContext.current
+    var searchContactName by remember { mutableStateOf("") }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -133,42 +130,53 @@ private fun ContactsScreen(
                 )
             }
         },
-        bottomBar = { BottomBar(navController) },
+        bottomBar = {
+            BottomBar(
+                navController = navController,
+                searchContactName = searchContactName,
+                onSearchContactNameChange = { searchContactName = it }
+            )
+        },
         content = { contentPadding ->
-            ContactsContent(ctx, viewModel, navController, contentPadding)
+            ContactsContent(ctx, viewModel, navController, contentPadding, searchContactName)
         }
     )
 }
 
 @Composable
-private fun BottomBar(navController: NavController) {
-    var contactName by remember { mutableStateOf("") }
+private fun BottomBar(
+    navController: NavController,
+    searchContactName: String,
+    onSearchContactNameChange: (String) -> Unit
+) {
+    var showSuggestions by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 16.dp, end = 12.dp, bottom = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedTextField(
-            value = contactName,
+            value = searchContactName,
             placeholder = { Text(stringResource(R.string.search)) },
             onValueChange = {
-                contactName = it
-                if (contactName.isNotEmpty()) {
-                    // Show in ContactsContent LazyColumn contacts whose name starts with contactName
-                }
+                onSearchContactNameChange(it)
+                showSuggestions = it.length > 1
             },
             modifier = Modifier.weight(1f),
             singleLine = true,
             trailingIcon = {
-                if (contactName.isNotEmpty())
+                if (searchContactName.isNotEmpty())
                     Icon(
                         Icons.Outlined.Clear,
                         contentDescription = null,
                         modifier = Modifier.clickable {
-                            contactName = ""
+                            if (showSuggestions)
+                                showSuggestions = false
+                            else
+                                onSearchContactNameChange("")
                         },
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -200,7 +208,8 @@ private fun ContactsContent(
     ctx: Context,
     viewModel: ViewModel,
     navController: NavController,
-    contentPadding: PaddingValues
+    contentPadding: PaddingValues,
+    searchQuery: String
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
@@ -223,6 +232,16 @@ private fun ContactsContent(
 
     val lazyListState = rememberLazyListState()
 
+    val filteredContacts = remember(BaresipService.contacts, searchQuery) {
+        if (searchQuery.isBlank()) {
+            BaresipService.contacts
+        } else {
+            BaresipService.contacts.filter { contact ->
+                contact.name().contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -237,7 +256,7 @@ private fun ContactsContent(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(BaresipService.contacts, key = { it.id() }) { contact ->
+        items(filteredContacts, key = { it.id() }) { contact ->
 
             val name = contact.name()
 
