@@ -70,6 +70,7 @@ import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.LaunchedEffect
 
 const val avatarSize: Int = 96
 
@@ -231,6 +232,12 @@ private fun ContactsContent(
         )
 
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            lazyListState.scrollToItem(0)
+        }
+    }
 
     val filteredContacts = remember(BaresipService.contacts, searchQuery) {
         if (searchQuery.isBlank()) {
