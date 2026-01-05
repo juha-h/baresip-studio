@@ -69,7 +69,6 @@ import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
@@ -163,7 +162,6 @@ private fun BottomBar(
     ) {
         OutlinedTextField(
             value = searchContactName,
-            placeholder = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
             onValueChange = {
                 onSearchContactNameChange(it)
                 if (it.isBlank()) {
