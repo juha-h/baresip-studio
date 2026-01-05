@@ -566,9 +566,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                         }
                     }
                 },
-                modifier = Modifier
-                    .padding(end = 6.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(end = 6.dp).fillMaxWidth(),
                 singleLine = true,
                 trailingIcon = {
                     if (newPeer.isNotEmpty())
