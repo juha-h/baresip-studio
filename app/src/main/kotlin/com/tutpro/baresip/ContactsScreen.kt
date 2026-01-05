@@ -71,6 +71,7 @@ import java.io.File
 import java.io.IOException
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 const val avatarSize: Int = 96
 
@@ -150,7 +151,8 @@ private fun BottomBar(
     searchContactName: String,
     onSearchContactNameChange: (String) -> Unit
 ) {
-    var showSuggestions by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -161,10 +163,12 @@ private fun BottomBar(
     ) {
         OutlinedTextField(
             value = searchContactName,
-            placeholder = { Text(stringResource(R.string.search)) },
+            placeholder = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
             onValueChange = {
                 onSearchContactNameChange(it)
-                showSuggestions = it.length > 1
+                if (it.isBlank()) {
+                    keyboardController?.hide()
+                }
             },
             modifier = Modifier.weight(1f),
             singleLine = true,
@@ -174,15 +178,13 @@ private fun BottomBar(
                         Icons.Outlined.Clear,
                         contentDescription = null,
                         modifier = Modifier.clickable {
-                            if (showSuggestions)
-                                showSuggestions = false
-                            else
-                                onSearchContactNameChange("")
+                            onSearchContactNameChange("")
+                            keyboardController?.hide()
                         },
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
             },
-            label = { Icon(Icons.Default.Search, contentDescription = "") },
+            label = { Text(stringResource(R.string.search)) },
             textStyle = TextStyle(fontSize = 18.sp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
