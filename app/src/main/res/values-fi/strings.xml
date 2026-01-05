@@ -477,6 +477,7 @@
     viestin ositteeseen \'%1$s\'\?</string>
     <string name="send_message">Lähetä viesti</string>
     <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'\?</string>
+    <string name="search">Etsi</string>
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
