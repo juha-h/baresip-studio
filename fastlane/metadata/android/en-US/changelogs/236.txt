@@ -1,0 +1,2 @@
+- Added Search to Contacts Screen
+- New translations (Czech)
