@@ -371,6 +371,7 @@ private fun ContactsContent(
                                             }
                                             Contact.removeBaresipContact(contact)
                                         }
+                                        neutralText.value = ""
                                         showDialog.value = true
                                     }
                                 )
