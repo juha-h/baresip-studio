@@ -6,6 +6,7 @@ import android.provider.ContactsContract
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -24,22 +25,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,8 +53,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -60,6 +69,8 @@ import com.tutpro.baresip.plus.CustomElements.TextAvatar
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 const val avatarSize: Int = 96
 
@@ -74,9 +85,13 @@ fun NavGraphBuilder.contactsScreenRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
+private fun ContactsScreen(
+    navController: NavController,
+    viewModel: ViewModel
+) {
 
     val ctx = LocalContext.current
+    var searchContactName by remember { mutableStateOf("") }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -116,23 +131,76 @@ private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
                 )
             }
         },
-        floatingActionButton = {
-            SmallFloatingActionButton(
-                modifier = Modifier.offset(x = 2.dp),
-                onClick = { navController.navigate("baresip_contact//new") },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary
-            ) {
-                Icon(imageVector = Icons.Filled.Add,
-                    modifier = Modifier.size(36.dp),
-                    contentDescription = stringResource(R.string.add)
-                )
-            }
+        bottomBar = {
+            BottomBar(
+                navController = navController,
+                searchContactName = searchContactName,
+                onSearchContactNameChange = { searchContactName = it }
+            )
         },
         content = { contentPadding ->
-            ContactsContent(ctx, viewModel, navController, contentPadding)
+            ContactsContent(ctx, viewModel, navController, contentPadding, searchContactName)
         }
     )
+}
+
+@Composable
+private fun BottomBar(
+    navController: NavController,
+    searchContactName: String,
+    onSearchContactNameChange: (String) -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        OutlinedTextField(
+            value = searchContactName,
+            onValueChange = {
+                onSearchContactNameChange(it)
+                if (it.isBlank()) {
+                    keyboardController?.hide()
+                }
+            },
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            trailingIcon = {
+                if (searchContactName.isNotEmpty())
+                    Icon(
+                        Icons.Outlined.Clear,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            onSearchContactNameChange("")
+                            keyboardController?.hide()
+                        },
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+            },
+            label = { Text(stringResource(R.string.search)) },
+            textStyle = TextStyle(fontSize = 18.sp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            )
+        )
+        SmallFloatingActionButton(
+            onClick = { navController.navigate("baresip_contact//new") },
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                modifier = Modifier.size(36.dp),
+                contentDescription = stringResource(R.string.add)
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -141,7 +209,8 @@ private fun ContactsContent(
     ctx: Context,
     viewModel: ViewModel,
     navController: NavController,
-    contentPadding: PaddingValues
+    contentPadding: PaddingValues,
+    searchQuery: String
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
@@ -164,12 +233,28 @@ private fun ContactsContent(
 
     val lazyListState = rememberLazyListState()
 
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            lazyListState.scrollToItem(0)
+        }
+    }
+
+    val filteredContacts = remember(BaresipService.contacts, searchQuery) {
+        if (searchQuery.isBlank()) {
+            BaresipService.contacts
+        } else {
+            BaresipService.contacts.filter { contact ->
+                contact.name().contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 64.dp)
+            .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 10.dp)
             .verticalScrollbar(
                 state = lazyListState,
                 width = 4.dp,
@@ -178,7 +263,7 @@ private fun ContactsContent(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(BaresipService.contacts, key = { it.id() }) { contact ->
+        items(filteredContacts, key = { it.id() }) { contact ->
 
             val name = contact.name()
 
