@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_title">O aplikaci baresip</string>
-    <string name="about_title_plus">O aplikaci baresip+</string>
-    <string name="authentication_username">Uživatelské jméno</string>
-    <string name="invalid_stun_username">Neplatné uživatelské jméno \'%1$s\'</string>
-    <string name="account">Účet</string>
-    <string name="stun_username">Uživatelské jméno STUN/TURN</string>
-    <string name="invalid_aor">Neplatný uživatel@doména[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
-    <string name="encrypt_password">Šifrovat heslo</string>
-    <string name="missed_calls_count">%1$d zmeškaných hovorů</string>
-    <string name="video_codecs">Video kodeky</string>
-    <string name="tls_certificate_file">Soubor TLS certifikátu</string>
-    <string name="opus_bit_rate">Datový tok Opus</string>
-    <string name="debug">Ladění</string>
-    <string name="call_already_active">Již máte aktivní hovor.</string>
-    <string name="restart_request">Požadavek na restart</string>
-    <string name="invalid_display_name">Neplatné zobrazované jméno \'%1$s\'</string>
-    <string name="invalid_authentication_password">Neplatné ověřovací heslo \'%1$s\'</string>
-    <string name="invalid_account_nickname">Neplatná přezdívka účtu \'%1$s\'</string>
-    <string name="non_unique_account_nickname">Přezdívka \'%1$s\' již existuje</string>
-    <string name="about_text_plus"><![CDATA[
+    <string name="about_title_plus">
+      <![CDATA[
         <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
@@ -69,12 +52,14 @@
                  <li><b>BSD-3-Clause</b> kromě následujících:</li>
                  <li><b>Apache 2.0</b> AMR codecs a TLS security</li>
                  <li><b>AGPLv4</b> šifrování médií ZRTP</li>
-                 <li><b>GNU LGPL 2.1</b> kodeky G.722, G.726 a Codec2</li>
+                 <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+                 <li><b>Free</b> G.722 codec</li>
                  <li><b>GNU GPLv3</b> kodek G.729 </li>
                  <li><b>GNU GPLv2</b> H.264 a H.265 kodeky</li>
                 <li><b>AOMedia</b> AV1 kodek</li>
         </ul>
-        ]]></string>
+      ]]>
+    </string>
     <string name="account_nickname_help">Přezdívka (pokud existuje) používaná k identifikaci tohoto účtu v aplikaci baresip.</string>
     <string name="nickname">Přezdívka</string>
     <string name="authentication_password">Heslo</string>
@@ -355,8 +340,8 @@
     <string name="invalid_microphone_gain">Neplatná hodnota zesílení mikrofonu</string>
     <string name="ringtone">Vyzvánění</string>
     <string name="select_ringtone">Vybrat vyzvánění</string>
-    <string name="numeric_keypad">Numerická klávesnice</string>"
-    <string name="numeric_keypad_help">Pokud je zatrženo, zobrazí se při zaměření pole \"Zavolat na ...\" numerická klávesnice.</string>"
+    <string name="numeric_keypad">Numerická klávesnice</string>
+    <string name="numeric_keypad_help">Pokud je zatrženo, zobrazí se při zaměření pole \"Zavolat na ...\" numerická klávesnice.</string>
     <string name="reply">Odpovědět</string>
     <string name="save">Uložit</string>
     <string name="playing_recording">Přehrávání nahrávky …</string>
@@ -370,17 +355,18 @@
     <string name="favorite_help">Je-li zaškrtnuto, kontakt se zobrazí mezi oblíbenými v horní části seznamu kontaktů.</string>
     <string name="no_aec">Hardwarové potlačení ozvěny není dostupné!</string>
     <string name="call_recording_title">Nahrávání hovoru</string>
-    <string name="call_recording_tip">Pokud je aktivováno, nové příchozí i odchozí hovory budou nahrávány. Nahrávky lze přehrát na stránce historie volání</string>
+    <string name="call_recording_tip">Pokud je aktivováno, nové příchozí i odchozí hovory budou nahrávány. Nahrávky lze přehrát na stránce historie volání.</string>
     <string name="microphone_title">Mikrofon</string>
     <string name="microphone_tip">Při aktivaci během hovoru se mikrofon ztlumí.</string>
     <string name="speakerphone_title">Reproduktor</string>
     <string name="speakerphone_tip">Po aktivaci se zvuk přehrává přes reproduktor zařízení.</string>
-    <string name="proximity_sensing">Detekce přiblížení</string>"&gt;
+    <string name="proximity_sensing">Detekce přiblížení</string>
     <string name="proximity_sensing_help">Při hovorech používat snímač přiblížení (automatické vypnutí displeje).</string>
     <string name="dynamic_colors">Dynamické barvy</string>
     <string name="dynamic_colors_help">Použijí se dynamické barvy, pokud jsou povoleny v nastavení Androidu</string>
-    <string name="about_text"><![CDATA[
-        <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a> h1>
+    <string name="about_text">
+        <![CDATA[
+        <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Verze %1$s</p>
@@ -421,8 +407,30 @@
             <li><b>BSD-3-Clause</b> kromě následujících:</li>
             <li><b>Apache 2.0</b> AMR kodeky a TLS zabezpečení</li>
             <li><b>AGPLv4</b> ZRTP šifrování médií</li>
-            <li><b>GNU LGPL 2.1</b> G.722, G.726, a Codec2 kodeky</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
             <li><b>GNU GPLv3</b> G.729 kodek</li>
         </ul>
-        ]]></string>
+        ]]>
+    </string>
+    <string name="check_origin">Ověřovat požadavky na registraci</string>
+    <string name="check_origin_help">Pokud je tato volba zapnutá, příchozí požadavky jsou povoleny pouze z IP adres, na které byly odeslány registrační požadavky.</string>
+    <string name="block_unknown">Blokovat neznámé kontakty</string>
+    <string name="block_unknown_help">Blokovat hovory a zprávy od protějšků, kteří nejsou v kontaktech.</string>
+    <string name="is_calling">volá</string>
+    <string name="call_blocked">Zablokovaný hovor od %1$s byl automaticky odmítnut</string>
+    <string name="message_blocked">Zablokovaná zpráva od %1$s byla automaticky odmítnuta</string>
+    <string name="blocked">Zablokované aktivity</string>
+    <string name="blocked_calls">Zablokované hovory</string>
+    <string name="blocked_messages">Zablokované zprávy</string>
+    <string name="blocked_delete_alert">Smazat zablokované požadavky od \'%1$s\'?</string>
+    <string name="blocked_contact_question">Přidat \'%1$s\' do kontaktů?</string>
+    <string name="save_recording">Uložit nahrávku</string>
+    <string name="save_recording_question">Uložit tuto nahrávku?</string>
+    <string name="recording_saved">Nahrávka byla uložena</string>
+    <string name="delete_call_alert">Smazat tento hovor z historie?</string>
+    <string name="transport_protocols">Transportní protokoly</string>
+    <string name="transport_protocols_help">Čárkami oddělený seznam podporovaných transportních protokolů SIP pro požadavky a odpovědi. Pokud je pole prázdné, použije se výchozí hodnota ‚udp,tcp,tls,ws,wss‘, která zahrnuje všechny podporované transportní protokoly. Uveďte pouze ty, které skutečně potřebujete. Použití UDP se z bezpečnostních i dalších důvodů nedoporučuje.</string>
+    <string name="invalid_transport_protocols">Neplatný seznam transportních protokolů</string>
+    <string name="stop">Zastavit</string>
 </resources>
