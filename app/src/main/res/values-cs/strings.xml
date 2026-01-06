@@ -69,7 +69,8 @@
                  <li><b>BSD-3-Clause</b> kromě následujících:</li>
                  <li><b>Apache 2.0</b> AMR codecs a TLS security</li>
                  <li><b>AGPLv4</b> šifrování médií ZRTP</li>
-                 <li><b>GNU LGPL 2.1</b> kodeky G.722, G.726 a Codec2</li>
+                 <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+                 <li><b>Free</b> G.722 codec</li>
                  <li><b>GNU GPLv3</b> kodek G.729 </li>
                  <li><b>GNU GPLv2</b> H.264 a H.265 kodeky</li>
                 <li><b>AOMedia</b> AV1 kodek</li>
@@ -370,7 +371,7 @@
     <string name="favorite_help">Je-li zaškrtnuto, kontakt se zobrazí mezi oblíbenými v horní části seznamu kontaktů.</string>
     <string name="no_aec">Hardwarové potlačení ozvěny není dostupné!</string>
     <string name="call_recording_title">Nahrávání hovoru</string>
-    <string name="call_recording_tip">Pokud je aktivováno, nové příchozí i odchozí hovory budou nahrávány. Nahrávky lze přehrát na stránce historie volání</string>
+    <string name="call_recording_tip">Pokud je aktivováno, nové příchozí i odchozí hovory budou nahrávány. Nahrávky lze přehrát na stránce historie volání.</string>
     <string name="microphone_title">Mikrofon</string>
     <string name="microphone_tip">Při aktivaci během hovoru se mikrofon ztlumí.</string>
     <string name="speakerphone_title">Reproduktor</string>
@@ -379,50 +380,25 @@
     <string name="proximity_sensing_help">Při hovorech používat snímač přiblížení (automatické vypnutí displeje).</string>
     <string name="dynamic_colors">Dynamické barvy</string>
     <string name="dynamic_colors_help">Použijí se dynamické barvy, pokud jsou povoleny v nastavení Androidu</string>
-    <string name="about_text"><![CDATA[
-        <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a> h1>
-        <br>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Verze %1$s</p>
-        <br>
-        <h2>Nápověda</h2>
-        <ul>
-            <li>Zkontrolujte, zda výchozí hodnoty nastavení vyhovují vašim potřebám
-                (nápovědu zobrazíte klepnutím na názvy položek).</li>
-            <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět klepněte na názvy položek).</li>
-            <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace
-                      proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
-                      nezačala).</li>
-            <li>Klepnutím na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.</li>
-            <li>Dlouhým dotykem na ikony na liště baresip zobrazíte informace o ikonách.</li>
-            <li>Přejetí prstem dolů po obrazovce (gesto) zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
-            <li>Dlouhým dotykem na aktuálně zobrazený název účtu povolíte nebo zakážete jeho registraci.</li>
-            <li>Mezi účty se můžete přepnout přejetím prstem vlevo/vpravo po obrazovce (gesto).</li>
-            <li>Poslední volaný kontakt lze znovu rychle vybrat klepnutím na ikonu hovoru, pokud je pole "Zavolat na ..." prázdné.</li>
-            <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhým podržením.</li>
-            <li>Dlouhým podržením lze také odstraňovat hovory, chaty, zprávy a kontakty.</li>
-            <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
-            <li>Dlouhým dotykem na zvukový kodek lze kodek povolit/zakázat.</li>
-            <li>Navštivte <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> pro více informací.</li>
-        </ul>
-        <h2>Zásady ochrany osobních údajů</h2>
-            <p>Zásady ochrany osobních údajů jsou k dispozici <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">zde</a>.</p>
-        <br>
-        <h2>Zdrojový kód</h2>
-            <p>Zdrojový kód je k dispozici na <a href="https://github.com/juha-h/baresip-studio">GitHubu</a>,
-            kde je také možno nahlásit problémy, náměty a požadavky.</p>
-        <br>
-        <h2>Překlady aplikace do jiných jazyků</h2>
-            <p>Překlady jsou realizovány skrze projekt baresip
-                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>.</p>
-        <br>
-        <h2>Licence</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> kromě následujících:</li>
-            <li><b>Apache 2.0</b> AMR kodeky a TLS zabezpečení</li>
-            <li><b>AGPLv4</b> ZRTP šifrování médií</li>
-            <li><b>GNU LGPL 2.1</b> G.722, G.726, a Codec2 kodeky</li>
-            <li><b>GNU GPLv3</b> G.729 kodek</li>
-        </ul>
-        ]]></string>
+    <string name="about_text">"&lt;li&gt;&lt;![CDATA[\n        &lt;h1&gt;SIP klient založený na knihovně &lt;a href=\"https://github.com/baresip/baresip\"&gt;baresip&lt;/a&gt; h1&gt;\n        &lt;br&gt;\n        &lt;p&gt;Juha Heinanen &amp;lt;jh@tutpro.com&amp;gt;&lt;/p&gt;\n        &lt;p&gt;Verze %1$s&lt;/p&gt;\n        &lt;br&gt;\n        &lt;h2&gt;Nápověda&lt;/h2&gt;\n        &lt;ul&gt;\n            &lt;li&gt;Zkontrolujte, zda výchozí hodnoty nastavení vyhovují vašim potřebám\n                (nápovědu zobrazíte klepnutím na názvy položek).&lt;/li&gt;\n            &lt;li&gt;Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět klepněte na názvy položek).&lt;/li&gt;\n            &lt;li&gt;Stav registrace účtu je indikován barevnou tečkou: zelená (registrace\n                      proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace \n                      nezačala).&lt;/li&gt;\n            &lt;li&gt;Klepnutím na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.&lt;/li&gt;\n            &lt;li&gt;Dlouhým dotykem na ikony na liště baresip zobrazíte informace o ikonách.&lt;/li&gt;\n            &lt;li&gt;Přejetí prstem dolů po obrazovce (gesto) zahájí opětovnou registraci aktuálně zobrazeného účtu.&lt;/li&gt;\n            &lt;li&gt;Dlouhým dotykem na aktuálně zobrazený název účtu povolíte nebo zakážete jeho registraci.&lt;/li&gt;\n            &lt;li&gt;Mezi účty se můžete přepnout přejetím prstem vlevo/vpravo po obrazovce (gesto).&lt;/li&gt;\n            &lt;li&gt;Poslední volaný kontakt lze znovu rychle vybrat klepnutím na ikonu hovoru, pokud je pole \"Zavolat na ...\" prázdné.&lt;/li&gt;\n            &lt;li&gt;Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhým podržením.&lt;/li&gt;\n            &lt;li&gt;Dlouhým podržením lze také odstraňovat hovory, chaty, zprávy a kontakty.&lt;/li&gt;\n            &lt;li&gt;Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.&lt;/li&gt;\n            &lt;li&gt;Dlouhým dotykem na zvukový kodek lze kodek povolit/zakázat.&lt;/li&gt;\n            &lt;li&gt;Navštivte &lt;a href=\"https://github.com/juha-h/baresip-studio/wiki\"&gt;Wiki&lt;/a&gt; pro více informací.&lt;/li&gt;\n        &lt;/ul&gt;\n        &lt;h2&gt;Zásady ochrany osobních údajů&lt;/h2&gt;\n            &lt;p&gt;Zásady ochrany osobních údajů jsou k dispozici &lt;a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\"&gt;zde&lt;/a&gt;.&lt;/p&gt;\n        &lt;br&gt;\n        &lt;h2&gt;Zdrojový kód&lt;/h2&gt;\n            &lt;p&gt;Zdrojový kód je k dispozici na &lt;a href=\"https://github.com/juha-h/baresip-studio\"&gt;GitHubu&lt;/a&gt;,\n            kde je také možno nahlásit problémy, náměty a požadavky.&lt;/p&gt;\n        &lt;br&gt;\n        &lt;h2&gt;Překlady aplikace do jiných jazyků&lt;/h2&gt;\n            &lt;p&gt;Překlady jsou realizovány skrze projekt baresip\n                &lt;a href=\"https://hosted.weblate.org/projects/baresip/\"&gt;Weblate&lt;/a&gt;.&lt;/p&gt;\n        &lt;br&gt;\n        &lt;h2&gt;Licence&lt;/h2&gt;\n        &lt;ul&gt;\n            &lt;li&gt;&lt;b&gt;BSD-3-Clause&lt;/b&gt; kromě následujících:&lt;/li&gt;\n            &lt;li&gt;&lt;b&gt;Apache 2.0&lt;/b&gt; AMR kodeky a TLS zabezpečení&lt;/li&gt;\n            &lt;li&gt;&lt;b&gt;AGPLv4&lt;/b&gt; ZRTP šifrování médií&lt;/li&gt;\n            &lt;li&gt;&lt;b&gt;GNU LGPL 2.1&lt;/b&gt; Codec2 codec&lt;/li&gt;\n            &lt;li&gt;&lt;b&gt;Free&lt;/b&gt; G.722 codec&lt;/li&gt;\n            &lt;li&gt;&lt;b&gt;GNU GPLv3&lt;/b&gt; G.729 kodek&lt;/li&gt;\n        &lt;/ul&gt;\n        ]]&gt;"</string>
+    <string name="check_origin">Ověřovat požadavky na registraci</string>
+    <string name="check_origin_help">Pokud je tato volba zapnutá, příchozí požadavky jsou povoleny pouze z IP adres, na které byly odeslány registrační požadavky.</string>
+    <string name="block_unknown">Blokovat neznámé kontakty</string>
+    <string name="block_unknown_help">Blokovat hovory a zprávy od protějšků, kteří nejsou v kontaktech.</string>
+    <string name="is_calling">volá</string>
+    <string name="call_blocked">Zablokovaný hovor od %1$s byl automaticky odmítnut</string>
+    <string name="message_blocked">Zablokovaná zpráva od %1$s byla automaticky odmítnuta</string>
+    <string name="blocked">Zablokované aktivity</string>
+    <string name="blocked_calls">Zablokované hovory</string>
+    <string name="blocked_messages">Zablokované zprávy</string>
+    <string name="blocked_delete_alert">Smazat zablokované požadavky od \'%1$s\'?</string>
+    <string name="blocked_contact_question">Přidat \'%1$s\' do kontaktů?</string>
+    <string name="save_recording">Uložit nahrávku</string>
+    <string name="save_recording_question">Uložit tuto nahrávku?</string>
+    <string name="recording_saved">Nahrávka byla uložena</string>
+    <string name="delete_call_alert">Smazat tento hovor z historie?</string>
+    <string name="transport_protocols">Transportní protokoly</string>
+    <string name="transport_protocols_help">Čárkami oddělený seznam podporovaných transportních protokolů SIP pro požadavky a odpovědi. Pokud je pole prázdné, použije se výchozí hodnota ‚udp,tcp,tls,ws,wss‘, která zahrnuje všechny podporované transportní protokoly. Uveďte pouze ty, které skutečně potřebujete. Použití UDP se z bezpečnostních i dalších důvodů nedoporučuje.</string>
+    <string name="invalid_transport_protocols">Neplatný seznam transportních protokolů</string>
+    <string name="stop">Zastavit</string>
 </resources>
