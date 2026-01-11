@@ -425,4 +425,5 @@
     <string name="blocked_contact_question">是否要将对方“%1$s”添加到联系人？</string>
     <string name="call_blocked">已自动拒绝来自 %1$s 的已屏蔽通话</string>
     <string name="message_blocked">已自动拒绝来自 %1$s 的已屏蔽消息</string>
+    <string name="search">搜索</string>
 </resources>
