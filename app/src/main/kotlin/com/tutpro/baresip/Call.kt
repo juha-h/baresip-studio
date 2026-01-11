@@ -1,5 +1,8 @@
 package com.tutpro.baresip
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import java.util.*
 
 class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, var status: String) {
@@ -14,6 +17,27 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var startTime: GregorianCalendar? = null  // Set when call is established
     var referTo = ""
     var dumpfiles = arrayOf("", "")
+
+    // UI state properties
+    val callUri: MutableState<String> = mutableStateOf("")
+    val callUriEnabled: MutableState<Boolean> = mutableStateOf(true)
+    val callUriLabel: MutableState<String> = mutableStateOf("")
+    val securityIconTint: MutableState<Int> = mutableIntStateOf(-1)
+    val showCallTimer: MutableState<Boolean> = mutableStateOf(false)
+    var callDuration: Int = 0
+    val showSuggestions: MutableState<Boolean> = mutableStateOf(false)
+    val showCallButton: MutableState<Boolean> = mutableStateOf(true)
+    val callButtonEnabled: MutableState<Boolean> = mutableStateOf(true)
+    val showCancelButton: MutableState<Boolean> = mutableStateOf(false)
+    val showAnswerRejectButtons: MutableState<Boolean> = mutableStateOf(false)
+    val showHangupButton: MutableState<Boolean> = mutableStateOf(false)
+    val showOnHoldNotice: MutableState<Boolean> = mutableStateOf(false)
+    val callOnHold: MutableState<Boolean> = mutableStateOf(false)
+    val transferButtonEnabled: MutableState<Boolean> = mutableStateOf(false)
+    val callTransfer: MutableState<Boolean> = mutableStateOf(false)
+    val dtmfText: MutableState<String> = mutableStateOf("")
+    val dtmfEnabled: MutableState<Boolean> = mutableStateOf(false)
+    val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
 
     fun add() {
         BaresipService.calls.add(0, this)

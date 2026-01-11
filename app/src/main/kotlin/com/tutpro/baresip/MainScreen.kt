@@ -841,26 +841,6 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     }
 }
 
-private val callUri = mutableStateOf("")
-private var callUriEnabled = mutableStateOf(true)
-private val callUriLabel = mutableStateOf("")
-private var securityIconTint = mutableIntStateOf(-1)
-private val showCallTimer = mutableStateOf(false)
-private var callDuration = 0
-private val showSuggestions = mutableStateOf(false)
-private val showCallButton = mutableStateOf(true)
-private val callButtonEnabled = mutableStateOf(true)
-private val showCancelButton = mutableStateOf(false)
-private val showAnswerRejectButtons = mutableStateOf(false)
-private val showHangupButton = mutableStateOf(false)
-private val showOnHoldNotice = mutableStateOf(false)
-private var callOnHold = mutableStateOf(false)
-private val transferButtonEnabled = mutableStateOf(false)
-private val callTransfer = mutableStateOf(false)
-private var dtmfText = mutableStateOf("")
-private val dtmfEnabled = mutableStateOf(false)
-private val focusDtmf = mutableStateOf(false)
-
 private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
 private val showAlert = mutableStateOf(false)
@@ -2116,24 +2096,12 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
     val call = showCall ?: ua.currentCall()
     if (call == null) {
         pullToRefreshEnabled.value = true
-        if (ua.account.resumeUri != "")
-            callUri.value = ua.account.resumeUri
-        else
-            callUri.value = ""
-        callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-        callUriEnabled.value = true
-        showCallTimer.value = false
-        securityIconTint.intValue = -1
-        showHangupButton.value = false
-        callTransfer.value = false
-        dtmfText.value = ""
-        dtmfEnabled.value = false
-        focusDtmf.value = false
-        showCallButton.value = true
-        callButtonEnabled.value = true
-        showCancelButton.value = false
-        showAnswerRejectButtons.value = false
-        showOnHoldNotice.value = false
+        viewModel.dialerState.callUri.value = ua.account.resumeUri
+        viewModel.dialerState.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
+        viewModel.dialerState.callUriEnabled.value = true
+        viewModel.dialerState.showCallButton.value = true
+        viewModel.dialerState.callButtonEnabled.value = true
+        viewModel.dialerState.showSuggestions.value = false
         dialpadButtonEnabled.value = true
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
@@ -2141,84 +2109,84 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         }
     } else {
         pullToRefreshEnabled.value = false
-        callUriEnabled.value = false
+        call.callUriEnabled.value = false
         val isLandscape = ctx.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (isLandscape || call.held || call.status != "connected") {
-            focusDtmf.value = false
-            dtmfEnabled.value = !call.held
+            call.focusDtmf.value = false
+            call.dtmfEnabled.value = !call.held
             Handler(Looper.getMainLooper()).postDelayed({
                 viewModel.requestHideKeyboard()
             }, 25)
         }
         else {
-            dtmfEnabled.value = true
-            focusDtmf.value = true
+            call.dtmfEnabled.value = true
+            call.focusDtmf.value = true
             viewModel.requestShowKeyboard()
         }
         when (call.status) {
             "outgoing", "transferring", "answered" -> {
-                callUriLabel.value = if (call.status == "answered")
+                call.callUriLabel.value = if (call.status == "answered")
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
-                callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                showCallTimer.value = false
-                securityIconTint.intValue = -1
-                showCallButton.value = false
-                showCancelButton.value = call.status == "outgoing"
-                showHangupButton.value = !showCancelButton.value
-                showAnswerRejectButtons.value = false
-                showOnHoldNotice.value = false
+                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                call.showCallTimer.value = false
+                call.securityIconTint.value = -1
+                call.showCallButton.value = false
+                call.showCancelButton.value = call.status == "outgoing"
+                call.showHangupButton.value = !call.showCancelButton.value
+                call.showAnswerRejectButtons.value = false
+                call.showOnHoldNotice.value = false
                 dialpadButtonEnabled.value = false
             }
             "incoming" -> {
-                showCallTimer.value = false
-                securityIconTint.intValue = -1
+                call.showCallTimer.value = false
+                call.securityIconTint.value = -1
                 val uri = call.diverterUri()
                 if (uri != "") {
-                    callUriLabel.value = ctx.getString(R.string.diverted_by_dots)
-                    callUri.value = Utils.friendlyUri(ctx, uri, ua.account)
+                    call.callUriLabel.value = ctx.getString(R.string.diverted_by_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, uri, ua.account)
                 }
                 else {
-                    callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                    callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                 }
-                showCallButton.value = false
-                showCancelButton.value = false
-                showHangupButton.value = false
-                showAnswerRejectButtons.value = true
-                showOnHoldNotice.value = false
+                call.showCallButton.value = false
+                call.showCancelButton.value = false
+                call.showHangupButton.value = false
+                call.showAnswerRejectButtons.value = true
+                call.showOnHoldNotice.value = false
                 dialpadButtonEnabled.value = false
             }
             "connected" -> {
                 if (call.referTo != "") {
-                    callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                    callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
-                    transferButtonEnabled.value = false
+                    call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
+                    call.transferButtonEnabled.value = false
                 } else {
                     if (call.dir == "out") {
-                        callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                        callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                        call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
+                        call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                     } else {
-                        callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                        callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                        call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
+                        call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                     }
-                    transferButtonEnabled.value = true
+                    call.transferButtonEnabled.value = true
                 }
-                callTransfer.value = call.onHoldCall != null
-                callDuration = call.duration()
-                showCallTimer.value = true
+                call.callTransfer.value = call.onHoldCall != null
+                call.callDuration = call.duration()
+                call.showCallTimer.value = true
                 if (ua.account.mediaEnc == "")
-                    securityIconTint.intValue = -1
+                    call.securityIconTint.value = -1
                 else
-                    securityIconTint.intValue = call.security
-                showCallButton.value = false
-                showCancelButton.value = false
-                showHangupButton.value = true
-                showAnswerRejectButtons.value = false
-                callOnHold.value = call.onhold
+                    call.securityIconTint.value = call.security
+                call.showCallButton.value = false
+                call.showCancelButton.value = false
+                call.showHangupButton.value = true
+                call.showAnswerRejectButtons.value = false
+                call.callOnHold.value = call.onhold
                 Handler(Looper.getMainLooper()).postDelayed({
-                    showOnHoldNotice.value = call.held
+                    call.showOnHoldNotice.value = call.held
                 }, 100)
             }
         }
