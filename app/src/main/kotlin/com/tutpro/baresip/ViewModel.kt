@@ -4,12 +4,39 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
+import kotlinx.coroutines.launch
+
+// Sealed class for type-safe navigation events
+sealed class NavigationCommand {
+    object NavigateToHome : NavigationCommand()
+    data class NavigateToCalls(val aor: String) : NavigationCommand()
+    data class NavigateToChat(val aor: String, val peerUri: String) : NavigationCommand()
+}
 
 class ViewModel: ViewModel() {
+
+    // A map to store message drafts. Key is "aor:peerUri"
+    private val messageDrafts = mutableMapOf<String, String>()
+
+    fun getAorPeerMessage(aor: String, peerUri: String): String {
+        return messageDrafts["$aor:$peerUri"] ?: ""
+    }
+
+    fun updateAorPeerMessage(aor: String, peerUri: String, message: String) {
+        val key = "$aor:$peerUri"
+        if (message.isEmpty()) {
+            messageDrafts.remove(key)
+        } else {
+            messageDrafts[key] = message
+        }
+    }
 
     data class DialerState(
         val callUri: MutableState<String> = mutableStateOf(""),
@@ -43,11 +70,24 @@ class ViewModel: ViewModel() {
     private val _hideKeyboard = MutableStateFlow(0)
     val hideKeyboard = _hideKeyboard.asStateFlow()
 
+    private val _navigationCommand = MutableSharedFlow<NavigationCommand>()
+    val navigationCommand = _navigationCommand.asSharedFlow()
+
+    private var _selectedCallRow: CallRow? = null
+
+    fun selectCallRow(callRow: CallRow) {
+        _selectedCallRow = callRow
+    }
+
+    fun consumeSelectedCallRow(): CallRow? {
+        val callRow = _selectedCallRow
+        _selectedCallRow = null
+        return callRow
+    }
+
     fun onNewMessageReceived(aor: String, peerUri: String) {
-        val acc = Account.ofAor(aor)
-        if (acc != null) {
-            acc.unreadMessages = true
-            triggerAccountUpdate()
+        viewModelScope.launch {
+            _navigationCommand.emit(NavigationCommand.NavigateToChat(aor, peerUri))
         }
     }
 
@@ -60,7 +100,7 @@ class ViewModel: ViewModel() {
     }
 
     fun triggerAccountUpdate() {
-        _accountUpdate.value = _accountUpdate.value + 1
+        _accountUpdate.value += 1
     }
 
     fun updateMicIcon(icon: ImageVector) {
@@ -72,19 +112,23 @@ class ViewModel: ViewModel() {
     }
 
     fun requestShowKeyboard() {
-        _showKeyboard.value = _showKeyboard.value + 1
+        _showKeyboard.value += 1
     }
 
     fun requestHideKeyboard() {
-        _hideKeyboard.value = _hideKeyboard.value + 1
+        _hideKeyboard.value += 1
     }
 
     fun navigateToHome() {
-        // This function can be used to navigate to the main screen
+        viewModelScope.launch {
+            _navigationCommand.emit(NavigationCommand.NavigateToHome)
+        }
     }
 
     fun navigateToCalls(aor: String) {
-        // This function can be used to navigate to the calls screen
+        viewModelScope.launch {
+            _navigationCommand.emit(NavigationCommand.NavigateToCalls(aor))
+        }
     }
 
 }

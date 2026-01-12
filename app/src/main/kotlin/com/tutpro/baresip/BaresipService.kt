@@ -830,7 +830,7 @@ class BaresipService: Service() {
                         return
                     }
                     "call outgoing" -> {
-                        if (call!!.status == "transferring")
+                        if (call!!.status.value == "transferring")
                             break
                         stopMediaPlayer()
                         setCallVolume()
@@ -989,8 +989,8 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopMediaPlayer()
-                        if (call!!.status == "incoming")
-                            call.status = "answered"
+                        if (call!!.status.value == "incoming")
+                            call.status.value = "answered"
                         else
                             return
                     }
@@ -1002,7 +1002,7 @@ class BaresipService: Service() {
                         Log.d(TAG, "AoR $aor call $callp established in mode ${am.mode}")
                         if (am.mode != MODE_IN_COMMUNICATION)
                             am.mode = MODE_IN_COMMUNICATION
-                        call!!.status = "connected"
+                        call!!.status.value = "connected"
                         call.onhold = false
                         if (ua.account.callHistory)
                             call.startTime = GregorianCalendar()
@@ -1020,7 +1020,7 @@ class BaresipService: Service() {
                             else
                                 playRingBack()
                         }
-                        if (!isMainVisible || call.status != "connected")
+                        if (!isMainVisible || call.status.value != "connected")
                             return
                     }
                     "call verified", "call secure" -> {

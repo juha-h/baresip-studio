@@ -5,7 +5,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import java.util.*
 
-class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, var status: String) {
+class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
+
+    var status: MutableState<String> = mutableStateOf(initialStatus)
 
     var onhold = false
     var held = false
@@ -132,7 +134,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
         fun call(status: String): Call? {
             for (c in BaresipService.calls.reversed())
-                if (c.status == status) return c
+                if (c.status.value == status) return c
             return null
         }
 

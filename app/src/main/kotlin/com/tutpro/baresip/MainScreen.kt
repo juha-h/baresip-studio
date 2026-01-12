@@ -106,7 +106,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -212,12 +211,15 @@ private fun MainScreen(
     val ua = uas.value.find { it.account.aor == viewModel.selectedAor.value }
     val call = ua?.currentCall()
 
-    LaunchedEffect(viewModel.showKeyboard.value) {
+    val showKeyboard by viewModel.showKeyboard.collectAsState()
+    val hideKeyboard by viewModel.hideKeyboard.collectAsState()
+
+    LaunchedEffect(showKeyboard) {
         if (viewModel.showKeyboard.value > 0)
             keyboardController?.show()
     }
 
-    LaunchedEffect(viewModel.hideKeyboard.value) {
+    LaunchedEffect(hideKeyboard) {
         if (viewModel.hideKeyboard.value > 0)
             keyboardController?.hide()
     }
@@ -385,10 +387,10 @@ private fun MainScreen(
     }
 
     LaunchedEffect(key1 = call?.status, key2 = configuration.orientation) {
-        val isConnected = call != null && call.status == "connected" && !call.held
+        val isConnected = call != null && call.status.value == "connected" && !call.held
         if (isConnected) {
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                focusDtmf.value = true
+                call.focusDtmf.value = true
                 delay(300)
                 keyboardController?.show()
             }
@@ -479,9 +481,7 @@ private fun MainScreen(
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -853,6 +853,21 @@ private val negativeText = mutableStateOf("")
 private val onNegativeClicked = mutableStateOf({})
 private val showDialog = mutableStateOf(false)
 
+@Composable
+private fun CallCard(
+    ctx: Context,
+    viewModel: ViewModel,
+    call: Call?,
+    dialerState: ViewModel.DialerState?
+) {
+    Column {
+        CallUriRow(ctx, viewModel, call, dialerState)
+        CallRow(ctx, viewModel, call, dialerState)
+        if (call != null && call.showOnHoldNotice.value)
+            OnHoldNotice()
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainContent(navController: NavController, viewModel: ViewModel, contentPadding: PaddingValues) {
@@ -862,6 +877,12 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
     var offset by remember { mutableFloatStateOf(0f) }
     val swipeThreshold = 200
     val ctx = LocalContext.current
+
+    val calls by viewModel.calls.collectAsState()
+    val selectedAor by viewModel.selectedAor.collectAsState()
+    val filteredCalls = calls.filter { it.ua.account.aor == selectedAor }
+
+    val dialingOrRinging = filteredCalls.any { it.status.value == "outgoing" || it.status.value == "incoming" }
 
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
@@ -936,8 +957,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                                     showCall(ctx, viewModel, ua)
                                 }
                             }
-                        }
-                        else if (offset > swipeThreshold) {
+                        } else if (offset > swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                 val newPos = when (curPos) {
@@ -962,10 +982,16 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AccountSpinner(ctx, viewModel, navController)
-        CallUriRow(ctx, viewModel)
-        CallRow(ctx, viewModel)
-        if (showOnHoldNotice.value)
-            OnHoldNotice()
+
+        filteredCalls.forEach { call ->
+            CallCard(ctx = ctx, viewModel = viewModel, call = call, dialerState = null)
+        }
+
+        // Only show the dialer if we are not in a transient state
+        if (!dialingOrRinging) {
+            CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
+        }
+
         Indicator(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             isRefreshing = isRefreshing,
@@ -1142,7 +1168,14 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
 }
 
 @Composable
-private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
+private fun CallUriRow(
+    ctx: Context,
+    viewModel: ViewModel,
+    call: Call?,
+    dialerState: ViewModel.DialerState?
+) {
+
+    val isDialer = dialerState != null
 
     val suggestions by remember { contactNames }
     var filteredSuggestions by remember { mutableStateOf(suggestions) }
@@ -1159,27 +1192,29 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
-                value = callUri.value,
-                readOnly = !callUriEnabled.value,
+                value = if (isDialer) dialerState.callUri.value else call!!.callUri.value,
+                readOnly = if (isDialer) !dialerState.callUriEnabled.value else !call!!.callUriEnabled.value,
                 singleLine = true,
                 onValueChange = {
-                    if (it != callUri.value) {
-                        callUri.value = it
-                        filteredSuggestions = suggestions.filter { suggestion ->
-                            it.length > 2 && suggestion.startsWith(it, ignoreCase = true)
+                    if (isDialer) {
+                        if (it != dialerState.callUri.value) {
+                            dialerState.callUri.value = it
+                            filteredSuggestions = suggestions.filter { suggestion ->
+                                it.length > 2 && suggestion.startsWith(it, ignoreCase = true)
+                            }
+                            dialerState.showSuggestions.value = it.length > 2
                         }
-                        showSuggestions.value = it.length > 2
                     }
                 },
                 trailingIcon = {
-                    if (callUriEnabled.value && callUri.value.isNotEmpty())
+                    if (isDialer && dialerState.callUriEnabled.value && dialerState.callUri.value.isNotEmpty())
                         Icon(Icons.Outlined.Clear,
                             contentDescription = null,
                             modifier = Modifier.clickable {
-                                if (showSuggestions.value)
-                                    showSuggestions.value = false
+                                if (dialerState.showSuggestions.value)
+                                    dialerState.showSuggestions.value = false
                                 else
-                                    callUri.value = ""
+                                    dialerState.callUri.value = ""
                             },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -1189,12 +1224,21 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged {
-                        val account = Account.ofAor(viewModel.selectedAor.value)
-                        if (account != null && account.numericKeypad)
-                            if (!isDialpadVisible)
-                                viewModel.toggleDialpadVisibility()
+                        if (isDialer) {
+                            val account = Account.ofAor(viewModel.selectedAor.value)
+                            if (account != null && account.numericKeypad)
+                                if (!isDialpadVisible)
+                                    viewModel.toggleDialpadVisibility()
+                        }
                     },
-                label = { Text(text = callUriLabel.value, fontSize = 18.sp) },
+                label = {
+                    Text(text = if (isDialer)
+                        dialerState.callUriLabel.value
+                    else
+                        call!!.callUriLabel.value,
+                        fontSize = 18.sp
+                    )
+                },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = if (isDialpadVisible)
                     KeyboardOptions(keyboardType = KeyboardType.Phone)
@@ -1212,7 +1256,7 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                     )
                     .animateContentSize()
             ) {
-                if (showSuggestions.value && filteredSuggestions.isNotEmpty()) {
+                if (isDialer && dialerState.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = 150.dp)) {
@@ -1234,8 +1278,8 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            callUri.value = suggestion
-                                            showSuggestions.value = false
+                                            dialerState.callUri.value = suggestion
+                                            dialerState.showSuggestions.value = false
                                         }
                                         .padding(12.dp)
                                 ) {
@@ -1252,24 +1296,24 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 }
             }
         }
-        if (showCallTimer.value) {
+        if (call != null && call.showCallTimer.value) {
             CallTimer(
-                initialDurationSeconds = callDuration.toLong(),
+                initialDurationSeconds = call.callDuration.toLong(),
                 modifier = Modifier.padding(
                     start = 6.dp,
                     top = 6.dp,
-                    end = if (securityIconTint.intValue != -1) 6.dp else 0.dp
+                    end = if (call.securityIconTint.value != -1) 6.dp else 0.dp
                 )
             )
         }
-        if (securityIconTint.intValue != -1)
+        if (call != null && call.securityIconTint.value != -1)
             Box(
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .size(32.dp)
                     .clip(CircleShape)
                     .clickable {
-                        when (securityIconTint.intValue) {
+                        when (call.securityIconTint.value) {
                             R.color.colorTrafficRed -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
@@ -1285,17 +1329,13 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
                                 positiveText.value = ctx.getString(R.string.unverify)
                                 onPositiveClicked.value = {
-                                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                                    val call = ua.currentCall()
-                                    if (call != null) {
-                                        if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
-                                            Log.e(
-                                                TAG,
-                                                "Command 'zrtp_unverify ${call.zid}' failed"
-                                            )
-                                        else
-                                            securityIconTint.intValue = R.color.colorTrafficYellow
-                                    }
+                                    if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
+                                        Log.e(
+                                            TAG,
+                                            "Command 'zrtp_unverify ${call.zid}' failed"
+                                        )
+                                    else
+                                        call.securityIconTint.value = R.color.colorTrafficYellow
                                 }
                                 negativeText.value = ctx.getString(R.string.cancel)
                                 showDialog.value = true
@@ -1305,18 +1345,17 @@ private fun CallUriRow(ctx: Context, viewModel: ViewModel) {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
+                    imageVector = if (call.securityIconTint.value == R.color.colorTrafficRed)
                         Icons.Filled.LockOpen
                     else
                         Icons.Filled.Lock,
                     contentDescription = null,
                     modifier = Modifier.size(28.dp),
-                    tint = colorResource(securityIconTint.intValue)
+                    tint = colorResource(call.securityIconTint.value)
                 )
             }
     }
 }
-
 @Composable
 private fun CallTimer(
     initialDurationSeconds: Long,
@@ -1348,8 +1387,14 @@ private fun CallTimer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CallRow(ctx: Context, viewModel: ViewModel) {
+private fun CallRow(
+    ctx: Context,
+    viewModel: ViewModel,
+    call: Call?,
+    dialerState: ViewModel.DialerState?
+) {
 
+    val isDialer = dialerState != null
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row( modifier = Modifier
@@ -1357,123 +1402,104 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
-        if (showCallButton.value)
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    showSuggestions.value = false
-                    callClick(ctx, viewModel)
-                },
-                enabled=callButtonEnabled.value
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Call,
-                    modifier = Modifier.size(42.dp),
-                    tint = colorResource(if (callButtonEnabled.value)
-                        R.color.colorTrafficGreen
-                    else
-                        R.color.colorTrafficYellow),
-                    contentDescription = null,
-                )
-            }
-
-        if (showCancelButton.value) {
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    showSuggestions.value = false
-                    abandonAudioFocus(ctx)
-                    val ua: UserAgent = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    val call = ua.currentCall()
-                    if (call != null) {
-                        val callp = call.callp
+        if (isDialer) {
+            if (dialerState.showCallButton.value)
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        dialerState.showSuggestions.value = false
+                        callClick(ctx, viewModel, dialerState)
+                    },
+                    enabled = dialerState.callButtonEnabled.value
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Call,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(if (dialerState.callButtonEnabled.value)
+                            R.color.colorTrafficGreen
+                        else
+                            R.color.colorTrafficYellow),
+                        contentDescription = null,
+                    )
+                }
+        } else {
+            if (call!!.showCancelButton.value) {
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        abandonAudioFocus(ctx)
                         Log.d(
                             TAG,
-                            "AoR ${ua.account.aor} canceling call $callp with ${callUri.value}"
+                            "AoR ${call.ua.account.aor} canceling call ${call.callp} with ${call.callUri.value}"
                         )
-                        Api.ua_hangup(ua.uap, callp, 487, "Request Terminated")
-                    }
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(42.dp),
-                    tint = colorResource(R.color.colorTrafficRed),
-                    contentDescription = null,
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-        }
-
-        if (showHangupButton.value) {
-
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    abandonAudioFocus(ctx)
-                    val uaCalls = ua.calls()
-                    if (uaCalls.isNotEmpty()) {
-                        val call = uaCalls.first()
-                        val callp = call.callp
-                        Log.d(TAG, "AoR ${ua.account.aor} hanging up call $callp with ${callUri.value}")
-                        Api.ua_hangup(ua.uap, callp, 487, "Request Terminated")
-                    }
+                        Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CallEnd,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(R.color.colorTrafficRed),
+                        contentDescription = null,
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(42.dp),
-                    tint = colorResource(R.color.colorTrafficRed),
-                    contentDescription = null,
-                )
+                Spacer(modifier = Modifier.width(12.dp))
             }
 
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    val aor = ua.account.aor
-                    val call = ua.currentCall()
-                    if (call != null) {
+            if (call.showHangupButton.value) {
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        abandonAudioFocus(ctx)
+                        Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}")
+                        Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CallEnd,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(R.color.colorTrafficRed),
+                        contentDescription = null,
+                    )
+                }
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
                         if (call.onhold) {
                             Log.d(
                                 TAG,
-                                "AoR $aor resuming call ${call.callp} with ${callUri.value}"
+                                "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
                             )
                             call.resume()
                             call.onhold = false
                         } else {
                             Log.d(
                                 TAG,
-                                "AoR $aor holding call ${call.callp} with ${callUri.value}"
+                                "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
                             )
                             call.hold()
                             call.onhold = true
                         }
-                    }
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.PauseCircle,
-                    modifier = Modifier.size(42.dp),
-                    tint = if (callOnHold.value)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.secondary,
-                    contentDescription = null,
-                )
-            }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.PauseCircle,
+                        modifier = Modifier.size(42.dp),
+                        tint = if (call.callOnHold.value)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
 
-            var showTransferDialog by remember { mutableStateOf(false) }
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                enabled = transferButtonEnabled.value,
-                onClick = {
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    val call = ua.currentCall()
-                    if (call != null) {
+                var showTransferDialog by remember { mutableStateOf(false) }
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    enabled = call.transferButtonEnabled.value,
+                    onClick = {
                         if (call.onHoldCall != null) {
                             if (!call.executeTransfer()) {
                                 alertTitle.value = ctx.getString(R.string.notice)
@@ -1482,392 +1508,384 @@ private fun CallRow(ctx: Context, viewModel: ViewModel) {
                             }
                         } else
                             showTransferDialog = true
-                    }
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ArrowCircleRight,
-                    modifier = Modifier.size(42.dp),
-                    tint = if (callTransfer.value)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.secondary,
-                    contentDescription = null,
-                )
-            }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ArrowCircleRight,
+                        modifier = Modifier.size(42.dp),
+                        tint = if (call.callTransfer.value)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
 
-            if (showTransferDialog) {
+                if (showTransferDialog) {
 
-                val showDialog = remember { mutableStateOf(true) }
-                val blindChecked = remember { mutableStateOf(true) }
-                val selectedAor: String by viewModel.selectedAor.collectAsState()
-                val ua = UserAgent.ofAor(selectedAor)!!
-                val call = ua.currentCall()
+                    val showDialog = remember { mutableStateOf(true) }
+                    val blindChecked = remember { mutableStateOf(true) }
 
-                if (showDialog.value)
-                    BasicAlertDialog(
-                        onDismissRequest = {
-                            viewModel.requestHideKeyboard()
-                            showDialog.value = false
-                            showTransferDialog = false
-                        }
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                            )
+                    if (showDialog.value)
+                        BasicAlertDialog(
+                            onDismissRequest = {
+                                viewModel.requestHideKeyboard()
+                                showDialog.value = false
+                                showTransferDialog = false
+                            }
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(
-                                    text = stringResource(R.string.call_transfer),
-                                    fontSize = 20.sp,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                                 )
-                                var transferUri by remember { mutableStateOf("") }
-                                val suggestions by remember { contactNames }
-                                var filteredSuggestions by remember { mutableStateOf(suggestions) }
-                                val focusRequester = remember { FocusRequester() }
-                                val lazyListState = rememberLazyListState()
-                                OutlinedTextField(
-                                    value = transferUri,
-                                    singleLine = true,
-                                    onValueChange = {
-                                        if (it != transferUri) {
-                                            transferUri = it
-                                            filteredSuggestions =
-                                                suggestions.filter { suggestion ->
-                                                    transferUri.length > 2 &&
-                                                            suggestion.startsWith(
-                                                                transferUri,
-                                                                ignoreCase = true
-                                                            )
-                                                }
-                                            showSuggestions.value = transferUri.length > 2
-                                        }
-                                    },
-                                    trailingIcon = {
-                                        if (transferUri.isNotEmpty())
-                                            Icon(
-                                                Icons.Outlined.Clear,
-                                                contentDescription = null,
-                                                modifier = Modifier.clickable {
-                                                    if (showSuggestions.value)
-                                                        showSuggestions.value = false
-                                                    else
-                                                        transferUri = ""
-                                                },
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
-                                        .focusRequester(focusRequester),
-                                    label = { Text(stringResource(R.string.transfer_destination)) },
-                                    textStyle = TextStyle(fontSize = 18.sp),
-                                    keyboardOptions = if (isDialpadVisible)
-                                        KeyboardOptions(keyboardType = KeyboardType.Phone)
-                                    else
-                                        KeyboardOptions(keyboardType = KeyboardType.Text)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .shadow(8.dp, RoundedCornerShape(8.dp))
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .animateContentSize()
-                                ) {
-                                    if (showSuggestions.value && filteredSuggestions.isNotEmpty()) {
-                                        Box(modifier = Modifier
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = stringResource(R.string.call_transfer),
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                    var transferUri by remember { mutableStateOf("") }
+                                    val suggestions by remember { contactNames }
+                                    var filteredSuggestions by remember { mutableStateOf(suggestions) }
+                                    val focusRequester = remember { FocusRequester() }
+                                    val lazyListState = rememberLazyListState()
+                                    OutlinedTextField(
+                                        value = transferUri,
+                                        singleLine = true,
+                                        onValueChange = {
+                                            if (it != transferUri) {
+                                                filteredSuggestions =
+                                                    suggestions.filter { suggestion ->
+                                                        transferUri.length > 2 &&
+                                                                suggestion.startsWith(
+                                                                    transferUri,
+                                                                    ignoreCase = true
+                                                                )
+                                                    }
+                                                call.showSuggestions.value = transferUri.length > 2
+                                            }
+                                        },
+                                        trailingIcon = {
+                                            if (transferUri.isNotEmpty())
+                                                Icon(
+                                                    Icons.Outlined.Clear,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.clickable {
+                                                        if (call.showSuggestions.value)
+                                                            call.showSuggestions.value = false
+                                                        else
+                                                            transferUri = ""
+                                                    },
+                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                        },
+                                        modifier = Modifier
                                             .fillMaxWidth()
-                                            .heightIn(max = 150.dp)) {
-                                            LazyColumn(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .verticalScrollbar(
-                                                        state = lazyListState,
-                                                        color = MaterialTheme.colorScheme.outlineVariant
-                                                    ),
-                                                horizontalAlignment = Alignment.Start,
-                                                state = lazyListState,
-                                            ) {
-                                                items(
-                                                    items = filteredSuggestions,
-                                                    key = { suggestion -> suggestion }
-                                                ) { suggestion ->
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .clickable {
-                                                                transferUri = suggestion
-                                                                showSuggestions.value = false
-                                                            }
-                                                            .padding(12.dp)
-                                                    ) {
-                                                        Text(
-                                                            text = suggestion,
-                                                            modifier = Modifier.fillMaxWidth(),
-                                                            color = MaterialTheme.colorScheme.onSurface,
-                                                            fontSize = 18.sp
-                                                        )
+                                            .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
+                                            .focusRequester(focusRequester),
+                                        label = { Text(stringResource(R.string.transfer_destination)) },
+                                        textStyle = TextStyle(fontSize = 18.sp),
+                                        keyboardOptions = if (isDialpadVisible)
+                                            KeyboardOptions(keyboardType = KeyboardType.Phone)
+                                        else
+                                            KeyboardOptions(keyboardType = KeyboardType.Text)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .shadow(8.dp, RoundedCornerShape(8.dp))
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .animateContentSize()
+                                    ) {
+                                        if (call.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
+                                            Box(modifier = Modifier
+                                                .fillMaxWidth()
+                                                .heightIn(max = 150.dp)) {
+                                                LazyColumn(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .verticalScrollbar(
+                                                            state = lazyListState,
+                                                            color = MaterialTheme.colorScheme.outlineVariant
+                                                        ),
+                                                    horizontalAlignment = Alignment.Start,
+                                                    state = lazyListState,
+                                                ) {
+                                                    items(
+                                                        items = filteredSuggestions,
+                                                        key = { suggestion -> suggestion }
+                                                    ) { suggestion ->
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .clickable {
+                                                                    transferUri = suggestion
+                                                                    call.showSuggestions.value = false
+                                                                }
+                                                                .padding(12.dp)
+                                                        ) {
+                                                            Text(
+                                                                text = suggestion,
+                                                                modifier = Modifier.fillMaxWidth(),
+                                                                color = MaterialTheme.colorScheme.onSurface,
+                                                                fontSize = 18.sp
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                if (call != null && call.replaces())
+                                    if (call.replaces())
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Start,
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = stringResource(R.string.blind),
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    modifier = Modifier.padding(8.dp),
+                                                )
+                                                Switch(
+                                                    checked = blindChecked.value,
+                                                    onCheckedChange = {
+                                                        blindChecked.value = true
+                                                    }
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = stringResource(R.string.attended),
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    modifier = Modifier.padding(8.dp),
+                                                )
+                                                Switch(
+                                                    checked = !blindChecked.value,
+                                                    onCheckedChange = {
+                                                        blindChecked.value = false
+                                                    }
+                                                )
+                                            }
+                                        }
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Start,
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = stringResource(R.string.blind),
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.padding(8.dp),
-                                            )
-                                            Switch(
-                                                checked = blindChecked.value,
-                                                onCheckedChange = {
-                                                    blindChecked.value = true
-                                                }
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = stringResource(R.string.attended),
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.padding(8.dp),
-                                            )
-                                            Switch(
-                                                checked = !blindChecked.value,
-                                                onCheckedChange = {
-                                                    blindChecked.value = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    TextButton(
-                                        onClick = {
-                                            viewModel.requestHideKeyboard()
-                                            showDialog.value = false
-                                            showTransferDialog = false
-                                        },
-                                        modifier = Modifier.padding(end = 32.dp),
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.cancel),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    TextButton(
-                                        onClick = {
-                                            showSuggestions.value = false
-                                            var uriText = transferUri.trim()
-                                            if (uriText.isNotEmpty()) {
-                                                val uris = Contact.contactUris(uriText)
-                                                if (uris.size > 1) {
-                                                    selectItems.value = uris
-                                                    selectItemAction.value = { index ->
-                                                        val uri = uris[index]
-                                                        transfer(
-                                                            ctx,
-                                                            viewModel,
-                                                            ua,
-                                                            if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
-                                                            !blindChecked.value
-                                                        )
-                                                        showSelectItemDialog.value = false
-                                                    }
-                                                    showSelectItemDialog.value = true
-                                                }
-                                                else {
-                                                    if (uris.size == 1) uriText = uris[0]
-                                                    transfer(
-                                                        ctx,
-                                                        viewModel,
-                                                        ua,
-                                                        if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
-                                                        !blindChecked.value
-                                                    )
-                                                }
+                                        TextButton(
+                                            onClick = {
                                                 viewModel.requestHideKeyboard()
                                                 showDialog.value = false
                                                 showTransferDialog = false
-                                            }
-                                        },
-                                        modifier = Modifier.padding(end = 16.dp),
-                                    ) {
-                                        Text(
-                                            text = stringResource(
-                                                if (blindChecked.value)
-                                                    R.string.transfer
-                                                else
-                                                    R.string.call
-                                            ).uppercase(),
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
+                                            },
+                                            modifier = Modifier.padding(end = 32.dp),
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.cancel),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        TextButton(
+                                            onClick = {
+                                                call.showSuggestions.value = false
+                                                var uriText = transferUri.trim()
+                                                if (uriText.isNotEmpty()) {
+                                                    val uris = Contact.contactUris(uriText)
+                                                    if (uris.size > 1) {
+                                                        selectItems.value = uris
+                                                        selectItemAction.value = { index ->
+                                                            val uri = uris[index]
+                                                            transfer(
+                                                                ctx,
+                                                                viewModel,
+                                                                call.ua,
+                                                                if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
+                                                                !blindChecked.value
+                                                            )
+                                                            showSelectItemDialog.value = false
+                                                        }
+                                                        showSelectItemDialog.value = true
+                                                    }
+                                                    else {
+                                                        if (uris.size == 1) uriText = uris[0]
+                                                        transfer(
+                                                            ctx,
+                                                            viewModel,
+                                                            call.ua,
+                                                            if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                            !blindChecked.value
+                                                        )
+                                                    }
+                                                    viewModel.requestHideKeyboard()
+                                                    showDialog.value = false
+                                                    showTransferDialog = false
+                                                }
+                                            },
+                                            modifier = Modifier.padding(end = 16.dp),
+                                        ) {
+                                            Text(
+                                                text = stringResource(
+                                                    if (blindChecked.value)
+                                                        R.string.transfer
+                                                    else
+                                                        R.string.call
+                                                ).uppercase(),
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-            }
+                }
 
-            val focusRequester = remember { FocusRequester() }
-            val shouldRequestFocus by focusDtmf
-            val interactionSource = remember { MutableInteractionSource() }
-            BasicTextField(
-                value = dtmfText.value,
-                onValueChange = { newText ->
-                    if (newText.length > dtmfText.value.length) {
-                        val char = newText.last()
-                        if (char.isDigit() || char == '*' || char == '#') {
-                            Log.d(TAG, "Got DTMF digit '$char'")
-                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                            ua.currentCall()?.sendDigit(char)
+                val focusRequester = remember { FocusRequester() }
+                val shouldRequestFocus by call.focusDtmf
+                val interactionSource = remember { MutableInteractionSource() }
+                BasicTextField(
+                    value = call.dtmfText.value,
+                    onValueChange = { newText ->
+                        if (newText.length > call.dtmfText.value.length) {
+                            val char = newText.last()
+                            if (char.isDigit() || char == '*' || char == '#') {
+                                Log.d(TAG, "Got DTMF digit '$char'")
+                                call.sendDigit(char)
+                            }
                         }
-                    }
-                    dtmfText.value = newText
-                },
-                modifier = Modifier
-                    .width(80.dp)
-                    .focusRequester(focusRequester),
-                enabled = dtmfEnabled.value,
-                textStyle = TextStyle(
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                singleLine = true,
-                interactionSource = interactionSource,
-                decorationBox = { innerTextField ->
-                    OutlinedTextFieldDefaults.DecorationBox(
-                        value = dtmfText.value,
-                        visualTransformation = VisualTransformation.None,
-                        innerTextField = innerTextField,
-                        singleLine = true,
-                        enabled = dtmfEnabled.value,
-                        interactionSource = interactionSource,
-                        label = {
-                            Text(
-                                stringResource(R.string.dtmf),
-                                style = TextStyle(fontSize = 12.sp)
+                        call.dtmfText.value = newText
+                    },
+                    modifier = Modifier
+                        .width(80.dp)
+                        .focusRequester(focusRequester),
+                    enabled = call.dtmfEnabled.value,
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    singleLine = true,
+                    interactionSource = interactionSource,
+                    decorationBox = { innerTextField ->
+                        OutlinedTextFieldDefaults.DecorationBox(
+                            value = call.dtmfText.value,
+                            visualTransformation = VisualTransformation.None,
+                            innerTextField = innerTextField,
+                            singleLine = true,
+                            enabled = call.dtmfEnabled.value,
+                            interactionSource = interactionSource,
+                            label = {
+                                Text(
+                                    stringResource(R.string.dtmf),
+                                    style = TextStyle(fontSize = 12.sp)
+                                )
+                            },
+                            contentPadding = PaddingValues(
+                                start = 4.dp,
+                                end = 4.dp,
+                                top = 8.dp,
+                                bottom = 8.dp
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                        },
-                        contentPadding = PaddingValues(
-                            start = 4.dp,
-                            end = 4.dp,
-                            top = 8.dp,
-                            bottom = 8.dp
-                        ),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                    }
+                )
+                LaunchedEffect(shouldRequestFocus) {
+                    if (shouldRequestFocus) {
+                        focusRequester.requestFocus()
+                        call.focusDtmf.value = false
+                    }
+                }
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        val stats = call.stats("audio")
+                        if (stats.isNotEmpty() && call.startTime != null) {
+                            val parts = stats.split(",") as java.util.ArrayList
+                            if (parts[2] == "0/0") {
+                                parts[2] = "?/?"
+                                parts[3] = "?/?"
+                                parts[4] = "?/?"
+                            }
+                            val codecs = call.audioCodecs()
+                            val duration = call.duration()
+                            val txCodec = codecs.split(',')[0].split("/")
+                            val rxCodec = codecs.split(',')[1].split("/")
+                            alertTitle.value = ctx.getString(R.string.call_info)
+                            alertMessage.value =
+                                "${String.format(ctx.getString(R.string.duration), duration)}\n" +
+                                        "${ctx.getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/${rxCodec[0]} ch ${rxCodec[2]}\n" +
+                                        "${String.format(ctx.getString(R.string.rate), parts[0])}\n" +
+                                        "${String.format(ctx.getString(R.string.average_rate), parts[1])}\n" +
+                                        "${ctx.getString(R.string.packets)}: ${parts[2]}\n" +
+                                        "${ctx.getString(R.string.lost)}: ${parts[3]}\n" +
+                                        String.format(ctx.getString(R.string.jitter), parts[4])
+                            showAlert.value = true
+                        } else {
+                            alertTitle.value = ctx.getString(R.string.call_info)
+                            alertMessage.value = ctx.getString(R.string.call_info_not_available)
+                            showAlert.value = true
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        modifier = Modifier.size(36.dp),
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
                     )
                 }
-            )
-            LaunchedEffect(shouldRequestFocus) {
-                if (shouldRequestFocus) {
-                    focusRequester.requestFocus()
-                    focusDtmf.value = false
+            }
+
+            if (call.showAnswerRejectButtons.value) {
+
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        answer(ctx, call)
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Call,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(R.color.colorTrafficGreen),
+                        contentDescription = null,
+                    )
                 }
-            }
 
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    val call = ua.currentCall()
-                    val stats = call?.stats("audio")
-                    if (stats != null && call.startTime != null && stats != "") {
-                        val parts = stats.split(",") as java.util.ArrayList
-                        if (parts[2] == "0/0") {
-                            parts[2] = "?/?"
-                            parts[3] = "?/?"
-                            parts[4] = "?/?"
-                        }
-                        val codecs = call.audioCodecs()
-                        val duration = call.duration()
-                        val txCodec = codecs.split(',')[0].split("/")
-                        val rxCodec = codecs.split(',')[1].split("/")
-                        alertTitle.value = ctx.getString(R.string.call_info)
-                        alertMessage.value =
-                            "${String.format(ctx.getString(R.string.duration), duration)}\n" +
-                                    "${ctx.getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/" +
-                                    "${rxCodec[0]} ch ${rxCodec[2]}\n" +
-                                    "${String.format(ctx.getString(R.string.rate), parts[0])}\n" +
-                                    "${String.format(ctx.getString(R.string.average_rate), parts[1])}\n" +
-                                    "${ctx.getString(R.string.packets)}: ${parts[2]}\n" +
-                                    "${ctx.getString(R.string.lost)}: ${parts[3]}\n" +
-                                    String.format(ctx.getString(R.string.jitter), parts[4])
-                        showAlert.value = true
-                    } else {
-                        alertTitle.value = ctx.getString(R.string.call_info)
-                        alertMessage.value = ctx.getString(R.string.call_info_not_available)
-                        showAlert.value = true
-                    }
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    modifier = Modifier.size(36.dp),
-                    tint = MaterialTheme.colorScheme.secondary,
-                    contentDescription = null,
-                )
-            }
-        }
+                Spacer(Modifier.weight(1f))
 
-        if (showAnswerRejectButtons.value) {
-
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    answer(ctx, viewModel)
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Call,
-                    modifier = Modifier.size(42.dp),
-                    tint = colorResource(R.color.colorTrafficGreen),
-                    contentDescription = null,
-                )
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    reject(viewModel)
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.CallEnd,
-                    modifier = Modifier.size(42.dp),
-                    tint = colorResource(R.color.colorTrafficRed),
-                    contentDescription = null,
-                )
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        reject(call)
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CallEnd,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(R.color.colorTrafficRed),
+                        contentDescription = null,
+                    )
+                }
             }
         }
     }
@@ -1894,31 +1912,30 @@ private fun spinToAor(viewModel: ViewModel, aor: String) {
     viewModel.triggerAccountUpdate()
 }
 
-private fun callClick(ctx: Context, viewModel: ViewModel) {
+private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?) {
     if (viewModel.selectedAor.value != "") {
         if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
-            if (Call.inCall())
-                return
-            val uriText = callUri.value.trim()
-            if (uriText.isNotEmpty()) {
-                val uris = Contact.contactUris(uriText)
-                if (uris.isEmpty())
-                    makeCall(ctx, viewModel, uriText)
-                else if (uris.size == 1)
-                    makeCall(ctx, viewModel, uris[0])
-                else {
-                    selectItems.value = uris
-                    selectItemAction.value = { index ->
-                        makeCall(ctx, viewModel, uris[index])
+            if (dialerState != null) {
+                val uriText = dialerState.callUri.value.trim()
+                if (uriText.isNotEmpty()) {
+                    val uris = Contact.contactUris(uriText)
+                    if (uris.isEmpty())
+                        makeCall(ctx, viewModel, uriText)
+                    else if (uris.size == 1)
+                        makeCall(ctx, viewModel, uris[0])
+                    else {
+                        selectItems.value = uris
+                        selectItemAction.value = { index ->
+                            makeCall(ctx, viewModel, uris[index])
+                        }
+                        showSelectItemDialog.value = true
                     }
-                    showSelectItemDialog.value = true
+                } else {
+                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                    val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
+                    if (latestPeerUri != null)
+                        dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
                 }
-            }
-            else {
-                val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
-                if (latestPeerUri != null)
-                    callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
             }
         }
         else
@@ -1953,7 +1970,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String) {
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
     else {
-        callButtonEnabled.value = false
+        viewModel.dialerState.callButtonEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -1984,18 +2001,28 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String) {
     }
 }
 
+private fun answer(ctx: Context, call: Call) {
+    Log.d(TAG, "AoR ${call.ua.account.aor} answering call from ${call.callUri.value}")
+    val intent = Intent(ctx, BaresipService::class.java)
+    intent.action = "Call Answer"
+    intent.putExtra("uap", call.ua.uap)
+    intent.putExtra("callp", call.callp)
+    ctx.startService(intent)
+}
+
+private fun reject(call: Call) {
+    Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp} from ${call.callUri.value}")
+    call.rejected = true
+    Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
+}
+
 private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: String) {
     callRunnable = Runnable {
         callRunnable = null
-        if (!call(ctx, viewModel, ua, uri)) {
+        val newCall = call(ctx, viewModel, ua, uri)
+        if (newCall == null) {
             BaresipService.abandonAudioFocus(ctx)
-            showCallButton.value = true
-            callButtonEnabled.value = true
-            showCancelButton.value = false
-        }
-        else {
-            showCallButton.value = false
-            showCancelButton.value = true
+            viewModel.dialerState.callButtonEnabled.value = true
         }
     }
     callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
@@ -2003,11 +2030,10 @@ private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: Stri
 
 private fun call(
     ctx: Context,
-    viewModel: ViewModel,
-    ua: UserAgent,
+    viewModel: ViewModel,    ua: UserAgent,
     uri: String,
     onHoldCall: Call? = null
-): Boolean {
+): Call? {
     spinToAor(viewModel, ua.account.aor)
     val callp = ua.callAlloc(0L, Api.VIDMODE_OFF)
     return if (callp != 0L) {
@@ -2019,7 +2045,7 @@ private fun call(
             onHoldCall.newCall = call
         if (call.connect(uri)) {
             showCall(ctx, viewModel, ua)
-            true
+            call
         } else {
             Log.w(TAG, "call_connect $callp failed")
             if (onHoldCall != null)
@@ -2027,35 +2053,11 @@ private fun call(
             call.remove()
             call.destroy()
             showCall(ctx, viewModel, ua)
-            false
+            null
         }
     } else {
         Log.w(TAG, "callAlloc for ${ua.uap} to $uri failed")
-        false
-    }
-}
-
-private fun answer(ctx: Context, viewModel: ViewModel) {
-    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-    val call = ua.currentCall()
-    if (call != null) {
-        Log.d(TAG, "AoR ${ua.account.aor} answering call from ${callUri.value}")
-        val intent = Intent(ctx, BaresipService::class.java)
-        intent.action = "Call Answer"
-        intent.putExtra("uap", ua.uap)
-        intent.putExtra("callp", call.callp)
-        ctx.startService(intent)
-    }
-}
-
-private fun reject(viewModel: ViewModel) {
-    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-    val call = ua.currentCall()
-    if (call != null) {
-        val callp = call.callp
-        Log.d(TAG, "AoR ${ua.account.aor} rejecting call $callp from ${callUri.value}")
-        call.rejected = true
-        Api.ua_hangup(ua.uap, callp, 486, "Busy Here")
+        null
     }
 }
 
@@ -2108,10 +2110,11 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             viewModel.updateMicIcon(Icons.Filled.Mic)
         }
     } else {
+        viewModel.dialerState.callUri.value = ""
         pullToRefreshEnabled.value = false
         call.callUriEnabled.value = false
         val isLandscape = ctx.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        if (isLandscape || call.held || call.status != "connected") {
+        if (isLandscape || call.held || call.status.value != "connected") {
             call.focusDtmf.value = false
             call.dtmfEnabled.value = !call.held
             Handler(Looper.getMainLooper()).postDelayed({
@@ -2123,9 +2126,9 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             call.focusDtmf.value = true
             viewModel.requestShowKeyboard()
         }
-        when (call.status) {
+        when (call.status.value) {
             "outgoing", "transferring", "answered" -> {
-                call.callUriLabel.value = if (call.status == "answered")
+                call.callUriLabel.value = if (call.status.value == "answered")
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
@@ -2133,7 +2136,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 call.showCallTimer.value = false
                 call.securityIconTint.value = -1
                 call.showCallButton.value = false
-                call.showCancelButton.value = call.status == "outgoing"
+                call.showCancelButton.value = call.status.value == "outgoing"
                 call.showHangupButton.value = !call.showCancelButton.value
                 call.showAnswerRejectButtons.value = false
                 call.showOnHoldNotice.value = false
@@ -2248,7 +2251,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             if (!BaresipService.isMainVisible)
                 viewModel.navigateToHome()
             spinToAor(viewModel, aor)
-            showCall(ctx, viewModel, ua)
+            val callp = params[1] as Long
+            showCall(ctx, viewModel, ua, Call.ofCallp(callp))
         }
         "call redirect" -> {
             val redirectUri = ev[1]
@@ -2275,8 +2279,13 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "call established" -> {
             if (aor == viewModel.selectedAor.value) {
-                dtmfText.value = ""
-                showCall(ctx, viewModel, ua)
+                viewModel.dialerState.callButtonEnabled.value = true // Re-enable dialer
+                val callp = params[1] as Long
+                val call = Call.ofCallp(callp)
+                if (call != null) {
+                    call.dtmfText.value = ""
+                }
+                showCall(ctx, viewModel, ua, call)
             }
         }
         "call update" -> {
@@ -2301,14 +2310,14 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 }
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
-                    securityIconTint.intValue = call.security
+                    call.securityIconTint.value = call.security
             }
             negativeText.value = ctx.getString(R.string.no)
             onNegativeClicked.value = {
                 call.security = R.color.colorTrafficYellow
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
-                    securityIconTint.intValue = R.color.colorTrafficYellow
+                    call.securityIconTint.value = R.color.colorTrafficYellow
                 onNegativeClicked.value = {}
             }
             showDialog.value = true
@@ -2321,7 +2330,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 return
             }
             if (aor == viewModel.selectedAor.value)
-                securityIconTint.intValue = call.security
+                call.securityIconTint.value = call.security
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -2364,24 +2373,13 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
-            val call = ua.currentCall()
-            if (call != null) {
-                call.resume()
-                callDuration = call.duration()
-                showCallTimer.value = true
-            }
-            else {
-                showCallTimer.value = false
-                securityIconTint.intValue = -1
-            }
             if (aor == viewModel.selectedAor.value) {
+                viewModel.dialerState.callButtonEnabled.value = true
                 ua.account.resumeUri = ""
                 showCall(ctx, viewModel, ua)
                 if (acc.missedCalls)
                     viewModel.triggerAccountUpdate()
             }
-            //if (kgm.isDeviceLocked)
-            //    this.setShowWhenLocked(false)
         }
         "message", "message show", "message reply" -> {
             Handler(Looper.getMainLooper()).postDelayed({
@@ -2404,6 +2402,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
 
+    viewModel.updateCalls(Call.calls().toList())
     handleNextEvent()
 }
 
@@ -2423,10 +2422,10 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                 return
             }
-            callUri.value = intent.getStringExtra("peer")!!
+            viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call")
-                callClick(ctx, viewModel)
+                callClick(ctx, viewModel, viewModel.dialerState)
         }
         "call show", "call answer" -> {
             val callp = intent.getLongExtra("callp", 0L)
@@ -2438,7 +2437,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             val ua = call.ua
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call answer")
-                answer(ctx, viewModel)
+                answer(ctx, call)
             else
                 BaresipService.postServiceEvent(ServiceEvent(
                     "call incoming",
@@ -2549,8 +2548,8 @@ fun callAction(ctx: Context, viewModel: ViewModel, uri: Uri?, action: String) {
 private fun redirect(ctx: Context, viewModel: ViewModel, ua: UserAgent, redirectUri: String) {
     if (ua.account.aor != viewModel.selectedAor.value)
         spinToAor(viewModel, ua.account.aor)
-    callUri.value = redirectUri
-    callClick(ctx, viewModel)
+    viewModel.dialerState.callUri.value = redirectUri
+    callClick(ctx, viewModel, viewModel.dialerState)
 }
 
 private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, call: Call, uri: String) {
