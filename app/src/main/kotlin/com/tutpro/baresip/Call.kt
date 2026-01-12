@@ -42,7 +42,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
 
     fun add() {
-        BaresipService.calls.add(0, this)
+        BaresipService.calls.add(this)
     }
 
     fun remove() {
@@ -133,7 +133,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         }
 
         fun call(status: String): Call? {
-            for (c in BaresipService.calls.reversed())
+            for (c in BaresipService.calls)
                 if (c.status.value == status) return c
             return null
         }
