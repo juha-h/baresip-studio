@@ -74,6 +74,7 @@ import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
 import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.filled.Voicemail
+import androidx.compose.material.icons.filled.WifiCalling
 import androidx.compose.material.icons.outlined.ArrowCircleRight
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Info
@@ -882,6 +883,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
     val filteredCalls = calls.filter { it.ua.account.aor == selectedAor }
 
     val dialingOrRinging = filteredCalls.any { it.status.value == "outgoing" || it.status.value == "incoming" }
+    val conferenceCall = filteredCalls.any { it.conferenceCall }
 
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
@@ -987,9 +989,8 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
         }
 
         // Only show the dialer if we are not in a transient state
-        if (!dialingOrRinging) {
+        if (!dialingOrRinging && (filteredCalls.isEmpty() || conferenceCall))
             CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
-        }
 
         Indicator(
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -1406,24 +1407,51 @@ private fun CallRow(
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
+                        dialerState.showCallConferenceButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
                     },
-                    enabled = dialerState.callButtonEnabled.value
+                    enabled = dialerState.callButtonsEnabled.value
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Call,
                         modifier = Modifier.size(42.dp),
-                        tint = colorResource(if (dialerState.callButtonEnabled.value)
+                        tint = colorResource(if (dialerState.callButtonsEnabled.value)
                             R.color.colorTrafficGreen
                         else
                             R.color.colorTrafficYellow),
                         contentDescription = null,
                     )
                 }
-        } else {
+            if (dialerState.showCallConferenceButton.value) {
+                Spacer(modifier = Modifier.weight(1f, true))
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    enabled = dialerState.callButtonsEnabled.value,
+                    onClick = {
+                        dialerState.showCallButton.value = false
+                        dialerState.showSuggestions.value = false
+                        callClick(ctx, viewModel, dialerState)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.WifiCalling,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(
+                            if (dialerState.callButtonsEnabled.value)
+                                R.color.colorTrafficGreen
+                            else
+                                R.color.colorTrafficYellow
+                        ),
+                        contentDescription = null,
+                    )
+                }
+            }
+        }
+        else {
             if (call!!.showCancelButton.value) {
-                Spacer(modifier = Modifier.weight(1f))
+                if (!call.conferenceCall)
+                    Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
@@ -1495,30 +1523,32 @@ private fun CallRow(
                 }
 
                 var showTransferDialog by remember { mutableStateOf(false) }
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    enabled = call.transferButtonEnabled.value,
-                    onClick = {
-                        if (call.onHoldCall != null) {
-                            if (!call.executeTransfer()) {
-                                alertTitle.value = ctx.getString(R.string.notice)
-                                alertMessage.value = ctx.getString(R.string.transfer_failed)
-                                showAlert.value = true
-                            }
-                        } else
-                            showTransferDialog = true
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.ArrowCircleRight,
-                        modifier = Modifier.size(42.dp),
-                        tint = if (call.callTransfer.value)
-                            MaterialTheme.colorScheme.error
-                        else
-                            MaterialTheme.colorScheme.secondary,
-                        contentDescription = null,
-                    )
-                }
+
+                if (!call.conferenceCall)
+                    IconButton(
+                        modifier = Modifier.size(48.dp),
+                        enabled = call.transferButtonEnabled.value,
+                        onClick = {
+                            if (call.onHoldCall != null) {
+                                if (!call.executeTransfer()) {
+                                    alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.transfer_failed)
+                                    showAlert.value = true
+                                }
+                            } else
+                                showTransferDialog = true
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowCircleRight,
+                            modifier = Modifier.size(42.dp),
+                            tint = if (call.callTransfer.value)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.secondary,
+                            contentDescription = null,
+                        )
+                    }
 
                 if (showTransferDialog) {
 
@@ -1747,6 +1777,7 @@ private fun CallRow(
                                 }
                             }
                         }
+
                 }
 
                 val focusRequester = remember { FocusRequester() }
@@ -1919,13 +1950,13 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                 if (uriText.isNotEmpty()) {
                     val uris = Contact.contactUris(uriText)
                     if (uris.isEmpty())
-                        makeCall(ctx, viewModel, uriText)
+                        makeCall(ctx, viewModel, uriText, dialerState.showCallConferenceButton.value)
                     else if (uris.size == 1)
-                        makeCall(ctx, viewModel, uris[0])
+                        makeCall(ctx, viewModel, uris[0], dialerState.showCallConferenceButton.value)
                     else {
                         selectItems.value = uris
                         selectItemAction.value = { index ->
-                            makeCall(ctx, viewModel, uris[index])
+                            makeCall(ctx, viewModel, uris[index], dialerState.showCallConferenceButton.value)
                         }
                         showSelectItemDialog.value = true
                     }
@@ -1942,7 +1973,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
     }
 }
 
-private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String) {
+private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, conferenceCall: Boolean) {
     val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
     val aor = ua.account.aor
@@ -1969,14 +2000,14 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String) {
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
     else {
-        viewModel.dialerState.callButtonEnabled.value = false
+        viewModel.dialerState.callButtonsEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = AudioManager.MODE_IN_COMMUNICATION
-            runCall(ctx, viewModel, ua, uri)
+            runCall(ctx, viewModel, ua, uri, conferenceCall)
         } else {
             if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
-                runCall(ctx, viewModel, ua, uri)
+                runCall(ctx, viewModel, ua, uri, conferenceCall)
             } else {
                 audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
                     if (mode == AudioManager.MODE_IN_COMMUNICATION) {
@@ -1986,7 +2017,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String) {
                             am.removeOnModeChangedListener(audioModeChangedListener!!)
                             audioModeChangedListener = null
                         }
-                        runCall(ctx, viewModel, ua, uri)
+                        runCall(ctx, viewModel, ua, uri, conferenceCall)
                     } else {
                         Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
                                 "device ${am.communicationDevice!!.type}")
@@ -2015,13 +2046,13 @@ private fun reject(call: Call) {
     Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
 }
 
-private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: String) {
+private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: String, conferenceCall: Boolean) {
     callRunnable = Runnable {
         callRunnable = null
-        val newCall = call(ctx, viewModel, ua, uri)
+        val newCall = call(ctx, viewModel, ua, uri, conferenceCall)
         if (newCall == null) {
             BaresipService.abandonAudioFocus(ctx)
-            viewModel.dialerState.callButtonEnabled.value = true
+            viewModel.dialerState.callButtonsEnabled.value = true
         }
     }
     callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
@@ -2032,6 +2063,7 @@ private fun call(
     viewModel: ViewModel,
     ua: UserAgent,
     uri: String,
+    conferenceCall: Boolean,
     onHoldCall: Call? = null
 ): Call? {
     spinToAor(viewModel, ua.account.aor)
@@ -2040,6 +2072,7 @@ private fun call(
         Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
         val call = Call(callp, ua, uri, "out", "outgoing")
         call.onHoldCall = onHoldCall
+        call.conferenceCall = conferenceCall
         call.add()
         if (onHoldCall != null)
             onHoldCall.newCall = call
@@ -2077,7 +2110,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
             if (attended) {
                 if (call.hold()) {
                     call.referTo = uri
-                    call(ctx, viewModel, ua, uri, call)
+                    call(ctx, viewModel, ua, uri, false,call)
                 }
             }
             else {
@@ -2102,7 +2135,8 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         viewModel.dialerState.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
         viewModel.dialerState.callUriEnabled.value = true
         viewModel.dialerState.showCallButton.value = true
-        viewModel.dialerState.callButtonEnabled.value = true
+        viewModel.dialerState.showCallConferenceButton.value = true
+        viewModel.dialerState.callButtonsEnabled.value = true
         viewModel.dialerState.showSuggestions.value = false
         dialpadButtonEnabled.value = true
         if (BaresipService.isMicMuted) {
@@ -2279,7 +2313,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "call established" -> {
             if (aor == viewModel.selectedAor.value) {
-                viewModel.dialerState.callButtonEnabled.value = true // Re-enable dialer
+                viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
                 val call = Call.ofCallp(callp)
                 if (call != null) {
@@ -2351,7 +2385,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 if (call in Call.calls())
                     acceptTransfer(ctx, viewModel, ua, call!!, ev[1])
                 else
-                    makeCall(ctx, viewModel, ev[1])
+                    makeCall(ctx, viewModel, ev[1], false)
             }
             negativeText.value = ctx.getString(R.string.no)
             onNegativeClicked.value = {
@@ -2366,7 +2400,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
                 Api.ua_hangup(uap, callp, 487, "Request Terminated")
-            call(ctx, viewModel, ua, ev[1])
+            call(ctx, viewModel, ua, ev[1], false)
             showCall(ctx, viewModel, ua)
         }
         "transfer failed" -> {
@@ -2374,7 +2408,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "call closed" -> {
             if (aor == viewModel.selectedAor.value) {
-                viewModel.dialerState.callButtonEnabled.value = true
+                viewModel.dialerState.callButtonsEnabled.value = true
                 ua.account.resumeUri = ""
                 showCall(ctx, viewModel, ua)
                 if (acc.missedCalls)
