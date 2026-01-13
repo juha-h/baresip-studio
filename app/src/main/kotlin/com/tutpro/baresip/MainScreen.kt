@@ -745,7 +745,6 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 // Disable the button if no account is selected
                 enabled = aor.isNotEmpty(),
                 onClick = {
-                    // No need for an 'if' check here anymore
                     val ua = UserAgent.ofAor(aor)!!
                     val acc = ua.account
                     if (acc.vmUri.isNotEmpty()) {
@@ -2030,7 +2029,8 @@ private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: Stri
 
 private fun call(
     ctx: Context,
-    viewModel: ViewModel,    ua: UserAgent,
+    viewModel: ViewModel,
+    ua: UserAgent,
     uri: String,
     onHoldCall: Call? = null
 ): Call? {
