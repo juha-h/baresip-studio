@@ -238,7 +238,7 @@ private fun MainScreen(
                         if (uas.value.isNotEmpty()) {
                             if (viewModel.selectedAor.value == "") {
                                 if (Call.inCall())
-                                    spinToAor(viewModel, Call.calls()[0].ua.account.aor)
+                                    spinToAor(viewModel, Call.calls().last().ua.account.aor)
                                 else
                                     spinToAor(viewModel, uas.value.first().account.aor)
                             }
@@ -2002,6 +2002,8 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
     }
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
+    else if (Call.calls().any { it.ua.account.aor != ua.account.aor })
+        Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
