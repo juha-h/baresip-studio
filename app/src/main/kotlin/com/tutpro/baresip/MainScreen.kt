@@ -232,6 +232,7 @@ private fun MainScreen(
                     Log.d(TAG, "Resumed to MainScreen")
                     BaresipService.isMainVisible = true
                     val incomingCall = Call.call("incoming")
+                    viewModel.updateCalls(Call.calls().toList())
                     if (incomingCall != null)
                         spinToAor(viewModel, incomingCall.ua.account.aor)
                     else {
