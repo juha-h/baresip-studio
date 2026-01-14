@@ -1478,9 +1478,12 @@ private fun CallRow(
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
-                        abandonAudioFocus(ctx)
-                        Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}")
-                        Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                        if (!call.terminated) {
+                            call.terminated = true
+                            abandonAudioFocus(ctx)
+                            Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}")
+                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                        }
                     }
                 ) {
                     Icon(
@@ -2067,6 +2070,8 @@ private fun call(
     onHoldCall: Call? = null
 ): Call? {
     spinToAor(viewModel, ua.account.aor)
+    if (conferenceCall && ua.calls().isEmpty())
+        Api.module_load("mixminus")
     val callp = ua.callAlloc(0L, Api.VIDMODE_OFF)
     return if (callp != 0L) {
         Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
@@ -2090,6 +2095,8 @@ private fun call(
         }
     } else {
         Log.w(TAG, "callAlloc for ${ua.uap} to $uri failed")
+        if (conferenceCall && ua.calls().isEmpty())
+            Api.module_unload("mixminus")
         null
     }
 }
@@ -2318,6 +2325,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 val call = Call.ofCallp(callp)
                 if (call != null) {
                     call.dtmfText.value = ""
+                    if (call.conferenceCall)
+                        Api.cmd_exec("conference")
                 }
                 showCall(ctx, viewModel, ua, call)
             }

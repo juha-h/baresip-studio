@@ -11,6 +11,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     var onhold = false
     var held = false
+    var terminated = false
     var conferenceCall = false
     var onHoldCall: Call? = null
     var newCall: Call? = null

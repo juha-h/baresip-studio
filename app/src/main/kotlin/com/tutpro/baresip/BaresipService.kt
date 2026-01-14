@@ -1104,6 +1104,8 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             call.remove()
+                            if (call.conferenceCall && ua.calls().isEmpty())
+                                Api.module_unload("mixminus")
                             val reason = ev[1]
                             val tone = ev[2]
                             if (tone == "busy") {
