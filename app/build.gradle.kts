@@ -12,8 +12,8 @@ android {
         applicationId = "com.tutpro.baresip"
         minSdk = 28
         targetSdk = 36
-        versionCode = 470
-        versionName = "76.0.0"
+        versionCode = 471
+        versionName = "76.0.1"
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
