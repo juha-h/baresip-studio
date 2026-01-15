@@ -418,7 +418,7 @@ private fun Calls(
                         Spacer(modifier = Modifier.width(4.dp))
                         var count = 1
                         for (d in callRow.details) {
-                            if (d.recording[0] != "")
+                            if (d.recording.isNotEmpty() && d.recording[0] != "")
                                 recordings = true
                             if (count > 3)
                                 continue
@@ -486,10 +486,10 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
             if (res.isNotEmpty() && res.last().peerUri == h.peerUri)
                 res.last().details.add(CallRow.Details(
                     direction, h.startTime,
-                    h.stopTime, h.recording
+                    h.stopTime, h.recording.toList()
                 ))
             else
-                res.add(CallRow(h.aor, h.peerUri, direction, h.startTime, h.stopTime, h.recording))
+                res.add(CallRow(h.aor, h.peerUri, direction, h.startTime, h.stopTime, h.recording.toList()))
         }
     }
     return res
@@ -497,12 +497,12 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
 
 private fun removeFromHistory(callHistory: MutableState<List<CallRow>>, callRow: CallRow) {
     for (details in callRow.details) {
-        CallHistoryNew.deleteRecordingFiles(details.recording)
+        CallHistoryNew.deleteRecordingFiles(details.recording.toTypedArray())
         BaresipService.callHistory.removeAll {
             it.startTime == details.startTime && it.stopTime == details.stopTime
         }
     }
-    CallHistoryNew.deleteRecordingFiles(callRow.recording)
+    CallHistoryNew.deleteRecordingFiles(callRow.recording.toTypedArray())
     val updatedList = callHistory.value.filterNot { it == callRow }
     callHistory.value = updatedList
     CallHistoryNew.save()

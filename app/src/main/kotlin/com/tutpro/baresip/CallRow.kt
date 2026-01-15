@@ -8,13 +8,13 @@ data class CallRow(
     var direction: Int,
     var startTime: GregorianCalendar?,
     var stopTime: GregorianCalendar,
-    var recording: Array<String>
+    var recording: List<String>
 ) {
     data class Details(
         var direction: Int,
         var startTime: GregorianCalendar?,
         var stopTime: GregorianCalendar,
-        var recording: Array<String>
+        var recording: List<String>
     )
     val details = mutableListOf(Details(direction, startTime, stopTime, recording))
 }
