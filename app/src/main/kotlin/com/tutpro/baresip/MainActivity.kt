@@ -252,29 +252,20 @@ class MainActivity : ComponentActivity() {
 
                 navController = rememberNavController()
 
-                LaunchedEffect(key1 = viewModel, key2 = navController) {
+                LaunchedEffect(key1 = viewModel) {
                     viewModel.navigationCommand.collect { command ->
                         Log.d(TAG, "MainActivity: Received NavigationCommand: $command")
                         when (command) {
                             is NavigationCommand.NavigateToChat -> {
-                                val route = "chat/${command.aor}/${command.peer}"
-                                navController.navigate(route) {
-                                    launchSingleTop = true
-                                    popUpTo("main")
-                                }
+                                val route = "chat/${command.aor}/${command.peerUri}"
+                                navController.navigate(route)
                             }
                             is NavigationCommand.NavigateToCalls -> {
                                 val route = "calls/${command.aor}"
-                                navController.navigate(route) {
-                                    launchSingleTop = true
-                                    popUpTo("main")
-                                }
+                                navController.navigate(route)
                             }
                             is NavigationCommand.NavigateToHome -> {
-                                navController.navigate("main") {
-                                    launchSingleTop = true
-                                    popUpTo("main")
-                                }
+                                navController.navigate("main")
                             }
                         }
                     }

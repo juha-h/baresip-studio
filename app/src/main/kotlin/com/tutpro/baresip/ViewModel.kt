@@ -1,106 +1,129 @@
 package com.tutpro.baresip
 
-import android.app.Application
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
 import kotlinx.coroutines.launch
 
+// Sealed class for type-safe navigation events
 sealed class NavigationCommand {
-    data class NavigateToChat(val aor: String, val peer: String?) : NavigationCommand()
+    object NavigateToHome : NavigationCommand()
     data class NavigateToCalls(val aor: String) : NavigationCommand()
-    object NavigateToHome: NavigationCommand()
-    // Add other navigation commands as needed
+    data class NavigateToChat(val aor: String, val peerUri: String) : NavigationCommand()
 }
 
-data class AorPeer(val aor: String, val peer: String)
+class ViewModel: ViewModel() {
 
-class ViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val _selectedAor = MutableStateFlow("")
-    val selectedAor: StateFlow<String> = _selectedAor.asStateFlow()
-
-    fun updateSelectedAor(newValue: String) {
-        _selectedAor.value = newValue
-    }
-
-    private val _accountUpdate = MutableStateFlow(0)
-    val accountUpdate: StateFlow<Int> = _accountUpdate
-
-    fun triggerAccountUpdate() {
-        _accountUpdate.value++
-    }
-
-    private val _aorPeerMessage = MutableStateFlow(mutableMapOf<AorPeer, String>())
-
-    fun updateAorPeerMessage(aor: String, peerUri: String, message: String) {
-        val key = AorPeer(aor, peerUri)
-        if (message == "")
-            _aorPeerMessage.value.remove(key)
-        else
-            _aorPeerMessage.value[key] = message
-    }
+    // A map to store message drafts. Key is "aor:peerUri"
+    private val messageDrafts = mutableMapOf<String, String>()
 
     fun getAorPeerMessage(aor: String, peerUri: String): String {
-        val key = AorPeer(aor, peerUri)
-        return _aorPeerMessage.value.getOrDefault(key, "")
+        return messageDrafts["$aor:$peerUri"] ?: ""
     }
 
-    private val _showKeyboard = mutableIntStateOf(0)
-    val showKeyboard: State<Int> = _showKeyboard
-
-    fun requestShowKeyboard() {
-        _showKeyboard.intValue++
+    fun updateAorPeerMessage(aor: String, peerUri: String, message: String) {
+        val key = "$aor:$peerUri"
+        if (message.isEmpty()) {
+            messageDrafts.remove(key)
+        } else {
+            messageDrafts[key] = message
+        }
     }
 
-    private val _hideKeyboard = mutableIntStateOf(0)
-    val hideKeyboard: State<Int> = _hideKeyboard
+    data class DialerState(
+        val callUri: MutableState<String> = mutableStateOf(""),
+        val callUriEnabled: MutableState<Boolean> = mutableStateOf(true),
+        val callUriLabel: MutableState<String> = mutableStateOf(""),
+        val showSuggestions: MutableState<Boolean> = mutableStateOf(false),
+        val showCallButton: MutableState<Boolean> = mutableStateOf(true),
+        val showCallConferenceButton: MutableState<Boolean> = mutableStateOf(true),
+        val callButtonsEnabled: MutableState<Boolean> = mutableStateOf(true),
+        val conferenceCall: MutableState<Boolean> = mutableStateOf(false),
+    )
 
-    fun requestHideKeyboard() {
-        _hideKeyboard.intValue++
-    }
+    val dialerState = DialerState()
+
+    private val _calls = MutableStateFlow<List<Call>>(emptyList())
+    val calls = _calls.asStateFlow()
+
+    private val _selectedAor = MutableStateFlow("")
+    val selectedAor = _selectedAor.asStateFlow()
+
+    private val _accountUpdate = MutableStateFlow(0)
+    val accountUpdate = _accountUpdate.asStateFlow()
 
     private val _micIcon = MutableStateFlow(Icons.Filled.Mic)
-    val micIcon: StateFlow<ImageVector> = _micIcon.asStateFlow()
+    val micIcon = _micIcon.asStateFlow()
+
+    private val _isDialpadVisible = MutableStateFlow(false)
+    val isDialpadVisible = _isDialpadVisible.asStateFlow()
+
+    private val _showKeyboard = MutableStateFlow(0)
+    val showKeyboard = _showKeyboard.asStateFlow()
+
+    private val _hideKeyboard = MutableStateFlow(0)
+    val hideKeyboard = _hideKeyboard.asStateFlow()
+
+    private val _navigationCommand = MutableSharedFlow<NavigationCommand>()
+    val navigationCommand = _navigationCommand.asSharedFlow()
+
+    private var _selectedCallRow: CallRow? = null
+
+    fun selectCallRow(callRow: CallRow) {
+        _selectedCallRow = callRow
+    }
+
+    fun consumeSelectedCallRow(): CallRow? {
+        val callRow = _selectedCallRow
+        _selectedCallRow = null
+        return callRow
+    }
+
+    fun onNewMessageReceived(aor: String, peerUri: String) {
+        viewModelScope.launch {
+            _navigationCommand.emit(NavigationCommand.NavigateToChat(aor, peerUri))
+        }
+    }
+
+    fun updateCalls(calls: List<Call>) {
+        _calls.value = calls
+    }
+
+    fun updateSelectedAor(aor: String) {
+        _selectedAor.value = aor
+    }
+
+    fun triggerAccountUpdate() {
+        _accountUpdate.value += 1
+    }
 
     fun updateMicIcon(icon: ImageVector) {
         _micIcon.value = icon
     }
 
-    private val _isDialpadVisible = MutableStateFlow(false)
-    val isDialpadVisible: StateFlow<Boolean> = _isDialpadVisible
-
     fun toggleDialpadVisibility() {
         _isDialpadVisible.value = !_isDialpadVisible.value
     }
 
-    private val _selectedCallRow = MutableStateFlow<CallRow?>(null)
-
-    fun selectCallRow(callRow: CallRow) {
-        _selectedCallRow.value = callRow
+    fun requestShowKeyboard() {
+        _showKeyboard.value += 1
     }
 
-    fun consumeSelectedCallRow(): CallRow? {
-        val callRow = _selectedCallRow.value
-        _selectedCallRow.value = null
-        return callRow
+    fun requestHideKeyboard() {
+        _hideKeyboard.value += 1
     }
 
-    private val _navigationCommand = MutableSharedFlow<NavigationCommand>()
-    val navigationCommand = _navigationCommand.asSharedFlow()
-
-    fun onNewMessageReceived(aor: String, peer: String) {
+    fun navigateToHome() {
         viewModelScope.launch {
-            _navigationCommand.emit(NavigationCommand.NavigateToChat(aor, peer))
+            _navigationCommand.emit(NavigationCommand.NavigateToHome)
         }
     }
 
@@ -110,9 +133,4 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun navigateToHome() {
-        viewModelScope.launch {
-            _navigationCommand.emit(NavigationCommand.NavigateToHome)
-        }
-    }
 }
