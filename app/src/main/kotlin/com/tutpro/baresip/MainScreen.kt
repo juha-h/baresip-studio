@@ -58,6 +58,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.AddIcCall
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Dialpad
@@ -74,7 +75,6 @@ import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SpeakerPhone
 import androidx.compose.material.icons.filled.VoiceOverOff
 import androidx.compose.material.icons.filled.Voicemail
-import androidx.compose.material.icons.filled.WifiCalling
 import androidx.compose.material.icons.outlined.ArrowCircleRight
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Info
@@ -1436,7 +1436,7 @@ private fun CallRow(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.WifiCalling,
+                        imageVector = Icons.Filled.AddIcCall,
                         modifier = Modifier.size(42.dp),
                         tint = colorResource(
                             if (dialerState.callButtonsEnabled.value)
