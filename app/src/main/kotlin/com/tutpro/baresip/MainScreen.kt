@@ -1478,13 +1478,12 @@ private fun CallRow(
 
                 IconButton(
                     modifier = Modifier.size(48.dp),
+                    enabled = !call.terminated.value,
                     onClick = {
-                        if (!call.terminated) {
-                            call.terminated = true
-                            abandonAudioFocus(ctx)
-                            Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}")
-                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                        }
+                        call.terminated.value = true
+                        abandonAudioFocus(ctx)
+                        Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}")
+                        Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
                     }
                 ) {
                     Icon(
