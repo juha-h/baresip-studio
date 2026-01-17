@@ -53,11 +53,15 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -240,13 +244,19 @@ private fun ContactsContent(
     }
 
     val filteredContacts = remember(BaresipService.contacts, searchQuery) {
-        if (searchQuery.isBlank())
-            BaresipService.contacts
-        else {
-            val normalizedQuery = Utils.unaccent(searchQuery)
-            BaresipService.contacts.filter { contact ->
-                Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
+        if (searchQuery.isBlank()) {
+            BaresipService.contacts.map { contact ->
+                Pair(contact, buildAnnotatedString { append(contact.name()) })
             }
+        } else {
+            val normalizedQuery = Utils.unaccent(searchQuery)
+            BaresipService.contacts
+                .filter { contact ->
+                    Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
+                }
+                .map { contact ->
+                    Pair(contact, buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
+                }
         }
     }
 
@@ -264,15 +274,13 @@ private fun ContactsContent(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(filteredContacts, key = { it.id() }) { contact ->
-
-            val name = contact.name()
+        items(filteredContacts, key = { it.first.id() }) { (contact, annotatedName) ->
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                when(contact) {
+                when (contact) {
 
                     is Contact.BaresipContact -> {
                         val avatarImage = contact.avatarImage
@@ -286,7 +294,7 @@ private fun ContactsContent(
                                     .clip(CircleShape)
                             )
                         else
-                            TextAvatar(name, contact.color)
+                            TextAvatar(contact.name(), contact.color)
                     }
 
                     is Contact.AndroidContact -> {
@@ -301,14 +309,14 @@ private fun ContactsContent(
                                     .clip(CircleShape),
                             )
                         else
-                            TextAvatar(name, contact.color)
+                            TextAvatar(contact.name(), contact.color)
                     }
                 }
 
-                when(contact) {
+                when (contact) {
 
                     is Contact.BaresipContact -> {
-                        Text(text = name,
+                        Text(text = annotatedName,
                             fontSize = 20.sp,
                             fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
                             modifier = Modifier
@@ -327,7 +335,7 @@ private fun ContactsContent(
                                             Log.w(TAG, "onClickListener did not find UA for $aor")
                                         dialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_action_question),
-                                            name
+                                            contact.name()
                                         )
                                         positiveText.value = ctx.getString(R.string.call)
                                         positiveAction.value = {
@@ -351,7 +359,7 @@ private fun ContactsContent(
                                     onLongClick = {
                                         dialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_delete_question),
-                                            name
+                                            contact.name()
                                         )
                                         positiveText.value = ctx.getString(R.string.delete)
                                         positiveAction.value = {
@@ -379,7 +387,7 @@ private fun ContactsContent(
                         )
                         SmallFloatingActionButton(
                             modifier = Modifier.padding(end = 10.dp),
-                            onClick = { navController.navigate("baresip_contact/${name}/old") },
+                            onClick = { navController.navigate("baresip_contact/${contact.name()}/old") },
                             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                             contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                         ) {
@@ -392,24 +400,24 @@ private fun ContactsContent(
                     }
 
                     is Contact.AndroidContact -> {
-                        Text(text = name,
+                        Text(text = annotatedName,
                             fontSize = 20.sp,
                             fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
                                 .combinedClickable(
-                                    onClick = { navController.navigate("android_contact/${name}") },
+                                    onClick = { navController.navigate("android_contact/${contact.name()}") },
                                     onLongClick = {
                                         dialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_delete_question),
-                                            name
+                                            contact.name()
                                         )
                                         positiveText.value = ctx.getString(R.string.delete)
                                         positiveAction.value = {
                                             ctx.contentResolver.delete(
                                                 ContactsContract.RawContacts.CONTENT_URI,
-                                                ContactsContract.Contacts.DISPLAY_NAME + "='" + name + "'",
+                                                ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
                                                 null
                                             )
                                         }
@@ -421,6 +429,23 @@ private fun ContactsContent(
                     }
                 }
             }
+        }
+    }
+}
+
+private fun buildAnnotatedStringWithHighlight(name: String, query: String): AnnotatedString {
+    val normalizedName = Utils.unaccent(name)
+    val normalizedQuery = Utils.unaccent(query)
+    val startIndex = normalizedName.indexOf(normalizedQuery, ignoreCase = true)
+    return if (startIndex == -1) {
+        buildAnnotatedString { append(name) }
+    } else {
+        buildAnnotatedString {
+            append(name.take(startIndex))
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(name.drop(startIndex).take(normalizedQuery.length))
+            }
+            append(name.drop(startIndex + normalizedQuery.length))
         }
     }
 }
