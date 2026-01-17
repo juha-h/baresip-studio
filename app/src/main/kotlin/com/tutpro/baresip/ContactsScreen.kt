@@ -240,11 +240,12 @@ private fun ContactsContent(
     }
 
     val filteredContacts = remember(BaresipService.contacts, searchQuery) {
-        if (searchQuery.isBlank()) {
+        if (searchQuery.isBlank())
             BaresipService.contacts
-        } else {
+        else {
+            val normalizedQuery = Utils.unaccent(searchQuery)
             BaresipService.contacts.filter { contact ->
-                contact.name().contains(searchQuery, ignoreCase = true)
+                Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
             }
         }
     }

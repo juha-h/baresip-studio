@@ -1357,6 +1357,7 @@ private fun CallUriRow(
             }
     }
 }
+
 @Composable
 private fun CallTimer(
     initialDurationSeconds: Long,
