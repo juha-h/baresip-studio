@@ -1,0 +1,2 @@
+- In contact search, match also diacritic characters
+- In contact search, highlight matched characters
