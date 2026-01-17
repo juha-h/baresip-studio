@@ -40,8 +40,9 @@ class UserAgent(val uap: Long) {
         return result
     }
 
+    // Returns call of UA that was added last or NULL
     fun currentCall(): Call? {
-        for (c in BaresipService.calls)
+        for (c in BaresipService.calls.reversed())
             if (c.ua == this)
                 return c
         return null

@@ -1,11 +1,18 @@
 package com.tutpro.baresip.plus
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import java.util.*
 
-class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, var status: String) {
+class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
+
+    var status: MutableState<String> = mutableStateOf(initialStatus)
 
     var onhold = false
     var held = false
+    val terminated = mutableStateOf(false)
+    var conferenceCall = false
     var onHoldCall: Call? = null
     var newCall: Call? = null
     var rejected = false  // Incoming rejected by user or outgoing fails but not due to 408 or 480
@@ -20,8 +27,32 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return Api.call_diverter_uri(callp)
     }
 
+    // UI state properties
+    val callUri: MutableState<String> = mutableStateOf("")
+    val callUriEnabled: MutableState<Boolean> = mutableStateOf(true)
+    val callUriLabel: MutableState<String> = mutableStateOf("")
+    val securityIconTint: MutableState<Int> = mutableIntStateOf(-1)
+    val showCallTimer: MutableState<Boolean> = mutableStateOf(false)
+    var callDuration: Int = 0
+    val showSuggestions: MutableState<Boolean> = mutableStateOf(false)
+    val showCallButton: MutableState<Boolean> = mutableStateOf(true)
+    val showCallVideoButton: MutableState<Boolean> = mutableStateOf(true)
+    val callButtonsEnabled: MutableState<Boolean> = mutableStateOf(true)
+    val callVideoButtonEnabled: MutableState<Boolean> = mutableStateOf(true)
+    val videoIcon: MutableState<Video> = mutableStateOf(Video.NONE)
+    val showCancelButton: MutableState<Boolean> = mutableStateOf(false)
+    val showAnswerRejectButtons: MutableState<Boolean> = mutableStateOf(false)
+    val showHangupButton: MutableState<Boolean> = mutableStateOf(false)
+    val showOnHoldNotice: MutableState<Boolean> = mutableStateOf(false)
+    val callOnHold: MutableState<Boolean> = mutableStateOf(false)
+    val transferButtonEnabled: MutableState<Boolean> = mutableStateOf(false)
+    val callTransfer: MutableState<Boolean> = mutableStateOf(false)
+    val dtmfText: MutableState<String> = mutableStateOf("")
+    val dtmfEnabled: MutableState<Boolean> = mutableStateOf(false)
+    val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
+
     fun add() {
-        BaresipService.calls.add(0, this)
+        BaresipService.calls.add(this)
     }
 
     fun remove() {
@@ -144,8 +175,8 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         }
 
         fun call(status: String): Call? {
-            for (c in BaresipService.calls.reversed())
-                if (c.status == status) return c
+            for (c in BaresipService.calls)
+                if (c.status.value == status) return c
             return null
         }
 
