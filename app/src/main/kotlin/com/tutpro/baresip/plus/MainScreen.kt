@@ -129,6 +129,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
@@ -1450,90 +1451,94 @@ private fun CallRow(
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         if (isDialer) {
-            if (dialerState.showCallButton.value)
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    enabled = dialerState.callButtonsEnabled.value,
-                    onClick = {
-                        dialerState.showCallConferenceButton.value = false
-                        dialerState.showCallVideoButton.value = false
-                        dialerState.showSuggestions.value = false
-                        callClick(ctx, viewModel, dialerState, false)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Call,
-                        modifier = Modifier.size(42.dp),
-                        tint = colorResource(
-                            if (dialerState.callButtonsEnabled.value)
-                                R.color.colorTrafficGreen
-                            else
-                                R.color.colorTrafficYellow
-                        ),
-                        contentDescription = null,
-                    )
-                }
-            if (dialerState.showCallConferenceButton.value) {
-                Spacer(modifier = Modifier.weight(1f, true))
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    enabled = dialerState.callButtonsEnabled.value,
-                    onClick = {
-                        dialerState.showCallButton.value = false
-                        dialerState.showCallVideoButton.value = false
-                        dialerState.showSuggestions.value = false
-                        callClick(ctx, viewModel, dialerState, false)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.AddIcCall,
-                        modifier = Modifier.size(42.dp),
-                        tint = colorResource(
-                            if (dialerState.callButtonsEnabled.value)
-                                R.color.colorTrafficGreen
-                            else
-                                R.color.colorTrafficYellow
-                        ),
-                        contentDescription = null,
-                    )
-                }
+
+            // Call Button (Left)
+            IconButton(
+                modifier = Modifier
+                    .size(48.dp)
+                    .alpha(if (dialerState.showCallButton.value) 1f else 0f),
+                enabled = dialerState.callButtonsEnabled.value && dialerState.showCallButton.value,
+                onClick = {
+                    dialerState.showCallConferenceButton.value = false
+                    dialerState.showCallVideoButton.value = false
+                    dialerState.showSuggestions.value = false
+                    callClick(ctx, viewModel, dialerState, false)
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Call,
+                    modifier = Modifier.size(42.dp),
+                    tint = colorResource(
+                        if (dialerState.callButtonsEnabled.value)
+                            R.color.colorTrafficGreen
+                        else
+                            R.color.colorTrafficYellow
+                    ),
+                    contentDescription = null,
+                )
             }
-            if (dialerState.showCallVideoButton.value) {
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    enabled = dialerState.callButtonsEnabled.value,
-                    onClick = {
-                        dialerState.showCallButton.value = false
-                        dialerState.showCallConferenceButton.value = false
-                        dialerState.showSuggestions.value = false
-                        callClick(ctx, viewModel, dialerState, true)
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Videocam,
-                        modifier = Modifier.size(42.dp),
-                        tint = colorResource(
-                            if (dialerState.callButtonsEnabled.value)
-                                R.color.colorTrafficGreen
-                            else
-                                R.color.colorTrafficYellow
-                        ),
-                        contentDescription = null,
-                    )
+
+            // Conference Button (Center)
+            IconButton(
+                modifier = Modifier
+                    .size(48.dp)
+                    .alpha(if (dialerState.showCallConferenceButton.value) 1f else 0f),
+                enabled = dialerState.callButtonsEnabled.value && dialerState.showCallConferenceButton.value,
+                onClick = {
+                    dialerState.showCallButton.value = false
+                    dialerState.showCallVideoButton.value = false
+                    dialerState.showSuggestions.value = false
+                    callClick(ctx, viewModel, dialerState, false)
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AddIcCall,
+                    modifier = Modifier.size(42.dp),
+                    tint = colorResource(
+                        if (dialerState.callButtonsEnabled.value)
+                            R.color.colorTrafficGreen
+                        else
+                            R.color.colorTrafficYellow
+                    ),
+                    contentDescription = null,
+                )
+            }
+
+            // Video Button (Right)
+            IconButton(
+                modifier = Modifier
+                    .size(48.dp)
+                    .alpha(if (dialerState.showCallVideoButton.value) 1f else 0f),
+                enabled = dialerState.callButtonsEnabled.value && dialerState.showCallVideoButton.value,
+                onClick = {
+                    dialerState.showCallButton.value = false
+                    dialerState.showCallConferenceButton.value = false
+                    dialerState.showSuggestions.value = false
+                    callClick(ctx, viewModel, dialerState, true)
                 }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Videocam,
+                    modifier = Modifier.size(42.dp),
+                    tint = colorResource(
+                        if (dialerState.callButtonsEnabled.value)
+                            R.color.colorTrafficGreen
+                        else
+                            R.color.colorTrafficYellow
+                    ),
+                    contentDescription = null,
+                )
             }
 
         }
         else {
             if (call!!.showCancelButton.value) {
-                if (!call.conferenceCall)
+                if (!call.videoCall)
                     Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     modifier = Modifier.size(48.dp),
@@ -2552,6 +2557,7 @@ private fun call(
         val call = Call(callp, ua, uri, "out", "outgoing")
         call.onHoldCall = onHoldCall
         call.conferenceCall = conferenceCall
+        call.videoCall = video
         call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
         call.add()
         if (onHoldCall != null)

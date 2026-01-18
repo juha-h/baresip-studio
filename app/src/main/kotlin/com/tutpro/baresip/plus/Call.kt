@@ -13,6 +13,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var held = false
     val terminated = mutableStateOf(false)
     var conferenceCall = false
+    var videoCall = false
     var onHoldCall: Call? = null
     var newCall: Call? = null
     var rejected = false  // Incoming rejected by user or outgoing fails but not due to 408 or 480
