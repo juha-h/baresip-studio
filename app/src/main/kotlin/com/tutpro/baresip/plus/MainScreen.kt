@@ -1260,6 +1260,7 @@ private fun CallUriRow(
                             if (it == "") {
                                 dialerState.showCallButton.value = true
                                 dialerState.showCallConferenceButton.value = true
+                                dialerState.showCallVideoButton.value = true
                             }
                             val normalizedInput = Utils.unaccent(it)
                             filteredSuggestions = suggestions
@@ -1285,6 +1286,7 @@ private fun CallUriRow(
                                 dialerState.callUri.value = ""
                                 dialerState.showCallButton.value = true
                                 dialerState.showCallConferenceButton.value = true
+                                dialerState.showCallVideoButton.value = true
                             },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
