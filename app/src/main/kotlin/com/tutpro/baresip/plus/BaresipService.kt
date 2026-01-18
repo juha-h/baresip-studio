@@ -1035,7 +1035,7 @@ class BaresipService: Service() {
                             "0", "1" -> call!!.held = true  // inactive, recvonly
                             "2", "3" -> call!!.held = false // sendonly, sendrecv
                         }
-                        if (!isMainVisible || call!!.status != "connected")
+                        if (!isMainVisible || call!!.status.value != "connected")
                             return
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                             (!callHasVideo && remoteHasVideo &&

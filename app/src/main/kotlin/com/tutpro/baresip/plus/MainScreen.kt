@@ -391,7 +391,6 @@ private fun MainScreen(
         VideoLayout(ctx = ctx, viewModel= viewModel,
             onCloseVideo = {
                 showVideoLayout.value = false
-                videoIcon.value = Video.ON
             }
         )
     else
@@ -1465,7 +1464,7 @@ private fun CallRow(
                         dialerState.showCallConferenceButton.value = false
                         dialerState.showCallVideoButton.value = false
                         dialerState.showSuggestions.value = false
-                        callClick(ctx, viewModel, dialerState)
+                        callClick(ctx, viewModel, dialerState, false)
                     },
                 ) {
                     Icon(
@@ -1489,7 +1488,7 @@ private fun CallRow(
                         dialerState.showCallButton.value = false
                         dialerState.showCallVideoButton.value = false
                         dialerState.showSuggestions.value = false
-                        callClick(ctx, viewModel, dialerState)
+                        callClick(ctx, viewModel, dialerState, false)
                     },
                 ) {
                     Icon(
@@ -1531,7 +1530,8 @@ private fun CallRow(
                 }
             }
 
-        } else {
+        }
+        else {
             if (call!!.showCancelButton.value) {
                 if (!call.conferenceCall)
                     Spacer(modifier = Modifier.weight(1f))
@@ -1557,7 +1557,6 @@ private fun CallRow(
             }
 
             if (call.showHangupButton.value) {
-
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
@@ -2125,7 +2124,8 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
                     IconButton(
                         onClick = {
-                            val call = Call.call("connected")
+                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                            val call = ua.currentCall()
                             if (call != null) {
                                 val targetUiState = !isFrontCamera
                                 if (call.setVideoSource(targetUiState) != 0) {
@@ -2178,11 +2178,13 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
             // Bottom Left Group
             Column(horizontalAlignment = Alignment.Start) {
+                val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                val call = ua.currentCall()
                 // Security Button
-                if (securityIconTint.intValue != -1) {
+                if (call != null && call.securityIconTint.value != -1) {
                     IconButton(
                         onClick = {
-                            when (securityIconTint.intValue) {
+                            when (call.securityIconTint.value) {
                                 R.color.colorTrafficRed -> {
                                     alertTitle.value = ctx.getString(R.string.alert)
                                     alertMessage.value = ctx.getString(R.string.call_not_secure)
@@ -2199,18 +2201,10 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                     dialogMessage.value = ctx.getString(R.string.call_is_secure)
                                     positiveText.value = ctx.getString(R.string.unverify)
                                     onPositiveClicked.value = {
-                                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                                        val call = ua.currentCall()
-                                        if (call != null) {
-                                            if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
-                                                Log.e(
-                                                    TAG,
-                                                    "Command 'zrtp_unverify ${call.zid}' failed"
-                                                )
-                                            else
-                                                securityIconTint.intValue =
-                                                    R.color.colorTrafficYellow
-                                        }
+                                        if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
+                                            Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
+                                        else
+                                            call.securityIconTint.value = R.color.colorTrafficYellow
                                     }
                                     onNegativeClicked.value = {}
                                     showDialog.value = true
@@ -2219,12 +2213,12 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         }
                     ) {
                         Icon(
-                            imageVector = if (securityIconTint.intValue == R.color.colorTrafficRed)
+                            imageVector = if (call.securityIconTint.value == R.color.colorTrafficRed)
                                 Icons.Filled.LockOpen
                             else
                                 Icons.Filled.Lock,
                             contentDescription = "Security Status",
-                            tint = colorResource(securityIconTint.intValue),
+                            tint = colorResource(call.securityIconTint.value),
                             modifier = Modifier.size(iconSize)
                         )
                     }
@@ -2386,36 +2380,46 @@ private fun spinToAor(viewModel: ViewModel, aor: String) {
     viewModel.triggerAccountUpdate()
 }
 
-private fun callClick(
-    ctx: Context,
-    viewModel: ViewModel,
-    dialerState: ViewModel.DialerState?,
-    video: Boolean
-) {
+private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?, video: Boolean) {
     if (viewModel.selectedAor.value != "") {
         if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
-            if (Call.inCall())
-                return
-            val uriText = callUri.value.trim()
-            if (uriText.isNotEmpty()) {
-                val uris = Contact.contactUris(uriText)
-                if (uris.isEmpty())
-                    makeCall(ctx, viewModel, uriText, video)
-                else if (uris.size == 1)
-                    makeCall(ctx, viewModel, uris[0], video)
-                else {
-                    selectItems.value = uris
-                    selectItemAction.value = { index ->
-                        makeCall(ctx, viewModel, uris[index], video)
+            if (dialerState != null) {
+                val uriText = dialerState.callUri.value.trim()
+                if (uriText.isNotEmpty()) {
+                    val uris = Contact.contactUris(uriText)
+                    if (uris.isEmpty())
+                        makeCall(ctx,
+                            viewModel,
+                            uriText,
+                            dialerState.showCallConferenceButton.value,
+                            video)
+                    else if (uris.size == 1)
+                        makeCall(
+                            ctx,
+                            viewModel,
+                            uris[0],
+                            dialerState.showCallConferenceButton.value,
+                            video
+                        )
+                    else {
+                        selectItems.value = uris
+                        selectItemAction.value = { index ->
+                            makeCall(
+                                ctx,
+                                viewModel,
+                                uris[index],
+                                dialerState.showCallConferenceButton.value,
+                                video
+                            )
+                        }
+                        showSelectItemDialog.value = true
                     }
-                    showSelectItemDialog.value = true
+                } else {
+                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+                    val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
+                    if (latestPeerUri != null)
+                        dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
                 }
-            }
-            else {
-                val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
-                if (latestPeerUri != null)
-                    callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
             }
         }
         else
@@ -2439,7 +2443,14 @@ fun videoClick(ctx: Context, call: Call) {
     showVideoLayout.value = true
 }
 
-private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, video: Boolean) {
+
+private fun makeCall(
+    ctx: Context,
+    viewModel: ViewModel,
+    uriText: String,
+    conferenceCall: Boolean,
+    video: Boolean
+) {
     val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
     val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
     val aor = ua.account.aor
@@ -2465,22 +2476,17 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, video:
     }
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
+    else if (Call.calls().any { it.ua.account.aor != ua.account.aor })
+        Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
-        if (video) {
-            showCallButton.value = false
-            callVideoButtonEnabled.value = false
-        }
-        else {
-            showCallVideoButton.value = false
-            callButtonEnabled.value = false
-        }
+        viewModel.dialerState.callButtonsEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = AudioManager.MODE_IN_COMMUNICATION
-            runCall(ctx, viewModel, ua, uri, video)
+            runCall(ctx, viewModel, ua, uri, conferenceCall, video)
         } else {
             if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
-                runCall(ctx, viewModel, ua, uri, video)
+                runCall(ctx, viewModel, ua, uri, conferenceCall, video)
             } else {
                 audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
                     if (mode == AudioManager.MODE_IN_COMMUNICATION) {
@@ -2490,7 +2496,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, video:
                             am.removeOnModeChangedListener(audioModeChangedListener!!)
                             audioModeChangedListener = null
                         }
-                        runCall(ctx, viewModel, ua, uri, video)
+                        runCall(ctx, viewModel, ua, uri, conferenceCall, video)
                     } else {
                         Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
                                 "device ${am.communicationDevice!!.type}")
@@ -2504,19 +2510,20 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, video:
     }
 }
 
-private fun runCall(ctx: Context, viewModel: ViewModel, ua: UserAgent, uri: String, video: Boolean) {
+private fun runCall(
+    ctx: Context,
+    viewModel: ViewModel,
+    ua: UserAgent,
+    uri: String,
+    conferenceCall: Boolean,
+    video: Boolean
+) {
     callRunnable = Runnable {
         callRunnable = null
-        if (!call(ctx, viewModel, ua, uri, video)) {
+        val newCall = call(ctx, viewModel, ua, uri, conferenceCall, video)
+        if (newCall == null) {
             BaresipService.abandonAudioFocus(ctx)
-            showCallButton.value = true
-            callButtonEnabled.value = true
-            callVideoButtonEnabled.value = true
-            showCancelButton.value = false
-        }
-        else {
-            showCallButton.value = false
-            showCancelButton.value = true
+            viewModel.dialerState.callButtonsEnabled.value = true
         }
     }
     callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
@@ -2527,10 +2534,13 @@ private fun call(
     viewModel: ViewModel,
     ua: UserAgent,
     uri: String,
+    conferenceCall: Boolean,
     video: Boolean,
     onHoldCall: Call? = null
-): Boolean {
+): Call? {
     spinToAor(viewModel, ua.account.aor)
+    if (conferenceCall && ua.calls().isEmpty())
+        Api.module_load("mixminus")
     val videoDir = if (video) {
         if (Utils.isCameraAvailable(ctx)) Api.SDP_SENDRECV else Api.SDP_RECVONLY
     }
@@ -2541,13 +2551,14 @@ private fun call(
         Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
         val call = Call(callp, ua, uri, "out", "outgoing")
         call.onHoldCall = onHoldCall
+        call.conferenceCall = conferenceCall
         call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
         call.add()
         if (onHoldCall != null)
             onHoldCall.newCall = call
         if (call.connect(uri)) {
             showCall(ctx, viewModel, ua)
-            true
+            call
         } else {
             Log.w(TAG, "call_connect $callp failed")
             if (onHoldCall != null)
@@ -2555,11 +2566,49 @@ private fun call(
             call.remove()
             call.destroy()
             showCall(ctx, viewModel, ua)
-            false
+            null
         }
     } else {
         Log.w(TAG, "callAlloc for ${ua.uap} to $uri failed")
-        false
+        if (conferenceCall && ua.calls().isEmpty())
+            Api.module_unload("mixminus")
+        null
+    }
+}
+
+
+private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText: String, attended: Boolean) {
+    val uri = if (Utils.isTelUri(uriText))
+        Utils.telToSip(uriText, ua.account)
+    else
+        Utils.uriComplete(uriText, ua.account.aor)
+    if (!Utils.checkUri(uri)) {
+        alertTitle.value = ctx.getString(R.string.notice)
+        alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
+        showAlert.value = true
+    }
+    else {
+        val call = ua.currentCall()
+        if (call != null) {
+            if (attended) {
+                if (call.hold()) {
+                    call.referTo = uri
+                    call(ctx, viewModel, ua, uri,
+                        conferenceCall = false,
+                        video = false,
+                        onHoldCall = call
+                    )
+                }
+            }
+            else {
+                if (!call.transfer(uri)) {
+                    alertTitle.value = ctx.getString(R.string.notice)
+                    alertMessage.value = ctx.getString(R.string.transfer_failed)
+                    showAlert.value = true
+                }
+            }
+            showCall(ctx, viewModel, ua)
+        }
     }
 }
 
@@ -2593,37 +2642,6 @@ private fun reject(call: Call) {
     Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
 }
 
-private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText: String, attended: Boolean) {
-    val uri = if (Utils.isTelUri(uriText))
-        Utils.telToSip(uriText, ua.account)
-    else
-        Utils.uriComplete(uriText, ua.account.aor)
-    if (!Utils.checkUri(uri)) {
-        alertTitle.value = ctx.getString(R.string.notice)
-        alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
-        showAlert.value = true
-    }
-    else {
-        val call = ua.currentCall()
-        if (call != null) {
-            if (attended) {
-                if (call.hold()) {
-                    call.referTo = uri
-                    call(ctx, viewModel, ua, uri, false, call)
-                }
-            }
-            else {
-                if (!call.transfer(uri)) {
-                    alertTitle.value = ctx.getString(R.string.notice)
-                    alertMessage.value = ctx.getString(R.string.transfer_failed)
-                    showAlert.value = true
-                }
-            }
-            showCall(ctx, viewModel, ua)
-        }
-    }
-}
-
 private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCall: Call? = null) {
     if (ua == null)
         return
@@ -2631,120 +2649,107 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
     if (call == null) {
         pullToRefreshEnabled.value = true
         showVideoLayout.value = false
-        if (ua.account.resumeUri != "")
-            callUri.value = ua.account.resumeUri
-        else
-            callUri.value = ""
-        callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-        callUriEnabled.value = true
-        showCallTimer.value = false
-        securityIconTint.intValue = -1
-        showHangupButton.value = false
-        callTransfer.value = false
-        dtmfText.value = ""
-        dtmfEnabled.value = false
-        focusDtmf.value = false
-        showCallButton.value = true
-        callButtonEnabled.value = true
-        showCallVideoButton.value = true
-        callVideoButtonEnabled.value = true
-        showCancelButton.value = false
-        showAnswerRejectButtons.value = false
-        showOnHoldNotice.value = false
+        viewModel.dialerState.callUri.value = ua.account.resumeUri
+        viewModel.dialerState.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
+        viewModel.dialerState.callUriEnabled.value = true
+        viewModel.dialerState.showCallButton.value = true
+        viewModel.dialerState.showCallConferenceButton.value = true
+        viewModel.dialerState.showCallVideoButton.value = true
+        viewModel.dialerState.callButtonsEnabled.value = true
+        viewModel.dialerState.showSuggestions.value = false
         dialpadButtonEnabled.value = true
-        videoIcon.value = Video.NONE
+        dialpadButtonEnabled.value = true
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
             viewModel.updateMicIcon(Icons.Filled.Mic)
         }
     } else {
+        viewModel.dialerState.callUri.value = ""
         pullToRefreshEnabled.value = false
-        callUriEnabled.value = false
+        call.callUriEnabled.value = false
         val isLandscape = ctx.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        if (showVideoLayout.value || isLandscape || call.held || call.status != "connected") {
-            focusDtmf.value = false
-            dtmfEnabled.value = !call.held
+        if (showVideoLayout.value || isLandscape || call.held || call.status.value != "connected") {
+            call.focusDtmf.value = false
+            call.dtmfEnabled.value = !call.held
             Handler(Looper.getMainLooper()).postDelayed({
                 viewModel.requestHideKeyboard()
             }, 25)
         }
         else {
-            dtmfEnabled.value = true
-            focusDtmf.value = true
+            call.dtmfEnabled.value = true
+            call.focusDtmf.value = true
             viewModel.requestShowKeyboard()
         }
 
-        when (call.status) {
+        when (call.status.value) {
             "outgoing", "transferring", "answered" -> {
-                callUriLabel.value = if (call.status == "answered")
+                call.callUriLabel.value = if (call.status.value == "answered")
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
-                callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                showCallTimer.value = false
-                securityIconTint.intValue = -1
-                showCallButton.value = false
-                showCallVideoButton.value = false
-                videoIcon.value = Video.NONE
-                showCancelButton.value = call.status == "outgoing"
-                showHangupButton.value = !showCancelButton.value
-                showAnswerRejectButtons.value = false
-                showOnHoldNotice.value = false
+                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                call.showCallTimer.value = false
+                call.securityIconTint.value = -1
+                call.showCallButton.value = false
+                call.showCallVideoButton.value = false
+                call.videoIcon.value = Video.NONE
+                call.showCancelButton.value = call.status.value == "outgoing"
+                call.showHangupButton.value = !call.showCancelButton.value
+                call.showAnswerRejectButtons.value = false
+                call.showOnHoldNotice.value = false
                 dialpadButtonEnabled.value = false
             }
             "incoming" -> {
-                showCallTimer.value = false
-                securityIconTint.intValue = -1
+                call.showCallTimer.value = false
+                call.securityIconTint.value = -1
                 val uri = call.diverterUri()
                 if (uri != "") {
-                    callUriLabel.value = ctx.getString(R.string.diverted_by_dots)
-                    callUri.value = Utils.friendlyUri(ctx, uri, ua.account)
+                    call.callUriLabel.value = ctx.getString(R.string.diverted_by_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, uri, ua.account)
                 }
                 else {
-                    callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                    callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                 }
-                showCallButton.value = false
-                showCallVideoButton.value = false
-                videoIcon.value = Video.NONE
-                showCancelButton.value = false
-                showHangupButton.value = false
-                showAnswerRejectButtons.value = true
-                showOnHoldNotice.value = false
+                call.showCallButton.value = false
+                call.showCallVideoButton.value = false
+                call.videoIcon.value = Video.NONE
+                call.showCancelButton.value = false
+                call.showHangupButton.value = false
+                call.showAnswerRejectButtons.value = true
+                call.showOnHoldNotice.value = false
                 dialpadButtonEnabled.value = false
             }
             "connected" -> {
                 if (call.referTo != "") {
-                    callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                    callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
-                    transferButtonEnabled.value = false
+                    call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
+                    call.transferButtonEnabled.value = false
                 } else {
-                    if (call.dir == "out") {
-                        callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                        callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                    } else {
-                        callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                        callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                    }
-                    transferButtonEnabled.value = true
+                    if (call.dir == "out")
+                        call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
+                    else
+                        call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    call.transferButtonEnabled.value = true
                 }
-                callTransfer.value = call.onHoldCall != null
-                callDuration = call.duration()
-                showCallTimer.value = true
+                call.callTransfer.value = call.onHoldCall != null
+                call.callDuration = call.duration()
+                call.showCallTimer.value = true
                 if (ua.account.mediaEnc == "")
-                    securityIconTint.intValue = -1
+                    call.securityIconTint.value = -1
                 else
-                    securityIconTint.intValue = call.security
-                showCallButton.value = false
-                showCallVideoButton.value = false
+                    call.securityIconTint.value = call.security
+                call.showCallButton.value = false
+                call.showCallVideoButton.value = false
                 if (call.hasVideo())
-                    videoIcon.value = Video.ON
-                showCancelButton.value = false
-                showHangupButton.value = true
-                showAnswerRejectButtons.value = false
-                callOnHold.value = call.onhold
+                    call.videoIcon.value = Video.ON
+                call.showCancelButton.value = false
+                call.showHangupButton.value = true
+                call.showAnswerRejectButtons.value = false
+                call.callOnHold.value = call.onhold
                 Handler(Looper.getMainLooper()).postDelayed({
-                    showOnHoldNotice.value = call.held
+                    call.showOnHoldNotice.value = call.held
                 }, 100)
             }
         }
@@ -2796,10 +2801,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.triggerAccountUpdate()
         }
         "call incoming", "call outgoing" -> {
-            val callp = params[1] as Long
             if (!BaresipService.isMainVisible)
                 viewModel.navigateToHome()
             spinToAor(viewModel, aor)
+            val callp = params[1] as Long
             showCall(ctx, viewModel, ua, Call.ofCallp(callp))
         }
         "call answered" -> {
@@ -2830,8 +2835,15 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "call established" -> {
             if (aor == viewModel.selectedAor.value) {
-                dtmfText.value = ""
-                showCall(ctx, viewModel, ua)
+                viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
+                val callp = params[1] as Long
+                val call = Call.ofCallp(callp)
+                if (call != null) {
+                    call.dtmfText.value = ""
+                    if (call.conferenceCall)
+                        Api.cmd_exec("conference")
+                }
+                showCall(ctx, viewModel, ua, call)
             }
         }
         "call update" -> {
@@ -2851,7 +2863,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 Log.w(TAG, "Video request call $callp not found")
                 return
             }
-            showOnHoldNotice.value = false
+            call.showOnHoldNotice.value = false
             dialogTitle.value = ctx.getString(R.string.video_request)
             val peerUri = Utils.friendlyUri(ctx, call.peerUri, acc)
             dialogMessage.value = when (dir) {
@@ -2889,14 +2901,14 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 }
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
-                    securityIconTint.intValue = call.security
+                    call.securityIconTint.value = call.security
             }
             negativeText.value = ctx.getString(R.string.no)
             onNegativeClicked.value = {
                 call.security = R.color.colorTrafficYellow
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
-                    securityIconTint.intValue = R.color.colorTrafficYellow
+                    call.securityIconTint.value = R.color.colorTrafficYellow
                 onNegativeClicked.value = {}
             }
             showDialog.value = true
@@ -2909,7 +2921,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 return
             }
             if (aor == viewModel.selectedAor.value)
-                securityIconTint.intValue = call.security
+                call.securityIconTint.value = call.security
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -2930,7 +2942,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 if (call in Call.calls())
                     acceptTransfer(ctx, viewModel, ua, call!!, ev[1])
                 else
-                    makeCall(ctx, viewModel, ev[1], false)
+                    makeCall(ctx, viewModel, ev[1], conferenceCall = false, video = false)
             }
             negativeText.value = ctx.getString(R.string.no)
             onNegativeClicked.value = {
@@ -2945,31 +2957,20 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
                 Api.ua_hangup(uap, callp, 487, "Request Terminated")
-            call(ctx, viewModel, ua, ev[1], false)
+            call(ctx, viewModel, ua, ev[1], conferenceCall = false, video = false)
             showCall(ctx, viewModel, ua)
         }
         "transfer failed" -> {
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
-            val call = ua.currentCall()
-            if (call != null) {
-                call.resume()
-                callDuration = call.duration()
-                showCallTimer.value = true
-            }
-            else {
-                showCallTimer.value = false
-                securityIconTint.intValue = -1
-            }
             if (aor == viewModel.selectedAor.value) {
+                viewModel.dialerState.callButtonsEnabled.value = true
                 ua.account.resumeUri = ""
                 showCall(ctx, viewModel, ua)
                 if (acc.missedCalls)
                     viewModel.triggerAccountUpdate()
             }
-            //if (kgm.isDeviceLocked)
-            //    this.setShowWhenLocked(false)
         }
         "message", "message show", "message reply" -> {
             Handler(Looper.getMainLooper()).postDelayed({
@@ -2992,6 +2993,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
 
+    viewModel.updateCalls(Call.calls().toList())
     handleNextEvent()
 }
 
@@ -3011,12 +3013,12 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                 return
             }
-            callUri.value = intent.getStringExtra("peer")!!
+            viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call")
-                callClick(ctx, viewModel, false)
+                callClick(ctx, viewModel, viewModel.dialerState, false)
             else if(ev[0] == "video call")
-                callClick(ctx, viewModel, true)
+                callClick(ctx, viewModel, viewModel.dialerState, true)
         }
         "call show", "call answer" -> {
             val callp = intent.getLongExtra("callp", 0L)
