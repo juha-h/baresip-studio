@@ -1,0 +1,3 @@
+- Added support for voice conference calls
+- Improved showing of contact suggestions on main, contacts, and chats screens
+- New translations (Chinese and Czech)

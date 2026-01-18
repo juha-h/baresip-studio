@@ -1,9 +1,9 @@
 This is a <a href="https://github.com/baresip/baresip">baresip</a> based SIP User Agent application for Android.
 
-Currently baresip+ app supports voice/video calling, text messaging, voicemail Message Waiting Indication, as well as blind and attended call transfers. Voice can be codec with Opus, AMR, Codec2, G.729, G.726, G.722, G.722.1, and PCMU/PCMA, codecs. Video can be coded with VP9, VP8, H.265, H.264, and AV1 codecs. Security is achieved via TLS or WSS signalling transport and ZRTP or (DTLS) SRTP media encapsulation.
+Currently baresip+ app supports voice/video calling, voice conferences, text messaging, voicemail Message Waiting Indication, as well as blind and attended call transfers. Voice can be codec with Opus, AMR, Codec2, G.729, G.726, G.722, G.722.1, and PCMU/PCMA, codecs. Video can be coded with VP9, VP8, H.265, H.264, and AV1 codecs. Security is achieved via TLS or WSS signalling transport and ZRTP or (DTLS) SRTP media encapsulation.
 
 Motivated by need for a secure SIP user agent for Android that does not depend on third party push notification services.
 
-This application can be installed on Android devices running Android version 9 or later.  Video calling requires that Android device supports Camera 2 API at hardware support level LEVEL3 or FULL.
+This application can be installed on Android devices running Android version 9 or later.
 
 Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, where also issues can be reported.
