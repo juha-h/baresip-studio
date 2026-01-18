@@ -430,8 +430,8 @@ object Utils {
     }
 
     fun buildAnnotatedStringWithHighlight(name: String, query: String): AnnotatedString {
-        val normalizedName = Utils.unaccent(name)
-        val normalizedQuery = Utils.unaccent(query)
+        val normalizedName = unaccent(name)
+        val normalizedQuery = unaccent(query)
         val startIndex = normalizedName.indexOf(normalizedQuery, ignoreCase = true)
         return if (startIndex == -1) {
             buildAnnotatedString { append(name) }
