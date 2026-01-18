@@ -255,7 +255,7 @@ private fun ContactsContent(
                     Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
                 }
                 .map { contact ->
-                    Pair(contact, buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
+                    Pair(contact, Utils.buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
                 }
         }
     }
@@ -429,23 +429,6 @@ private fun ContactsContent(
                     }
                 }
             }
-        }
-    }
-}
-
-private fun buildAnnotatedStringWithHighlight(name: String, query: String): AnnotatedString {
-    val normalizedName = Utils.unaccent(name)
-    val normalizedQuery = Utils.unaccent(query)
-    val startIndex = normalizedName.indexOf(normalizedQuery, ignoreCase = true)
-    return if (startIndex == -1) {
-        buildAnnotatedString { append(name) }
-    } else {
-        buildAnnotatedString {
-            append(name.take(startIndex))
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(name.drop(startIndex).take(normalizedQuery.length))
-            }
-            append(name.drop(startIndex + normalizedQuery.length))
         }
     }
 }
