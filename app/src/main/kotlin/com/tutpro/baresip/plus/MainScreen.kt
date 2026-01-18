@@ -2079,13 +2079,15 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
     val iconSize = 36.dp
 
+    var ua: UserAgent? = null
+    var call: Call? = null
+
     LaunchedEffect(Unit) {
         delay(1000)
-        val call = Call.call("connected")
-        if (call != null) {
-            Log.d(TAG, "Syncing video source to Front (sending ${isFrontCamera})")
-            call.setVideoSource(isFrontCamera)
-        }
+        ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+        call = ua.currentCall()
+        Log.d(TAG, "Syncing video source to Front (sending ${isFrontCamera})")
+        call?.setVideoSource(isFrontCamera)
     }
 
     // Use a Box to layer the UI controls on top of the video
@@ -2124,16 +2126,14 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
         ) {
             // Top Left Group
             Column(horizontalAlignment = Alignment.Start) {
+
                 // Camera Switch Button
                 if (Utils.isCameraAvailable(ctx)) {
-
                     IconButton(
                         onClick = {
-                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                            val call = ua.currentCall()
                             if (call != null) {
                                 val targetUiState = !isFrontCamera
-                                if (call.setVideoSource(targetUiState) != 0) {
+                                if (call!!.setVideoSource(targetUiState) != 0) {
                                     Log.w(TAG, "Failed to switch camera")
                                 } else {
                                     isFrontCamera = targetUiState
@@ -2183,13 +2183,12 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
             // Bottom Left Group
             Column(horizontalAlignment = Alignment.Start) {
-                val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                val call = ua.currentCall()
+
                 // Security Button
-                if (call != null && call.securityIconTint.value != -1) {
+                if (call != null && call!!.securityIconTint.value != -1) {
                     IconButton(
                         onClick = {
-                            when (call.securityIconTint.value) {
+                            when (call!!.securityIconTint.value) {
                                 R.color.colorTrafficRed -> {
                                     alertTitle.value = ctx.getString(R.string.alert)
                                     alertMessage.value = ctx.getString(R.string.call_not_secure)
@@ -2206,10 +2205,10 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                     dialogMessage.value = ctx.getString(R.string.call_is_secure)
                                     positiveText.value = ctx.getString(R.string.unverify)
                                     onPositiveClicked.value = {
-                                        if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
-                                            Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
+                                        if (Api.cmd_exec("zrtp_unverify " + call!!.zid) != 0)
+                                            Log.e(TAG, "Command 'zrtp_unverify ${call!!.zid}' failed")
                                         else
-                                            call.securityIconTint.value = R.color.colorTrafficYellow
+                                            call!!.securityIconTint.value = R.color.colorTrafficYellow
                                     }
                                     onNegativeClicked.value = {}
                                     showDialog.value = true
@@ -2218,12 +2217,12 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         }
                     ) {
                         Icon(
-                            imageVector = if (call.securityIconTint.value == R.color.colorTrafficRed)
+                            imageVector = if (call!!.securityIconTint.value == R.color.colorTrafficRed)
                                 Icons.Filled.LockOpen
                             else
                                 Icons.Filled.Lock,
                             contentDescription = "Security Status",
-                            tint = colorResource(call.securityIconTint.value),
+                            tint = colorResource(call!!.securityIconTint.value),
                             modifier = Modifier.size(iconSize)
                         )
                     }
@@ -2233,7 +2232,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 // Video Off Button
                 IconButton(
                     onClick = {
-                        Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+                        call?.setVideoDirection(Api.SDP_INACTIVE)
                         onCloseVideo()
                     }
                 ) {
@@ -2258,6 +2257,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
         ) {
             // Top Right Group
             Column(horizontalAlignment = Alignment.End) {
+
                 // Speaker button
                 IconButton(
                     onClick = {
@@ -2308,19 +2308,17 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
             // Bottom Right Group
             Column(horizontalAlignment = Alignment.End) {
+
                 // Call Info Button
                 IconButton(
                     onClick = {
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val calls = ua.calls()
-                        if (calls.isNotEmpty()) {
-                            val call = calls[0]
-                            val stats = call.stats("video")
+                        if (call != null) {
+                            val stats = call!!.stats("video")
                             alertTitle.value = ctx.getString(R.string.call_info)
                             if (stats != "") {
                                 val parts = stats.split(",")
-                                val codecs = call.videoCodecs().split(',')
-                                val duration = call.duration()
+                                val codecs = call!!.videoCodecs().split(',')
+                                val duration = call!!.duration()
                                 val txCodec = if (codecs.isNotEmpty()) codecs[0] else ""
                                 val rxCodec = if (codecs.size > 1) codecs[1] else ""
                                 alertMessage.value = "${String.format(ctx.getString(R.string.duration), duration)}\n" +
@@ -2351,18 +2349,14 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 IconButton(
                     onClick = {
                         if (!Utils.isCameraAvailable(ctx))
-                            Call.call("connected")?.setVideoDirection(Api.SDP_INACTIVE)
+                            call?.setVideoDirection(Api.SDP_INACTIVE)
 
                         // Assuming abandonAudioFocus is handled in the ViewModel or separate logic now,
                         // or you can keep using the legacy call:
                         // (ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager).abandonAudioFocus(null)
 
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        val uaCalls = ua.calls()
-                        if (uaCalls.isNotEmpty()) {
-                            val call = uaCalls.last()
-                            Api.ua_hangup(ua.uap, call.callp, 487, "Request Terminated")
-                        }
+                        if (call != null)
+                            Api.ua_hangup(ua!!.uap, call!!.callp, 487, "Request Terminated")
                     }
                 ) {
                     Icon(
