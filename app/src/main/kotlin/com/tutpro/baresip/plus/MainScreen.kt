@@ -145,6 +145,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -562,7 +563,9 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
@@ -734,8 +737,7 @@ private fun TopAppBar(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
                                 Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                        "${am.communicationDevice!!.type}/${am.mode}"
-                                )
+                                            "${am.communicationDevice!!.type}/${am.mode}")
                             isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
                         },
@@ -1115,7 +1117,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                } else {
+                                }
+                                else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1166,7 +1169,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 if (Api.account_regint(acc.accp) > 0) {
                                     Api.account_set_regint(acc.accp, 0)
                                     Api.ua_unregister(ua.uap)
-                                } else {
+                                }
+                                else {
                                     Api.account_set_regint(
                                         acc.accp,
                                         acc.configuredRegInt
@@ -1230,15 +1234,17 @@ private fun CallUriRow(
     val isDialer = dialerState != null
 
     val suggestions by remember { contactNames }
-    var filteredSuggestions by remember { mutableStateOf(suggestions) }
+    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
     val focusRequester = remember { FocusRequester() }
     val lazyListState = rememberLazyListState()
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 4.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -1251,10 +1257,21 @@ private fun CallUriRow(
                     if (isDialer) {
                         if (it != dialerState.callUri.value) {
                             dialerState.callUri.value = it
-                            filteredSuggestions = suggestions.filter { suggestion ->
-                                it.length > 2 && suggestion.startsWith(it, ignoreCase = true)
+                            if (it == "") {
+                                dialerState.showCallButton.value = true
+                                dialerState.showCallConferenceButton.value = true
                             }
-                            dialerState.showSuggestions.value = it.length > 2
+                            val normalizedInput = Utils.unaccent(it)
+                            filteredSuggestions = suggestions
+                                .filter { suggestion ->
+                                    it.length > 1 &&
+                                            Utils.unaccent(suggestion)
+                                                .contains(normalizedInput, ignoreCase = true)
+                                }
+                                .map { suggestion ->
+                                    Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                                }
+                            dialerState.showSuggestions.value = it.length > 1
                         }
                     }
                 },
@@ -1265,8 +1282,9 @@ private fun CallUriRow(
                             modifier = Modifier.clickable {
                                 if (dialerState.showSuggestions.value)
                                     dialerState.showSuggestions.value = false
-                                else
-                                    dialerState.callUri.value = ""
+                                dialerState.callUri.value = ""
+                                dialerState.showCallButton.value = true
+                                dialerState.showCallConferenceButton.value = true
                             },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -1284,10 +1302,11 @@ private fun CallUriRow(
                         }
                     },
                 label = {
-                    Text(text = if (isDialer)
-                        dialerState.callUriLabel.value
-                    else
-                        call!!.callUriLabel.value,
+                    Text(
+                        text = if (isDialer)
+                            dialerState.callUriLabel.value
+                        else
+                            call!!.callUriLabel.value,
                         fontSize = 18.sp
                     )
                 },
@@ -1309,9 +1328,11 @@ private fun CallUriRow(
                     .animateContentSize()
             ) {
                 if (isDialer && dialerState.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 150.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 150.dp)
+                    ) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -1324,13 +1345,13 @@ private fun CallUriRow(
                         ) {
                             items(
                                 items = filteredSuggestions,
-                                key = { suggestion -> suggestion }
+                                key = { suggestion -> suggestion.toString() }
                             ) { suggestion ->
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            dialerState.callUri.value = suggestion
+                                            dialerState.callUri.value = suggestion.toString()
                                             dialerState.showSuggestions.value = false
                                         }
                                         .padding(12.dp)
@@ -1729,7 +1750,12 @@ private fun CallRow(
                                         },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
+                                            .padding(
+                                                start = 4.dp,
+                                                end = 4.dp,
+                                                top = 12.dp,
+                                                bottom = 2.dp
+                                            )
                                             .focusRequester(focusRequester),
                                         label = { Text(stringResource(R.string.transfer_destination)) },
                                         textStyle = TextStyle(fontSize = 18.sp),
@@ -1772,7 +1798,8 @@ private fun CallRow(
                                                                 .fillMaxWidth()
                                                                 .clickable {
                                                                     transferUri = suggestion
-                                                                    call.showSuggestions.value = false
+                                                                    call.showSuggestions.value =
+                                                                        false
                                                                 }
                                                                 .padding(12.dp)
                                                         ) {

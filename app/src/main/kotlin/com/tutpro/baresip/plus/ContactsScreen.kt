@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,16 +53,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -73,8 +72,6 @@ import com.tutpro.baresip.plus.CustomElements.TextAvatar
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 const val avatarSize: Int = 96
 
@@ -255,7 +252,7 @@ private fun ContactsContent(
                     Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
                 }
                 .map { contact ->
-                    Pair(contact, buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
+                    Pair(contact, Utils.buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
                 }
         }
     }
@@ -429,23 +426,6 @@ private fun ContactsContent(
                     }
                 }
             }
-        }
-    }
-}
-
-private fun buildAnnotatedStringWithHighlight(name: String, query: String): AnnotatedString {
-    val normalizedName = Utils.unaccent(name)
-    val normalizedQuery = Utils.unaccent(query)
-    val startIndex = normalizedName.indexOf(normalizedQuery, ignoreCase = true)
-    return if (startIndex == -1) {
-        buildAnnotatedString { append(name) }
-    } else {
-        buildAnnotatedString {
-            append(name.take(startIndex))
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(name.drop(startIndex).take(normalizedQuery.length))
-            }
-            append(name.drop(startIndex + normalizedQuery.length))
         }
     }
 }

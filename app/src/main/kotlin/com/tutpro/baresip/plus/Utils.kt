@@ -36,6 +36,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
@@ -424,6 +429,23 @@ object Utils {
     fun unaccent(input: String): String {
         val normalized = java.text.Normalizer.normalize(input, java.text.Normalizer.Form.NFD)
         return "\\p{InCombiningDiacriticalMarks}+".toRegex().replace(normalized, "")
+    }
+
+    fun buildAnnotatedStringWithHighlight(name: String, query: String): AnnotatedString {
+        val normalizedName = unaccent(name)
+        val normalizedQuery = unaccent(query)
+        val startIndex = normalizedName.indexOf(normalizedQuery, ignoreCase = true)
+        return if (startIndex == -1) {
+            buildAnnotatedString { append(name) }
+        } else {
+            buildAnnotatedString {
+                append(name.take(startIndex))
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(name.drop(startIndex).take(normalizedQuery.length))
+                }
+                append(name.drop(startIndex + normalizedQuery.length))
+            }
+        }
     }
 
     fun isVisible(): Boolean {
