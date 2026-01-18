@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -320,9 +321,7 @@ private fun Chats(
                                 model = thumbNailUri,
                                 contentDescription = "Avatar",
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape),
+                                modifier = Modifier.size(36.dp).clip(CircleShape),
                             )
                         else
                             CustomElements.TextAvatar(contact.name, contact.color)
@@ -484,7 +483,8 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
     )
 
     val suggestions by remember { contactNames }
-    var filteredSuggestions by remember { mutableStateOf(suggestions) }
+    // 1. Change state to hold AnnotatedStrings
+    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
     var showSuggestions by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
@@ -524,20 +524,21 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                             state = lazyListState
                         ) {
                             items(
+                                // 3. Update key and clickable logic
                                 items = filteredSuggestions,
-                                key = { suggestion -> suggestion }
+                                key = { suggestion -> suggestion.toString() }
                             ) { suggestion ->
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            newPeer = suggestion
+                                            newPeer = suggestion.toString()
                                             showSuggestions = false
                                         }
                                         .padding(12.dp)
                                 ) {
                                     Text(
-                                        text = suggestion,
+                                        text = suggestion, // Text composable accepts AnnotatedString
                                         modifier = Modifier.fillMaxWidth(),
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 18.sp
@@ -554,16 +555,20 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 placeholder = { Text(stringResource(R.string.new_chat_peer)) },
                 onValueChange = {
                     newPeer = it
-                    showSuggestions = newPeer.length > 2
+                    showSuggestions = newPeer.length > 1
+                    // 2. Update filtering and mapping logic
                     filteredSuggestions = if (it.isEmpty()) {
-                        suggestions
+                        emptyList()
                     } else {
-                        suggestions.filter { suggestion ->
-                            newPeer.length > 2 && suggestion.startsWith(
-                                newPeer,
-                                ignoreCase = true
-                            )
-                        }
+                        val normalizedInput = Utils.unaccent(it)
+                        suggestions
+                            .filter { suggestion ->
+                                it.length > 1 &&
+                                    Utils.unaccent(suggestion).contains(normalizedInput, ignoreCase = true)
+                            }
+                            .map { suggestion ->
+                                Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                            }
                     }
                 },
                 modifier = Modifier.padding(end = 6.dp).fillMaxWidth(),
@@ -576,8 +581,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                             modifier = Modifier.clickable {
                                 if (showSuggestions)
                                     showSuggestions = false
-                                else
-                                    newPeer = ""
+                                newPeer = ""
                             },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
