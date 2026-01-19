@@ -1,0 +1,2 @@
+- Added BaresipApp to avoid baresip service starting before baresip library is loaded
+- Improved showing of call transfer destination suggestions
