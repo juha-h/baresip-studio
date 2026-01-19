@@ -1,9 +1,9 @@
 这是一款基于 <a href="https://github.com/baresip/baresip">baresip</a> 的 Android SIP 用户代理应用程序。
 
-目前，baresip 应用支持语音通话、短信、语音信箱消息等待指示以及盲转和协商转接。语音编码支持 Opus、AMR、Codec2、G.729、G.722、G.722.1、G.726 或 PCMU/PCMA 编解码器。通过 TLS 或 WSS SIP 信令传输以及 ZRTP 或（DTLS）SRTP 媒体封装实现安全保障。
+目前，baresip 应用支持语音通话和电话会议、短信、语音信箱消息等待指示以及盲转和协商转接。语音编码支持 Opus、AMR、Codec2、G.729、G.722、G.722.1、G.726 或 PCMU/PCMA 编解码器。通过 TLS 或 WSS SIP 信令传输以及 ZRTP 或（DTLS）SRTP 媒体封装实现安全保障。
 
 开发 baresip 应用的初衷是打造一款安全、开源的 Android SIP VoIP 用户代理，且不依赖任何专有的第三方推送通知服务。
 
-如果您需要视频通话，并且有 Android 9 或更高版本、支持 Camera2 API（硬件支持级别 LEVEL3 或 FULL）的设备，则可以安装其姊妹应用 baresip+ 来代替此应用。
+如果您需要视频通话，可以安装其姊妹应用 baresip+ 来代替此应用。
 
 源代码可在 <a href="https://github.com/juha-h/baresip-studio">GitHub</a> 上找到，您也可以在此报告问题。
