@@ -1611,15 +1611,15 @@ private fun CallRow(
                                         singleLine = true,
                                         onValueChange = {
                                             if (it != transferUri) {
+                                                transferUri = it
+                                                val normalizedInput = Utils.unaccent(it)
                                                 filteredSuggestions =
                                                     suggestions.filter { suggestion ->
-                                                        transferUri.length > 2 &&
-                                                                suggestion.startsWith(
-                                                                    transferUri,
-                                                                    ignoreCase = true
-                                                                )
+                                                        transferUri.length > 1 &&
+                                                                Utils.unaccent(suggestion)
+                                                                    .contains(normalizedInput, ignoreCase = true)
                                                     }
-                                                call.showSuggestions.value = transferUri.length > 2
+                                                call.showSuggestions.value = transferUri.length > 1
                                             }
                                         },
                                         trailingIcon = {
