@@ -1717,7 +1717,7 @@ private fun CallRow(
                                     )
                                     var transferUri by remember { mutableStateOf("") }
                                     val suggestions by remember { contactNames }
-                                    var filteredSuggestions by remember { mutableStateOf(suggestions) }
+                                    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
                                     val focusRequester = remember { FocusRequester() }
                                     val lazyListState = rememberLazyListState()
                                     OutlinedTextField(
@@ -1725,15 +1725,19 @@ private fun CallRow(
                                         singleLine = true,
                                         onValueChange = {
                                             if (it != transferUri) {
-                                                filteredSuggestions =
-                                                    suggestions.filter { suggestion ->
-                                                        transferUri.length > 2 &&
-                                                                suggestion.startsWith(
-                                                                    transferUri,
-                                                                    ignoreCase = true
-                                                                )
-                                                    }
-                                                call.showSuggestions.value = transferUri.length > 2
+                                                transferUri = it
+                                                if (it.length > 1) {
+                                                    val normalizedInput = Utils.unaccent(it)
+                                                    filteredSuggestions =
+                                                        suggestions.filter { suggestion ->
+                                                            Utils.unaccent(suggestion)
+                                                                .contains(normalizedInput, ignoreCase = true)
+                                                        }
+                                                            .map { suggestion ->
+                                                                Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                                                            }
+                                                }
+                                                call.showSuggestions.value = transferUri.length > 1
                                             }
                                         },
                                         trailingIcon = {
@@ -1793,15 +1797,14 @@ private fun CallRow(
                                                 ) {
                                                     items(
                                                         items = filteredSuggestions,
-                                                        key = { suggestion -> suggestion }
+                                                        key = { suggestion -> suggestion.toString() }
                                                     ) { suggestion ->
                                                         Box(
                                                             modifier = Modifier
                                                                 .fillMaxWidth()
                                                                 .clickable {
-                                                                    transferUri = suggestion
-                                                                    call.showSuggestions.value =
-                                                                        false
+                                                                    transferUri = suggestion.toString()
+                                                                    call.showSuggestions.value = false
                                                                 }
                                                                 .padding(12.dp)
                                                         ) {
