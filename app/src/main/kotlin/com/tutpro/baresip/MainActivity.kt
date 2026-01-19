@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val extraAction = intent.getStringExtra("action")
-        Log.e(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
+        Log.i(TAG, "Main onCreate ${intent.action}/${intent.data}/$extraAction")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES)
 
@@ -407,14 +407,6 @@ class MainActivity : ComponentActivity() {
         val intent = pm.getLaunchIntentForPackage(this.packageName)
         this.startActivity(intent)
         exitProcess(0)
-    }
-
-    init {
-        if (!BaresipService.libraryLoaded) {
-            Log.d(TAG, "Loading baresip library")
-            System.loadLibrary("baresip")
-            BaresipService.libraryLoaded = true
-        }
     }
 
 }
