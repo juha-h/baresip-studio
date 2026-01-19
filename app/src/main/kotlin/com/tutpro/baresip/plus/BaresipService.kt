@@ -130,7 +130,7 @@ class BaresipService: Service() {
     override fun onCreate() {
         super.onCreate()
 
-        Log.d(TAG, "BaresipService onCreate")
+        Log.i(TAG, "BaresipService onCreate")
 
         intent = Intent("com.tutpro.baresip.EVENT")
         intent.setPackage("com.tutpro.baresip")
