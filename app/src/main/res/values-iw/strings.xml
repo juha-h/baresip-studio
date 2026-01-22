@@ -1,3 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="about_title">אודות baresip</string>
+    <string name="about_title_plus">אודות baresip+</string>
+    <string name="about_text"><![CDATA[
+        <h1>סוכן משתמש SIP המבוסס על ספריית <a href="https://github.com/baresip/baresip">baresip</a></h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>גירסה %1$s</p>
+        <br>
+        <h2>טיפים לשימוש</h2>
+        <ul>
+            <li>בדוק שערכי ברירת מחדל בהגדרות baresip מתאימים לצרכיך
+                (גע בכותרות הפריטים לקבלת עזרה).</li>
+            <li>לאחר מכן, תחת "חשבונות", צור חשבון אחד או יותר (שוב, גע בכותרות הפריטים לקבלת עזרה).</li>
+            <li>סטטוס הרישום של חשבון מוצג באמצעות נקודה בצבעים שונים:
+                        ירוק (הרישום הצליח), צהוב (הרישום בתהליך), 
+                        אדום (הרישום נכשל), לבן (הרישום לא הופעל).</li>
+            <li>נגיעה בנקודת הסטטוס מובילה ישירות להגדרת החשבון.</li>
+            <li>נגיעה ממושכת על אייקוני סרגל baresip מציגה מידע אודות האייקונים.</li>
+            <li>מחוות החלקה כלפי מטה גורמת לרישום מחדש של החשבון המוצג כרגע.</li>
+            <li>נגיעה ממושכת על החשבון המוצג כרגע מאפשרת או מבטלת את רישום החשבון.</li>
+            <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>
+            <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>
+            <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>
+            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ'אטים, הודעות ואנשי קשר.</li>
+            <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>
+            <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
+            <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a> למידע נוסף.</li>
+        </ul>
+        <h2>מדיניות פרטיות</h2>
+            <p>מדיניות פרטיות זמינה <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">כאן</a>.</p>
+        <br>
+        <h2>קוד מקור</h2>
+            <p>קוד מקור זמין ב־<a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            שם ניתן גם לדווח על תקלות.</p>
+        <br>
+        <h2>תרגומים</h2>
+            <p>תרגומי שפות מנוהלים דרך פרויקט 
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> של baresip.</p>
+        <br>
+        <h2>רשיונות</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> חוץ מהבאים:</li>
+            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+        </ul>
+        ]]></string>
+    <string name="about_text_plus"><![CDATA[
+        <h1>סוכן משתמש SIP המבוסס על ספריית <a href="https://github.com/baresip/baresip">baresip</a></h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>גירסה %1$s</p>
+        <br>
+        <h2>טיפים לשימוש</h2>
+        <ul>
+            <li>בדוק שערכי ברירת מחדל בהגדרות baresip מתאימים לצרכיך
+                (גע בכותרות הפריטים לקבלת עזרה).</li>
+            <li>לאחר מכן, תחת "חשבונות", צור חשבון אחד או יותר (שוב, גע בכותרות הפריטים לקבלת עזרה).</li>
+            <li>סטטוס הרישום של חשבון מוצג באמצעות נקודה בצבעים שונים:
+                ירוק (הרישום הצליח), צהוב (הרישום בתהליך), 
+                אדום (הרישום נכשל), לבן (הרישום לא הופעל).</li>
+            <li>נגיעה בנקודת הסטטוס מובילה ישירות להגדרת החשבון.</li>
+            <li>נגיעה ממושכת על אייקוני סרגל baresip מציגה מידע אודות האייקונים.</li>
+            <li>מחוות החלקה כלפי מטה גורמת לרישום מחדש של החשבון המוצג כרגע.</li>
+            <li>נגיעה ממושכת על החשבון המוצג כרגע מאפשרת או מבטלת את רישום החשבון.</li>
+            <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>
+            <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>
+            <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>
+            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ'אטים, הודעות ואנשי קשר.</li>
+            <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>
+            <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
+            <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a> 
+                למידע נוסף.</li>
+        </ul>
+        <h2>מדיניות פרטיות</h2>
+            <p>מדיניות פרטיות זמינה <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">כאן</a>.</p>
+        <br>
+        <h2>קוד מקור</h2>
+            <p>קוד מקור זמין ב־<a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            שם ניתן גם לדווח על תקלות.</p>
+        <br>
+        <h2>תרגומים</h2>
+            <p>תרגומי שפות מנוהלים דרך פרויקט 
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> של baresip.</p>
+        <br>
+        <h2>רשיונות</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> חוץ מהבאים:</li>
+            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+            <li><b>GNU GPLv2</b> H.264 and H.265 codecs</li>
+            <li><b>AOMedia</b> AV1 codec</li>
+        </ul>
+        ]]></string>
+    <string name="account">חשבון</string>
+    <string name="account_nickname_help">כינוי (אם יש) המשמש לזיהוי החשבון הזה בתוך אפליקציית baresip.</string>
+    <string name="nickname">כינוי</string>
+    <string name="invalid_account_nickname">כינוי חשבון לא תקין \'%1$s\'</string>
+    <string name="non_unique_account_nickname">כינוי \'%1$s\' כבר קיים</string>
+    <string name="display_name">שם תצוגה</string>
+    <string name="display_name_help">שם (אם יש) המשמש ב־From URI של בקשות יוצאות.</string>
+    <string name="invalid_display_name">שם תצוגה לא תקין \'%1$s\'</string>
+    <string name="authentication_username">שם משתמש לאימות</string>
+    <string name="authentication_username_help">שם משתמש לאימות אם נדרש אימות לבקשות SIP. ברירת המחדל היא שם המשתמש של החשבון.</string>
+    <string name="invalid_authentication_username">שם משתמש לאימות לא תקני \'%1$s\'</string>
+    <string name="authentication_password">סיסמה לאימות</string>
+    <string name="authentication_password_help">סיסמת אימות עד 64 תוים. אם שם המשתמש לאימות נמסר, אך הסיסמה לא נמסרה, היא תתבקש כאשר baresip יתחיל.</string>
+    <string name="invalid_authentication_password">סיסמת אימות לא תקינה \'%1$s\'</string>
+    <string name="outbound_proxies">פרוקסים יוצאים</string>
 </resources>
