@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ApplicationExtension
+
 plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
@@ -5,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-android {
+configure<ApplicationExtension> {
     compileSdk = 36
     ndkVersion = "29.0.14206865"
     defaultConfig {
@@ -31,11 +33,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    splits {
-        abi {
-            reset()
-        }
-    }
     buildTypes {
         debug {
             ndk {
@@ -55,9 +52,6 @@ android {
         viewBinding = true
         buildConfig = true
         compose = true
-    }
-    sourceSets {
-        getByName("main").java.srcDirs("src/main/kotlin")
     }
     externalNativeBuild {
         cmake {
