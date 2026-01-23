@@ -38,8 +38,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     val showSuggestions: MutableState<Boolean> = mutableStateOf(false)
     val showCallButton: MutableState<Boolean> = mutableStateOf(true)
     val showCallVideoButton: MutableState<Boolean> = mutableStateOf(true)
-    val callButtonsEnabled: MutableState<Boolean> = mutableStateOf(true)
-    val callVideoButtonEnabled: MutableState<Boolean> = mutableStateOf(true)
     val videoIcon: MutableState<Video> = mutableStateOf(Video.NONE)
     val showCancelButton: MutableState<Boolean> = mutableStateOf(false)
     val showAnswerRejectButtons: MutableState<Boolean> = mutableStateOf(false)
