@@ -23,23 +23,12 @@ class VideoView(val context: Context) {
         surfaceView = View(surfaceHolderCallback, context)
     }
 
-    inner class View: SurfaceView {
-        constructor(callback: SurfaceHolder.Callback, context: Context) : super(context) {
-            holder.addCallback(callback)
-        }
-
-        constructor(callback: SurfaceHolder.Callback, context: Context, attrs: AttributeSet) :
-                super(context, attrs) {
-            holder.addCallback(callback)
-        }
-
-        constructor(callback: SurfaceHolder.Callback, context: Context, attrs: AttributeSet, defStyle: Int) :
-                super(context, attrs, defStyle) {
-            holder.addCallback(callback)
-        }
-
-        constructor(callback: SurfaceHolder.Callback, context: Context, attrs: AttributeSet, defStyle: Int, defStyleRes: Int) :
-                super(context, attrs, defStyle, defStyleRes) {
+    class View @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+    ) : SurfaceView(context, attrs, defStyleAttr) {
+        constructor(callback: SurfaceHolder.Callback, context: Context) : this(context) {
             holder.addCallback(callback)
         }
     }
