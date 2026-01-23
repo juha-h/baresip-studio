@@ -31,7 +31,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var callDuration: Int = 0
     val showSuggestions: MutableState<Boolean> = mutableStateOf(false)
     val showCallButton: MutableState<Boolean> = mutableStateOf(true)
-    val callButtonEnabled: MutableState<Boolean> = mutableStateOf(true)
     val showCancelButton: MutableState<Boolean> = mutableStateOf(false)
     val showAnswerRejectButtons: MutableState<Boolean> = mutableStateOf(false)
     val showHangupButton: MutableState<Boolean> = mutableStateOf(false)
