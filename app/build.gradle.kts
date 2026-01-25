@@ -29,13 +29,6 @@ configure<ApplicationExtension> {
         }
         vectorDrawables.useSupportLibrary = true
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        jvmToolchain(17)
-    }
     buildTypes {
         debug {
             ndk {
@@ -63,6 +56,10 @@ configure<ApplicationExtension> {
         }
     }
     namespace = "com.tutpro.baresip.plus"
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 composeCompiler {
