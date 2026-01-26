@@ -3047,10 +3047,16 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             }
             viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
             spinToAor(viewModel, ua.account.aor)
-            if (ev[0] == "call")
+            if (ev[0] == "call") {
+                viewModel.dialerState.showCallConferenceButton.value = false
+                viewModel.dialerState.showCallVideoButton.value = false
                 callClick(ctx, viewModel, viewModel.dialerState, false)
-            else if(ev[0] == "video call")
+            }
+            else if(ev[0] == "video call") {
+                viewModel.dialerState.showCallButton.value = false
+                viewModel.dialerState.showCallConferenceButton.value = false
                 callClick(ctx, viewModel, viewModel.dialerState, true)
+            }
         }
         "call show", "call answer" -> {
             val callp = intent.getLongExtra("callp", 0L)
