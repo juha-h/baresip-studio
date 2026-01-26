@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
 }
 
 configure<ApplicationExtension> {
@@ -56,10 +55,6 @@ configure<ApplicationExtension> {
         }
     }
     namespace = "com.tutpro.baresip.plus"
-}
-
-kotlin {
-    jvmToolchain(17)
 }
 
 composeCompiler {
