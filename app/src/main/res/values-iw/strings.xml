@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_title">אודות baresip</string>    <string name="about_title_plus">אודות baresip+</string>
+    <string name="about_title">אודות baresip</string>
+    <string name="about_title_plus">אודות baresip+</string>
     <string name="about_text"><![CDATA[
         <h1>סוכן משתמש SIP המבוסס על ספריית <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
@@ -113,4 +114,20 @@
     <string name="authentication_password_help">סיסמת אימות עד 64 תוים. אם שם המשתמש לאימות נמסר, אך הסיסמה לא נמסרה, היא תתבקש כאשר baresip יתחיל.</string>
     <string name="invalid_authentication_password">סיסמת אימות לא תקינה \'%1$s\'</string>
     <string name="outbound_proxies">פרוקסים יוצאים</string>
+    <string name="outbound_proxies_help">כתובת SIP URI של פרוקסי אחד או שניים שיש להשתמש בהם בעת שליחת בקשות. אם ניתנים שניים, בקשות REGISTER נשלחות לשניהם, ושאר הבקשות נשלחות לזה שמגיב. אם לא הוגדר פרוקסי יוצא (outbound proxy), הבקשות נשלחות על פי חיפוש רשומות DNS מסוג NAPTR/SRV/A של ה־hostpart ב־URI של היעד. אם ה־hostpart של כתובת ה־SIP URI הוא כתובת IPv6, יש לכתוב את הכתובת בתוך סוגריים מרובעים []. \nדוגמאות: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="sip_uri_of_proxy_server">כתובת SIP URI של שרת פרוקסי</string>
+    <string name="sip_uri_of_another_proxy_server">כתובת SIP URI של שרת פרוקסי נוסף</string>
+    <string name="invalid_proxy_server_uri">כתובת URI של שרת פרוקסי לא תקינה \'%1$s\'</string>
+    <string name="register">הרשמה</string>
+    <string name="register_help">אם האפשרות מסומנת, הרישום מופעל ובקשות REGISTER נשלחות במרווח הזמן המוגדר ב\'מרווחי זמן רישום\'.</string>
+    <string name="reg_int">מרווחי זמן רישום</string>
+    <string name="reg_int_help">מציין כל כמה זמן (בשניות) baresip שולח בקשות REGISTER. הערכים התקינים הם בין 60 ל־3600.</string>
+    <string name="invalid_reg_int">מרווח זמן רישום לא תקין \'%1$s\'</string>
+    <string name="check_origin">בדוק מקור</string>
+    <string name="check_origin_help">אם האפשרות מסומנת, בקשות נכנסות מותרות רק מכתובות IP שאליהן נשלחו בקשות רישום.</string>
+    <string name="media_nat">מעבר NAT למדיה</string>
+    <string name="media_nat_help">בוחר את פרוטוקול מעבר ה־NAT למדיה (אם יש). האפשרויות הזמינות הן STUN ‏(Session Traversal Utilities for NAT, ‏RFC 5389) ו־ICE ‏(Interactive Connectivity Establishment, ‏RFC 5245).</string>
+    <string name="stun_server">שרת STUN/TURN</string>
+    <string name="stun_server_help">כתובת URI של שרת STUN/TURN בפורמט scheme:host[:port][?transport=udp|tcp], כאשר ‎scheme‎ הוא אחד מהבאים: ‎\'stun\' ‎, ‎\'stuns\'‎, \'turn\'‎ או ‎\'turns\'‎. שרת ה־STUN המוגדר כברירת מחדל מהיצרן עבור פרוטוקולי STUN ו־ICE הוא \'stun:stun.l.google.com:19302\', המצביע על שרת STUN ציבורי של Google. לא קיים שרת TURN המוגדר כברירת מחדל מהיצרן.</string>
+    <string name="invalid_stun_server">כתובת URI לא חוקית של שרת STUN/TURN \'%1$s\'</string>
 </resources>
