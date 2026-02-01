@@ -251,6 +251,7 @@ fun NewAccount(navController: NavController) {
 
     var newAor by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()

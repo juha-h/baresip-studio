@@ -145,7 +145,7 @@ class BaresipService: Service() {
         nt = RingtoneManager.getRingtone(applicationContext, ntUri)
 
         val rtUri = if (Preferences(applicationContext).ringtoneUri == "")
-            Settings.System.RINGTONE.toUri()
+            Settings.System.DEFAULT_RINGTONE_URI
         else
             Preferences(applicationContext).ringtoneUri!!.toUri()
         rt = RingtoneManager.getRingtone(applicationContext, rtUri)
