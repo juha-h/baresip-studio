@@ -257,8 +257,10 @@ class Account(val accp: Long) {
         fun saveAccounts() {
             var accounts = ""
             for (a in accounts()) accounts = accounts + a.print() + "\n"
-            Utils.putFileContents(BaresipService.filesPath + "/accounts",
-                accounts.toByteArray(Charsets.UTF_8))
+            Utils.putFileContents(
+                BaresipService.filesPath + "/accounts",
+                accounts.toByteArray(Charsets.UTF_8)
+            )
             // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 

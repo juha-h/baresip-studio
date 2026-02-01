@@ -228,12 +228,7 @@ private fun ContactScreen(
 @Composable
 private fun TopAppBar(title: String, onBack: () -> Unit, onCheck: () -> Unit) {
     TopAppBar(
-        title = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold
-            )
-        },
+        title = { Text(text = title, fontWeight = FontWeight.Bold) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -564,16 +559,10 @@ private fun checkOnClick(
 
     if (currentState.tmpAvatarFile != null && currentState.tmpAvatarFile.exists()) {
         if (currentState.id != currentState.newId) { // Avatar changed, implying new ID
-            // Delete old avatar if it existed for currentState.contactId
             val oldAvatar = File(BaresipService.filesPath, "${currentState.id}.png")
             if (oldAvatar.exists()) Utils.deleteFile(oldAvatar)
-            idToUse = currentState.newId // Use the new ID for the contact
+            idToUse = currentState.newId
         }
-        /*val avatarFile = File(BaresipService.filesPath, "$idToUse.png")
-        if (!Utils.moveFile(currentState.tempAvatarFile, avatarFile)) {
-            Log.e(TAG, "Failed to move tmp avatar file $idToUse.png")
-            return "Failed to save avatar"
-        }*/
     } else if (currentState.avatarImageUri == null) { // Avatar was explicitly cleared
         val avatarFile = File(BaresipService.filesPath, "$idToUse.png")
         if (avatarFile.exists())
