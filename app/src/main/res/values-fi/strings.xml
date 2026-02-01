@@ -325,7 +325,8 @@
     <string name="configuration">Asetukset</string>
     <string name="start_automatically">Käynnistä automaattisesti</string>
     <string name="start_automatically_help">Jos merkitty, baresip
-    käynnistyy automaattisesti, kun laite käynnistyy.</string>
+    käynnistyy automaattisesti, kun laite käynnistyy tai kun uusi baresip-versio
+        on asennettu. Käynnistys tapahtuu, kun laite on avattu.</string>
     <string name="appear_on_top_permission">Automaattinen käynnistys vaatii "Näytä päällimmäisenä"
         käyttöoikeuden.</string>
     <string name="battery_optimizations">Akun käytön optimointi</string>

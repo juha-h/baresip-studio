@@ -311,7 +311,9 @@
     <!-- Settings Activity -->
     <string name="configuration">Settings</string>
     <string name="start_automatically">Start Automatically</string>
-    <string name="start_automatically_help">If checked, baresip starts automatically after device (re)start.</string>
+    <string name="start_automatically_help">If checked, baresip starts automatically after device boots
+        or after a new version of baresip is installed. Start is delayed until device is unlocked.
+    </string>
     <string name="appear_on_top_permission">Automatic start needs Appear on Top permission.</string>
     <string name="battery_optimizations">Battery Optimizations</string>
     <string name="battery_optimizations_help">Disable battery optimizations (recommended) if you want
