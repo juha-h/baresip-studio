@@ -57,6 +57,10 @@ import androidx.navigation.compose.composable
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
+enum class Result {
+    OK, ERROR, RESTART
+}
+
 fun NavGraphBuilder.audioScreenRoute(
     navController: NavController,
 ) {
@@ -67,11 +71,16 @@ fun NavGraphBuilder.audioScreenRoute(
                 navController.navigateUp()
             },
             checkOnClick = {
-                val result = checkOnClick(ctx)
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("audio_settings_result", result)
-                navController.navigateUp()
+                when (checkOnClick(ctx)) {
+                    Result.OK -> navController.navigateUp()
+                    Result.RESTART -> {
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("audio_settings_result", true)
+                        navController.navigateUp()
+                    }
+                    Result.ERROR -> {}
+                }
             },
         )
     }
@@ -509,7 +518,7 @@ private fun ToneCountry() {
     }
 }
 
-private fun checkOnClick(ctx: Context): Boolean {
+private fun checkOnClick(ctx: Context): Result {
 
     var restart = false
 
@@ -528,7 +537,7 @@ private fun checkOnClick(ctx: Context): Boolean {
                 alertTitle.value = ctx.getString(R.string.notice)
                 alertMessage.value = "${ctx.getString(R.string.invalid_microphone_gain)}: $gain."
                 showAlert.value = true
-                return false
+                return Result.ERROR
             }
             if (gain == "1.0") {
                 Api.module_unload("augain")
@@ -540,7 +549,7 @@ private fun checkOnClick(ctx: Context): Boolean {
                         alertTitle.value = ctx.getString(R.string.error)
                         alertMessage.value = ctx.getString(R.string.failed_to_load_module) + ": augain.so"
                         showAlert.value = true
-                        return false
+                        return Result.ERROR
                     }
                     Config.addVariable("module", "augain.so")
                 }
@@ -566,7 +575,7 @@ private fun checkOnClick(ctx: Context): Boolean {
                         alertTitle.value = ctx.getString(R.string.error)
                         alertMessage.value = "${ctx.getString(R.string.failed_to_load_module)}: ${module}.so"
                         showAlert.value = true
-                        return false
+                        return Result.ERROR
                     }
                     Config.addVariable("module", "${module}.so")
                     save = true
@@ -587,7 +596,7 @@ private fun checkOnClick(ctx: Context): Boolean {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_opus_bitrate)}: $newOpusBitrate."
             showAlert.value = true
-            return false
+            return Result.ERROR
         }
         Config.replaceVariable("opus_bitrate", newOpusBitrate)
         restart = true
@@ -599,7 +608,7 @@ private fun checkOnClick(ctx: Context): Boolean {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "${ctx.getString(R.string.invalid_opus_packet_loss)}: $newOpusPacketLoss"
             showAlert.value = true
-            return false
+            return Result.ERROR
         }
         Config.replaceVariable("opus_packet_loss", newOpusPacketLoss)
         restart = true
@@ -612,7 +621,7 @@ private fun checkOnClick(ctx: Context): Boolean {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = String.format(ctx.getString(R.string.invalid_audio_delay), audioDelay)
             showAlert.value = true
-            return false
+            return Result.ERROR
         }
         Config.replaceVariable("audio_delay", audioDelay)
         BaresipService.audioDelay = audioDelay.toLong()
@@ -627,7 +636,7 @@ private fun checkOnClick(ctx: Context): Boolean {
 
     if (save) Config.save()
 
-    return restart
+    return if (restart) Result.RESTART else Result.OK
 }
 
 private fun checkMicGain(micGain: String): Boolean {
