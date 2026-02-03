@@ -54,6 +54,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -106,29 +107,29 @@ fun NavGraphBuilder.chatsScreenRoute(navController: NavController) {
 @Composable
 private fun ChatsScreen(navController: NavController, aor: String) {
 
-    val account = Account.ofAor(aor)!!
     val ctx = LocalContext.current
+
+    val account = Account.ofAor(aor)!!
+    val uaMessages: MutableState<List<Message>> = remember { mutableStateOf(emptyList()) }
+    var areMessagesLoaded by remember { mutableStateOf(false) }
+
+    var refreshTrigger by remember { mutableIntStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val uaMessages: MutableState<List<Message>> = remember { mutableStateOf(emptyList()) }
+    LaunchedEffect(aor, refreshTrigger) {
+        uaMessages.value = loadMessages(account)
+        areMessagesLoaded = true
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                Log.d(TAG, "Resumed to ChatsScreen for AOR: $aor")
-                uaMessages.value = loadMessages(account)
-            }
+            if (event == Lifecycle.Event.ON_RESUME)
+                refreshTrigger++
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
-    }
-
-    var areMessagesLoaded by remember { mutableStateOf(false) }
-    LaunchedEffect(aor) {
-        uaMessages.value = loadMessages(account)
-        areMessagesLoaded = true
     }
 
     Scaffold(
@@ -212,9 +213,7 @@ private fun TopAppBar(
                     when (selectedItem) {
                         delete -> {
                             positiveAction.value = {
-                                Message.clearMessagesOfAor(account.aor)
-                                Message.save()
-                                uaMessages.value = listOf()
+                                deleteMessages(uaMessages, account, "")
                                 account.unreadMessages = false
                             }
                             showDialog.value = true
@@ -362,8 +361,7 @@ private fun Chats(
                             )
                             positiveButtonText.value = ctx.getString(R.string.delete)
                             positiveAction.value = {
-                                Message.deleteAorPeerMessages(aor, message.peerUri)
-                                uaMessages.value = loadMessages(account)
+                                deleteMessages(uaMessages, account, message.peerUri)
                             }
                             neutralButtonText.value = ""
                         } else {
@@ -375,7 +373,7 @@ private fun Chats(
                             }
                             neutralButtonText.value = ctx.getString(R.string.delete)
                             neutralAction.value = {
-                                Message.deleteAorPeerMessages(aor, message.peerUri)
+                                deleteMessages(uaMessages, account, message.peerUri)
                             }
                         }
                         showDialog.value = true
@@ -644,4 +642,14 @@ private fun loadMessages(account: Account) : List<Message> {
         }
     }
     return res.toList()
+}
+
+private fun deleteMessages(uaMessages: MutableState<List<Message>>, account: Account, peerUri: String) {
+    val updatedMessages = BaresipService.messages.toMutableList()
+    updatedMessages.removeAll {
+        it.aor == account.aor && (peerUri == "" || it.peerUri == peerUri)
+    }
+    BaresipService.messages = updatedMessages.toList()
+    Message.save()
+    uaMessages.value = loadMessages(account)
 }
