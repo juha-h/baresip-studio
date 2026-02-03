@@ -119,7 +119,7 @@
     <string name="video_codecs">视频编解码器</string>
     <string name="configuration">设置</string>
     <string name="start_automatically">自动启动</string>
-    <string name="start_automatically_help">如果选中，baresip 将在设备（重新）启动后自动启动。</string>
+    <string name="start_automatically_help">如果选中，在设备启动后或安装新版本 baresip 后，baresip 将自动启动。启动会延迟至设备解锁后执行。</string>
     <string name="appear_on_top_permission">自动启动需要“悬浮窗”权限。</string>
     <string name="battery_optimizations">电池优化</string>
     <string name="battery_optimizations_help">如果您想降低 Android 限制 baresip 访问网络或让 baresip 进入待机状态的概率，请禁用电池优化（推荐）。</string>
@@ -130,7 +130,7 @@
     <string name="listen_address_help">baresip 监听传入 SIP 请求的 IP 地址和端口，格式为“地址:端口”。如果 IP 地址是 IPv6 地址，则必须将其写在方括号 [] 内。IPv4 地址 0.0.0.0 或 IPv6 地址 [::] 使 baresip 监听所有可用地址。如果留空（出厂默认），baresip 将在所有可用地址的任意端口上监听。</string>
     <string name="invalid_listen_address">监听地址无效</string>
     <string name="address_family">地址族</string>
-    <string name="address_family_help">选择 baresip 正在使用的 IP 地址。如果选择 IPv4 或 IPv6，则baresip仅使用 IPv4 或 IPv6 地址。如果两者都没有选择，baresip 将同时使用 IPv4 和 IPv6 地址。</string>
+    <string name="address_family_help">选择 baresip 正在使用的 IP 地址。如果选择 IPv4 或 IPv6，则 baresip 仅使用 IPv4 或 IPv6 地址。如果两者都没有选择，baresip 将同时使用 IPv4 和 IPv6 地址。</string>
     <string name="dns_servers">DNS 服务器</string>
     <string name="dns_servers_help">以英文逗号分隔的 DNS 服务器地址列表。如果未指定，则从系统中动态获取 DNS 服务器地址。每个 DNS 地址的格式为“ip:端口”或“ip”。如果省略端口，则默认为 53。如果 ip 是 IPv6 地址，并且指定了端口，则 ip 必须写在方括号 [] 内。例如，列表“8.8.8.8:53,[2001:4860:4860::8888]:53”指向公共 Google DNS 服务器的 IPv4 和 IPv6 地址。</string>
     <string name="invalid_dns_servers">DNS 服务器无效</string>
