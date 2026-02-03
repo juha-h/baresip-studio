@@ -61,15 +61,6 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 }
         }
 
-        fun deleteAorPeerMessages(aor: String, peerUri: String) {
-            val updatedMessages = BaresipService.messages.toMutableList()
-            for (message in updatedMessages)
-                if (message.aor == aor && message.peerUri == peerUri)
-                    updatedMessages.remove(message)
-            BaresipService.messages = updatedMessages.toList()
-            save()
-        }
-
         fun updateAorMessage(aor: String, time: Long) {
             val updatedMessages = BaresipService.messages.toMutableList()
             for (message in updatedMessages.reversed())
