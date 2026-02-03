@@ -483,7 +483,6 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
     )
 
     val suggestions by remember { contactNames }
-    // 1. Change state to hold AnnotatedStrings
     var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
     var showSuggestions by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
@@ -505,7 +504,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                     modifier = Modifier
                         .shadow(8.dp, RoundedCornerShape(8.dp))
                         .background(
-                            color = MaterialTheme.colorScheme.surfaceContainer,
+                            color = MaterialTheme.colorScheme.surfaceVariant,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .animateContentSize()
@@ -524,7 +523,6 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                             state = lazyListState
                         ) {
                             items(
-                                // 3. Update key and clickable logic
                                 items = filteredSuggestions,
                                 key = { suggestion -> suggestion.toString() }
                             ) { suggestion ->
@@ -538,9 +536,9 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                                         .padding(12.dp)
                                 ) {
                                     Text(
-                                        text = suggestion, // Text composable accepts AnnotatedString
+                                        text = suggestion,
                                         modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.onSurface,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 18.sp
                                     )
                                 }
@@ -556,7 +554,6 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 onValueChange = {
                     newPeer = it
                     showSuggestions = newPeer.length > 1
-                    // 2. Update filtering and mapping logic
                     filteredSuggestions = if (it.isEmpty()) {
                         emptyList()
                     } else {

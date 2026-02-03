@@ -1269,7 +1269,7 @@ private fun CallUriRow(
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(8.dp))
                     .background(
-                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .animateContentSize()
@@ -1306,7 +1306,7 @@ private fun CallUriRow(
                                     Text(
                                         text = suggestion,
                                         modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.onSurface,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 18.sp
                                     )
                                 }
@@ -1662,7 +1662,7 @@ private fun CallRow(
                                             .fillMaxWidth()
                                             .shadow(8.dp, RoundedCornerShape(8.dp))
                                             .background(
-                                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                                color = MaterialTheme.colorScheme.surfaceVariant,
                                                 shape = RoundedCornerShape(8.dp)
                                             )
                                             .animateContentSize()
@@ -1697,7 +1697,7 @@ private fun CallRow(
                                                             Text(
                                                                 text = suggestion,
                                                                 modifier = Modifier.fillMaxWidth(),
-                                                                color = MaterialTheme.colorScheme.onSurface,
+                                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                                 fontSize = 18.sp
                                                             )
                                                         }
