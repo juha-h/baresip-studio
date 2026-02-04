@@ -1,0 +1,6 @@
+- Fixed crash related to deleting of messages
+- Start automatically also when new version of baresip is installed
+- Improved Audio Settings check
+- Improved alert dialog background color
+- Improved suggestion coloring
+- New translations (Chinese and Hebrew)
