@@ -251,7 +251,7 @@ object CustomElements {
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
