@@ -116,15 +116,15 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
 
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
-    val positiveAction = remember { mutableStateOf({}) }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = message.value,
-        positiveButtonText = stringResource(R.string.delete),
-        onPositiveClicked = positiveAction.value,
-        negativeButtonText = stringResource(R.string.cancel),
+        firstButtonText = stringResource(R.string.cancel),
+        lastButtonText = stringResource(R.string.delete),
+        onLastClicked = lastAction.value,
     )
 
     val showAccounts = remember { mutableStateOf(true) }
@@ -169,7 +169,7 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                         modifier = Modifier.padding(end = 8.dp),
                         onClick = {
                             message.value = String.format(deleteAccountMessage, text)
-                            positiveAction.value = {
+                            lastAction.value = {
                                 CallHistoryNew.clear(aor)
                                 Message.clearMessagesOfAor(aor)
                                 ua.remove()
@@ -206,7 +206,7 @@ fun NewAccount(navController: NavController) {
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
-            positiveButtonText = stringResource(R.string.ok),
+            lastButtonText = stringResource(R.string.ok),
         )
 
     fun createNew(ctx: Context, newAor: String): Account? {

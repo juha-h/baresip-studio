@@ -70,6 +70,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.CallRow.Details
+import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -280,18 +281,17 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
         }
     }
     val showDialog = remember { mutableStateOf(false) }
-    val positiveAction = remember { mutableStateOf({}) }
 
-    CustomElements.AlertDialog(
+    AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = stringResource(R.string.delete_call_alert),
-        positiveButtonText = stringResource(R.string.delete),
-        onPositiveClicked = {
+        firstButtonText = stringResource(R.string.cancel),
+        lastButtonText = stringResource(R.string.delete),
+        onLastClicked = {
             CallHistoryNew.remove(detail.startTime, detail.stopTime)
             onDelete(detail)
         },
-        negativeButtonText = stringResource(R.string.cancel)
     )
 
     Text(
@@ -299,9 +299,6 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
         modifier = Modifier.combinedClickable(
             onClick = {},
             onLongClick = {
-                positiveAction.value = {
-                    CallHistoryNew.remove(startTime, stopTime)
-                }
                 showDialog.value = true
             }
         )
@@ -371,22 +368,21 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
     )
 
     // 2. Download Confirmation Dialog
-    if (showDownloadDialog.value) {
-        CustomElements.AlertDialog(
+    if (showDownloadDialog.value)
+        AlertDialog(
             showDialog = showDownloadDialog,
             title = stringResource(R.string.save_recording),
             message = stringResource(R.string.save_recording_question),
-            positiveButtonText = stringResource(R.string.save),
-            onPositiveClicked = {
+            firstButtonText = stringResource(R.string.cancel),
+            lastButtonText = stringResource(R.string.save),
+            onLastClicked = {
                 showDownloadDialog.value = false
                 detail.recording.firstOrNull { it.isNotEmpty() }?.let {
                     val suggestedName = File(it).name
                     saveLauncher.launch(suggestedName)
                 }
             },
-            negativeButtonText = stringResource(R.string.cancel)
         )
-    }
 
     val hasRecording = detail.recording.isNotEmpty() && detail.recording[0].isNotEmpty()
     if (hasRecording) {

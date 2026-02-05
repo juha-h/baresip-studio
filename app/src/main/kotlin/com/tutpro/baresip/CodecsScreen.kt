@@ -47,7 +47,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
@@ -161,11 +160,6 @@ private fun CodecsScreen(
     )
 }
 
-private val alertTitle = mutableStateOf("")
-private val alertMessage = mutableStateOf("")
-private val showAlert = mutableStateOf(false)
-
-
 @Composable
 private fun CodecsContent(
     contentPadding: PaddingValues,
@@ -194,15 +188,6 @@ private fun CodecsContent(
                 currentCodecs.add(Codec(codec, mutableStateOf(false)))
         codecs.clear()
         codecs.addAll(currentCodecs)
-    }
-
-    if (showAlert.value) {
-        AlertDialog(
-            showDialog = showAlert,
-            title = alertTitle.value,
-            message = alertMessage.value,
-            positiveButtonText = stringResource(R.string.ok),
-        )
     }
 
     Column(
