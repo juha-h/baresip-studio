@@ -2338,7 +2338,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val redirectUri = ev[1]
             val target = Utils.friendlyUri(ctx, redirectUri, acc)
             if (acc.autoRedirect) {
-                redirect(ctx, viewModel, ua, target)
+                redirect(ctx, viewModel, ua, redirectUri)
                 Toast.makeText(ctx,
                     String.format(ctx.getString(R.string.redirect_notice), target),
                     Toast.LENGTH_SHORT
@@ -2352,7 +2352,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 onSecondClicked.value = { }
                 lastText.value = ctx.getString(R.string.yes)
                 onLastClicked.value = {
-                    redirect(ctx, viewModel, ua, target)
+                    redirect(ctx, viewModel, ua, redirectUri)
                 }
                 showDialog.value = true
             }
