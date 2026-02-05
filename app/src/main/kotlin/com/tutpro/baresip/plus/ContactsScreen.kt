@@ -217,6 +217,8 @@ private fun ContactsContent(
     val dialogMessage = remember { mutableStateOf("") }
     val secondText = remember { mutableStateOf("") }
     val secondAction = remember { mutableStateOf({}) }
+    val thirdText = remember { mutableStateOf("") }
+    val thirdAction = remember { mutableStateOf({}) }
     val lastText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
@@ -228,6 +230,8 @@ private fun ContactsContent(
             firstButtonText = stringResource(R.string.cancel),
             secondButtonText = secondText.value,
             onSecondClicked = secondAction.value,
+            thirdButtonText = thirdText.value,
+            onThirdClicked = thirdAction.value,
             lastButtonText = lastText.value,
             onLastClicked = lastAction.value,
         )
@@ -344,6 +348,16 @@ private fun ContactsContent(
                                                 }
                                             }
                                         }
+                                        thirdText.value = ctx.getString(R.string.video_call)
+                                        thirdAction.value = {
+                                            if (ua != null) {
+                                                handleIntent(ctx, viewModel, intent, "video call")
+                                                navController.navigate("main") {
+                                                    popUpTo("main")
+                                                    launchSingleTop = true
+                                                }
+                                            }
+                                        }
                                         lastText.value = ctx.getString(R.string.send_message)
                                         lastAction.value = {
                                             if (ua != null) {
@@ -359,6 +373,7 @@ private fun ContactsContent(
                                             contact.name()
                                         )
                                         secondText.value = ""
+                                        thirdText.value = ""
                                         lastText.value = ctx.getString(R.string.delete)
                                         lastAction.value = {
                                             val id = contact.id
@@ -411,6 +426,7 @@ private fun ContactsContent(
                                             contact.name()
                                         )
                                         secondText.value = ""
+                                        thirdText.value = ""
                                         lastText.value = ctx.getString(R.string.delete)
                                         lastAction.value = {
                                             ctx.contentResolver.delete(

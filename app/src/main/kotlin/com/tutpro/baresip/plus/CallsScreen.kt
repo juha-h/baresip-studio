@@ -163,6 +163,8 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
         title = stringResource(R.string.confirmation),
         message = String.format(stringResource(R.string.delete_history_alert), account.text()),
         firstButtonText = stringResource(R.string.cancel),
+        secondButtonText = "",
+        thirdButtonText = "",
         lastButtonText = stringResource(R.string.delete),
         onLastClicked = lastAction.value,
     )
@@ -278,6 +280,8 @@ private fun Calls(
     val message = remember { mutableStateOf("") }
     val secondButtonText = remember { mutableStateOf("") }
     val secondAction = remember { mutableStateOf({}) }
+    val thirdButtonText = remember { mutableStateOf("") }
+    val thirdAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
@@ -288,6 +292,8 @@ private fun Calls(
         firstButtonText = stringResource(R.string.cancel),
         secondButtonText = secondButtonText.value,
         onSecondClicked = secondAction.value,
+        thirdButtonText = thirdButtonText.value,
+        onThirdClicked = thirdAction.value,
         lastButtonText = lastButtonText.value,
         onLastClicked = lastAction.value,
     )
@@ -339,6 +345,16 @@ private fun Calls(
                                         }
                                     }
                                 }
+                                thirdButtonText.value = ctx.getString(R.string.video_call)
+                                thirdAction.value = {
+                                    if (ua != null) {
+                                        handleIntent(ctx, viewModel, intent, "video call")
+                                        navController.navigate("main") {
+                                            popUpTo("main")
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                }
                                 lastButtonText.value = ctx.getString(R.string.send_message)
                                 lastAction.value = {
                                     if (ua != null) {
@@ -361,6 +377,7 @@ private fun Calls(
                                         peerName, callText
                                     )
                                     secondButtonText.value = ""
+                                    thirdButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
@@ -375,6 +392,7 @@ private fun Calls(
                                     secondAction.value = {
                                         navController.navigate("baresip_contact/$peerUri/new")
                                     }
+                                    thirdButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
