@@ -167,15 +167,15 @@ private fun TopAppBar(
     val delete = stringResource(R.string.delete)
     val blocked = stringResource(R.string.blocked)
     val showDialog = remember { mutableStateOf(false) }
-    val positiveAction = remember { mutableStateOf({}) }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = String.format(stringResource(R.string.delete_chats_alert), account.text()),
-        positiveButtonText = stringResource(R.string.delete),
-        onPositiveClicked = positiveAction.value,
-        negativeButtonText = stringResource(R.string.cancel),
+        firstButtonText = stringResource(R.string.cancel),
+        lastButtonText = stringResource(R.string.delete),
+        onLastClicked = lastAction.value,
     )
 
     TopAppBar(
@@ -212,7 +212,7 @@ private fun TopAppBar(
                     menuExpanded = false
                     when (selectedItem) {
                         delete -> {
-                            positiveAction.value = {
+                            lastAction.value = {
                                 deleteMessages(uaMessages, account, "")
                                 account.unreadMessages = false
                             }
@@ -269,21 +269,21 @@ private fun Chats(
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
-    val positiveButtonText = remember { mutableStateOf("") }
-    val positiveAction = remember { mutableStateOf({}) }
-    val neutralButtonText = remember { mutableStateOf("") }
-    val neutralAction = remember { mutableStateOf({}) }
+    val secondButtonText = remember { mutableStateOf("") }
+    val secondAction = remember { mutableStateOf({}) }
+    val lastButtonText = remember { mutableStateOf("") }
+    val lastAction = remember { mutableStateOf({}) }
 
     if (showDialog.value)
         AlertDialog(
             showDialog = showDialog,
             title = stringResource(R.string.confirmation),
             message = dialogMessage.value,
-            positiveButtonText = positiveButtonText.value,
-            onPositiveClicked = positiveAction.value,
-            neutralButtonText = neutralButtonText.value,
-            onNeutralClicked = neutralAction.value,
-            negativeButtonText = stringResource(R.string.cancel)
+            firstButtonText = stringResource(R.string.cancel),
+            secondButtonText = secondButtonText.value,
+            onSecondClicked = secondAction.value,
+            lastButtonText = lastButtonText.value,
+            onLastClicked = lastAction.value,
         )
 
     val lazyListState = rememberLazyListState()
@@ -359,21 +359,21 @@ private fun Chats(
                                 ctx.getString(R.string.short_chat_question),
                                 peer
                             )
-                            positiveButtonText.value = ctx.getString(R.string.delete)
-                            positiveAction.value = {
+                            secondButtonText.value = ""
+                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastAction.value = {
                                 deleteMessages(uaMessages, account, message.peerUri)
                             }
-                            neutralButtonText.value = ""
                         } else {
                             dialogMessage.value =
                                 String.format(ctx.getString(R.string.long_chat_question), peer)
-                            positiveButtonText.value = ctx.getString(R.string.add_contact)
-                            positiveAction.value = {
-                                navController.navigate("baresip_contact/${message.peerUri}/new")
-                            }
-                            neutralButtonText.value = ctx.getString(R.string.delete)
-                            neutralAction.value = {
+                            secondButtonText.value = ctx.getString(R.string.delete)
+                            secondAction.value = {
                                 deleteMessages(uaMessages, account, message.peerUri)
+                            }
+                            lastButtonText.value = ctx.getString(R.string.add_contact)
+                            lastAction.value = {
+                                navController.navigate("baresip_contact/${message.peerUri}/new")
                             }
                         }
                         showDialog.value = true
@@ -463,7 +463,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
-            positiveButtonText = stringResource(R.string.ok),
+            lastButtonText = stringResource(R.string.ok),
         )
     }
 

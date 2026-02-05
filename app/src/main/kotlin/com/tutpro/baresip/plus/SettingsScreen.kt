@@ -200,14 +200,14 @@ private fun SettingsScreen(
                 showDialog = showRestartDialog,
                 title = stringResource(R.string.restart_request),
                 message = stringResource(R.string.config_restart),
-                positiveButtonText = stringResource(R.string.restart),
-                onPositiveClicked = {
+                firstButtonText = stringResource(R.string.cancel),
+                onFirstClicked = {
+                    navController.navigateUp()
+                },
+                lastButtonText = stringResource(R.string.restart),
+                onLastClicked = {
                     onRestartApp()
                 },
-                negativeButtonText = stringResource(R.string.cancel),
-                onNegativeClicked = {
-                    navController.navigateUp()
-                }
             )
         }
 
@@ -218,10 +218,10 @@ private fun SettingsScreen(
 
 private val dialogTitle = mutableStateOf("")
 private val dialogMessage = mutableStateOf("")
-private val positiveText = mutableStateOf("")
-private val onPositiveClicked = mutableStateOf({})
-private val negativeText = mutableStateOf("")
-private val onNegativeClicked = mutableStateOf({})
+private val firstButtonText = mutableStateOf("")
+private val onFirstClicked = mutableStateOf({})
+private val lastButtonText = mutableStateOf("")
+private val onLastClicked = mutableStateOf({})
 private val showDialog = mutableStateOf(false)
 
 private val alertTitle = mutableStateOf("")
@@ -249,7 +249,8 @@ private fun SettingsContent(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
-            positiveButtonText = okButtonText,
+            firstButtonText = "",
+            lastButtonText = okButtonText,
         )
     }
 
@@ -258,10 +259,10 @@ private fun SettingsContent(
             showDialog = showDialog,
             title = dialogTitle.value,
             message = dialogMessage.value,
-            positiveButtonText = positiveText.value,
-            onPositiveClicked = onPositiveClicked.value,
-            negativeButtonText = negativeText.value,
-            onNegativeClicked = onNegativeClicked.value,
+            firstButtonText = firstButtonText.value,
+            onFirstClicked = onFirstClicked.value,
+            lastButtonText = lastButtonText.value,
+            onLastClicked = onLastClicked.value,
         )
 
     @Composable
@@ -293,14 +294,12 @@ private fun SettingsContent(
                         if (!isAppearOnTopPermissionGranted(ctx)) {
                             dialogTitle.value = noticeTitleText
                             dialogMessage.value = appearOnTopPermissionMessage
-                            positiveText.value = okButtonText
-                            onPositiveClicked.value = {
+                            firstButtonText.value = cancelButtonText
+                            onFirstClicked.value = {}
+                            lastButtonText.value = okButtonText
+                            onLastClicked.value = {
                                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                                 ctx.startActivity(intent)
-                            }
-                            negativeText.value = cancelButtonText
-                            onNegativeClicked.value = {
-                                negativeText.value = ""
                             }
                             showDialog.value = true
                             viewModel.autoStart.value = false
@@ -578,10 +577,10 @@ private fun SettingsContent(
                 showDialog = showAlertDialog,
                 title = stringResource(R.string.notice),
                 message = stringResource(R.string.no_read_permission),
-                positiveButtonText = stringResource(R.string.ok),
-                onPositiveClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
-                negativeButtonText = "",
-                onNegativeClicked = {},
+                firstButtonText = "",
+                onFirstClicked = {},
+                lastButtonText = stringResource(R.string.ok),
+                onLastClicked = { requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
             )
     }
 
@@ -690,11 +689,11 @@ private fun SettingsContent(
                                 shouldShowRequestPermissionRationale(activity, permission) -> {
                                     dialogTitle.value = noticeTitleText
                                     dialogMessage.value = noReadPermissionMessage
-                                    positiveText.value = okButtonText
-                                    onPositiveClicked.value = {
+                                    firstButtonText.value = ""
+                                    lastButtonText.value = okButtonText
+                                    onLastClicked.value = {
                                         requestPermissionLauncher.launch(permission)
                                     }
-                                    negativeText.value = ""
                                     showDialog.value = true
                                 }
                                 else ->
@@ -764,8 +763,8 @@ private fun SettingsContent(
         val contactsHelp = stringResource(R.string.contacts_help)
         val consentRequestTitle = stringResource(R.string.consent_request)
         val contactsConsentMessage = stringResource(R.string.contacts_consent)
-        val positiveButtonText = stringResource(R.string.accept)
-        val negativeButtonText = stringResource(R.string.deny)
+        val denyText = stringResource(R.string.deny)
+        val acceptText = stringResource(R.string.accept)
         val both = stringResource(R.string.both)
         val noAndroidContactsMessage = stringResource(R.string.no_android_contacts)
         val showAlertDialog = remember { mutableStateOf(false) }
@@ -832,8 +831,12 @@ private fun SettingsContent(
                                 if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
                                     dialogTitle.value = consentRequestTitle
                                     dialogMessage.value = contactsConsentMessage
-                                    positiveText.value = positiveButtonText
-                                    onPositiveClicked.value = {
+                                    firstButtonText.value = denyText
+                                    onFirstClicked.value = {
+                                        itemPosition.intValue = contactValues.indexOf(contactsMode)
+                                    }
+                                    lastButtonText.value = acceptText
+                                    onLastClicked.value = {
                                         showDialog.value = false
                                         viewModel.contactsMode.value = mode
                                         if (ContextCompat.checkSelfPermission(
@@ -864,11 +867,6 @@ private fun SettingsContent(
                                                 )
                                         }
                                     }
-                                    negativeText.value = negativeButtonText
-                                    onNegativeClicked.value = {
-                                        itemPosition.intValue = contactValues.indexOf(contactsMode)
-                                        negativeText.value = ""
-                                    }
                                     showDialog.value = true
                                 }
                                 else {
@@ -886,15 +884,15 @@ private fun SettingsContent(
                     showDialog = showAlertDialog,
                     title = noticeTitleText,
                     message = noAndroidContactsMessage,
-                    positiveButtonText = okButtonText,
-                    onPositiveClicked = { requestPermissionsLauncher.launch(
+                    firstButtonText = "",
+                    onFirstClicked = {},
+                    lastButtonText = okButtonText,
+                    onLastClicked = { requestPermissionsLauncher.launch(
                         arrayOf(
                             Manifest.permission.READ_CONTACTS,
                             Manifest.permission.WRITE_CONTACTS
                         )
                     )},
-                    negativeButtonText = "",
-                    onNegativeClicked = {},
                 )
         }
     }
@@ -1325,15 +1323,14 @@ private fun SettingsContent(
                 onCheckedChange = {
                     dialogTitle.value = confirmationText
                     dialogMessage.value = resetConfigAlert
-                    positiveText.value = resetButtonText
-                    onPositiveClicked.value = {
+                    firstButtonText.value = cancelButtonText
+                    onFirstClicked.value = {
+                        reset = false
+                    }
+                    lastButtonText.value = resetButtonText
+                    onLastClicked.value = {
                         Config.reset()
                         onRestartApp()
-                    }
-                    negativeText.value = cancelButtonText
-                    onNegativeClicked.value = {
-                        reset = false
-                        negativeText.value = ""
                     }
                     showDialog.value = true
                 }

@@ -215,21 +215,21 @@ private fun ContactsContent(
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
-    val positiveText = remember { mutableStateOf("") }
-    val positiveAction = remember { mutableStateOf({}) }
-    val neutralText = remember { mutableStateOf("") }
-    val neutralAction = remember { mutableStateOf({}) }
+    val secondText = remember { mutableStateOf("") }
+    val secondAction = remember { mutableStateOf({}) }
+    val lastText = remember { mutableStateOf("") }
+    val lastAction = remember { mutableStateOf({}) }
 
     if (showDialog.value)
         AlertDialog(
             showDialog = showDialog,
             title = stringResource(R.string.confirmation),
             message = dialogMessage.value,
-            positiveButtonText = positiveText.value,
-            onPositiveClicked = positiveAction.value,
-            neutralButtonText = neutralText.value,
-            onNeutralClicked = neutralAction.value,
-            negativeButtonText = stringResource(R.string.cancel)
+            firstButtonText = stringResource(R.string.cancel),
+            secondButtonText = secondText.value,
+            onSecondClicked = secondAction.value,
+            lastButtonText = lastText.value,
+            onLastClicked = lastAction.value,
         )
 
     val lazyListState = rememberLazyListState()
@@ -334,8 +334,8 @@ private fun ContactsContent(
                                             ctx.getString(R.string.contact_action_question),
                                             contact.name()
                                         )
-                                        positiveText.value = ctx.getString(R.string.call)
-                                        positiveAction.value = {
+                                        secondText.value = ctx.getString(R.string.call)
+                                        secondAction.value = {
                                             if (ua != null) {
                                                 handleIntent(ctx, viewModel, intent, "call")
                                                 navController.navigate("main") {
@@ -344,8 +344,8 @@ private fun ContactsContent(
                                                 }
                                             }
                                         }
-                                        neutralText.value = ctx.getString(R.string.send_message)
-                                        neutralAction.value = {
+                                        lastText.value = ctx.getString(R.string.send_message)
+                                        lastAction.value = {
                                             if (ua != null) {
                                                 handleIntent(ctx, viewModel, intent, "message")
                                                 navController.navigateUp()
@@ -358,8 +358,9 @@ private fun ContactsContent(
                                             ctx.getString(R.string.contact_delete_question),
                                             contact.name()
                                         )
-                                        positiveText.value = ctx.getString(R.string.delete)
-                                        positiveAction.value = {
+                                        secondText.value = ""
+                                        lastText.value = ctx.getString(R.string.delete)
+                                        lastAction.value = {
                                             val id = contact.id
                                             val avatarFile = File(
                                                 BaresipService.filesPath,
@@ -377,7 +378,6 @@ private fun ContactsContent(
                                             }
                                             Contact.removeBaresipContact(contact)
                                         }
-                                        neutralText.value = ""
                                         showDialog.value = true
                                     }
                                 )
@@ -410,15 +410,15 @@ private fun ContactsContent(
                                             ctx.getString(R.string.contact_delete_question),
                                             contact.name()
                                         )
-                                        positiveText.value = ctx.getString(R.string.delete)
-                                        positiveAction.value = {
+                                        secondText.value = ""
+                                        lastText.value = ctx.getString(R.string.delete)
+                                        lastAction.value = {
                                             ctx.contentResolver.delete(
                                                 ContactsContract.RawContacts.CONTENT_URI,
                                                 ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
                                                 null
                                             )
                                         }
-                                        neutralText.value = ""
                                         showDialog.value = true
                                     }
                                 )

@@ -339,20 +339,20 @@ private fun Messages(
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
-    val positiveButtonText = remember { mutableStateOf("") }
-    val positiveAction = remember { mutableStateOf({}) }
-    val neutralButtonText = remember { mutableStateOf("") }
-    val neutralAction = remember { mutableStateOf({}) }
+    val secondButtonText = remember { mutableStateOf("") }
+    val secondAction = remember { mutableStateOf({}) }
+    val lastButtonText = remember { mutableStateOf("") }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = dialogMessage.value,
-        positiveButtonText = positiveButtonText.value,
-        onPositiveClicked = positiveAction.value,
-        neutralButtonText = neutralButtonText.value,
-        onNeutralClicked = neutralAction.value,
-        negativeButtonText = stringResource(R.string.cancel)
+        firstButtonText = stringResource(R.string.cancel),
+        secondButtonText = secondButtonText.value,
+        onSecondClicked = secondAction.value,
+        lastButtonText = lastButtonText.value,
+        onLastClicked = lastAction.value,
     )
 
     val lazyListState = rememberLazyListState()
@@ -415,23 +415,23 @@ private fun Messages(
                                 ctx.getString(R.string.long_message_question),
                                 peerUri
                             )
-                            positiveButtonText.value = ctx.getString(R.string.add_contact)
-                            positiveAction.value = {
+                            secondButtonText.value = ctx.getString(R.string.add_contact)
+                            secondAction.value = {
                                 navController.navigate("baresip_contact/$peerUri/new")
                             }
-                            neutralButtonText.value = ctx.getString(R.string.delete)
-                            neutralAction.value = {
+                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastAction.value = {
                                 message.delete()
                                 onMessageDeleted()
                             }
                         } else {
                             dialogMessage.value = ctx.getString(R.string.short_message_question)
-                            positiveButtonText.value = ctx.getString(R.string.delete)
-                            positiveAction.value = {
+                            secondButtonText.value = ""
+                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastAction.value = {
                                 message.delete()
                                 onMessageDeleted()
                             }
-                            neutralButtonText.value = ""
                         }
                         showDialog.value = true
                     },
@@ -508,7 +508,7 @@ private fun NewMessage(
         showDialog = showDialog,
         title = stringResource(R.string.notice),
         message = dialogMessage.value,
-        positiveButtonText = stringResource(R.string.ok),
+        lastButtonText = stringResource(R.string.ok),
     )
 
     Row(modifier = Modifier

@@ -145,15 +145,15 @@ private fun TopAppBar(
     var expanded by remember { mutableStateOf(false) }
     val delete = stringResource(R.string.delete)
     val showDialog = remember { mutableStateOf(false) }
-    val positiveAction = remember { mutableStateOf({}) }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = String.format(stringResource(R.string.blocked_delete_alert), account.text()),
-        positiveButtonText = stringResource(R.string.delete),
-        negativeButtonText = stringResource(R.string.cancel),
-        onPositiveClicked = positiveAction.value,
+        firstButtonText = stringResource(R.string.cancel),
+        lastButtonText = stringResource(R.string.delete),
+        onLastClicked = lastAction.value,
     )
 
     TopAppBar(
@@ -200,7 +200,7 @@ private fun TopAppBar(
                     expanded = false
                     when (selectedItem) {
                         delete -> {
-                            positiveAction.value = {
+                            lastAction.value = {
                                 Blocked.clear(account.aor)
                                 blocked.value = emptyList()
                             }
@@ -251,20 +251,16 @@ private fun Account(account: Account) {
 private fun Blocked(ctx: Context, navController: NavController, blocked: MutableState<List<Blocked>>) {
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
-    val positiveButtonText = remember { mutableStateOf("") }
-    val positiveAction = remember { mutableStateOf({}) }
-    val neutralButtonText = remember { mutableStateOf("") }
-    val neutralAction = remember { mutableStateOf({}) }
+    val lastButtonText = remember { mutableStateOf("") }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = message.value,
-        positiveButtonText = positiveButtonText.value,
-        onPositiveClicked = positiveAction.value,
-        neutralButtonText = neutralButtonText.value,
-        onNeutralClicked = neutralAction.value,
-        negativeButtonText = stringResource(R.string.cancel)
+        firstButtonText = stringResource(R.string.cancel),
+        lastButtonText = lastButtonText.value,
+        onLastClicked = lastAction.value,
     )
 
     val lazyListState = rememberLazyListState()
@@ -289,8 +285,8 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
                     .clickable(onClick = {
                         message.value = String.format(ctx.getString(R.string.blocked_contact_question),
                             peerUri)
-                        positiveButtonText.value = ctx.getString(R.string.add_contact)
-                        positiveAction.value = {
+                        lastButtonText.value = ctx.getString(R.string.add_contact)
+                        lastAction.value = {
                             navController.navigate("baresip_contact/$peerUri/new")
                         }
                         showDialog.value = true

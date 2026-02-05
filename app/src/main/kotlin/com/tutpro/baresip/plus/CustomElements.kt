@@ -228,18 +228,21 @@ object CustomElements {
             }
         }
     }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AlertDialog(
         showDialog: MutableState<Boolean>,
         title: String,
         message: String,
-        positiveButtonText: String = "",
-        onPositiveClicked: () -> Unit = {},
-        negativeButtonText: String = "",
-        onNegativeClicked: () -> Unit = {},
-        neutralButtonText: String = "",
-        onNeutralClicked: () -> Unit = {}
+        firstButtonText: String = "",
+        onFirstClicked: () -> Unit = {},
+        secondButtonText: String = "",
+        onSecondClicked: () -> Unit = {},
+        thirdButtonText: String = "",
+        onThirdClicked: () -> Unit = {},
+        lastButtonText: String = "",
+        onLastClicked: () -> Unit = {}
     ) {
         if (showDialog.value) {
             BasicAlertDialog(
@@ -272,50 +275,57 @@ object CustomElements {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // New logic starts here
-                            if (positiveButtonText.isNotEmpty()) {
-                                val buttonCount = listOf(positiveButtonText, negativeButtonText, neutralButtonText)
-                                    .count { it.isNotEmpty() }
+                            if (lastButtonText.isNotEmpty()) {
+
+                                val buttonCount = listOf(
+                                    firstButtonText, secondButtonText, thirdButtonText, lastButtonText
+                                ).count { it.isNotEmpty() }
 
                                 if (buttonCount >= 3) {
-                                    // Use a Column for 3 buttons, aligned to the end (right)
+                                    // Use a Column for 3-4 buttons, aligned to the end (right)
                                     Column(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalAlignment = Alignment.End
                                     ) {
-                                        // The positive button is usually last for emphasis
-                                        if (negativeButtonText.isNotEmpty()) {
-                                            TextButton(onClick = {
-                                                onNegativeClicked()
-                                                showDialog.value = false
-                                            }) {
-                                                Text(
-                                                    text = negativeButtonText.uppercase(),
-                                                    fontSize = 14.sp,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                        }
-                                        if (neutralButtonText.isNotEmpty()) {
-                                            TextButton(onClick = {
-                                                onNeutralClicked()
-                                                showDialog.value = false
-                                            }) {
-                                                Text(
-                                                    text = neutralButtonText.uppercase(),
-                                                    fontSize = 14.sp,
-                                                    color = MaterialTheme.colorScheme.primary
-                                                )
-                                            }
-                                        }
                                         TextButton(onClick = {
-                                            onPositiveClicked()
+                                            onFirstClicked()
                                             showDialog.value = false
                                         }) {
                                             Text(
-                                                text = positiveButtonText.uppercase(),
+                                                text = firstButtonText.uppercase(),
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        TextButton(onClick = {
+                                            onSecondClicked()
+                                            showDialog.value = false
+                                        }) {
+                                            Text(
+                                                text = secondButtonText.uppercase(),
                                                 fontSize = 14.sp,
                                                 color = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                        if (thirdButtonText.isNotEmpty())
+                                            TextButton(onClick = {
+                                                onThirdClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = thirdButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                )
+                                            }
+                                        TextButton(onClick = {
+                                            onLastClicked()
+                                            showDialog.value = false
+                                        }) {
+                                            Text(
+                                                text = lastButtonText.uppercase(),
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.primary
                                             )
                                         }
                                     }
@@ -325,38 +335,36 @@ object CustomElements {
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.End
                                     ) {
-                                        if (negativeButtonText.isNotEmpty()) {
+                                        if (firstButtonText.isNotEmpty())
                                             TextButton(onClick = {
-                                                onNegativeClicked()
+                                                onFirstClicked()
                                                 showDialog.value = false
                                             }) {
                                                 Text(
-                                                    text = negativeButtonText.uppercase(),
+                                                    text = firstButtonText.uppercase(),
                                                     fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
-                                        }
-                                        if (neutralButtonText.isNotEmpty()) {
+                                        if (secondButtonText.isNotEmpty())
                                             TextButton(onClick = {
-                                                onNeutralClicked()
+                                                onSecondClicked()
                                                 showDialog.value = false
                                             }) {
                                                 Text(
-                                                    text = neutralButtonText.uppercase(),
+                                                    text = secondButtonText.uppercase(),
                                                     fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.primary
                                                 )
                                             }
-                                        }
                                         TextButton(onClick = {
-                                            onPositiveClicked()
+                                            onLastClicked()
                                             showDialog.value = false
                                         }) {
                                             Text(
-                                                text = positiveButtonText.uppercase(),
+                                                text = lastButtonText.uppercase(),
                                                 fontSize = 14.sp,
-                                                color = MaterialTheme.colorScheme.primary,
+                                                color = MaterialTheme.colorScheme.primary
                                             )
                                         }
                                     }
@@ -481,7 +489,7 @@ object CustomElements {
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {

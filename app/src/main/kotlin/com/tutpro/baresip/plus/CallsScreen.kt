@@ -156,15 +156,15 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
     val blocked = stringResource(R.string.blocked)
 
     val showDialog = remember { mutableStateOf(false) }
-    val positiveAction = remember { mutableStateOf({}) }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = String.format(stringResource(R.string.delete_history_alert), account.text()),
-        positiveButtonText = stringResource(R.string.delete),
-        negativeButtonText = stringResource(R.string.cancel),
-        onPositiveClicked = positiveAction.value,
+        firstButtonText = stringResource(R.string.cancel),
+        lastButtonText = stringResource(R.string.delete),
+        onLastClicked = lastAction.value,
     )
 
     TopAppBar(
@@ -211,7 +211,7 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
                     expanded = false
                     when (selectedItem) {
                         delete -> {
-                            positiveAction.value = {
+                            lastAction.value = {
                                 CallHistoryNew.clear(account.aor)
                                 callHistory.value = emptyList()
                                 Blocked.clear(account.aor)
@@ -276,20 +276,20 @@ private fun Calls(
 
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
-    val positiveButtonText = remember { mutableStateOf("") }
-    val positiveAction = remember { mutableStateOf({}) }
-    val neutralButtonText = remember { mutableStateOf("") }
-    val neutralAction = remember { mutableStateOf({}) }
+    val secondButtonText = remember { mutableStateOf("") }
+    val secondAction = remember { mutableStateOf({}) }
+    val lastButtonText = remember { mutableStateOf("") }
+    val lastAction = remember { mutableStateOf({}) }
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
         message = message.value,
-        positiveButtonText = positiveButtonText.value,
-        onPositiveClicked = positiveAction.value,
-        neutralButtonText = neutralButtonText.value,
-        onNeutralClicked = neutralAction.value,
-        negativeButtonText = stringResource(R.string.cancel)
+        firstButtonText = stringResource(R.string.cancel),
+        secondButtonText = secondButtonText.value,
+        onSecondClicked = secondAction.value,
+        lastButtonText = lastButtonText.value,
+        onLastClicked = lastAction.value,
     )
 
     val lazyListState = rememberLazyListState()
@@ -329,8 +329,8 @@ private fun Calls(
                                     Log.w(TAG, "onClickListener did not find UA for $aor")
                                 val peerName = Utils.friendlyUri(ctx, peerUri, account)
                                 message.value = String.format(ctx.getString(R.string.contact_action_question), peerName)
-                                positiveButtonText.value = ctx.getString(R.string.call)
-                                positiveAction.value = {
+                                secondButtonText.value = ctx.getString(R.string.call)
+                                secondAction.value = {
                                     if (ua != null) {
                                         handleIntent(ctx, viewModel, intent, "call")
                                         navController.navigate("main") {
@@ -339,8 +339,8 @@ private fun Calls(
                                         }
                                     }
                                 }
-                                neutralButtonText.value = ctx.getString(R.string.send_message)
-                                neutralAction.value = {
+                                lastButtonText.value = ctx.getString(R.string.send_message)
+                                lastAction.value = {
                                     if (ua != null) {
                                         handleIntent(ctx, viewModel, intent, "message")
                                         navController.navigateUp()
@@ -360,23 +360,23 @@ private fun Calls(
                                         ctx.getString(R.string.calls_delete_question),
                                         peerName, callText
                                     )
-                                    positiveButtonText.value = ctx.getString(R.string.delete)
-                                    positiveAction.value = {
+                                    secondButtonText.value = ""
+                                    lastButtonText.value = ctx.getString(R.string.delete)
+                                    lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
                                     }
-                                    neutralButtonText.value = ""
                                 }
                                 else {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_add_delete_question),
                                         peerName, callText
                                     )
-                                    positiveButtonText.value = ctx.getString(R.string.add_contact)
-                                    positiveAction.value = {
+                                    secondButtonText.value = ctx.getString(R.string.add_contact)
+                                    secondAction.value = {
                                         navController.navigate("baresip_contact/$peerUri/new")
                                     }
-                                    neutralButtonText.value = ctx.getString(R.string.delete)
-                                    neutralAction.value = {
+                                    lastButtonText.value = ctx.getString(R.string.delete)
+                                    lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
                                     }
                                 }

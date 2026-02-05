@@ -193,10 +193,12 @@ private val showAlert = mutableStateOf(false)
 
 private val dialogTitle = mutableStateOf("")
 private val dialogMessage = mutableStateOf("")
-private val positiveText = mutableStateOf("")
-private val onPositiveClicked = mutableStateOf({})
-private val negativeText = mutableStateOf("")
-private val onNegativeClicked = mutableStateOf({})
+private val firstText = mutableStateOf("")
+private val onFirstClicked = mutableStateOf({})
+private val secondText = mutableStateOf("")
+private val onSecondClicked = mutableStateOf({})
+private val lastText = mutableStateOf("")
+private val onLastClicked = mutableStateOf({})
 private val showDialog = mutableStateOf(false)
 
 private val passwordTitle = mutableStateOf("")
@@ -292,7 +294,7 @@ private fun MainScreen(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
-            positiveButtonText = stringResource(R.string.ok),
+            lastButtonText = stringResource(R.string.ok),
         )
 
     if (showDialog.value)
@@ -300,10 +302,12 @@ private fun MainScreen(
             showDialog = showDialog,
             title = stringResource(R.string.confirmation),
             message = dialogMessage.value,
-            positiveButtonText = positiveText.value,
-            onPositiveClicked = onPositiveClicked.value,
-            negativeButtonText = negativeText.value,
-            onNegativeClicked = onNegativeClicked.value
+            firstButtonText = firstText.value,
+            onFirstClicked = onFirstClicked.value,
+            secondButtonText = secondText.value,
+            onSecondClicked = onSecondClicked.value,
+            lastButtonText = lastText.value,
+            onLastClicked = onLastClicked.value,
         )
 
     if (showPasswordDialog.value) {
@@ -836,15 +840,16 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     if (acc.vmUri.isNotEmpty()) {
                         dialogTitle.value = ctx.getString(R.string.voicemail_messages)
                         dialogMessage.value = acc.vmMessages(ctx)
-                        positiveText.value = ctx.getString(R.string.listen)
-                        onPositiveClicked.value = {
+                        firstText.value = ctx.getString(R.string.cancel)
+                        onFirstClicked.value = {}
+                        secondText.value = ""
+                        lastText.value = ctx.getString(R.string.listen)
+                        onLastClicked.value = {
                             val intent = Intent(ctx, MainActivity::class.java)
                             intent.putExtra("uap", ua.uap)
                             intent.putExtra("peer", acc.vmUri)
                             handleIntent(ctx, viewModel, intent, "call")
                         }
-                        negativeText.value = ctx.getString(R.string.cancel)
-                        onNegativeClicked.value = {}
                         showDialog.value = true
                     }
                 },
@@ -1402,8 +1407,11 @@ private fun CallUriRow(
                             R.color.colorTrafficGreen -> {
                                 dialogTitle.value = ctx.getString(R.string.info)
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
-                                positiveText.value = ctx.getString(R.string.unverify)
-                                onPositiveClicked.value = {
+                                firstText.value = ctx.getString(R.string.cancel)
+                                onFirstClicked.value = {}
+                                secondText.value = ""
+                                lastText.value = ctx.getString(R.string.unverify)
+                                onLastClicked.value = {
                                     if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
                                         Log.e(
                                             TAG,
@@ -1412,7 +1420,6 @@ private fun CallUriRow(
                                     else
                                         call.securityIconTint.value = R.color.colorTrafficYellow
                                 }
-                                negativeText.value = ctx.getString(R.string.cancel)
                                 showDialog.value = true
                             }
                         }
@@ -2235,14 +2242,16 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
                                 R.color.colorTrafficGreen -> {
                                     dialogMessage.value = ctx.getString(R.string.call_is_secure)
-                                    positiveText.value = ctx.getString(R.string.unverify)
-                                    onPositiveClicked.value = {
+                                    firstText.value = ctx.getString(R.string.cancel)
+                                    onFirstClicked.value = {}
+                                    secondText.value = ""
+                                    lastText.value = ctx.getString(R.string.unverify)
+                                    onLastClicked.value = {
                                         if (Api.cmd_exec("zrtp_unverify " + call!!.zid) != 0)
                                             Log.e(TAG, "Command 'zrtp_unverify ${call!!.zid}' failed")
                                         else
                                             call!!.securityIconTint.value = R.color.colorTrafficYellow
                                     }
-                                    onNegativeClicked.value = {}
                                     showDialog.value = true
                                 }
                             }
@@ -2855,12 +2864,13 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             else {
                 dialogTitle.value = ctx.getString(R.string.redirect_request)
                 dialogMessage.value = String.format(ctx.getString(R.string.redirect_request_query), target)
-                positiveText.value = ctx.getString(R.string.yes)
-                onPositiveClicked.value = {
+                firstText.value = ""
+                secondText.value = ctx.getString(R.string.no)
+                onSecondClicked.value = {}
+                lastText.value = ctx.getString(R.string.yes)
+                onLastClicked.value = {
                     redirect(ctx, viewModel, ev[0], ua, redirectUri)
                 }
-                negativeText.value = ctx.getString(R.string.no)
-                onNegativeClicked.value = {}
                 showDialog.value = true
             }
             showCall(ctx, viewModel, ua)
@@ -2904,13 +2914,13 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 3 -> String.format(ctx.getString(R.string.allow_video), peerUri)
                 else -> ""
             }
-            positiveText.value = ctx.getString(R.string.yes)
-            onPositiveClicked.value = {
+            firstText.value = ""
+            secondText.value = ctx.getString(R.string.no)
+            onSecondClicked.value = {}
+            lastText.value = ctx.getString(R.string.yes)
+            onLastClicked.value = {
                 call.videoRequest = dir
                 videoClick(ctx, call)
-            }
-            negativeText.value = ctx.getString(R.string.no)
-            onNegativeClicked.value = {
             }
             showDialog.value = true
         }
@@ -2923,8 +2933,17 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             }
             dialogTitle.value = ctx.getString(R.string.verify)
             dialogMessage.value = String.format(ctx.getString(R.string.verify_sas), ev[1])
-            positiveText.value = ctx.getString(R.string.yes)
-            onPositiveClicked.value = {
+            firstText.value = ""
+            secondText.value = ctx.getString(R.string.no)
+            onSecondClicked.value = {
+                call.security = R.color.colorTrafficYellow
+                call.zid = ev[2]
+                if (aor == viewModel.selectedAor.value)
+                    call.securityIconTint.value = R.color.colorTrafficYellow
+                secondText.value = ""
+            }
+            lastText.value = ctx.getString(R.string.yes)
+            onLastClicked.value = {
                 call.security = if (Api.cmd_exec("zrtp_verify ${ev[2]}") != 0) {
                     Log.e(TAG, "Command 'zrtp_verify ${ev[2]}' failed")
                     R.color.colorTrafficYellow
@@ -2934,14 +2953,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
                     call.securityIconTint.value = call.security
-            }
-            negativeText.value = ctx.getString(R.string.no)
-            onNegativeClicked.value = {
-                call.security = R.color.colorTrafficYellow
-                call.zid = ev[2]
-                if (aor == viewModel.selectedAor.value)
-                    call.securityIconTint.value = R.color.colorTrafficYellow
-                onNegativeClicked.value = {}
             }
             showDialog.value = true
         }
@@ -2969,18 +2980,18 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 String.format(ctx.getString(R.string.transfer_request_query), target)
             else
                 String.format(ctx.getString(R.string.call_request_query), target)
-            positiveText.value = ctx.getString(R.string.yes)
-            onPositiveClicked.value = {
+            firstText.value = ""
+            secondText.value = ctx.getString(R.string.no)
+            onSecondClicked.value = {
+                if (call in Call.calls())
+                    call!!.notifySipfrag(603, "Decline")
+            }
+            lastText.value = ctx.getString(R.string.yes)
+            onLastClicked.value = {
                 if (call in Call.calls())
                     acceptTransfer(ctx, viewModel, ua, call!!, ev[1])
                 else
                     makeCall(ctx, viewModel, ev[1], conferenceCall = false, video = false)
-            }
-            negativeText.value = ctx.getString(R.string.no)
-            onNegativeClicked.value = {
-                if (call in Call.calls())
-                    call!!.notifySipfrag(603, "Decline")
-                onNegativeClicked.value = {}
             }
             showDialog.value = true
         }
@@ -3124,9 +3135,10 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
 fun handleDialog(ctx: Context, title: String, message: String, action: () -> Unit = {}) {
     dialogTitle.value = title
     dialogMessage.value = message
-    positiveText.value = ctx.getString(R.string.ok)
-    onPositiveClicked.value = { action() }
-    negativeText.value = ""
+    firstText.value = ""
+    secondText.value = ""
+    lastText.value = ctx.getString(R.string.ok)
+    onLastClicked.value = { action() }
     showDialog.value = true
 }
 
@@ -3291,13 +3303,14 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
 
     dialogTitle.value = ctx.getString(R.string.info)
     dialogMessage.value = ctx.getString(R.string.restored)
-    positiveText.value = ctx.getString(R.string.restart)
-    onPositiveClicked.value = {
-        onRestartApp()
+    firstText.value = ctx.getString(R.string.cancel)
+    onFirstClicked.value = {
         showDialog.value = false
     }
-    negativeText.value = ctx.getString(R.string.cancel)
-    onNegativeClicked.value = {
+    secondText.value = ""
+    lastText.value = ctx.getString(R.string.restart)
+    onLastClicked.value = {
+        onRestartApp()
         showDialog.value = false
     }
     showDialog.value = true

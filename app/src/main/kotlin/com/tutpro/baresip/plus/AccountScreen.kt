@@ -1218,7 +1218,7 @@ private fun AccountContent(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
-            positiveButtonText = stringResource(R.string.ok),
+            lastButtonText = stringResource(R.string.ok),
         )
     }
 
