@@ -123,7 +123,7 @@ object CustomElements {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismissRequest,
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ) {
             val itemsIterator = items.iterator()
             while (itemsIterator.hasNext()) {
@@ -132,7 +132,7 @@ object CustomElements {
                     text = {
                         Text(
                             text = item,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 16.sp
                         ) },
                     onClick = { onItemClick(item) }
