@@ -36,9 +36,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -1344,47 +1344,42 @@ private fun SettingsContent(
         save = true
     }
 
-    val lazyListState = rememberLazyListState()
+    val scrollState = rememberScrollState()
 
-    LazyColumn(
-        state = lazyListState,
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            ),
+            .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+            .verticalScrollbar(scrollState)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item { StartAutomatically() }
-        item { AddressFamily() }
-        item { ListenAddress() }
-        item { TransportProtocols() }
-        item { DnsServers() }
-        item { TlsCertificateFile(activity) }
-        item { VerifyServer() }
-        item { CaFile(activity) }
-        item { UserAgent() }
-        item { AudioSettings(navController) }
-        item { Contacts(activity) }
-        item { Ringtone() }
-        item { VideoSize() }
-        item { VideoFps() }
-        item { BatteryOptimizations() }
-        item { DarkTheme() }
-        if (VERSION.SDK_INT >= 31) {
-            item { DynamicColors() }
-        }
-        item { ColorBlind() }
-        item { ProximitySensing() }
-        if (VERSION.SDK_INT >= 29) {
-            item { DefaultDialer() }
-        }
-        item { Debug() }
-        item { SipTrace() }
-        item { Reset(onRestartApp) }
+        StartAutomatically()
+        AddressFamily()
+        ListenAddress()
+        TransportProtocols()
+        DnsServers()
+        TlsCertificateFile(activity)
+        VerifyServer()
+        CaFile(activity)
+        UserAgent()
+        AudioSettings(navController)
+        Contacts(activity)
+        Ringtone()
+        VideoSize()
+        VideoFps()
+        BatteryOptimizations()
+        DarkTheme()
+        if (VERSION.SDK_INT >= 31)
+            DynamicColors()
+        ColorBlind()
+        ProximitySensing()
+        if (VERSION.SDK_INT >= 29)
+            DefaultDialer()
+        Debug()
+        SipTrace()
+        Reset(onRestartApp)
     }
 }
 
