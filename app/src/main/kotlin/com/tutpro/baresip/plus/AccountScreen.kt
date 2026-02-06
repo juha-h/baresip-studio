@@ -80,6 +80,7 @@ import java.io.File
 import java.io.StringReader
 import java.net.URL
 import java.util.Locale
+import javax.net.ssl.HttpsURLConnection
 
 fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
     composable(
@@ -131,7 +132,7 @@ private fun AccountScreen(
 
     LaunchedEffect(kind, acc) {
         if (kind == "new")
-            initAccountFromConfig(acc) { isAccountAvailable = true }
+            initAccountFromNetwork(acc) { isAccountAvailable = true }
         else
             isAccountAvailable = true
     }
@@ -1650,25 +1651,28 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         return true
 }
 
-private fun initAccountFromConfig(acc: Account, onConfigLoaded: () -> Unit) {
+private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
     val scope = CoroutineScope(Job() + Dispatchers.Main)
     scope.launch(Dispatchers.IO) {
         val url = "https://${Utils.uriHostPart(acc.aor)}/baresip/account_config.xml"
+        val urlConnection = URL(url).openConnection() as HttpsURLConnection
+        urlConnection.connectTimeout = 5000
+        urlConnection.readTimeout = 3000
         val caFile = File(BaresipService.filesPath + "/ca_certs.crt")
-        val config = try {
+        val template = try {
             if (caFile.exists())
-                Utils.readUrlWithCustomCAs(URL(url), caFile)
+                Utils.readUrlWithCustomCAs(urlConnection, caFile)
             else
-                URL(url).readText()
+                urlConnection.inputStream.bufferedReader().use { it.readText() }
         } catch (e: java.lang.Exception) {
-            Log.d(TAG, "Failed to get account configuration from network: ${e.message}")
+            Log.d(TAG, "Failed to get account template from network: ${e.message}")
             null
         }
-        if (config != null) {
-            Log.d(TAG, "Got account config '$config'")
+        if (template != null) {
+            Log.d(TAG, "Got account template '$template'")
             val parserFactory: XmlPullParserFactory = XmlPullParserFactory.newInstance()
             val parser: XmlPullParser = parserFactory.newPullParser()
-            parser.setInput(StringReader(config))
+            parser.setInput(StringReader(template))
             var tag: String?
             var text = ""
             var event = parser.eventType
