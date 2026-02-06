@@ -57,7 +57,6 @@ import java.lang.reflect.Method
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
-import java.net.URL
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.security.cert.CertificateException
@@ -1038,18 +1037,16 @@ object Utils {
         Api.AAudio_close_stream()
     }
 
-    fun readUrlWithCustomCAs(url: URL, caFile: File): String? {
+    fun readUrlWithCustomCAs(urlConnection: HttpsURLConnection, caFile: File): String? {
         if (!caFile.exists()) {
             Log.d("Utils", "Custom CA file not found at ${caFile.path}")
             return null
         }
-
         try {
-            // 1. Create a TrustManager that trusts the CAs in the user-provided file
+            // Create a TrustManager that trusts the CAs in the user-provided file
             val customTrustManager = fun(): X509TrustManager {
                 val certificateFactory = CertificateFactory.getInstance("X.509")
                 val certificateInputStream = caFile.inputStream()
-                // generateCertificates (plural) is crucial for loading all certs from the file
                 val certificates = certificateFactory.generateCertificates(certificateInputStream)
                 certificateInputStream.close()
 
@@ -1064,29 +1061,28 @@ object Utils {
                 return tmf.trustManagers.find { it is X509TrustManager } as X509TrustManager
             }()
 
-            // 2. Create a TrustManager that trusts the default system CAs
+            // Create a TrustManager that trusts the default system CAs
             val systemTrustManager = fun(): X509TrustManager {
                 val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
                 factory.init(null as KeyStore?) // A null keystore loads the system's default CAs
                 return factory.trustManagers.find { it is X509TrustManager } as X509TrustManager
             }()
 
-            // 3. Create a composite TrustManager that delegates to both system and custom CAs
+            // Create a composite TrustManager that delegates to both system and custom CAs
             @SuppressLint("CustomX509TrustManager")
             val compositeTrustManager = object : X509TrustManager {
                 override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-                    // This is for client certificate authentication, which you are not using.
-                    // It's safe to just delegate to the system manager by default.
+                    // Delegate to the system manager by default.
                     systemTrustManager.checkClientTrusted(chain, authType)
                 }
 
                 override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
                     try {
-                        // First, try to validate the chain with the system's default TrustManager.
+                        // Try to validate the chain with the system's default TrustManager.
                         systemTrustManager.checkServerTrusted(chain, authType)
                     } catch (_: CertificateException) {
                         // If that fails, and only if that fails, try to validate with our custom TrustManager.
-                        // This will throw the final CertificateException if it also fails, which is the correct behavior.
+                        // This will throw the final CertificateException if it also fails.
                         customTrustManager.checkServerTrusted(chain, authType)
                     }
                 }
@@ -1097,19 +1093,18 @@ object Utils {
                 }
             }
 
-            // 4. Create an SSLContext that uses our new composite TrustManager
+            // Create an SSLContext that uses our new composite TrsustManager
             val sslContext = SSLContext.getInstance("TLS")
             sslContext.init(null, arrayOf(compositeTrustManager), null)
 
-            // 5. Tell HttpsURLConnection to use our custom SSLContext for this connection
-            val urlConnection = url.openConnection() as HttpsURLConnection
+            // Tell HttpsURLConnection to use our custom SSLContext for this connection
             urlConnection.sslSocketFactory = sslContext.socketFactory
 
-            // 6. Proceed with the connection and return the result
+            // Proceed with the connection and return the result
             return urlConnection.inputStream.bufferedReader().use { it.readText() }
 
         } catch (e: Exception) {
-            // Catch any exception from certificate loading or from the network connection and log it
+            // Catch any exception from certificate loading or from the network connection
             Log.e("Utils", "readUrlWithCustomCa failed: ${e.message}")
             return null
         }
@@ -1133,8 +1128,7 @@ object Utils {
     }
 
     fun createTextAvatar(letter: String, colorHex: String): Bitmap {
-        // Standard notification large icon size is usually 64dp or 48dp.
-        // We use a decent resolution (e.g. 128x128) and let Android scale it down.
+        // Use decent resolution 128x128 and let Android scale it down.
         val size = 128
 
         // Use KTX createBitmap to match toCircle style
@@ -1143,7 +1137,7 @@ object Utils {
         // Use Fully Qualified Names to avoid Compose conflicts
         val canvas = android.graphics.Canvas(bitmap)
 
-        // 1. Draw the colored circle background
+        // Draw the colored circle background
         val bgPaint = android.graphics.Paint()
         bgPaint.isAntiAlias = true
         try {
@@ -1153,14 +1147,14 @@ object Utils {
         }
         canvas.drawCircle(size / 2f, size / 2f, size / 2f, bgPaint)
 
-        // 2. Draw the text (Initial)
+        // Draw the text (Initial)
         val textPaint = android.graphics.Paint()
         textPaint.isAntiAlias = true
         textPaint.color = android.graphics.Color.WHITE
         textPaint.textSize = size / 2f // Text size is half the circle size
         textPaint.textAlign = android.graphics.Paint.Align.CENTER
 
-        // Use a bold font if possible to match your UI
+        // Use a bold font if possible
         textPaint.typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
 
         // Calculate vertical center to center the text properly
