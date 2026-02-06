@@ -36,9 +36,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -150,11 +150,14 @@ private fun SettingsScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -236,7 +239,6 @@ private fun SettingsContent(
     activity: Activity,
     onRestartApp: () -> Unit
 ) {
-
     val alertTitleText = stringResource(R.string.alert)
     val errorTitleText = stringResource(R.string.error)
     val noticeTitleText = stringResource(R.string.notice)
@@ -271,7 +273,9 @@ private fun SettingsContent(
         val startAutomaticallyHelp = stringResource(R.string.start_automatically_help)
         val appearOnTopPermissionMessage = stringResource(R.string.appear_on_top_permission)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -319,7 +323,9 @@ private fun SettingsContent(
         val addressFamilyTitle = stringResource(R.string.address_family)
         val addressFamilyHelp = stringResource(R.string.address_family_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -382,7 +388,9 @@ private fun SettingsContent(
         val listenAddressTitle = stringResource(R.string.listen_address)
         val listenAddressHelp = stringResource(R.string.listen_address_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
         ) {
@@ -413,7 +421,9 @@ private fun SettingsContent(
         val transportProtocolsTitle = stringResource(R.string.transport_protocols)
         val transportProtocolsHelp = stringResource(R.string.transport_protocols_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -442,7 +452,9 @@ private fun SettingsContent(
         val dnsServersTitle = stringResource(R.string.dns_servers)
         val dnsServersHelp = stringResource(R.string.dns_servers_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -511,7 +523,9 @@ private fun SettingsContent(
         val showAlertDialog = remember { mutableStateOf(false) }
 
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -589,12 +603,15 @@ private fun SettingsContent(
         val verifyServerTitle = stringResource(R.string.verify_server)
         val verifyServerHelp = stringResource(R.string.verify_server_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = verifyServerTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = verifyServerTitle
                         alertMessage.value = verifyServerHelp
@@ -648,13 +665,16 @@ private fun SettingsContent(
         }
 
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             val ctx = LocalContext.current
             Text(text = tlsCaFileTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = tlsCaFileTitle
                         alertMessage.value = tlsCaFileHelp
@@ -717,7 +737,9 @@ private fun SettingsContent(
         val userAgentTitle = stringResource(R.string.user_agent)
         val userAgentHelp = stringResource(R.string.user_agent_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -743,13 +765,16 @@ private fun SettingsContent(
     @Composable
     fun AudioSettings(navController: NavController) {
         Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             Text(
                 text = stringResource(R.string.audio_settings),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable { navController.navigate("audio") },
                 fontSize = 18.sp,
                 fontWeight = FontWeight. Bold
@@ -769,7 +794,10 @@ private fun SettingsContent(
         val noAndroidContactsMessage = stringResource(R.string.no_android_contacts)
         val showAlertDialog = remember { mutableStateOf(false) }
         Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -915,7 +943,9 @@ private fun SettingsContent(
             }
         }
         Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -952,7 +982,9 @@ private fun SettingsContent(
         val batteryOptimizationsTitle = stringResource(R.string.battery_optimizations)
         val batteryOptimizationsHelp = stringResource(R.string.battery_optimizations_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -991,7 +1023,9 @@ private fun SettingsContent(
         val darkThemeTitle = stringResource(R.string.dark_theme)
         val darkThemeHelp = stringResource(R.string.dark_theme_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1018,12 +1052,15 @@ private fun SettingsContent(
         val dynamicColorsTitle = stringResource(R.string.dynamic_colors)
         val dynamicColorsHelp = stringResource(R.string.dynamic_colors_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = dynamicColorsTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = dynamicColorsTitle
                         alertMessage.value = dynamicColorsHelp
@@ -1044,7 +1081,9 @@ private fun SettingsContent(
         val colorBlindTitle = stringResource(R.string.colorblind)
         val colorBlindHelp = stringResource(R.string.colorblind_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1070,7 +1109,9 @@ private fun SettingsContent(
         val proximitySensingTitle = stringResource(R.string.proximity_sensing)
         val proximitySensingHelp = stringResource(R.string.proximity_sensing_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1099,7 +1140,9 @@ private fun SettingsContent(
         val defaultPhoneAppHelp = stringResource(R.string.default_phone_app_help)
         val dialerRoleNotAvailableMessage = stringResource(R.string.dialer_role_not_available)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1152,12 +1195,15 @@ private fun SettingsContent(
         val debugTitle = stringResource(R.string.debug)
         val debugHelp = stringResource(R.string.debug_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = debugTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = debugTitle
                         alertMessage.value = debugHelp
@@ -1178,7 +1224,9 @@ private fun SettingsContent(
         val sipTraceTitle = stringResource(R.string.sip_trace)
         val sipTraceHelp = stringResource(R.string.sip_trace_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1207,7 +1255,9 @@ private fun SettingsContent(
         val resetConfigAlert = stringResource(R.string.reset_config_alert)
         val resetButtonText = stringResource(R.string.reset)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1248,45 +1298,40 @@ private fun SettingsContent(
         save = true
     }
 
-    val lazyListState = rememberLazyListState()
+    val scrollState = rememberScrollState()
 
-    LazyColumn(
-        state = lazyListState,
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 8.dp)
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            ),
+            .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+            .verticalScrollbar(scrollState)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item { StartAutomatically() }
-        item { AddressFamily() }
-        item { ListenAddress() }
-        item { TransportProtocols() }
-        item { DnsServers() }
-        item { TlsCertificateFile(activity) }
-        item { VerifyServer() }
-        item { CaFile(activity) }
-        item { UserAgent() }
-        item { AudioSettings(navController) }
-        item { Contacts(activity) }
-        item { Ringtone() }
-        item { BatteryOptimizations() }
-        item { DarkTheme() }
-        if (VERSION.SDK_INT >= 31) {
-            item { DynamicColors() }
-        }
-        item { ColorBlind() }
-        item { ProximitySensing() }
-        if (VERSION.SDK_INT >= 29) {
-            item { DefaultDialer() }
-        }
-        item { Debug() }
-        item { SipTrace() }
-        item { Reset(onRestartApp) }
+        StartAutomatically()
+        AddressFamily()
+        ListenAddress()
+        TransportProtocols()
+        DnsServers()
+        TlsCertificateFile(activity)
+        VerifyServer()
+        CaFile(activity)
+        UserAgent()
+        AudioSettings(navController)
+        Contacts(activity)
+        Ringtone()
+        BatteryOptimizations()
+        DarkTheme()
+        if (VERSION.SDK_INT >= 31)
+            DynamicColors()
+        ColorBlind()
+        ProximitySensing()
+        if (VERSION.SDK_INT >= 29)
+            DefaultDialer()
+        Debug()
+        SipTrace()
+        Reset(onRestartApp)
     }
 }
 
