@@ -347,11 +347,7 @@ private fun Messages(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 2.dp)
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
         reverseLayout = true,
         state = lazyListState,

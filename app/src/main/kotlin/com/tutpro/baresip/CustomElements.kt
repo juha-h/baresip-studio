@@ -200,15 +200,13 @@ object CustomElements {
     @Composable
     fun Modifier.verticalScrollbar(
         state: LazyListState,
-        width: Dp = 8.dp,
+        width: Dp = 4.dp,
         alwaysShow: Boolean = true,
         color: Color = MaterialTheme.colorScheme.outlineVariant
     ): Modifier {
-        val targetAlpha = if (state.isScrollInProgress || alwaysShow) 1f else 0f
-        val duration = if (state.isScrollInProgress) 150 else 500
         val alpha by animateFloatAsState(
-            targetValue = targetAlpha,
-            animationSpec = tween(durationMillis = duration)
+            targetValue = if (state.isScrollInProgress || alwaysShow) 1f else 0f,
+            animationSpec = tween(durationMillis = if (state.isScrollInProgress) 150 else 500)
         )
         return drawWithContent {
             drawContent()

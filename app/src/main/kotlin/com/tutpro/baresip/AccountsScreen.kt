@@ -139,11 +139,7 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                 .fillMaxWidth()
                 .padding(contentPadding)
                 .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                .verticalScrollbar(
-                    state = lazyListState,
-                    width = 4.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                ),
+                .verticalScrollbar(state = lazyListState),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             items(BaresipService.uas.value) { ua ->

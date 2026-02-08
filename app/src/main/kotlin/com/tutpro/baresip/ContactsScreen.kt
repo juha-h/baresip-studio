@@ -263,11 +263,7 @@ private fun ContactsContent(
             .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
             .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 10.dp)
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            ),
+            .verticalScrollbar(state = lazyListState),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
