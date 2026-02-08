@@ -218,10 +218,7 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
     LazyColumn(
         modifier = Modifier
             .padding(end = 4.dp)
-            .verticalScrollbar(
-                state = draggableState.listState,
-                width = 4.dp
-            ),
+            .verticalScrollbar(state = draggableState.listState),
         state = draggableState.listState,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp),
         //verticalArrangement = Arrangement.spacedBy(8.dp)

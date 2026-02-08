@@ -200,10 +200,7 @@ private fun Details(ctx: Context, details: SnapshotStateList<Details>, onDelete:
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp
-            )
+            .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),

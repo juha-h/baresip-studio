@@ -1343,10 +1343,7 @@ private fun CallUriRow(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .verticalScrollbar(
-                                    state = lazyListState,
-                                    color = MaterialTheme.colorScheme.outlineVariant
-                                ),
+                                .verticalScrollbar(state = lazyListState, width = 6.dp),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
                         ) {
@@ -1797,7 +1794,7 @@ private fun CallRow(
                                                         .fillMaxWidth()
                                                         .verticalScrollbar(
                                                             state = lazyListState,
-                                                            color = MaterialTheme.colorScheme.outlineVariant
+                                                            width = 6.dp,
                                                         ),
                                                     horizontalAlignment = Alignment.Start,
                                                     state = lazyListState,

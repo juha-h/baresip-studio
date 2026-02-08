@@ -268,11 +268,7 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 4.dp)
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),

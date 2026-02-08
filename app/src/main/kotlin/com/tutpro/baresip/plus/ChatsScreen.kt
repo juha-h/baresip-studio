@@ -292,11 +292,7 @@ private fun Chats(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, end = 4.dp)
-            .verticalScrollbar(
-                state = lazyListState,
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
         reverseLayout = true,
         state = lazyListState,
@@ -513,10 +509,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(max = 180.dp)
-                                .verticalScrollbar(
-                                    state = lazyListState,
-                                    color = MaterialTheme.colorScheme.outlineVariant
-                                ),
+                                .verticalScrollbar(state = lazyListState, width = 6.dp),
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
                         ) {
