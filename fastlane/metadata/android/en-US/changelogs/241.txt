@@ -1,0 +1,5 @@
+- Migrated alert dialogs to Material design style
+- Improved dropdown menu coloring
+- Added possibility to make video call from contacts and call history
+- Added timeout for getting account template from network
+- New translations (Hebrew)
