@@ -20,18 +20,10 @@ class SettingsViewModel: ViewModel() {
     val addressFamily = MutableStateFlow("")
 
     val transportProtocols = MutableStateFlow("")
-    val oldTransportProtocols = Config.variable("sip_transports")
+    var oldTransportProtocols = ""
 
     val dnsServers = MutableStateFlow("")
-    val oldDnsServers = if (Config.variable("dyn_dns") == "yes")
-        ""
-    else {
-        val servers = Config.variables("dns_server")
-        var serverList = ""
-        for (server in servers)
-            serverList += ", $server"
-        serverList.trimStart(',').trimStart(' ')
-    }
+    var oldDnsServers = ""
 
     val tlsCertificateFile = MutableStateFlow(false)
     val verifyServer = MutableStateFlow(false)
@@ -52,6 +44,17 @@ class SettingsViewModel: ViewModel() {
 
     fun loadSettings(ctx: Context) {
         if (isLoaded) return else isLoaded = true
+
+        oldTransportProtocols = Config.variable("sip_transports")
+        oldDnsServers = if (Config.variable("dyn_dns") == "yes")
+            ""
+        else {
+            val servers = Config.variables("dns_server")
+            var serverList = ""
+            for (server in servers)
+                serverList += ", $server"
+            serverList.trimStart(',').trimStart(' ')
+        }
 
         autoStart.value = Config.variable("auto_start") == "yes"
 
