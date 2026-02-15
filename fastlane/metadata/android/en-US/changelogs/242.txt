@@ -1,0 +1,3 @@
+- Prevent multiple call button actions when the buttons are touched repeatedly
+- Avoid crash if getting of call's codec info fails
+- Avoid possible crash related to settings viewmodel
