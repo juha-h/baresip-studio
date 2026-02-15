@@ -1368,7 +1368,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
     val transportProtocols = viewModel.transportProtocols.value
         .lowercase(Locale.ROOT).replace(" ", "")
-    if (transportProtocols != viewModel.oldTransportProtocols) {
+    if (transportProtocols != Config.variable("sip_transports")) {
         if (!checkTransportProtocols(transportProtocols)) {
             alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_transport_protocols)}: " +
@@ -1385,7 +1385,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
     val dnsServers = addMissingPorts(viewModel.dnsServers.value
         .lowercase(Locale.ROOT).replace(" ", ""))
-    if (dnsServers != viewModel.oldDnsServers) {
+    if (dnsServers != Config.dnsServers()) {
         if (!checkDnsServers(dnsServers)) {
             alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_dns_servers)}: $dnsServers"
