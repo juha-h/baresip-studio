@@ -1432,12 +1432,13 @@ private fun CallRow(
             if (dialerState.showCallButton.value)
                 IconButton(
                     modifier = Modifier.size(48.dp),
+                    enabled = dialerState.callButtonsEnabled.value,
                     onClick = {
+                        if (!dialerState.callButtonsEnabled.value) return@IconButton
                         dialerState.showCallConferenceButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
                     },
-                    enabled = dialerState.callButtonsEnabled.value
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Call,
@@ -1455,6 +1456,7 @@ private fun CallRow(
                     modifier = Modifier.size(48.dp),
                     enabled = dialerState.callButtonsEnabled.value,
                     onClick = {
+                        if (!dialerState.callButtonsEnabled.value) return@IconButton
                         dialerState.showCallButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
@@ -1480,7 +1482,10 @@ private fun CallRow(
                     Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     modifier = Modifier.size(48.dp),
+                    enabled = !call.terminated.value,
                     onClick = {
+                        if (call.terminated.value) return@IconButton
+                        call.terminated.value = true
                         abandonAudioFocus(ctx)
                         Log.d(
                             TAG,
@@ -1505,6 +1510,7 @@ private fun CallRow(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
                     onClick = {
+                        if (call.terminated.value) return@IconButton
                         call.terminated.value = true
                         abandonAudioFocus(ctx)
                         Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}")
