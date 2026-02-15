@@ -335,6 +335,18 @@ object Config {
         // Api.reload_config()
     }
 
+    fun dnsServers(): String {
+        return if (variable("dyn_dns") == "yes")
+            ""
+        else {
+            val servers = variables("dns_server")
+            var serverList = ""
+            for (server in servers)
+                serverList += ", $server"
+            serverList.trimStart(',').trimStart(' ')
+        }
+    }
+
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
         var servers = ""
         for (dnsServer in dnsServers) {

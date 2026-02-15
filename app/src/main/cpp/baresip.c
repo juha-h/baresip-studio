@@ -1546,9 +1546,9 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1audio_1codecs(
     if (tx && rx)
         len = re_snprintf(start, left, "%s/%u/%u,%s/%u/%u", tx->name, tx->srate, tx->ch, rx->name,
                 rx->srate, rx->ch);
-    if (len == -1) {
+    else {
         LOGE("failed to get audio codecs of call %ld\n", (long)call);
-        codec_buf[0] = '\0';
+        len = re_snprintf(start, left, "%s/%u/%u,%s/%u/%u", '?', 0, 0, '?', 0, 0);
     }
     return (*env)->NewStringUTF(env, codec_buf);
 }

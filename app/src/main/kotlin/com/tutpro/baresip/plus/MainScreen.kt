@@ -1491,6 +1491,7 @@ private fun CallRow(
                     .alpha(if (dialerState.showCallButton.value) 1f else 0f),
                 enabled = dialerState.callButtonsEnabled.value && dialerState.showCallButton.value,
                 onClick = {
+                    if (!dialerState.callButtonsEnabled.value) return@IconButton
                     dialerState.showCallConferenceButton.value = false
                     dialerState.showCallVideoButton.value = false
                     dialerState.showSuggestions.value = false
@@ -1517,6 +1518,7 @@ private fun CallRow(
                     .alpha(if (dialerState.showCallConferenceButton.value) 1f else 0f),
                 enabled = dialerState.callButtonsEnabled.value && dialerState.showCallConferenceButton.value,
                 onClick = {
+                    if (!dialerState.callButtonsEnabled.value) return@IconButton
                     dialerState.showCallButton.value = false
                     dialerState.showCallVideoButton.value = false
                     dialerState.showSuggestions.value = false
@@ -1543,6 +1545,7 @@ private fun CallRow(
                     .alpha(if (dialerState.showCallVideoButton.value) 1f else 0f),
                 enabled = dialerState.callButtonsEnabled.value && dialerState.showCallVideoButton.value,
                 onClick = {
+                    if (!dialerState.callButtonsEnabled.value) return@IconButton
                     dialerState.showCallButton.value = false
                     dialerState.showCallConferenceButton.value = false
                     dialerState.showSuggestions.value = false
@@ -1569,7 +1572,9 @@ private fun CallRow(
                     Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     modifier = Modifier.size(48.dp),
+                    enabled = !call.terminated.value,
                     onClick = {
+                        if (call.terminated.value) return@IconButton
                         abandonAudioFocus(ctx)
                         Log.d(
                             TAG,
@@ -1593,6 +1598,7 @@ private fun CallRow(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
                     onClick = {
+                        if (call.terminated.value) return@IconButton
                         call.terminated.value = true
                         abandonAudioFocus(ctx)
                         Log.d(
@@ -2005,10 +2011,10 @@ private fun CallRow(
                                 parts[3] = "?/?"
                                 parts[4] = "?/?"
                             }
-                            val codecs = call.audioCodecs()
+                            val codecs = call.audioCodecs().split(',')
                             val duration = call.duration()
-                            val txCodec = codecs.split(',')[0].split("/")
-                            val rxCodec = codecs.split(',')[1].split("/")
+                            val txCodec = codecs[0].split("/")
+                            val rxCodec = codecs[1].split("/")
                             alertTitle.value = ctx.getString(R.string.call_info)
                             alertMessage.value =
                                 "${String.format(ctx.getString(R.string.duration), duration)}\n" +

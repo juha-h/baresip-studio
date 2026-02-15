@@ -18,21 +18,8 @@ class SettingsViewModel: ViewModel() {
     val autoStart = MutableStateFlow(false)
     val listenAddress = MutableStateFlow("")
     val addressFamily = MutableStateFlow("")
-
     val transportProtocols = MutableStateFlow("")
-    val oldTransportProtocols = Config.variable("sip_transports")
-
     val dnsServers = MutableStateFlow("")
-    val oldDnsServers = if (Config.variable("dyn_dns") == "yes")
-        ""
-    else {
-        val servers = Config.variables("dns_server")
-        var serverList = ""
-        for (server in servers)
-            serverList += ", $server"
-        serverList.trimStart(',').trimStart(' ')
-    }
-
     val tlsCertificateFile = MutableStateFlow(false)
     val verifyServer = MutableStateFlow(false)
     val caFile = MutableStateFlow(false)
@@ -53,6 +40,7 @@ class SettingsViewModel: ViewModel() {
     private var isLoaded = false
 
     fun loadSettings(ctx: Context) {
+
         if (isLoaded) return else isLoaded = true
 
         autoStart.value = Config.variable("auto_start") == "yes"
@@ -64,9 +52,9 @@ class SettingsViewModel: ViewModel() {
             mutableIntStateOf(familyValues.indexOf(Config.variable("net_af").lowercase()))
         addressFamily.value = familyValues[itemPosition.intValue]
 
-        transportProtocols.value = oldTransportProtocols
+        transportProtocols.value = Config.variable("sip_transports")
 
-        dnsServers.value = oldDnsServers
+        dnsServers.value = Config.dnsServers()
 
         tlsCertificateFile.value = File(BaresipService.filesPath + "/cert.pem").exists()
 
