@@ -1892,15 +1892,10 @@ private fun CallRow(
                                 parts[3] = "?/?"
                                 parts[4] = "?/?"
                             }
-                            val codecs = call.audioCodecs()
+                            val codecs = call.audioCodecs().split(',')
                             val duration = call.duration()
-                            val codecParts = codecs.split(',')
-                            var txCodec = listOf("?", "?", "?")
-                            var rxCodec = listOf("?", "?", "?")
-                            if (codecParts.size == 2) {
-                                txCodec = codecParts[0].split("/")
-                                rxCodec = codecParts[1].split("/")
-                            }
+                            val txCodec = codecs[0].split("/")
+                            val rxCodec = codecs[1].split("/")
                             alertTitle.value = ctx.getString(R.string.call_info)
                             alertMessage.value =
                                 "${String.format(ctx.getString(R.string.duration), duration)}\n" +
