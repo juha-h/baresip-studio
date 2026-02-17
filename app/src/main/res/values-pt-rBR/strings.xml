@@ -344,7 +344,7 @@
     <string name="audio_permissions">O baresip precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth e a permissão \"Notificações\" para postar notificações.</string>
     <string name="audio_and_video_permissions">O baresip+ precisa da permissão \"Microfone\" para realizar chamadas de voz, da permissão \"Câmera\" para realizar chamadas de vídeo. da permissão \"Dispositivos próximos\" para fazer a detecção do microfone/alto-falante Bluetooth caso queira usar tal dispositivo, assim como a permissão \"Notificações\" para postar notificações.</string>
     <string name="reg_int">Intervalo de registro</string>
-    <string name="invalid_reg_int">Intervalo de registro inválido\'%1$s\'</string>
+    <string name="invalid_reg_int">Intervalo de registro inválido \'%1$s\'</string>
     <string name="reg_int_help">Informa com que frequência (em segundos) o baresip envia solicitações REGISTER. Os valores válidos são entre 60 a 3600.</string>
     <string name="no_telephony_provider">A conta \'%1$s\' não tem provedor telefonico</string>
     <string name="choose_destination_uri">Escolha a URI de destino</string>
@@ -385,4 +385,5 @@
     <string name="microphone_gain">Ganho do microfone</string>
     <string name="microphone_gain_help">Multiplique o volume do microfone por esse número decimal. O valor mínimo é 1,0 (padrão de fábrica), que desativa o ganho do microfone. Valores maiores podem afetar negativamente a qualidade do áudio.</string>
     <string name="favorite_help">Se marcada, o contato será exibido entre os favoritos na parte superior da lista.</string>
+    <string name="check_origin">Verificar Origem</string>
 </resources>
