@@ -1539,7 +1539,7 @@ class BaresipService: Service() {
             }, 500L, 2000L)
         }
     }
-    
+
     private fun shouldStartRinging(callerNumber: String): Boolean {
         val currentFilter = nm.currentInterruptionFilter
         if (currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
@@ -1564,7 +1564,7 @@ class BaresipService: Service() {
             @Suppress("DEPRECATION")
             Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) != 0
         } catch (_: Exception) {
-            // If the setting can't be read, default to FALSE to be non-intrusive.
+            // If the setting can't be read, default to FALSE.
             false
         }
     }
