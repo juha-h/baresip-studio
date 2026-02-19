@@ -919,7 +919,7 @@ class BaresipService: Service() {
                             startActivity(newIntent)
                             return
                         }
-                        val channelId = if (shouldVibrate()) HIGH_CHANNEL_ID else MEDIUM_CHANNEL_ID
+                        val channelId = HIGH_CHANNEL_ID
                         val callerNumber = peerUri.split(":")[1].split("@")[0]
                         if (shouldStartRinging(channelId, callerNumber))
                             startRinging()
@@ -944,7 +944,6 @@ class BaresipService: Service() {
                                     icon = IconCompat.createWithBitmap(callerContact.avatarImage!!.toCircle())
                             }
                             else if (callerContact is Contact.AndroidContact) {
-                                // AndroidContact has a URI, we must decode it
                                 if (callerContact.thumbnailUri != null) {
                                     try {
                                         val source = ImageDecoder.createSource(contentResolver,
@@ -1290,7 +1289,6 @@ class BaresipService: Service() {
                     icon = IconCompat.createWithBitmap(senderContact.avatarImage!!.toCircle())
             }
             else if (senderContact is Contact.AndroidContact) {
-                // AndroidContact has a URI, we must decode it
                 if (senderContact.thumbnailUri != null) {
                     try {
                         val source = ImageDecoder.createSource(contentResolver,
