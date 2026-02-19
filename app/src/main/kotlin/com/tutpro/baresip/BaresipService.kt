@@ -1539,8 +1539,7 @@ class BaresipService: Service() {
             }, 500L, 2000L)
         }
     }
-
-\
+    
     private fun shouldStartRinging(callerNumber: String): Boolean {
         val currentFilter = nm.currentInterruptionFilter
         if (currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
