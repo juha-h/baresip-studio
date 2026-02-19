@@ -921,7 +921,7 @@ class BaresipService: Service() {
                         }
                         val channelId = HIGH_CHANNEL_ID
                         val callerNumber = peerUri.split(":")[1].split("@")[0]
-                        if (shouldStartRinging(channelId, callerNumber))
+                        if (shouldStartRinging(callerNumber))
                             startRinging()
                         if (!Utils.isVisible()) {
                             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
@@ -1540,12 +1540,12 @@ class BaresipService: Service() {
         }
     }
 
-
-    private fun shouldStartRinging(channelId: String, callerNumber: String): Boolean {
+\
+    private fun shouldStartRinging(callerNumber: String): Boolean {
         val currentFilter = nm.currentInterruptionFilter
         if (currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
             return true
-        val channel = nm.getNotificationChannel(channelId)
+        val channel = nm.getNotificationChannel(HIGH_CHANNEL_ID)
         if (channel != null && channel.canBypassDnd())
             return true
         return isStarredContact(callerNumber)
