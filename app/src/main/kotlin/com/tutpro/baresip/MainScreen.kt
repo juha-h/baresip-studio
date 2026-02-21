@@ -3,7 +3,9 @@ package com.tutpro.baresip
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.RECORD_AUDIO
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -655,7 +657,7 @@ private fun TopAppBar(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 31)
                                 Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                            "${am.communicationDevice!!.type}/${am.mode}")
+                                        "${am.communicationDevice!!.type}/${am.mode}")
                             isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
                         },
@@ -1342,11 +1344,13 @@ private fun CallUriRow(
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
                                 showAlert.value = true
                             }
+
                             R.color.colorTrafficYellow -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.peer_not_verified)
                                 showAlert.value = true
                             }
+
                             R.color.colorTrafficGreen -> {
                                 dialogTitle.value = ctx.getString(R.string.info)
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
@@ -2460,6 +2464,14 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
+            val activity = ctx as? Activity
+            if (activity != null) {
+                val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+                if (kgm.isKeyguardLocked) {
+                    activity.finishAndRemoveTask()
+                    return
+                }
+            }
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true
                 ua.account.resumeUri = ""

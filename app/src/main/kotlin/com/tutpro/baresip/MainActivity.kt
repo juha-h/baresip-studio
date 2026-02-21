@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
                                     exitProcess(0)
                             }
                         } else
-                            handleServiceEvent(applicationContext, viewModel, first.event, first.params)
+                            handleServiceEvent(this, viewModel, first.event, first.params)
                     }
                 }
                 else
