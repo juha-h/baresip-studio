@@ -2468,7 +2468,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             if (activity != null) {
                 val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
                 if (kgm.isKeyguardLocked) {
-                    activity.finishAndRemoveTask()
+                    activity.moveTaskToBack(true)
                     return
                 }
             }
