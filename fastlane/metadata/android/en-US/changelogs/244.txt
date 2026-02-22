@@ -1,0 +1,2 @@
+- Issue missed call notification also when baresip app is not visible
+- Cancel full screen notification when call is closed
