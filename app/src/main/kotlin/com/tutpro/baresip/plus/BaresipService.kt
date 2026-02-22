@@ -1140,8 +1140,8 @@ class BaresipService: Service() {
                     }
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
+                        nm.cancel(CALL_NOTIFICATION_ID)
                         if (call != null) {
-                            nm.cancel(CALL_NOTIFICATION_ID)
                             stopRinging()
                             stopMediaPlayer()
                             aec?.release()
@@ -1168,7 +1168,8 @@ class BaresipService: Service() {
                             val tone = ev[2]
                             if (tone == "busy") {
                                 playBusy()
-                            } else if (!Call.inCall()) {
+                            }
+                            else if (!Call.inCall()) {
                                 resetCallVolume()
                                 abandonAudioFocus(applicationContext)
                                 proximitySensing(false)
@@ -1221,49 +1222,49 @@ class BaresipService: Service() {
                                 }
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
-                            if (!Utils.isVisible()) {
-                                if (missed) {
-                                    val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                                    val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
-                                    val intent = Intent(applicationContext, MainActivity::class.java)
-                                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                                    intent.putExtra("action", "call missed")
-                                            .putExtra("uap", uap)
-                                    val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE,
-                                        intent, piFlags)
-                                    val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                                    nb.setSmallIcon(R.drawable.ic_notification_call_missed)
-                                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                                            .setContentIntent(pi)
-                                            .setCategory(Notification.CATEGORY_CALL)
-                                            .setAutoCancel(true)
-                                    var missedCalls = 0
-                                    for (notification in nm.activeNotifications)
-                                        if (notification.id == CALL_MISSED_NOTIFICATION_ID)
-                                            missedCalls++
-                                    if (missedCalls == 0) {
-                                        nb.setContentTitle(getString(R.string.missed_call_from))
-                                        nb.setContentText(caller)
-                                    } else {
-                                        nb.setContentTitle(getString(R.string.missed_calls))
-                                        nb.setContentText(
-                                                String.format(getString(R.string.missed_calls_count),
-                                                        missedCalls + 1))
-                                    }
-                                    nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
+                            if (missed) {
+                                val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                                val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
+                                val intent = Intent(applicationContext, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                                intent.putExtra("action", "call missed")
+                                        .putExtra("uap", uap)
+                                val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE,
+                                    intent, piFlags)
+                                val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+                                nb.setSmallIcon(R.drawable.ic_notification_call_missed)
+                                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                                        .setContentIntent(pi)
+                                        .setCategory(Notification.CATEGORY_CALL)
+                                        .setAutoCancel(true)
+                                var missedCalls = 0
+                                for (notification in nm.activeNotifications)
+                                    if (notification.id == CALL_MISSED_NOTIFICATION_ID)
+                                        missedCalls++
+                                if (missedCalls == 0) {
+                                    nb.setContentTitle(getString(R.string.missed_call_from))
+                                    nb.setContentText(caller)
                                 }
-                                return
+                                else {
+                                    nb.setContentTitle(getString(R.string.missed_calls))
+                                    nb.setContentText(
+                                            String.format(getString(R.string.missed_calls_count),
+                                                    missedCalls + 1))
+                                }
+                                nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
                             }
+                            if (!Utils.isVisible())
+                                return
                         }
                         val reason = ev[1].trim()
                         if ((reason != "") && (ua.calls().isEmpty())) {
                             if (reason[0].isDigit()) {
                                 if (reason[0] != '3')
                                     toast("${getString(R.string.call_failed)}: $reason")
-                            } else {
-                                toast("${getString(R.string.call_closed)}: ${Api.call_peer_uri(callp)}: $reason")
                             }
+                            else
+                                toast("${getString(R.string.call_closed)}: ${Api.call_peer_uri(callp)}: $reason")
                         }
                     }
                 }
