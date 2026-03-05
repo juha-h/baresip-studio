@@ -252,32 +252,25 @@ static void setup_vertices(struct vidisp_st *st)
 
 static void setup_layout(struct vidrect *ortho, struct vidrect *vp)
 {
-    int x, y;
+    float window_aspect = (float)window_width / (float)window_height;
+    float frame_aspect = (float)frame_width / (float)frame_height;
 
-    x = (window_width - frame_width) / 2;
-    y = (window_height - frame_height) / 2;
-
-    if (x < 0) {
-        vp->x = 0;
-        ortho->x = -x;
-    } else {
-        vp->x = x;
-        ortho->x = 0;
-    }
-
-    if (y < 0) {
+    if (window_aspect > frame_aspect) {
+        vp->h = window_height;
+        vp->w = (int)((float)window_height * frame_aspect);
+        vp->x = (window_width - vp->w) / 2;
         vp->y = 0;
-        ortho->y = -y;
     } else {
-        vp->y = y;
-        ortho->y = 0;
+        vp->w = window_width;
+        vp->h = (int)((float)window_width / frame_aspect);
+        vp->x = 0;
+        vp->y = (window_height - vp->h) / 2;
     }
 
-    vp->w = window_width - 2 * vp->x;
-    vp->h = window_height - 2 * vp->y;
-
-    ortho->w = frame_width - ortho->x;
-    ortho->h = frame_height - ortho->y;
+    ortho->x = 0;
+    ortho->y = 0;
+    ortho->w = frame_width;
+    ortho->h = frame_height;
 }
 
 static void window_resize()
