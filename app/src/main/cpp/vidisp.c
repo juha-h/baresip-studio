@@ -369,6 +369,19 @@ int opengles_display(
     if (!window) {
         return err;
     }
+
+    /* Check if frame resolution has changed */
+    if (st->vf && (st->vf->size.w != frame->size.w || st->vf->size.h != frame->size.h)) {
+        LOGI("Frame resolution changed from %dx%d to %dx%d",
+             st->vf->size.w, st->vf->size.h, frame->size.w, frame->size.h);
+        mem_deref(st->vf);
+        st->vf = NULL;
+        if (st->texture_id) {
+            glDeleteTextures(1, &st->texture_id);
+            st->texture_id = 0;
+        }
+    }
+
     /* This is hack to make sure that context is initialised on the same thread */
     if (!st->context) {
         err = context_initialize(st);
@@ -438,7 +451,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_set_1surface(
 
     LOGD("At set_surface() on thread %li\n", (long)pthread_self());
 
-    if (surface != 0) {
+    if (surface != NULL) {
+        if (window) {
+            ANativeWindow_release(window);
+        }
         window = ANativeWindow_fromSurface(env, surface);
         w = ANativeWindow_getWidth(window);
         h = ANativeWindow_getHeight(window);
@@ -450,7 +466,9 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_VideoView_set_1surface(
         }
     } else {
         LOGI("Releasing window");
-        ANativeWindow_release(window);
-        window = NULL;
+        if (window) {
+            ANativeWindow_release(window);
+            window = NULL;
+        }
     }
 }
