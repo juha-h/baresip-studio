@@ -27,6 +27,8 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
         jint rowStride0, jint pixStride0, jobject plane1, jint rowStride1, jint pixStride1,
         jobject plane2, jint rowStride2, jint pixStride2);
 
+static void JNICALL OnSetRotation(JNIEnv *env, jobject obj, jlong user_data, jint degrees);
+
 static bool jni_init_ids()
 {
     JNIEnv *jni_env;
@@ -70,12 +72,13 @@ static bool jni_init_ids()
             jobjs.cam2.m_start);
     GET_METHOD_ID(jobjs.cam2.cls, CAMERA, "stopCamera", "()V", jobjs.cam2.m_stop);
 
-    /* native PushFrame */
+    /* Register Native Methods */
     {
-        JNINativeMethod m[] = {{"pushFrame",
-                "(JLjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;II)V",
-                (void *)&OnGetFrame}};
-        if ((*jni_env)->RegisterNatives(jni_env, jobjs.cam2.cls, m, 1)) {
+        JNINativeMethod m[] = {
+            {"pushFrame", "(JLjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;IILjava/nio/ByteBuffer;II)V", (void *)&OnGetFrame},
+            {"setRotation", "(JI)V", (void *)&OnSetRotation}
+        };
+        if ((*jni_env)->RegisterNatives(jni_env, jobjs.cam2.cls, m, 2)) {
             status = false;
         }
     }
@@ -337,4 +340,12 @@ static void JNICALL OnGetFrame(JNIEnv *env, jobject obj, jlong user_data, jobjec
 
     // Send data to the encoder
     process_frame(st);
+}
+
+static void JNICALL OnSetRotation(JNIEnv *env, jobject obj, jlong user_data, jint degrees)
+{
+    struct vidsrc_st *st = (struct vidsrc_st *)(intptr_t)user_data;
+    if (st) {
+        st->rotate = (int)degrees;
+    }
 }
