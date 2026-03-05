@@ -246,9 +246,6 @@ object Config {
             config = "${config}module avformat.so\n"
             config = "${config}module selfview.so\n"
             config = "${config}video_selfview pip\n"
-            config = "${config}selfview_size " +
-                    "${BaresipService.videoSize.width/5}" + "x" +
-                    "${BaresipService.videoSize.height/5}\n"
         }
         else
             Log.w(TAG, "No supported cameras!")
