@@ -55,6 +55,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -2123,7 +2124,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
     var isSpeakerOn by remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
     var isMicMuted by remember { mutableStateOf(BaresipService.isMicMuted) }
 
-    val iconSize = 36.dp
+    val iconSize = 48.dp
 
     var ua: UserAgent? = null
     var call: Call? = null
@@ -2141,6 +2142,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
+            .statusBarsPadding()
             .navigationBarsPadding()
     ) {
         // The Video Layer (Must remain AndroidView for the Surface)
@@ -2165,7 +2167,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
         Column(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 6.dp, top = 32.dp, bottom = 32.dp)
+                .padding(start = 16.dp, top = 32.dp, bottom = 32.dp)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start
@@ -2298,7 +2300,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
         Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(end = 6.dp, top = 32.dp, bottom = 32.dp)
+                .padding(end = 16.dp, top = 32.dp, bottom = 32.dp)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.End
