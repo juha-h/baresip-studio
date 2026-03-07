@@ -216,7 +216,7 @@ object Config {
         }
 
         val cameraManager: CameraManager = ctx.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        val defaultSizes = arrayListOf("320x240", "640x480", "720x480", "960x720", "1280x720",  "1920x1080")
+        val defaultSizes = arrayListOf("320x240", "640x480", "720x480", "720x720", "960x720", "1280x720",  "1920x1080")
         for (id in cameraManager.cameraIdList) {
             val cameraCharacteristics = cameraManager.getCameraCharacteristics(id)
             if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) != CameraCharacteristics.LENS_FACING_FRONT)

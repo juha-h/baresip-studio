@@ -164,7 +164,8 @@ class BaresipService: Service() {
             applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
 
-        // Set up the camera manager
+        // Set up camera2 and camera manager
+        Camera2.setContext(this)
         Camera2.setCameraManager(getSystemService(CAMERA_SERVICE) as CameraManager)
 
         // This is needed to keep service running also in Doze Mode

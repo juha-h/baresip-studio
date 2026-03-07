@@ -2126,15 +2126,17 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
     val iconSize = 48.dp
 
-    var ua: UserAgent? = null
-    var call: Call? = null
+    var call by remember { mutableStateOf<Call?>(null) }
 
     LaunchedEffect(Unit) {
         delay(1000)
-        ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-        call = ua.currentCall()
-        Log.d(TAG, "Syncing video source to Front (sending ${isFrontCamera})")
-        call?.setVideoSource(isFrontCamera)
+        val ua = UserAgent.ofAor(viewModel.selectedAor.value)
+        if (ua != null) {
+            val currentCall = ua.currentCall()
+            call = currentCall
+            Log.d(TAG, "Syncing video source to Front (sending ${isFrontCamera})")
+            call?.setVideoSource(isFrontCamera)
+        }
     }
 
     // Use a Box to layer the UI controls on top of the video
@@ -2398,15 +2400,13 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 // Hangup Button
                 IconButton(
                     onClick = {
-                        if (!Utils.isCameraAvailable(ctx))
-                            call?.setVideoDirection(Api.SDP_INACTIVE)
-
-                        // Assuming abandonAudioFocus is handled in the ViewModel or separate logic now,
-                        // or you can keep using the legacy call:
-                        // (ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager).abandonAudioFocus(null)
-
-                        if (call != null)
-                            Api.ua_hangup(ua!!.uap, call!!.callp, 487, "Request Terminated")
+                        abandonAudioFocus(ctx)
+                        if (call != null) {
+                            call!!.terminated.value = true
+                            if (!Utils.isCameraAvailable(ctx))
+                                call!!.setVideoDirection(Api.SDP_INACTIVE)
+                            Api.ua_hangup(call!!.ua.uap, call!!.callp, 487, "Request Terminated")
+                        }
                     }
                 ) {
                     Icon(

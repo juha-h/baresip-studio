@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
+import android.content.Context
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.hardware.camera2.params.OutputConfiguration
@@ -9,6 +10,7 @@ import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Range
+import android.view.OrientationEventListener
 import android.view.Surface
 import androidx.annotation.RequiresPermission
 import java.nio.ByteBuffer
@@ -28,6 +30,9 @@ class Camera2(
     private var imageReader: ImageReader? = null
     private var previewSurface: Surface? = null
     private var isRunning = false
+    private var orientationListener: OrientationEventListener? = null
+    private var sensorOrientation = 0
+    private var isFrontFacing = false
 
     fun startBackground() {
         bgThread = HandlerThread("CameraBg").apply { start() }
@@ -51,6 +56,7 @@ class Camera2(
     @Suppress("unused")
     fun startCamera(previewSurface: Surface?, facing: Int) {
         this.previewSurface = previewSurface
+        isFrontFacing = (facing == CameraCharacteristics.LENS_FACING_FRONT)
         startBackground()
         imageReader = ImageReader.newInstance(w, h, ImageFormat.YUV_420_888, 3).apply {
             setOnImageAvailableListener(imageAvailListener, bgHandler)
@@ -58,12 +64,35 @@ class Camera2(
         isRunning = true
         try {
             val cameraId = getCameraId(facing)
-            cameraId?.let  {
-                cameraManager?.openCamera(it, camStateCallback, bgHandler)
+            cameraId?.let  { id ->
+                val characteristics = cameraManager?.getCameraCharacteristics(id)
+                sensorOrientation = characteristics?.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
+                cameraManager?.openCamera(id, camStateCallback, bgHandler)
             }
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
+
+        if (orientationListener == null && appContext != null) {
+            orientationListener = object : OrientationEventListener(appContext) {
+                override fun onOrientationChanged(orientation: Int) {
+                    if (orientation == ORIENTATION_UNKNOWN) return
+                    val rotation = when (orientation) {
+                        in 45 until 135 -> 270
+                        in 135 until 225 -> 180
+                        in 225 until 315 -> 90
+                        else -> 0
+                    }
+                    val degrees = if (isFrontFacing) {
+                        (sensorOrientation + rotation) % 360
+                    } else {
+                        (sensorOrientation - rotation + 360) % 360
+                    }
+                    setRotation(userData, degrees)
+                }
+            }
+        }
+        orientationListener?.enable()
     }
 
     @Throws(CameraAccessException::class)
@@ -81,6 +110,7 @@ class Camera2(
         Log.d("Camera2", "stopCamera")
         if (!isRunning) return
         isRunning = false
+        orientationListener?.disable()
         captureSession?.close()
         captureSession = null
         cameraDevice?.close()
@@ -189,13 +219,21 @@ class Camera2(
         plane2: ByteBuffer?, rowStride2: Int, pixStride2: Int
     )
 
+    @Suppress("KotlinJniMissingFunction")
+    external fun setRotation(userData: Long, degrees: Int)
+
     companion object {
         private var cameraManager: CameraManager? = null
+        private var appContext: Context? = null
 
         @JvmStatic
         fun setCameraManager(cm: CameraManager) {
             cameraManager = cm
         }
 
+        @JvmStatic
+        fun setContext(ctx: Context) {
+            appContext = ctx.applicationContext
+        }
     }
 }
