@@ -3,5 +3,4 @@
 - Added support for video screen rotation
 - Added 720x720 to default video frame sizes
 - Improved video layout
-- Avoid possible crash whet hangup button is touched repeatedly
-
+- Avoid possible crash when hangup button is touched repeatedly
