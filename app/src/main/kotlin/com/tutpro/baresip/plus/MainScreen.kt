@@ -2127,7 +2127,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
     val iconSize = 48.dp
 
     var ua: UserAgent? = null
-    var call: Call? = null
+    var call by remember { mutableStateOf<Call?>(null) }
 
     LaunchedEffect(Unit) {
         delay(1000)
