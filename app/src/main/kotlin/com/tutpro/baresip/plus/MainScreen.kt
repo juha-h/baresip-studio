@@ -2401,7 +2401,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 IconButton(
                     onClick = {
                         abandonAudioFocus(ctx)
-                        if (call != null) {
+                        if (call != null && !call!!.terminated.value) {
                             call!!.terminated.value = true
                             if (!Utils.isCameraAvailable(ctx))
                                 call!!.setVideoDirection(Api.SDP_INACTIVE)
