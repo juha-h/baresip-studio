@@ -178,15 +178,30 @@ object CustomElements {
     ): Modifier {
         val alpha by animateFloatAsState(
             targetValue = if(state.isScrollInProgress || alwaysShow) 1f else 0f,
-            animationSpec = tween(400, delayMillis = if(state.isScrollInProgress) 0 else 700)
+            animationSpec = tween(400, delayMillis = if(state.isScrollInProgress) 0 else 700),
+            label = "scrollbarAlpha"
         )
         return this then Modifier.drawWithContent {
             drawContent()
+
             val viewHeight = state.viewportSize.toFloat()
+            if (viewHeight <= 0f) return@drawWithContent // Safety check for zero height
+
             val contentHeight = state.maxValue + viewHeight
-            val scrollbarHeight = (viewHeight * (viewHeight / contentHeight )).coerceIn(10.dp.toPx() .. viewHeight)
+            val minHeight = 10.dp.toPx()
+
+            // Ensure the 'max' of coerceIn is at least as large as 'min'
+            val scrollbarHeight = (viewHeight * (viewHeight / contentHeight))
+                .coerceIn(minHeight.coerceAtMost(viewHeight) .. viewHeight)
+
             val variableZone = viewHeight - scrollbarHeight
-            val scrollbarOffsetY = (state.value.toFloat() / state.maxValue) * variableZone
+
+            // Prevent division by zero if maxValue is 0 (no scrolling needed)
+            val scrollbarOffsetY = if (state.maxValue > 0)
+                (state.value.toFloat() / state.maxValue) * variableZone
+            else
+                0f
+
             drawRoundRect(
                 cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2, scrollbarWidth.toPx() / 2),
                 color = color,
@@ -206,23 +221,35 @@ object CustomElements {
     ): Modifier {
         val alpha by animateFloatAsState(
             targetValue = if (state.isScrollInProgress || alwaysShow) 1f else 0f,
-            animationSpec = tween(durationMillis = if (state.isScrollInProgress) 150 else 500)
+            animationSpec = tween(durationMillis = if (state.isScrollInProgress) 150 else 500),
+            label = "lazyScrollbarAlpha"
         )
-        return drawWithContent {
+        return this.drawWithContent {
             drawContent()
-            val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
-            val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
-            if (needDrawScrollbar && firstVisibleElementIndex != null) {
-                val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
-                val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
-                val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
-                drawRoundRect(
-                    cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
-                    color = color,
-                    topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
-                    size = Size(width.toPx(), scrollbarHeight),
-                    alpha = alpha
-                )
+
+            val totalItems = state.layoutInfo.totalItemsCount
+            val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+
+            // Check if there are items and if they actually exceed the viewport
+            if (totalItems > 0 && visibleItemsInfo.isNotEmpty()) {
+                val firstVisibleElementIndex = visibleItemsInfo.first().index
+                val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
+
+                if (needDrawScrollbar) {
+                    val elementHeight = this.size.height / totalItems
+                    val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
+                    val scrollbarHeight = visibleItemsInfo.size * elementHeight
+
+                    // Only draw if the scrollbar is actually smaller than the track
+                    if (scrollbarHeight < this.size.height)
+                        drawRoundRect(
+                            cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
+                            color = color,
+                            topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
+                            size = Size(width.toPx(), scrollbarHeight),
+                            alpha = alpha
+                        )
+                }
             }
         }
     }
