@@ -84,8 +84,6 @@
         </ul>
         <h2>Known Issues</h2>
         <ul>
-            <li>In video calls, the device needs to be held in landscape
-            mode rotated 90 degrees left from portrait orientation.</li>
             <li>Selfview is not properly shown when video stream is sendonly.</li>
         </ul>
         <h2>Privacy Policy</h2>
