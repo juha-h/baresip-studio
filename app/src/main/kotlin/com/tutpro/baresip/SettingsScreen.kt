@@ -763,6 +763,35 @@ private fun SettingsContent(
     }
 
     @Composable
+    fun UniqueContactUri() {
+        val uniqueContactUriTitle = stringResource(R.string.unique_contact_uri)
+        val uniqueContactUriHelp = stringResource(R.string.unique_contact_uri_help)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = uniqueContactUriTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = uniqueContactUriTitle
+                        alertMessage.value = uniqueContactUriHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            val uniqueContactUri by viewModel.uniqueContactUri.collectAsState()
+            Switch(
+                checked = uniqueContactUri,
+                onCheckedChange = { viewModel.uniqueContactUri.value = it }
+            )
+        }
+    }
+
+    @Composable
     fun AudioSettings(navController: NavController) {
         Row(
             Modifier
@@ -1318,6 +1347,7 @@ private fun SettingsContent(
         VerifyServer()
         CaFile(activity)
         UserAgent()
+        UniqueContactUri()
         AudioSettings(navController)
         Contacts(activity)
         Ringtone()
@@ -1431,6 +1461,13 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             Config.replaceVariable("user_agent", userAgent)
         else
             Config.removeVariable("user_agent")
+        save = true
+        restart = true
+    }
+
+    if ((Config.variable("sip_cuser_random") == "yes") != viewModel.uniqueContactUri.value) {
+        Config.replaceVariable("sip_cuser_random",
+            if (viewModel.uniqueContactUri.value) "yes" else "no")
         save = true
         restart = true
     }

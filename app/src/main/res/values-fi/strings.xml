@@ -382,6 +382,11 @@
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
     <string name="no_read_permission">Ei ulkoisen muistin lukuoikeutta</string>
+    <string name="unique_contact_uri">Uniikki Contact URI</string>
+    <string name="unique_contact_uri_help">Jos merkitty, Contact URI:n taataan olevan uniikki.
+        Merkittävä, jos on useammalla tilillä on same SIP URI:n käyttäjäosa, mutta myös
+        suojaa tilejä hyökkäyksiltä.
+    </string>
     <string name="audio_settings">Audio-asetukset</string>
     <string name="speaker_phone">Kaiutin</string>
     <string name="speaker_phone_help">Jos merkitty, kaiutin kytketään sutomaattisesti päälle
