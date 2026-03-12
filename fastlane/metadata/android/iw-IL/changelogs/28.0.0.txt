@@ -1,0 +1,1 @@
+- נוספה אפשרות להגדרה אוטומטית חלקית של חשבון חדש דרך דף אינטרנט (ראו https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration for details)
