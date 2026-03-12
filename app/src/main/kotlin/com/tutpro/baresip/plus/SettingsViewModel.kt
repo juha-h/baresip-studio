@@ -24,6 +24,7 @@ class SettingsViewModel: ViewModel() {
     val verifyServer = MutableStateFlow(false)
     val caFile = MutableStateFlow(false)
     val userAgent = MutableStateFlow("")
+    val uniqueContactUri =  MutableStateFlow(true)
     val contactsMode = MutableStateFlow("")
     val ringtoneUri = MutableStateFlow("")
     val videoSize = MutableStateFlow("")
@@ -63,6 +64,8 @@ class SettingsViewModel: ViewModel() {
         caFile.value = File(BaresipService.filesPath + "/ca_certs.crt").exists()
 
         userAgent.value = Config.variable("user_agent")
+
+        uniqueContactUri.value =  Config.variable("sip_cuser_random") == "yes"
 
         contactsMode.value = Config.variable("contacts_mode").lowercase()
 

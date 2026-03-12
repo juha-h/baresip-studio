@@ -120,6 +120,12 @@ object Config {
         if (userAgent != "")
             config = "${config}user_agent $userAgent\n"
 
+        val sipCuserRandom = previousVariable("sip_cuser_random")
+        config = if (sipCuserRandom != "")
+            "${config}sip_cuser_random $sipCuserRandom\n"
+        else
+            "${config}sip_cuser_random yes\n"
+
         val darkTheme = previousVariable("dark_theme")
         Preferences(ctx).displayTheme = if (darkTheme == "yes") {
             config = "${config}dark_theme yes\n"
