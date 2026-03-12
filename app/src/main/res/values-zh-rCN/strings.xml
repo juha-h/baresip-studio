@@ -425,4 +425,6 @@
     <string name="call_blocked">已自动拒绝来自 %1$s 的已屏蔽通话</string>
     <string name="message_blocked">已自动拒绝来自 %1$s 的已屏蔽消息</string>
     <string name="search">搜索</string>
+    <string name="unique_contact_uri">唯一联系人 URI</string>
+    <string name="unique_contact_uri_help">如果选中，则保证联系人 URI 是唯一的。如果存在多个账号具有相同的 SIP URI 用户部分时需要选中，同时还能保护账号免受攻击。</string>
 </resources>
