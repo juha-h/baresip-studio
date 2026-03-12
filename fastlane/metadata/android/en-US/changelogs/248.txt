@@ -1,0 +1,2 @@
+- Added Unique Contact URI setting
+- New translations (Chinese, English, Finnish)
