@@ -49,3 +49,4 @@ opus_cbr no
 opus_inbandfec yes
 opus_application voip
 dtls_srtp_use_ec prime256v1
+zrtp_parallel no
