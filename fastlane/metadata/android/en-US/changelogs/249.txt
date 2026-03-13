@@ -1,0 +1,3 @@
+- Added Unique Contact URI setting
+- Improved reliability of ZRTP negotiation in video calls
+- New translations (Chinese, English, Finnish)
