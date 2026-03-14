@@ -50,6 +50,7 @@
         </ul>
         ]]></string>
     <string name="about_text_plus"><![CDATA[
+        <h1>
         <h1>סוכן משתמש SIP המבוסס על ספריית <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
@@ -75,6 +76,10 @@
             <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
             <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a>
                 למידע נוסף.</li>
+        </ul>
+        <h2>תקלות ידועות</h2>
+        <ul>
+            <li>תצוגה עצמית אינה מוצגת כראוי כאשר זרם הווידאו מוגדר כשליחה בלבד.</li>
         </ul>
         <h2>מדיניות פרטיות</h2>
             <p>מדיניות פרטיות זמינה <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">כאן</a>.</p>
@@ -432,4 +437,6 @@
     <string name="microphone_tip">אם האפשרות מופעלת במהלך שיחה, המיקרופון יושתק.</string>
     <string name="speakerphone_title">רמקול</string>
     <string name="speakerphone_tip">אם האפשרות מופעלת, השמע יושמע דרך הרמקול של המכשיר.</string>
+    <string name="unique_contact_uri">URI ייחודי של איש קשר</string>
+    <string name="unique_contact_uri_help">אם מסומן, URI של איש הקשר מובטח להיות ייחודי. יש לסמן זאת אם קיימים יותר מחשבון אחד עם חלק המשתמש זהה ב־SIP URI, אך גם משפר את ההגנה על החשבונות מפני תקיפות.</string>
 </resources>
