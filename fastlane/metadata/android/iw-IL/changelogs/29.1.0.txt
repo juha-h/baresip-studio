@@ -1,0 +1,3 @@
+- תרגומים מ־Weblate שלפורטוגזית (ברזיל)
+- תוקן F-Droid nb-NO locale tag
+- מניעת התראות מסוג "duplicate finish request"
