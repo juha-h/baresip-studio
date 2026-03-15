@@ -256,4 +256,5 @@
     <string name="audio_delay_help">Temps (en millisecondes) pour attendre l’audio de l’appelé lorsque l’appel est établi. Réglez sur une valeur plus élevée si vous manquez l’audio de l’appelé au début de l’appel.</string>
     <string name="invalid_audio_delay">Délai audio invalide \'%1$s\'. Les valeurs valides sont comprises entre 100 et 3000.</string>
     <string name="default_call_volume">Volume d’appel par défaut</string>
+    <string name="time">Heure</string>
 </resources>
