@@ -30,11 +30,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -97,7 +95,28 @@ private fun CodecsScreen(
 ) {
     val ua = UserAgent.ofAor(aor)!!
     val acc = ua.account
-    var currentCodecsState by remember { mutableStateOf<List<Codec>>(emptyList()) }
+    val codecs = remember { mutableStateListOf<Codec>() }
+
+    LaunchedEffect(acc, media) {
+        val allCodecs: List<String> = if (media == "audio") {
+            Api.audio_codecs().split(",")
+        } else {
+            Api.video_codecs().split(",").distinct()
+        }
+        val accCodecs: List<String> = if (media == "audio") {
+            acc.audioCodec
+        } else {
+            acc.videoCodec
+        }
+        val currentCodecs = mutableListOf<Codec>()
+        for (codec in accCodecs)
+            currentCodecs.add(Codec(codec, mutableStateOf(true)))
+        for (codec in allCodecs)
+            if (codec !in accCodecs)
+                currentCodecs.add(Codec(codec, mutableStateOf(false)))
+        codecs.clear()
+        codecs.addAll(currentCodecs)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -138,7 +157,7 @@ private fun CodecsScreen(
                     },
                     actions = {
                         IconButton(onClick = {
-                            checkOnClick(currentCodecsState)
+                            checkOnClick(codecs)
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Check,
@@ -152,9 +171,7 @@ private fun CodecsScreen(
         content = { contentPadding ->
             CodecsContent(
                 contentPadding,
-                acc,
-                media,
-                onUpdateCodecs = { updatedCodecs -> currentCodecsState = updatedCodecs }
+                codecs
             )
         },
     )
@@ -163,33 +180,8 @@ private fun CodecsScreen(
 @Composable
 private fun CodecsContent(
     contentPadding: PaddingValues,
-    acc: Account,
-    media: String,
-    onUpdateCodecs: (List<Codec>) -> Unit
+    codecs: SnapshotStateList<Codec>
 ) {
-    val codecs = remember { mutableStateListOf<Codec>() }
-
-    LaunchedEffect(acc, media) {
-        val allCodecs: List<String> = if (media == "audio") {
-            Api.audio_codecs().split(",")
-        } else {
-            Api.video_codecs().split(",").distinct()
-        }
-        val accCodecs: List<String> = if (media == "audio") {
-            acc.audioCodec
-        } else {
-            acc.videoCodec
-        }
-        val currentCodecs = mutableListOf<Codec>()
-        for (codec in accCodecs)
-            currentCodecs.add(Codec(codec, mutableStateOf(true)))
-        for (codec in allCodecs)
-            if (codec !in accCodecs)
-                currentCodecs.add(Codec(codec, mutableStateOf(false)))
-        codecs.clear()
-        codecs.addAll(currentCodecs)
-    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,21 +189,17 @@ private fun CodecsContent(
             .padding(contentPadding)
             .padding(bottom = 16.dp),
     ) {
-        Codecs(
-            codecs = codecs,
-            onUpdateCodecs = onUpdateCodecs
-        )
+        Codecs(codecs = codecs)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec>) -> Unit) {
+private fun Codecs(codecs: SnapshotStateList<Codec>) {
 
     val draggableState = rememberDraggableListState(
         onMove = { fromIndex, toIndex ->
             codecs.add(toIndex, codecs.removeAt(fromIndex))
-            onUpdateCodecs(codecs.toList())
         }
     )
 
@@ -221,7 +209,6 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
             .verticalScrollbar(state = draggableState.listState),
         state = draggableState.listState,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp),
-        //verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         draggableItems(
             state = draggableState,
@@ -254,7 +241,6 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
                                         codecs.removeAt(index)
                                         codecs.add(item)
                                     }
-                                    onUpdateCodecs(codecs.toList())
                                 }
                             )
                     )
@@ -279,5 +265,3 @@ private fun Codecs(codecs: SnapshotStateList<Codec>, onUpdateCodecs: (List<Codec
         }
     }
 }
-
-
