@@ -95,7 +95,6 @@
     <string name="media_nat">Media NAT-gjennomgang</string>
     <string name="media_nat_help">Velger media NAT-gjennomgangsprotokoll (hvis noen). Mulige valg er STUN (øktgjennomgangsverktøy for NAT, RFC 5389) og ICE (interaktivt tilkoblingstilknytning, RFC 5245).</string>
     <string name="stun_server_help">En STUN-tjener i utførelsen host[:port]. Forvalgt fabrikkverdi er \'stun.l.google.com:19302\', som peker til offentlig Google STUN-tjener. Brukernavn og passord støttes foreløpig ikke.</string>
-    <string name="stun_server_default">stun.l.google.com:19302</string>
     <string name="media_encryption_help">Velger krypteringsprotokoll for mediatransport (hvis noen).
 \n • ZRTP (anbefalt) betyr at ZRTP ende-til-ende -forhandling av mediakryptering forsøkes etter at samtalen har blitt opprettet.
 \n • DTLS-SRTPF betyr at UDP/TLS/RTP/SAVPF tilbys i utgående samtale, og at RTP/SAVP, RTP/SAVPF, UDP/TLS/RTP/SAVP, eller UDP/TLS/RTP/SAVPF brukes hvis tilbudt i innkomende anrop.
