@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">baresip</string>
     <string name="app_name_plus" translatable="false">baresip+</string>
     <!-- About Activity -->
@@ -249,7 +249,7 @@
     <string name="is_calling">is calling</string>
     <string name="missed_call_from">Missed call from</string>
     <string name="missed_calls">Missed calls</string>
-    <string name="missed_calls_count">%1$d missed calls</string>
+    <string name="missed_calls_count" tools:ignore="PluralsCandidate">%1$d missed calls</string>
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="call_auto_rejected">Auto-rejected call from \`%1$s\`</string>
     <string name="call_blocked">Auto-rejected blocked call from \`%1$s\`</string>
