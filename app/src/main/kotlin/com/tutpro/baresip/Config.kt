@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
 object Config {
 
     private val configPath = BaresipService.filesPath + "/config"
-    val audioModules = listOf("opus", "amr", "libg722", "g7221", "g726", "g729", "codec2", "g711")
+    val audioModules = listOf("opus", "amr", "libg722", "g7221", "g729", "codec2", "g711")
     private lateinit var config: String
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
