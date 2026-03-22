@@ -61,7 +61,6 @@ object Api {
     external fun account_dtmfmode(acc: Long): Int
     external fun account_set_dtmfmode(acc: Long, mode: Int): Int
     external fun account_extra(acc: Long): String
-    @Suppress("unused")
     external fun account_debug(acc: Long)
 
     external fun uag_reset_transp(register: Boolean, reinvite: Boolean)
