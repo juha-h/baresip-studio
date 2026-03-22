@@ -68,7 +68,7 @@
     <string name="battery_optimizations">Optimalizace baterie</string>
     <string name="listen_address">Naslouchací adresa</string>
     <string name="start_automatically">Spustit automaticky</string>
-    <string name="start_automatically_help">Pokud je zaškrtnuto, baresip se spustí automaticky po (opětovném) spuštění zařízení.</string>
+    <string name="start_automatically_help">Pokud je zaškrtnuto, baresip se spustí automaticky po (opětovném) spuštění zařízení nebo po instalaci nové verze baresip. Ke spuštění dojde po odemčení zařízení.</string>
     <string name="battery_optimizations_help">Pokud chcete snížit pravděpodobnost, že systém Android omezí přístup zařízení baresip k síti nebo jej přepne do pohotovostního režimu, zakažte optimalizace baterie (doporučeno).</string>
     <string name="listen_address_help">IP adresa a port ve tvaru \"address:port\", na kterém baresip naslouchá příchozím požadavkům SIP. Pokud je IP adresa IPv6, musí být zapsána v závorce []. IPv4 adresa 0.0.0.0 nebo IPv6 adresa [::] způsobí, že baresip bude naslouchat na všech dostupných adresách. Pokud zůstane prázdné (výchozí nastavení), bude baresip naslouchat na libovolném portu na všech dostupných adresách.</string>
     <string name="dns_servers">Servery DNS</string>
@@ -422,8 +422,6 @@
         </ul>
         <h2>Známé problémy</h2>
         <ul>
-                 <li>Při videohovorech je třeba zařízení držet v režimu na šířku 
-                 otočeném o 90 stupňů doleva od orientace na výšku.</li>
                 <li>Náhled sebe sama se nezobrazuje správně, když je video stream pouze pro odesílání..</li>
         </ul>
         <h2>Zásady ochrany osobních údajů</h2>
@@ -450,4 +448,6 @@
                 <li><b>AOMedia</b> AV1 kodek</li>
         </ul>
         ]]></string>
+    <string name="unique_contact_uri">Jedinečné URI kontaktu</string>
+    <string name="unique_contact_uri_help">Pokud je zaškrtnuto, URI kontaktu je zaručeně jedinečné. Je nutné tuto volbu zapnout, pokud existuje více účtů se stejnou uživatelskou částí SIP URI, a zároveň zlepšuje ochranu účtů proti útokům.</string>
 </resources>
