@@ -78,10 +78,6 @@ add_library(lib_avformat SHARED IMPORTED)
 set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libavformat.so)
 
-add_library(lib_postproc SHARED IMPORTED)
-set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/lib/${ANDROID_ABI}/libpostproc.so)
-
 add_library(lib_g722 STATIC IMPORTED)
 set_target_properties(lib_g722 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/g722/lib/${ANDROID_ABI}/libg722.a)
@@ -164,7 +160,6 @@ target_link_libraries(
         lib_vpx
         lib_avutil
         lib_swresample
-        lib_postproc
         lib_g722
         lib_g722_1
         lib_g729
