@@ -536,6 +536,10 @@ class BaresipService: Service() {
                     toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
             }
 
+            "Notification Dismissed" -> {
+                updateStatusNotification()
+            }
+
             "Start Content Observer" -> {
                 registerAndroidContactsObserver()
             }
@@ -1513,6 +1517,17 @@ class BaresipService: Service() {
         nm.createNotificationChannel(mediumChannel)
     }
 
+    private fun buildStatusNotification(): Notification {
+        if (VERSION.SDK_INT >= 31)
+            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+        snb.setOngoing(true)
+        snb.setCategory(Notification.CATEGORY_SERVICE)
+        val notification = snb.build()
+        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR or
+                Notification.FLAG_ONGOING_EVENT
+        return notification
+    }
+
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun showStatusNotification() {
         val intent = Intent(applicationContext, MainActivity::class.java)
@@ -1520,15 +1535,23 @@ class BaresipService: Service() {
                 .addCategory(Intent.CATEGORY_LAUNCHER)
         val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent,
             PendingIntent.FLAG_IMMUTABLE)
+        val deleteIntent = Intent(this, BaresipService::class.java)
+            .setAction("Notification Dismissed")
+        val dpi = PendingIntent.getService(
+            this,
+            STATUS_REQ_CODE,
+            deleteIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_notification_b)
                 .setContentIntent(pi)
+                .setDeleteIntent(dpi)
                 .setOngoing(true)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(notificationLayout)
-        if (VERSION.SDK_INT >= 31)
-            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
+        val notification = buildStatusNotification()
         try {
             if (VERSION.SDK_INT >= 29) {
                 var types = FOREGROUND_SERVICE_TYPE_PHONE_CALL
@@ -1542,10 +1565,10 @@ class BaresipService: Service() {
                     else
                         Log.w(TAG, "showStatusNotification: CAMERA permission not granted")
                 }
-                startForeground(STATUS_NOTIFICATION_ID, snb.build(), types)
+                startForeground(STATUS_NOTIFICATION_ID, notification, types)
             }
             else
-                startForeground(STATUS_NOTIFICATION_ID, snb.build())
+                startForeground(STATUS_NOTIFICATION_ID, notification)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start foreground service: ${e.message}")
         }
@@ -1574,7 +1597,7 @@ class BaresipService: Service() {
         snb.setCustomContentView(notificationLayout)
         // Don't know why, but without the delay the notification is not always updated
         Timer().schedule(250) {
-            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+            nm.notify(STATUS_NOTIFICATION_ID,buildStatusNotification())
         }
     }
 
