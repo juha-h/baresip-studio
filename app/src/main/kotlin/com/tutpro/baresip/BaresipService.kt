@@ -1468,11 +1468,13 @@ class BaresipService: Service() {
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(notificationLayout)
         if (VERSION.SDK_INT >= 31)
-            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFAULT
+            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+        val notification = snb.build()
+        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR
         try {
             if (VERSION.SDK_INT >= 29)
                 startForeground(
-                    STATUS_NOTIFICATION_ID, snb.build(),
+                    STATUS_NOTIFICATION_ID, notification,
                     if (VERSION.SDK_INT >= 30) {
                         if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
                             FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE
@@ -1483,7 +1485,7 @@ class BaresipService: Service() {
                         FOREGROUND_SERVICE_TYPE_PHONE_CALL
                 )
             else
-                startForeground(STATUS_NOTIFICATION_ID, snb.build())
+                startForeground(STATUS_NOTIFICATION_ID, notification)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start foreground service: ${e.message}")
         }
