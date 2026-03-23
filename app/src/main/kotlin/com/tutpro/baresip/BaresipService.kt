@@ -1453,6 +1453,17 @@ class BaresipService: Service() {
         nm.createNotificationChannel(mediumChannel)
     }
 
+    private fun buildStatusNotification(): Notification {
+        if (VERSION.SDK_INT >= 31)
+            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+        snb.setOngoing(true)
+        snb.setCategory(Notification.CATEGORY_SERVICE)
+        val notification = snb.build()
+        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR or
+                Notification.FLAG_ONGOING_EVENT
+        return notification
+    }
+
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun showStatusNotification() {
         val intent = Intent(applicationContext, MainActivity::class.java)
@@ -1467,10 +1478,7 @@ class BaresipService: Service() {
                 .setOngoing(true)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(notificationLayout)
-        if (VERSION.SDK_INT >= 31)
-            snb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
-        val notification = snb.build()
-        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR
+        val notification = buildStatusNotification()
         try {
             if (VERSION.SDK_INT >= 29)
                 startForeground(
@@ -1514,7 +1522,7 @@ class BaresipService: Service() {
         snb.setCustomContentView(notificationLayout)
         // Don't know why, but without the delay the notification is not always updated
         Timer().schedule(250) {
-            nm.notify(STATUS_NOTIFICATION_ID, snb.build())
+            nm.notify(STATUS_NOTIFICATION_ID, buildStatusNotification())
         }
     }
 
