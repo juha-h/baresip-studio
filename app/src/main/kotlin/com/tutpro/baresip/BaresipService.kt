@@ -522,6 +522,10 @@ class BaresipService: Service() {
                     toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
             }
 
+            "Notification Dismissed" -> {
+                updateStatusNotification()
+            }
+
             "Start Content Observer" -> {
                 registerAndroidContactsObserver()
             }
@@ -1471,10 +1475,19 @@ class BaresipService: Service() {
                 .addCategory(Intent.CATEGORY_LAUNCHER)
         val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent,
             PendingIntent.FLAG_IMMUTABLE)
+        val deleteIntent = Intent(this, BaresipService::class.java)
+            .setAction("Notification Dismissed")
+        val dpi = PendingIntent.getService(
+            this,
+            STATUS_REQ_CODE,
+            deleteIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_notification_b)
                 .setContentIntent(pi)
+                .setDeleteIntent(dpi)
                 .setOngoing(true)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(notificationLayout)
