@@ -117,6 +117,8 @@ class BaresipService: Service() {
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
     private var androidContactsObserverRegistered = false
+    private var bluetoothReceiverRegistered = false
+    private var hotSpotReceiverRegistered = false
     private var isServiceClean = false
 
     @SuppressLint("WakelockTimeout")
@@ -261,6 +263,7 @@ class BaresipService: Service() {
 
         this.registerReceiver(hotSpotReceiver,
             IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
+        hotSpotReceiverRegistered = true
 
         tm = getSystemService(TELECOM_SERVICE) as TelecomManager
 
@@ -339,6 +342,7 @@ class BaresipService: Service() {
             filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
             filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
             this.registerReceiver(bluetoothReceiver, filter)
+            bluetoothReceiverRegistered = true
         }
 
         androidContactsObserver = object : ContentObserver(null) {
@@ -1842,9 +1846,14 @@ class BaresipService: Service() {
 
     private fun cleanService() {
         if (!isServiceClean) {
-            if (btAdapter != null)
+            if (bluetoothReceiverRegistered) {
                 this.unregisterReceiver(bluetoothReceiver)
-            this.unregisterReceiver(hotSpotReceiver)
+                bluetoothReceiverRegistered = false
+            }
+            if (hotSpotReceiverRegistered) {
+                unregisterReceiver(hotSpotReceiver)
+                hotSpotReceiverRegistered = false
+            }
             stopRinging()
             stopMediaPlayer()
             abandonAudioFocus(applicationContext)
