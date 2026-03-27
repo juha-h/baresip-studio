@@ -1,1 +1,1 @@
-- Baresip foreground service notification is now always visible also when Android version is 14 or newer
+- Baresip+ foreground service notification is now always visible also when Android version is 14 or newer
