@@ -100,7 +100,6 @@ class BaresipService: Service() {
     private lateinit var tm: TelecomManager
     private lateinit var btm: BluetoothManager
     private lateinit var vibrator: Vibrator
-    private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var bluetoothReceiver: BroadcastReceiver
@@ -156,16 +155,6 @@ class BaresipService: Service() {
         } else {
             @Suppress("DEPRECATION")
             applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
-        }
-
-        // This is needed to keep service running also in Doze Mode
-        partialWakeLock = pm.run {
-            newWakeLock(
-                PowerManager.PARTIAL_WAKE_LOCK,
-                "com.tutpro.baresip:partial_wakelock"
-            ).apply {
-                acquire()
-            }
         }
 
         cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -1414,8 +1403,7 @@ class BaresipService: Service() {
         callActionUri = ""
         Log.d(TAG, "Battery optimizations are ignored: " +
                 "${pm.isIgnoringBatteryOptimizations(packageName)}")
-        Log.d(TAG, "Partial wake lock/wifi lock is held: " +
-                "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
+        Log.d(TAG, "Wifi lock is held: ${wifiLock.isHeld}")
         updateStatusNotification()
     }
 
@@ -1866,8 +1854,6 @@ class BaresipService: Service() {
             messages = emptyList()
             if (this::nm.isInitialized)
                 nm.cancelAll()
-            if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
-                partialWakeLock.release()
             if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
                 proximityWakeLock.release()
             if (this::wifiLock.isInitialized)
