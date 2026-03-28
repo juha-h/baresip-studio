@@ -105,6 +105,7 @@ class BaresipService: Service() {
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
     private lateinit var androidContactsObserver: ContentObserver
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
@@ -159,53 +160,54 @@ class BaresipService: Service() {
             applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
 
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Log.d(TAG, "Network $network is available")
+                if (network !in allNetworks)
+                    allNetworks.add(network)
+            }
+
+            override fun onLosing(network: Network, maxMsToLive: Int) {
+                super.onLosing(network, maxMsToLive)
+                Log.d(TAG, "Network $network is losing after $maxMsToLive ms")
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                Log.d(TAG, "Network $network is lost")
+                if (network in allNetworks)
+                    allNetworks.remove(network)
+                if (isServiceRunning)
+                    updateNetwork()
+            }
+
+            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                super.onCapabilitiesChanged(network, caps)
+                Log.d(TAG, "Network $network capabilities changed: $caps")
+                if (network !in allNetworks)
+                    allNetworks.add(network)
+                if (isServiceRunning)
+                    updateNetwork()
+            }
+
+            override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
+                super.onLinkPropertiesChanged(network, props)
+                Log.d(TAG, "Network $network link properties changed: $props")
+                if (network !in allNetworks)
+                    allNetworks.add(network)
+                if (isServiceRunning)
+                    updateNetwork()
+            }
+        }
+
         cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val builder = NetworkRequest.Builder()
-            .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         cm.registerNetworkCallback(
-                builder.build(),
-                object : ConnectivityManager.NetworkCallback() {
-
-                    override fun onAvailable(network: Network) {
-                        super.onAvailable(network)
-                        Log.d(TAG, "Network $network is available")
-                        if (network !in allNetworks)
-                            allNetworks.add(network)
-                    }
-
-                    override fun onLosing(network: Network, maxMsToLive: Int) {
-                        super.onLosing(network, maxMsToLive)
-                        Log.d(TAG, "Network $network is losing after $maxMsToLive ms")
-                    }
-
-                    override fun onLost(network: Network) {
-                        super.onLost(network)
-                        Log.d(TAG, "Network $network is lost")
-                        if (network in allNetworks)
-                            allNetworks.remove(network)
-                        if (isServiceRunning)
-                            updateNetwork()
-                    }
-
-                    override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                        super.onCapabilitiesChanged(network, caps)
-                        Log.d(TAG, "Network $network capabilities changed: $caps")
-                        if (network !in allNetworks)
-                            allNetworks.add(network)
-                        if (isServiceRunning)
-                            updateNetwork()
-                    }
-
-                    override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
-                        super.onLinkPropertiesChanged(network, props)
-                        Log.d(TAG, "Network $network link properties changed: $props")
-                        if (network !in allNetworks)
-                            allNetworks.add(network)
-                        if (isServiceRunning)
-                            updateNetwork()
-                    }
-
-                }
+            NetworkRequest.Builder()
+                .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                .build(),
+            networkCallback
         )
 
         wm = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
@@ -261,8 +263,12 @@ class BaresipService: Service() {
             }
         }
 
-        this.registerReceiver(hotSpotReceiver,
-            IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"))
+        ContextCompat.registerReceiver(
+            applicationContext,
+            hotSpotReceiver,
+            IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         hotSpotReceiverRegistered = true
 
         tm = getSystemService(TELECOM_SERVICE) as TelecomManager
@@ -341,11 +347,12 @@ class BaresipService: Service() {
             filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
             filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
             filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
-            this.registerReceiver(bluetoothReceiver, filter)
+            ContextCompat.registerReceiver(applicationContext, bluetoothReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED)
             bluetoothReceiverRegistered = true
         }
 
-        androidContactsObserver = object : ContentObserver(null) {
+        androidContactsObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(self: Boolean) {
                 Log.d(TAG, "Android contacts change")
                 if (contactsMode != "baresip") {
@@ -1542,15 +1549,25 @@ class BaresipService: Service() {
         rt!!.isLooping = true
         rt!!.play()
         if (shouldVibrate()) {
+            val effect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
             vbTimer = Timer()
             vbTimer!!.schedule(object : TimerTask() {
                 override fun run() {
-                    vibrator.vibrate(
-                        VibrationEffect.createOneShot(
-                            500,
-                            VibrationEffect.DEFAULT_AMPLITUDE
+                    if (VERSION.SDK_INT >= 33) {
+                        vibrator.vibrate(
+                            effect,
+                            android.os.VibrationAttributes.Builder()
+                                .setUsage(android.os.VibrationAttributes.USAGE_RINGTONE)
+                                .build()
                         )
-                    )
+                    } else {
+                        val attributes = AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(effect, attributes)
+                    }
                 }
             }, 500L, 2000L)
         }
@@ -1575,7 +1592,6 @@ class BaresipService: Service() {
         // First, check if the ringer volume is actually non-zero
         if (am.getStreamVolume(AudioManager.STREAM_RING) == 0) return false
         // Finally, check the system "Vibrate for calls" setting.
-        // Although deprecated, it is the standard way to check the "Also vibrate for calls" toggle.
         return try {
             @Suppress("DEPRECATION")
             Settings.System.getInt(contentResolver, Settings.System.VIBRATE_WHEN_RINGING, 0) != 0
@@ -1867,6 +1883,8 @@ class BaresipService: Service() {
                 proximityWakeLock.release()
             if (this::wifiLock.isInitialized)
                 wifiLock.release()
+            if (this::networkCallback.isInitialized)
+                cm.unregisterNetworkCallback(networkCallback)
             if (this::androidContactsObserver.isInitialized)
                 contentResolver.unregisterContentObserver(androidContactsObserver)
             isServiceClean = true
