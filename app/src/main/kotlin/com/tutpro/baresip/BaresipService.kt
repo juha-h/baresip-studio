@@ -113,6 +113,7 @@ class BaresipService: Service() {
     private var mediaPlayer: MediaPlayer? = null
     private var androidContactsObserverRegistered = false
     private var hotSpotReceiverRegistered = false
+    private var isNotificationInCall = false
     private var isServiceClean = false
 
     @SuppressLint("WakelockTimeout")
@@ -1495,6 +1496,7 @@ class BaresipService: Service() {
         if (VERSION.SDK_INT >= 31)
             builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
 
+        builder.setOngoing(true)
         val notification = builder.build()
         notification.flags = notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
 
@@ -1510,13 +1512,23 @@ class BaresipService: Service() {
                     startForeground(STATUS_NOTIFICATION_ID, notification, type)
                 else
                     startForeground(STATUS_NOTIFICATION_ID, notification)
+                isNotificationInCall = true
             } else {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                if (VERSION.SDK_INT >= 34)
-                    startForeground(STATUS_NOTIFICATION_ID, notification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-                else
-                    startForeground(STATUS_NOTIFICATION_ID, notification)
+                if (isNotificationInCall) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    isNotificationInCall = false
+                    if (VERSION.SDK_INT >= 34)
+                        startForeground(STATUS_NOTIFICATION_ID, notification,
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                    else if (VERSION.SDK_INT >= 30)
+                        startForeground(STATUS_NOTIFICATION_ID, notification, 0)
+                    else
+                        startForeground(STATUS_NOTIFICATION_ID, notification)
+                } else {
+                    // Use standard notify for standby updates.
+                    // This is much more stable for background registration.
+                    nm.notify(STATUS_NOTIFICATION_ID, notification)
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update foreground notification: ${e.message}")
