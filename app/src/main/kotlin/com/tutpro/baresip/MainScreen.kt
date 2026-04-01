@@ -231,19 +231,12 @@ private fun MainScreen(
                 Lifecycle.Event.ON_RESUME -> {
                     Log.d(TAG, "Resumed to MainScreen")
                     BaresipService.isMainVisible = true
-                    val incomingCall = Call.call("incoming")
                     viewModel.updateCalls(Call.calls().toList())
-                    if (incomingCall != null)
-                        spinToAor(viewModel, incomingCall.ua.account.aor)
-                    else {
-                        if (uas.value.isNotEmpty()) {
-                            if (viewModel.selectedAor.value == "") {
-                                if (Call.inCall())
-                                    spinToAor(viewModel, Call.calls().last().ua.account.aor)
-                                else
-                                    spinToAor(viewModel, uas.value.first().account.aor)
-                            }
-                        }
+                    (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
+                        spinToAor(viewModel, it.ua.account.aor)
+                    } ?: run {
+                        if (uas.value.isNotEmpty() && viewModel.selectedAor.value == "")
+                            spinToAor(viewModel, uas.value.first().account.aor)
                     }
                     val ua = UserAgent.ofAor(viewModel.selectedAor.value)
                     if (ua != null) {
