@@ -1552,16 +1552,20 @@ class BaresipService: Service() {
         val isAnyUaActive = uasStatus.value.values.any { it != R.drawable.circle_white }
         val isAnyCallActive = calls.isNotEmpty()
         val needsToStayAwake = isAnyUaActive || isAnyCallActive
-        if (needsToStayAwake) {
-            if (!partialWakeLock.isHeld) {
-                Log.d(TAG, "Acquiring Partial Wake Lock")
-                partialWakeLock.acquire()
+        try {
+            if (needsToStayAwake) {
+                if (!partialWakeLock.isHeld) {
+                    Log.d(TAG, "Acquiring Partial Wake Lock (UA Active or Call in progress)")
+                    partialWakeLock.acquire()
+                }
+            } else {
+                if (partialWakeLock.isHeld) {
+                    Log.d(TAG, "Releasing Partial Wake Lock (All UAs idle and no calls)")
+                    partialWakeLock.release()
+                }
             }
-        } else {
-            if (partialWakeLock.isHeld) {
-                Log.d(TAG, "Releasing Partial Wake Lock")
-                partialWakeLock.release()
-            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error managing partialWakeLock: ${e.message}")
         }
     }
 
