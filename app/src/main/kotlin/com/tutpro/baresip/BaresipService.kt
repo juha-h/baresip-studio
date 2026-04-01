@@ -1795,23 +1795,29 @@ class BaresipService: Service() {
         Log.d(TAG, "Added/Removed/Old/New Active = $added/$removed/$activeNetwork/$active")
 
         if (added > 0 || removed > 0 || active != activeNetwork) {
+            Api.net_debug()
             linkAddresses = addresses
             activeNetwork = active
             Api.uag_reset_transp(register = true, reinvite = true)
         }
 
-        Api.net_debug()
+        val hasWifi = allNetworks.any { network ->
+            val caps = cm.getNetworkCapabilities(network)
+            caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+        }
 
-        if (activeNetwork != null) {
-            val caps = cm.getNetworkCapabilities(activeNetwork)
-            if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+        if (hasWifi) {
+            if (!wifiLock.isHeld) {
                 Log.d(TAG, "Acquiring WiFi Lock")
                 wifiLock.acquire()
-                return
             }
         }
-        Log.d(TAG, "Releasing WiFi Lock")
-        wifiLock.release()
+        else {
+            if (wifiLock.isHeld) {
+                Log.d(TAG, "Releasing WiFi Lock")
+                wifiLock.release()
+            }
+        }
     }
 
     private fun linkAddresses(): MutableMap<String, String> {
