@@ -100,6 +100,7 @@ class BaresipService: Service() {
     private lateinit var tm: TelecomManager
     private lateinit var btm: BluetoothManager
     private lateinit var vibrator: Vibrator
+    private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var bluetoothReceiver: BroadcastReceiver
@@ -159,6 +160,12 @@ class BaresipService: Service() {
             @Suppress("DEPRECATION")
             applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
+
+        // This is needed to keep service running also in Doze Mode
+        partialWakeLock = pm.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "com.tutpro.baresip:wakelock"
+        ).apply { setReferenceCounted(false) }
 
         networkCallback = object : ConnectivityManager.NetworkCallback() {
 
@@ -1414,7 +1421,8 @@ class BaresipService: Service() {
         callActionUri = ""
         Log.d(TAG, "Battery optimizations are ignored: " +
                 "${pm.isIgnoringBatteryOptimizations(packageName)}")
-        Log.d(TAG, "Wifi lock is held: ${wifiLock.isHeld}")
+        Log.d(TAG, "Partial wake lock/wifi lock is held: " +
+                "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
         updateStatusNotification()
     }
 
@@ -1535,6 +1543,25 @@ class BaresipService: Service() {
         // Don't know why, but without the delay the notification is not always updated
         Timer().schedule(250) {
             nm.notify(STATUS_NOTIFICATION_ID, buildStatusNotification())
+        }
+        updatePartialWakeLock()
+    }
+
+    @SuppressLint("WakelockTimeout")
+    private fun updatePartialWakeLock() {
+        val isAnyUaActive = uasStatus.value.values.any { it != R.drawable.circle_white }
+        val isAnyCallActive = calls.isNotEmpty()
+        val needsToStayAwake = isAnyUaActive || isAnyCallActive
+        if (needsToStayAwake) {
+            if (!partialWakeLock.isHeld) {
+                Log.d(TAG, "Acquiring Partial Wake Lock")
+                partialWakeLock.acquire()
+            }
+        } else {
+            if (partialWakeLock.isHeld) {
+                Log.d(TAG, "Releasing Partial Wake Lock")
+                partialWakeLock.release()
+            }
         }
     }
 
@@ -1879,6 +1906,8 @@ class BaresipService: Service() {
             messages = emptyList()
             if (this::nm.isInitialized)
                 nm.cancelAll()
+            if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
+                partialWakeLock.release()
             if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
                 proximityWakeLock.release()
             if (this::wifiLock.isInitialized)
