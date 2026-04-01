@@ -284,7 +284,6 @@ class BaresipService: Service() {
             wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
         else
             wm.createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, "Baresip")
-
         wifiLock.setReferenceCounted(false)
 
         androidContactsObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -1867,16 +1866,12 @@ class BaresipService: Service() {
         Log.d(TAG, "Added/Removed/Old/New Active = $added/$removed/$activeNetwork/$active")
 
         if (added > 0 || removed > 0 || active != activeNetwork) {
+            Api.net_debug()
             linkAddresses = addresses
             activeNetwork = active
             Api.uag_reset_transp(register = true, reinvite = true)
         }
 
-        Api.net_debug()
-
-        // Robust Wi-Fi Lock Logic:
-        // Check ALL networks, not just the 'active' one, to ensure we keep the radio
-        // awake if Wi-Fi is available at all.
         val hasWifi = allNetworks.any { network ->
             val caps = cm.getNetworkCapabilities(network)
             caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
