@@ -859,14 +859,6 @@ object Utils {
         }
     }
 
-    fun isSpeakerPhoneOn(am: AudioManager): Boolean {
-        return if (Build.VERSION.SDK_INT >= 31)
-             am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-        else
-            @Suppress("DEPRECATION")
-            am.isSpeakerphoneOn
-    }
-
     private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 31) {
             val current = am.communicationDevice!!.type
@@ -895,7 +887,7 @@ object Utils {
                     Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
-                    if (BaresipService.audioFocusRequest != null && am.mode == AudioManager.MODE_NORMAL) {
+                    if (Call.inCall() && am.mode == AudioManager.MODE_NORMAL) {
                         Log.d(TAG, "Setting mode to communication")
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                     }
@@ -943,18 +935,6 @@ object Utils {
             @Suppress("DEPRECATION")
             setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    fun setCommunicationDevice(am: AudioManager, type: Int) {
-        val current = am.communicationDevice!!.type
-        Log.d(TAG, "Current com dev/mode $current/${am.mode}")
-        for (device in am.availableCommunicationDevices)
-            if (device.type == type) {
-                am.setCommunicationDevice(device)
-                break
-            }
-        Log.d(TAG, "New com dev/mode ${am.communicationDevice!!.type}/${am.mode}")
     }
 
     private fun clearCommunicationDevice(am: AudioManager) {

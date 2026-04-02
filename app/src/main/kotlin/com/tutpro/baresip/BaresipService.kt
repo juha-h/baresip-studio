@@ -65,7 +65,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
-import androidx.media.AudioFocusRequestCompat
 import com.tutpro.baresip.Utils.toCircle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -2068,7 +2067,6 @@ class BaresipService: Service() {
         var dnsServers = listOf<InetAddress>()
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
-        var audioFocusRequest: AudioFocusRequestCompat? = null
         var aecAvailable = false
         private var aec: AcousticEchoCanceler? = null
         var agcAvailable = false
