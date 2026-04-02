@@ -863,17 +863,15 @@ class BaresipService: Service() {
                     "incoming call" -> {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
-                        val blockUnknown = ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri
-                        val toastMsg = if (Call.inCall())
+                        val toastMsg = if (Call.isAnyCallActive(applicationContext))
                             String.format(getString(R.string.call_auto_rejected),
                                 Utils.friendlyUri(this, peerUri, ua.account))
-                        else if (blockUnknown)
+                        else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri)
                             String.format(getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account))
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else if (!requestAudioFocus(applicationContext))
-                            // request fails if there is an active telephony call
                             getString(R.string.audio_focus_denied)
                         else
                             ""
@@ -882,7 +880,7 @@ class BaresipService: Service() {
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(bevent)
                             toast(toastMsg)
-                            if (blockUnknown) {
+                            if (toastMsg.contains(getString(R.string.call_blocked))) {
                                 if (ua.account.callHistory)
                                     Blocked(
                                         ua.account.aor,

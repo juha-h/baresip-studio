@@ -2037,10 +2037,10 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
         alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
         showAlert.value = true
     }
+    else if (Call.isAnyCallActive(ctx))
+        Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else if (!BaresipService.requestAudioFocus(ctx))
         Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
-    else if (Call.calls().any { it.ua.account.aor != ua.account.aor })
-        Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
         if (Build.VERSION.SDK_INT < 31) {
