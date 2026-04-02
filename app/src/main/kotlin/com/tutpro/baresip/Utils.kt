@@ -41,6 +41,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.NavController
+import com.tutpro.baresip.Call.Companion.inCall
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -841,6 +842,16 @@ object Utils {
                         Configuration.UI_MODE_NIGHT_YES
     }
 
+    fun isAnyCallActive(ctx: Context): Boolean {
+        return inCall() || isPSTNCallActive(ctx)
+    }
+
+    fun isPSTNCallActive(ctx: Context): Boolean {
+        // MODE_IN_CALL indicates a PSTN call is active
+        val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return am.mode == AudioManager.MODE_IN_CALL
+    }
+
     fun relativeTime(ctx: Context, time: GregorianCalendar): String {
         return if (DateUtils.isToday(time.timeInMillis)) {
             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
@@ -887,7 +898,7 @@ object Utils {
                     Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
-                    if (Call.inCall() && am.mode == AudioManager.MODE_NORMAL) {
+                    if (inCall() && am.mode == AudioManager.MODE_NORMAL) {
                         Log.d(TAG, "Setting mode to communication")
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                     }

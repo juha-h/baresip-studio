@@ -206,13 +206,23 @@ class ConnectionService : ConnectionService() {
 
         override fun onHold() {
             Log.d(TAG, "Telecom Connection onHold $callp")
-            Api.call_hold(callp, true)
+            val call = Call.ofCallp(callp)
+            if (call == null || !call.conferenceCall) {
+                Api.call_hold(callp, true)
+            } else {
+                Log.d(TAG, "Call $callp is in conference, skipping baresip hold")
+            }
             setOnHold()
         }
 
         override fun onUnhold() {
             Log.d(TAG, "Telecom Connection onUnhold $callp")
-            Api.call_hold(callp, false)
+            val call = Call.ofCallp(callp)
+            if (call == null || !call.conferenceCall) {
+                Api.call_hold(callp, false)
+            } else {
+                Log.d(TAG, "Call $callp is in conference, skipping baresip resume")
+            }
             setActive()
         }
 

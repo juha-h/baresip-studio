@@ -1,7 +1,5 @@
 package com.tutpro.baresip
 
-import android.content.Context
-import android.media.AudioManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -143,14 +141,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
         fun inCall(): Boolean {
             return BaresipService.calls.isNotEmpty()
-        }
-
-        fun isAnyCallActive(ctx: Context): Boolean {
-            // Check SIP calls managed by baresip
-            if (inCall()) return true
-            // MODE_IN_CALL indicates a PSTN call is active
-            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            return am.mode == AudioManager.MODE_IN_CALL
         }
     }
 }
