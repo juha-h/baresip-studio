@@ -55,7 +55,7 @@ class ConnectionService : ConnectionService() {
         val call = Call.ofCallp(callp)
         if (call != null)
             BaresipService.instance?.handleIncomingCall(call)
-        
+
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
             // Check speakerphone setting
