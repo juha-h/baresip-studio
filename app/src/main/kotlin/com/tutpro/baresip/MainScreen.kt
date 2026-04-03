@@ -1540,15 +1540,18 @@ private fun CallRow(
                         onClick = {
                             val connection = ConnectionService.connections[call.callp]
                             if (call.onhold) {
-                                Log.d(
-                                    TAG,
-                                    "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
-                                )
-                                if (connection != null)
-                                    connection.onUnhold()
-                                else
-                                    call.resume()
-                            } else {
+                                if (!Call.isAnyCallActive(ctx)) {
+                                    Log.d(
+                                        TAG,
+                                        "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
+                                    )
+                                    if (connection != null)
+                                        connection.onUnhold()
+                                    else
+                                        call.resume()
+                                }
+                            }
+                            else {
                                 Log.d(
                                     TAG,
                                     "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
