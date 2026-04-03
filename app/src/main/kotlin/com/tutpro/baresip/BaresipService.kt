@@ -801,7 +801,7 @@ class BaresipService: Service() {
                     "incoming call" -> {
                         val peerUri = ev[1]
                         val bevent = ev[2].toLong()
-                        val toastMsg = if (Utils.isAnyCallActive(applicationContext))
+                        val toastMsg = if (Call.isAnyCallActive(applicationContext))
                             String.format(getString(R.string.call_auto_rejected),
                                 Utils.friendlyUri(this, peerUri, ua.account))
                         else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri)

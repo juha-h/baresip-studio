@@ -842,10 +842,6 @@ object Utils {
                         Configuration.UI_MODE_NIGHT_YES
     }
 
-    fun isAnyCallActive(ctx: Context): Boolean {
-        return inCall() || isPSTNCallActive(ctx)
-    }
-
     fun isPSTNCallActive(ctx: Context): Boolean {
         // MODE_IN_CALL indicates a PSTN call is active
         val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager

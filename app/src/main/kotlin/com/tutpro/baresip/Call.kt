@@ -1,5 +1,7 @@
 package com.tutpro.baresip
 
+import android.content.Context
+import android.media.AudioManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,11 +57,15 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     }
 
     fun hold(): Boolean {
-        return Api.call_hold(callp, true) == 0
+        if (Api.call_hold(callp, true) == 0)
+            onhold = true
+        return onhold
     }
 
     fun resume(): Boolean {
-        return Api.call_hold(callp, false) == 0
+        if (Api.call_hold(callp, false) == 0)
+            onhold = false
+        return !onhold
     }
 
     fun transfer(uri: String): Boolean {
@@ -141,6 +147,14 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
         fun inCall(): Boolean {
             return BaresipService.calls.isNotEmpty()
+        }
+
+        fun isAnyCallActive(ctx: Context): Boolean {
+            // Check if there exist SIP calls that are not onhold or held
+            if (BaresipService.calls.any { !it.onhold && !it.held }) return true
+            // MODE_IN_CALL indicates a PSTN call is active
+            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            return am.mode == AudioManager.MODE_IN_CALL
         }
     }
 }

@@ -1534,43 +1534,42 @@ private fun CallRow(
                     )
                 }
 
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = {
-                        val connection = ConnectionService.connections[call.callp]
-                        if (call.onhold) {
-                            Log.d(
-                                TAG,
-                                "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
-                            )
-                            if (connection != null)
-                                connection.onUnhold()
+                if (!call.conferenceCall)
+                    IconButton(
+                        modifier = Modifier.size(48.dp),
+                        onClick = {
+                            val connection = ConnectionService.connections[call.callp]
+                            if (call.onhold) {
+                                Log.d(
+                                    TAG,
+                                    "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
+                                )
+                                if (connection != null)
+                                    connection.onUnhold()
+                                else
+                                    call.resume()
+                            } else {
+                                Log.d(
+                                    TAG,
+                                    "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
+                                )
+                                if (connection != null)
+                                    connection.onHold()
+                                else
+                                    call.hold()
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.PauseCircle,
+                            modifier = Modifier.size(42.dp),
+                            tint = if (call.callOnHold.value)
+                                MaterialTheme.colorScheme.error
                             else
-                                call.resume()
-                            call.onhold = false
-                        } else {
-                            Log.d(
-                                TAG,
-                                "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
-                            )
-                            if (connection != null)
-                                connection.onHold()
-                            else
-                                call.hold()
-                            call.onhold = true
-                        }
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.PauseCircle,
-                        modifier = Modifier.size(42.dp),
-                        tint = if (call.callOnHold.value)
-                            MaterialTheme.colorScheme.error
-                        else
-                            MaterialTheme.colorScheme.secondary,
-                        contentDescription = null,
-                    )
-                }
+                                MaterialTheme.colorScheme.secondary,
+                            contentDescription = null,
+                        )
+                    }
 
                 var showTransferDialog by remember { mutableStateOf(false) }
 
@@ -2129,6 +2128,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
                     call.onhold = true
                     call.referTo = uri
                     makeCall(ctx, viewModel, uri, false, call.callp)
+                    showCall(ctx, viewModel, ua, call)
                 }
             }
             else {
