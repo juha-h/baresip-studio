@@ -20,6 +20,8 @@ object Api {
 
     const val CALL_STATE_EARLY = 4
 
+    const val REPLACES = 1
+
     external fun account_set_display_name(acc: Long, dn: String): Int
     external fun account_display_name(acc: Long): String
     external fun account_aor(acc: Long): String

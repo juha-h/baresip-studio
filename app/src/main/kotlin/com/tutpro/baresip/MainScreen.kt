@@ -1579,7 +1579,7 @@ private fun CallRow(
                         enabled = call.transferButtonEnabled.value,
                         onClick = {
                             if (call.onHoldCall != null) {
-                                if (!Api.call_supported(call.callp, Call.REPLACES)) {
+                                if (!Api.call_supported(call.callp, API.REPLACES)) {
                                    alertTitle.value = ctx.getString(R.string.notice)
                                     alertMessage.value = ctx.getString(R.string.replaces_not_supported)
                                     showAlert.value = true

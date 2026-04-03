@@ -129,8 +129,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     companion object {
 
-        const val REPLACES = 1
-
         fun calls(): ArrayList<Call> {
             return BaresipService.calls
         }
