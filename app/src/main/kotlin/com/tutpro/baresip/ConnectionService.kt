@@ -58,13 +58,10 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
-            // Check speakerphone setting
             if (BaresipService.speakerPhone) {
                 @Suppress("DEPRECATION")
                 connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
             }
-
-            // Check for Auto-Answer
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering call $callp")
                 connection.onAnswer()
@@ -90,7 +87,6 @@ class ConnectionService : ConnectionService() {
         val rootExtras = request?.extras
         val nestedExtras = rootExtras?.getBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS)
 
-        // Try root extras first, then fallback to nested
         val uap = rootExtras?.getLong("uap", 0L).takeIf { it != 0L }
             ?: nestedExtras?.getLong("uap") ?: 0L
 
