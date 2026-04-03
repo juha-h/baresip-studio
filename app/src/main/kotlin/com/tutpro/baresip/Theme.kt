@@ -2,6 +2,9 @@ package com.tutpro.baresip
 
 import android.app.Activity
 import android.os.Build.VERSION
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -103,11 +106,26 @@ fun AppTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            val insetsController = WindowCompat.getInsetsController(window, view)
-            val isBackgroundEffectivelyLight = ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
-            insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
-            insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
+            val activity = view.context as? ComponentActivity
+            if (activity != null) {
+                activity.enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { isDark },
+                    navigationBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { isDark }
+                )
+            } else {
+                val window = (view.context as Activity).window
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                val isBackgroundEffectivelyLight =
+                    ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
+                insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
+                insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
+            }
         }
     }
 
