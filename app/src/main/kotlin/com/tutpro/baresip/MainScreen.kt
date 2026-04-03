@@ -1579,12 +1579,19 @@ private fun CallRow(
                         enabled = call.transferButtonEnabled.value,
                         onClick = {
                             if (call.onHoldCall != null) {
-                                val connection = ConnectionService.connections[call.callp]
-                                connection?.onHold()
-                                if (!call.executeTransfer()) {
-                                    alertTitle.value = ctx.getString(R.string.notice)
-                                    alertMessage.value = ctx.getString(R.string.transfer_failed)
+                                if (!Api.call_supported(call.callp, Call.REPLACES)) {
+                                   alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.replaces_not_supported)
                                     showAlert.value = true
+                                }
+                                else {
+                                    val connection = ConnectionService.connections[call.callp]
+                                    connection?.onHold()
+                                    if (!call.executeTransfer()) {
+                                        alertTitle.value = ctx.getString(R.string.notice)
+                                        alertMessage.value = ctx.getString(R.string.transfer_failed)
+                                        showAlert.value = true
+                                    }
                                 }
                             }
                             else

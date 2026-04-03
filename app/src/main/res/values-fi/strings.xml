@@ -521,6 +521,7 @@
     <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'\?</string>
     <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'\?</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
+    <string name="call_is_connected">Puhelu on yhdistetty</string>
     <string name="rec_in_call">Tallennus voidaan asettaa päälle tai pois vain silloin, kun puhelu
         ei ole yhdistetty</string>
     <string name="call_transfer">Puhelun siirto</string>
@@ -530,6 +531,7 @@
     <string name="choose_destination_uri">Valitse kohteen URI</string>
     <string name="transfer">Siirto</string>
     <string name="transfer_failed">Siirto epäonnistui</string>
+    <string name="replaces_not_supported">Toinen osapuoli ei tue REPLACES ominaisuutta</string>
     <string name="dtmf">DTMF</string>
     <string name="call_info">Puhelutiedot</string>
     <string name="call_info_not_available">Ei saatavilla</string>
