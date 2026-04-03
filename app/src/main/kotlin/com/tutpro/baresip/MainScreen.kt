@@ -1531,14 +1531,12 @@ private fun CallRow(
                                 "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
                             )
                             call.resume()
-                            call.onhold = false
                         } else {
                             Log.d(
                                 TAG,
                                 "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
                             )
                             call.hold()
-                            call.onhold = true
                         }
                     },
                 ) {
@@ -2157,6 +2155,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
                 if (call.hold()) {
                     call.referTo = uri
                     call(ctx, viewModel, ua, uri, false,call)
+                    showCall(ctx, viewModel, ua, call)
                 }
             }
             else {
