@@ -1557,7 +1557,6 @@ class BaresipService: Service() {
         } catch (e: Exception) {
             Log.e(TAG, "Error managing partialWakeLock: ${e.message}")
         }
-        updatePartialWakeLock()
     }
 
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
