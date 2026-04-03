@@ -41,6 +41,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.NavController
+import com.tutpro.baresip.Call.Companion.inCall
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -841,6 +842,12 @@ object Utils {
                         Configuration.UI_MODE_NIGHT_YES
     }
 
+    fun isPSTNCallActive(ctx: Context): Boolean {
+        // MODE_IN_CALL indicates a PSTN call is active
+        val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return am.mode == AudioManager.MODE_IN_CALL
+    }
+
     fun relativeTime(ctx: Context, time: GregorianCalendar): String {
         return if (DateUtils.isToday(time.timeInMillis)) {
             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
@@ -857,14 +864,6 @@ object Utils {
                 "$month $day" + "\n" + time.get(Calendar.YEAR)
             }
         }
-    }
-
-    fun isSpeakerPhoneOn(am: AudioManager): Boolean {
-        return if (Build.VERSION.SDK_INT >= 31)
-             am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-        else
-            @Suppress("DEPRECATION")
-            am.isSpeakerphoneOn
     }
 
     private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
@@ -895,7 +894,7 @@ object Utils {
                     Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
-                    if (BaresipService.audioFocusRequest != null && am.mode == AudioManager.MODE_NORMAL) {
+                    if (inCall() && am.mode == AudioManager.MODE_NORMAL) {
                         Log.d(TAG, "Setting mode to communication")
                         am.mode = AudioManager.MODE_IN_COMMUNICATION
                     }
@@ -943,18 +942,6 @@ object Utils {
             @Suppress("DEPRECATION")
             setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    fun setCommunicationDevice(am: AudioManager, type: Int) {
-        val current = am.communicationDevice!!.type
-        Log.d(TAG, "Current com dev/mode $current/${am.mode}")
-        for (device in am.availableCommunicationDevices)
-            if (device.type == type) {
-                am.setCommunicationDevice(device)
-                break
-            }
-        Log.d(TAG, "New com dev/mode ${am.communicationDevice!!.type}/${am.mode}")
     }
 
     private fun clearCommunicationDevice(am: AudioManager) {

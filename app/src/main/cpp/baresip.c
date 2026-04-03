@@ -1414,6 +1414,14 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_Api_call_1ismuted(
     return audio_ismuted(call_audio((struct call *)call));
 }
 
+JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_Api_call_1supported(
+        JNIEnv *env, jobject obj, jlong call, jint tags)
+{
+    (void)env;
+    (void)obj;
+    return call_supported((struct call *)call, tags);
+}
+
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_call_1transfer(
         JNIEnv *env, jobject obj, jlong call, jstring jPeer)
 {
