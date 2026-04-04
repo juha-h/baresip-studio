@@ -201,19 +201,27 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onHold() {
-            Log.d(TAG, "Telecom Connection onHold $callp")
-            val c = Call.ofCallp(callp)
-            if (c?.conferenceCall != true)
-                c?.hold()
-            setOnHold()
+            super.onHold()
+            Log.d(TAG, "Telecom requested Hold for $callp")
+            val call = BaresipService.calls.find { it.callp == this.callp }
+            if (call != null && !call.onhold && !call.conferenceCall) {
+                call.onhold = true
+                Api.call_hold(call.callp, true)
+            }
         }
 
         override fun onUnhold() {
             Log.d(TAG, "Telecom Connection onUnhold $callp")
-            val c = Call.ofCallp(callp)
-            if (c?.conferenceCall != true)
-                c?.resume()
-            setActive()
+            val call = BaresipService.calls.find { it.callp == this.callp }
+            if (call != null) {
+                if (!call.conferenceCall) {
+                    call.onhold = false
+                    call.callOnHold.value = false
+                    call.showOnHoldNotice.value = false
+                    Api.call_hold(call.callp, false)
+                }
+                setActive()
+            }
         }
 
         override fun onPlayDtmfTone(c: Char) {

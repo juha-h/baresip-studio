@@ -851,10 +851,8 @@ class BaresipService: Service() {
                     "call incoming" -> {
                         val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
-
                         if (Call.ofCallp(callp) == null)
                             Call(callp, ua, peerUri, "in", "incoming").add()
-
                         val extras = android.os.Bundle()
                         extras.putLong("uap", uap)
                         extras.putLong("callp", callp)
@@ -888,13 +886,38 @@ class BaresipService: Service() {
                             return
                     }
                     "call update" -> {
-                        val held = when (ev[1].toInt()) {
+                        val newHeldState = when (ev[1].toInt()) {
                             Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
                             else -> false
                         }
-                        call!!.held = held
+
                         val connection = ConnectionService.connections[callp]
-                        if (held) connection?.setOnHold() else connection?.setActive()
+
+                        if (call!!.held && !newHeldState) {
+                            Log.d(TAG, "Call ${call.callp} un-held by peer. Requesting Telecom Active.")
+                            // Clear local UI state
+                            call.onhold = false
+                            call.callOnHold.value = false
+                            call.showOnHoldNotice.value = false
+
+                            // Tell Android to make this call active.
+                            // Telecom will automatically trigger onHold for other connections.
+                            connection?.setActive()
+                        }
+
+                        call.held = newHeldState
+
+                        if (newHeldState) {
+                            connection?.setOnHold()
+                            call.callOnHold.value = true
+                            call.showOnHoldNotice.value = true
+                        } else if (!call.onhold) {
+                            // Only set active if we haven't manually put it on hold ourselves
+                            call.callOnHold.value = false
+                            call.showOnHoldNotice.value = false
+                            connection?.setActive()
+                        }
+
                         if (call.state() == Api.CALL_STATE_EARLY) {
                             if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                                 stopMediaPlayer()

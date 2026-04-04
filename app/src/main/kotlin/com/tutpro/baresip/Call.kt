@@ -5,6 +5,7 @@ import android.media.AudioManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import java.util.*
 
 class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
@@ -57,20 +58,43 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     }
 
     fun hold(): Boolean {
-        if (Api.call_hold(callp, true) == 0)
+        if (onhold) return true
+        val connection = ConnectionService.connections[callp]
+        if (connection != null) {
+            connection.setOnHold()
+            return true
+        }
+        // Fallback if no Telecom connection exists
+        if (Api.call_hold(callp, true)) {
             onhold = true
+            callOnHold.value = true
+            showOnHoldNotice.value = true
+        }
         return onhold
     }
 
     fun resume(): Boolean {
-        if (Api.call_hold(callp, false) == 0)
+        if (!onhold) return true
+        val connection = ConnectionService.connections[callp]
+        if (connection != null) {
+            connection.setAddress(
+                "sip:$peerUri".toUri(),
+                android.telecom.TelecomManager.PRESENTATION_ALLOWED
+            )
+            connection.setActive()
+            return true
+        }
+        // Fallback if no Telecom connection exists
+        if (Api.call_hold(callp, false)) {
             onhold = false
+            callOnHold.value = false
+            showOnHoldNotice.value = false
+        }
         return !onhold
     }
 
     fun transfer(uri: String): Boolean {
-        val err = Api.call_hold(callp, true)
-        if (err != 0)
+        if (!Api.call_hold(callp, true))
             return false
         onhold = true
         referTo = uri
@@ -79,7 +103,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     fun executeTransfer(): Boolean {
         return if (onHoldCall != null) {
-            if (Api.call_hold(callp, true) == 0)
+            if (Api.call_hold(callp, true))
                 Api.call_replace_transfer(onHoldCall!!.callp, callp)
             else
                 false

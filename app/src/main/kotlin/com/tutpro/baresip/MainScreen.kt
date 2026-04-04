@@ -108,6 +108,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -649,7 +650,8 @@ private fun TopAppBar(
                             val aor = viewModel.selectedAor.value
                             val ua = uas.value.find { it.account.aor == aor }
                             val call = ua?.currentCall()
-                            val connection = if (call != null) ConnectionService.connections[call.callp] else null
+                            val connection =
+                                if (call != null) ConnectionService.connections[call.callp] else null
                             if (connection != null) {
                                 @Suppress("DEPRECATION")
                                 connection.setAudioRoute(
@@ -892,9 +894,9 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
 
     val calls by viewModel.calls.collectAsState()
     val selectedAor by viewModel.selectedAor.collectAsState()
-    val filteredCalls = calls.filter { it.ua.account.aor == selectedAor && it.status.value != "disconnecting" }
-    val dialingOrRinging = filteredCalls.any { it.status.value == "outgoing" || it.status.value == "incoming" }
-    val conferenceCall = filteredCalls.any { it.conferenceCall }
+    val aorCalls = calls.filter { it.ua.account.aor == selectedAor }
+    val hasActiveCalls = aorCalls.any { !it.callOnHold.value }
+    val conferenceCall = aorCalls.any { it.conferenceCall }
 
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
@@ -997,12 +999,13 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
     ) {
         AccountSpinner(ctx, viewModel, navController)
 
-        filteredCalls.forEach { call ->
-            CallCard(ctx = ctx, viewModel = viewModel, call = call, dialerState = null)
+        aorCalls.forEach { call ->
+            key(call.callp) {
+                CallCard(ctx = ctx, viewModel = viewModel, call = call, dialerState = null)
+            }
         }
 
-        // Only show the dialer if we are not in a transient state
-        if (!dialingOrRinging && (filteredCalls.isEmpty() || conferenceCall))
+        if (!hasActiveCalls || conferenceCall)
             CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
 
         Indicator(
@@ -1539,7 +1542,7 @@ private fun CallRow(
                         modifier = Modifier.size(48.dp),
                         onClick = {
                             val connection = ConnectionService.connections[call.callp]
-                            if (call.onhold) {
+                            if (call.callOnHold.value) {
                                 if (!Call.isAnyCallActive(ctx)) {
                                     Log.d(
                                         TAG,
@@ -1549,6 +1552,7 @@ private fun CallRow(
                                         connection.onUnhold()
                                     else
                                         call.resume()
+                                    call.callOnHold.value = false
                                 }
                             }
                             else {
@@ -1560,6 +1564,7 @@ private fun CallRow(
                                     connection.onHold()
                                 else
                                     call.hold()
+                                call.callOnHold.value = true
                             }
                         },
                     ) {
@@ -1728,8 +1733,10 @@ private fun CallRow(
                                                             modifier = Modifier
                                                                 .fillMaxWidth()
                                                                 .clickable {
-                                                                    transferUri = suggestion.toString()
-                                                                    call.showSuggestions.value = false
+                                                                    transferUri =
+                                                                        suggestion.toString()
+                                                                    call.showSuggestions.value =
+                                                                        false
                                                                 }
                                                                 .padding(12.dp)
                                                         ) {

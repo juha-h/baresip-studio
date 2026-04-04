@@ -90,7 +90,7 @@ object Api {
     external fun bevent_stop(event: Long)
 
     external fun call_connect(callp: Long, peer_uri: String): Int
-    external fun call_hold(callp: Long, hold: Boolean): Int
+    external fun call_hold(callp: Long, hold: Boolean): Boolean
     @Suppress("unused")
     external fun call_ismuted(callp: Long): Boolean
     external fun call_transfer(callp: Long, peer_uri: String): Int

@@ -1384,7 +1384,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_call_1start_1audio(
     re_thread_leave();
 }
 
-JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_call_1hold(
+JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_Api_call_1hold(
         JNIEnv *env, jobject obj, jlong call, jboolean hold)
 {
     (void)env;
@@ -1403,7 +1403,7 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_call_1hold(
     }
     if (err)
         LOGW("call_hold error: %d\n", err);
-    return err;
+    return err == 0;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_Api_call_1ismuted(
