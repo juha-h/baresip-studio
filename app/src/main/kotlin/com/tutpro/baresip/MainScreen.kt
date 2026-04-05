@@ -1538,33 +1538,14 @@ private fun CallRow(
                 }
 
                 if (!call.conferenceCall)
-                    IconButton(
-                        modifier = Modifier.size(48.dp),
+                    IconButton(    modifier = Modifier.size(48.dp),
                         onClick = {
-                            val connection = ConnectionService.connections[call.callp]
                             if (call.callOnHold.value) {
-                                if (!Call.isAnyCallActive(ctx)) {
-                                    Log.d(
-                                        TAG,
-                                        "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
-                                    )
-                                    if (connection != null)
-                                        connection.onUnhold()
-                                    else
-                                        call.resume()
-                                    call.callOnHold.value = false
-                                }
-                            }
-                            else {
-                                Log.d(
-                                    TAG,
-                                    "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
-                                )
-                                if (connection != null)
-                                    connection.onHold()
-                                else
-                                    call.hold()
-                                call.callOnHold.value = true
+                                Log.d(TAG, "User requested resume for ${call.callp}")
+                                call.resume() // This now automatically holds other calls
+                            } else {
+                                Log.d(TAG, "User requested hold for ${call.callp}")
+                                call.hold()
                             }
                         },
                     ) {

@@ -59,38 +59,43 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     fun hold(): Boolean {
         if (onhold) return true
-        val connection = ConnectionService.connections[callp]
-        if (connection != null) {
-            connection.setOnHold()
-            return true
-        }
-        // Fallback if no Telecom connection exists
         if (Api.call_hold(callp, true)) {
             onhold = true
             callOnHold.value = true
-            showOnHoldNotice.value = true
+            // Fix: Do NOT set showOnHoldNotice to true here.
+            // That notice is for when the PEER holds us.
+            showOnHoldNotice.value = false
+            ConnectionService.connections[callp]?.setOnHold()
+            return true
         }
-        return onhold
+        return false
     }
 
     fun resume(): Boolean {
-        if (!onhold) return true
-        val connection = ConnectionService.connections[callp]
-        if (connection != null) {
-            connection.setAddress(
-                "sip:$peerUri".toUri(),
-                android.telecom.TelecomManager.PRESENTATION_ALLOWED
-            )
-            connection.setActive()
-            return true
+        if (!onhold && !held) return true
+
+        // 1. Hold other calls first
+        for (c in BaresipService.calls) {
+            if (c.callp != this.callp && !c.onhold && !c.held) {
+                Log.d("Baresip", "Auto-holding active call ${c.callp}")
+                c.hold()
+            }
         }
-        // Fallback if no Telecom connection exists
+
+        val connection = ConnectionService.connections[callp]
+
+        // 2. SIP Signaling
         if (Api.call_hold(callp, false)) {
             onhold = false
             callOnHold.value = false
             showOnHoldNotice.value = false
+
+            // 3. Telecom Sync
+            connection?.setAddress("sip:$peerUri".toUri(), android.telecom.TelecomManager.PRESENTATION_ALLOWED)
+            connection?.setActive()
+            return true
         }
-        return !onhold
+        return false
     }
 
     fun transfer(uri: String): Boolean {

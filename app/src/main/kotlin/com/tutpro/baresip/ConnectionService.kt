@@ -201,26 +201,40 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onHold() {
-            super.onHold()
-            Log.d(TAG, "Telecom requested Hold for $callp")
-            val call = BaresipService.calls.find { it.callp == this.callp }
-            if (call != null && !call.onhold && !call.conferenceCall) {
-                call.onhold = true
-                Api.call_hold(call.callp, true)
+            // Do NOT call super.onHold() first, as it might change internal state
+            // before we can grab the call object.
+            Log.d(TAG, "Telecom Connection onHold $callp")
+            val call = Call.ofCallp(callp)
+            if (call != null && !call.conferenceCall) {
+                // 1. Force SIP Signaling
+                if (Api.call_hold(call.callp, true)) {
+                    // 2. Sync Call object state
+                    call.onhold = true
+                    call.callOnHold.value = true
+                    call.showOnHoldNotice.value = true
+                    // 3. Tell Telecom the move is complete
+                    setOnHold()
+                } else {
+                    Log.e(TAG, "SIP Hold failed for $callp")
+                }
             }
         }
 
         override fun onUnhold() {
             Log.d(TAG, "Telecom Connection onUnhold $callp")
-            val call = BaresipService.calls.find { it.callp == this.callp }
-            if (call != null) {
-                if (!call.conferenceCall) {
+            val call = Call.ofCallp(callp)
+            if (call != null && !call.conferenceCall) {
+                // 1. Force SIP Signaling
+                if (Api.call_hold(call.callp, false)) {
+                    // 2. Sync Call object state
                     call.onhold = false
                     call.callOnHold.value = false
                     call.showOnHoldNotice.value = false
-                    Api.call_hold(call.callp, false)
+                    // 3. Tell Telecom we are active
+                    setActive()
+                } else {
+                    Log.e(TAG, "SIP Resume failed for $callp")
                 }
-                setActive()
             }
         }
 

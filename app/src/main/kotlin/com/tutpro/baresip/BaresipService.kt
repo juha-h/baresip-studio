@@ -886,36 +886,45 @@ class BaresipService: Service() {
                             return
                     }
                     "call update" -> {
-                        val newHeldState = when (ev[1].toInt()) {
-                            Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
+                        val newHeldState = when (ev[1].toInt()) {Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
                             else -> false
                         }
 
                         val connection = ConnectionService.connections[callp]
 
+                        // Handle Remote Un-hold
                         if (call!!.held && !newHeldState) {
-                            Log.d(TAG, "Call ${call.callp} un-held by peer. Requesting Telecom Active.")
-                            // Clear local UI state
-                            call.onhold = false
-                            call.callOnHold.value = false
-                            call.showOnHoldNotice.value = false
+                            Log.d(TAG, "Call ${call.callp} un-held by peer.")
 
-                            // Tell Android to make this call active.
-                            // Telecom will automatically trigger onHold for other connections.
-                            connection?.setActive()
+                            // Clear our local manual hold flag so resume() can execute
+                            call.onhold = false
+
+                            // We use a Coroutine with a small delay to let the SIP
+                            // transaction (the re-INVITE from the peer) finish
+                            // before we try to hold the other call and resume this one.
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(100)
+                                call.resume()
+                            }
                         }
 
                         call.held = newHeldState
 
                         if (newHeldState) {
-                            connection?.setOnHold()
-                            call.callOnHold.value = true
+                            // Peer put us on hold
                             call.showOnHoldNotice.value = true
-                        } else if (!call.onhold) {
-                            // Only set active if we haven't manually put it on hold ourselves
-                            call.callOnHold.value = false
+                            call.callOnHold.value = true
+                            connection?.setOnHold()
+                        } else {
+                            // Peer un-held us
                             call.showOnHoldNotice.value = false
-                            connection?.setActive()
+
+                            // Only clear the UI if we aren't also manually holding it
+                            // (If we just called call.resume() above, it will handle this)
+                            if (!call.onhold) {
+                                call.callOnHold.value = false
+                                connection?.setActive()
+                            }
                         }
 
                         if (call.state() == Api.CALL_STATE_EARLY) {
@@ -924,6 +933,15 @@ class BaresipService: Service() {
                             else {
                                 ConnectionService.connections[callp]?.setRinging()
                                 playRingBack()
+                            }
+                        }
+
+                        if (call.status.value == "connected" && !call.held && !call.onhold) {
+                            if (call.callOnHold.value || call.showOnHoldNotice.value) {
+                                Log.d(TAG, "Safety guard: Clearing stuck hold flags for ${call.callp}")
+                                call.callOnHold.value = false
+                                call.showOnHoldNotice.value = false
+                                connection?.setActive()
                             }
                         }
                         if (!isMainVisible || call.status.value != "connected")
