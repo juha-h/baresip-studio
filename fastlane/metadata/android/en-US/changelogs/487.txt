@@ -1,0 +1,7 @@
+- Baresip app is now integrated with Android Telecom Framework
+- Added support for multiple simultaneous calls (only one can be active)
+- Acquire partial wake lock only if there is active registrations or calls
+- Acquire WiFi lock also when WiFi is available but not actively used
+- Always resume to active call on main screen if there is one
+- In attended call transfer, check if peer supports REPLACES header
+- Print network debug only if there was a change
