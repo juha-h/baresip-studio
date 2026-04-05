@@ -3,40 +3,51 @@
     <!-- About Activity -->
     <string name="about_title">Acerca de Baresip</string>
     <string name="about_text"><![CDATA[
-        <h1> Agente de usuario SIP basado en la biblioteca Baresip </h1>
-        <p> Juha Heinanen < jh@tutpro.com > </p>
+        <h1> Agente de Usuario SIP basado en la biblioteca <a href="https://github.com/baresip/baresip">baresip</a> </h1>
+        <br>
+        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>
         <p> Versión %1$s </p>
+         <br>
         <h2> Consejos de uso </h2>
         <ul>
             <li> Compruebe que los valores predeterminados en la configuración de baresip se ajusten a sus necesidades
                 (toque los títulos de los elementos para obtener ayuda). </li>
             <li> Luego, en Cuentas, crea una o más cuentas (nuevamente toca los títulos de los elementos para obtener ayuda). </li>
-            <li> El estado de registro de una cuenta se muestra con un punto de color: verde (registro
-                exitoso), amarillo (el registro está en proceso), rojo (el registro falló), blanco (el registro está en progreso).
+            <li> El estado de registro de una cuenta se muestra con un punto de color: verde (registro logrado),
+                amarillo (el registro está en proceso), rojo (el registro falló), blanco (el registro está en progreso)
                 no ha sido activado). </li>
-            <li> Al tocar el punto se accede directamente a la configuración de la cuenta. </li>
+            <li> Al tocar el punto de estado se accede directamente a la configuración de la cuenta. </li>
+            <li> Mantén pulsado un icono de la barra de baresip para ver información sobre dicho icono.</li>
             <li> El gesto de deslizar hacia abajo provoca el nuevo registro de la cuenta mostrada actualmente. </li>
             <li> Al mantener pulsada la cuenta que se muestra actualmente, se habilita o deshabilita el registro de la cuenta. </li>
             <li> El gesto de deslizar hacia la izquierda o hacia la derecha alterna entre las cuentas. </li>
-            <li> Se puede volver a seleccionar la persona que llamó anteriormente tocando el ícono de llamada cuando el destinatario esté vacío. </li>
+            <li> Se puede volver a seleccionar la persona con la que se llamó anteriormente tocando el icono de llamada cuando el campo "Destinatario" esté vacío.</li>
+            <li> El gesto de deslizar hacia la izquierda o hacia la derecha permite alternar entre las cuentas.</li></li>
             <li> Los pares de llamadas y mensajes se pueden agregar a los contactos mediante toques prolongados. </li>
             <li> Los toques prolongados también se pueden utilizar para eliminar llamadas, chats, mensajes y contactos. </li>
-            <li> Se puede utilizar el toque o toque prolongado del ícono de contacto para instalar o eliminar la imagen del avatar. </li>
-            <li> Consulte <a href="https://github.com/juha-h/baresip-studio/wiki"> Wiki </a> para obtener más información.
-                información. </li>
+            <li> Se puede utilizar el toque o toque prolongado del icono de contacto para instalar o desinstalar la imagen del avatar. </li>
+            <li>Mantener pulsado un códec de audio permite activarlo o desactivarlo.</li>
+            <li> Consulte <a href="https://github.com/juha-h/baresip-studio/wiki"> Wiki </a> para obtener más información.</li>
         </ul>
         <h2> Política de privacidad </h2>
-            La política de privacidad está disponible <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt"> aquí </a> .
-        <h2> Código fuente </h2>
-            El código fuente está disponible en <a href="https://github.com/juha-h/baresip-studio"> GitHub </a> ,
-            donde también se pueden reportar problemas.
+            <p>La política de privacidad está disponible <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">aquí </a> .</p>
+        <br>
+        <h2> Código Fuente</h2>
+            <p>El código fuente está disponible en <a href="https://github.com/juha-h/baresip-studio"> GitHub </a> ,
+            donde también se pueden reportar problemas.</p>
+          <br>
+        <h2>Traducciones de Idioma</h2>
+            <p>Las traducciones de idioma son gestionadas por baresip en el proyecto
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>.</p>
+        <br>
         <h2> Licencias </h2>
         <ul>
             <li> <b> Cláusula BSD-3 </b> excepto lo siguiente: </li>
-            <li> <b> Códecs AMR y seguridad TLS de Apache 2.0 </b>
+            <li> <b> Codecs AMR y seguridad TLS de Apache 2.0 </b>
             <li> <b> AGPLv4 </b> Cifrado de medios ZRTP </li>
-            <li> <b> GNU LGPL 2.1 </b> Códecs G.722, G.726 y Codec2 </li>
-            <li> <b> GNU GPLv3 </b> Códec G.729 </li>
+            <li> <b> GNU LGPL 2.1</b> codec Codec2</li>
+            <li> <b> Libre</b> G.722 codec</li>
+            <li> <b> GNU GPLv3 </b> Codec G.729 </li>
         </ul>
         ]]></string>
     <!-- Account Activity -->
@@ -125,14 +136,9 @@
     <!-- Config Activity -->
     <string name="configuration">Configuración</string>
     <string name="start_automatically">Comenzar automáticamente</string>
-    <string name="start_automatically_help">Si está marcado, baresip se inicia automáticamente después de que el dispositivo se (re)inicia.</string>
+    <string name="start_automatically_help">Si está marcado, baresip se inicia automáticamente tras arrancar el dispositivo o tras estár instalada una versión nueva de baresip. El inicio está retardado hasta que el dispositivo sea desbloqueado.</string>
     <string name="listen_address">Dirección de escucha</string>
-    <string name="listen_address_help">Dirección IP y puerto de formulario \'address:port\' en el que escucha baresip
-        para solicitudes SIP entrantes. Si la dirección IP es una dirección IPv6, debe escribirse dentro
-        soportes []. La dirección IPv4 0.0.0.0 o la dirección IPv6 [::] hace que la escucha de baresip sea
-        Direcciones disponibles. Si se deja vacío (predeterminado de fábrica), baresip escucha en el puerto 5060 de
-        todas las direcciones disponibles.
-    </string>
+    <string name="listen_address_help">Dirección IP y puerto de formulario \'address:port\' en el que escucha baresip para solicitudes SIP entrantes. Si la dirección IP es una dirección IPv6, debe escribirse dentro soportes []. La dirección IPv4 0.0.0.0 o la dirección IPv6 [::] hace que la escucha de baresip sea Direcciones disponibles. Si se deja vacío (predeterminado de fábrica), baresip escucha en un puerto aleatorio en todas las direcciones disponibles.</string>
     <string name="invalid_listen_address">Dirección de escucha no válida</string>
     <string name="dns_servers">Servidores DNS</string>
     <string name="dns_servers_help">Lista separada por comas de direcciones de servidores DNS. Si no se da,
@@ -223,7 +229,7 @@
     <string name="call_is_secure">¡Esta llamada es SEGURA y el compañero está VERIFICADO!
         ¿Quieres desverificar al compañero?</string>
     <string name="unverify">No verificar</string>
-    <string name="backed_up">Los datos de la aplicación han sido respaldados en el archivo \'%1$s\'. En las versión de Android 9, el archivo está en la carpeta Download.</string>
+    <string name="backed_up">Los datos de la aplicación (excluyendo grabaciones) respaldados en el archivo \'%1$s\'. En las versión de Android 9, el archivo está en la carpeta Download.</string>
     <string name="backup_failed">Ha fallado la copia de seguridad de los datos de la aplicación en el archivo \'%1$s\'. Compruebe Apps → baresip → Permisos → Almacenamiento.</string>
     <string name="restored">Se restauraron los datos de la aplicación. Baresip necesita reiniciarse. ¿Quiere reiniciar ahora\?</string>
     <string name="restore_failed">No se han podido restaurar los datos de la aplicación. Compruebe que ha dado la contraseña correcta y que el archivo de copia de seguridad es de esta aplicación. En las versión de Android 9, compruebe también Aplicaciones → baresip → Permisos → Almacenamiento y que el archivo \'%1$s\' existe en la carpeta Download.</string>
@@ -234,7 +240,7 @@
     <string name="no_calls">baresip necesita permiso de \"Micrófono\" para las llamadas de voz.</string>
     <string name="invalid_authentication_password">Contraseña incorrecta%1$s</string>
     <string name="invalid_authentication_username">Nombre de usuario no válido \'%1$s\'</string>
-    <string name="no_cameras">No tiene ninguna cámara de video compatible.</string>
+    <string name="no_cameras">¡No admite cámaras de vídeo!</string>
     <string name="no_video_calls">Concede permiso a \"Cámara\" para realizar o responder videollamadas.</string>
     <string name="restart_request">Solicitud de reinicio</string>
     <string name="call_info_not_available">No hay información disponible</string>
@@ -261,8 +267,8 @@
     <string name="verify_server">Verificar los certificados del servidor</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>
     <string name="missed_call_from">Llamada perdida de</string>
-    <string name="accounts_help">Cuando se crea una nueva cuenta, el número de puerto de la cuenta y el protocolo de transporte pueden ser dados opcionalmente: &lt;usuario&gt;@&lt;dominio&gt;[:&lt;puerto&gt;][;transporte=udp|tcp|tls]. Si se indica &lt;puerto&gt; y no se indica el protocolo de transporte, el protocolo de transporte será por defecto udp. Si no se da &lt;puerto&gt; y se da el protocolo de transporte, &lt;puerto&gt; es por defecto 5060 o 5061 (TLS). Si no se indica ninguno de los dos y no se especifica ningún proxy de salida, el registrador de la cuenta (si lo hay) se determina únicamente a partir de la información DNS del dominio.</string>
-    <string name="new_account">Nueva cuenta</string>
+    <string name="accounts_help">URL SIP de cuenta nueva de formulario &lt;usuario&gt;@&lt;dominio&gt;[:&lt;puerto&gt;][;transport=udp|tcp|tls]. Si se indica &lt;puerto&gt; y no se indica el protocolo de transporte, el protocolo de transporte será por defecto udp. Si no se da &lt;puerto&gt; y se da el protocolo de transporte, &lt;puerto&gt; es por defecto 5060 o 5061 (TLS). Si no se indica ninguno de los dos y no se especifica ningún proxy de salida, el registrador de la cuenta (si lo hay) se determina únicamente a partir de la información DNS del dominio.</string>
+    <string name="new_account">URI SIP de cuenta nueva</string>
     <string name="dtmf_info">Solicitudes SIP INFO</string>
     <string name="dtmf_inband">Eventos RTP en banda</string>
     <string name="dtmf_mode_help">Selecciona cómo se envían los tonos DTMF 0-9, #, * y A-D.</string>
@@ -293,16 +299,16 @@
 <li>Deslizar el dedo hacia abajo provoca que la cuenta mostrada actualmente vuelva a registrarse. </li>
 <li>El toque largo en la cuenta mostrada actualmente activa o desactiva el registro de la cuenta. </li>
 <li>El gesto de deslizar hacia la izquierda/derecha alterna entre las cuentas. </li>
-<li>La llamada anterior puede ser reseleccionada tocando el icono de llamada cuando Callee está vacío. </li>
+<li>La llamada anterior puede ser re‐seleccionada tocando el icono de llamada cuando Callee está vacío. </li>
 <li>Los pares de llamadas y mensajes se pueden agregar a contactos con toques largos. </li>
-<li>Los toques largos también se pueden usar para eliminar llamadas, chats, mensajes y contactos. </li>
+<li>Los toques, toques largos también se pueden usar para eliminar llamadas, chats, mensajes y contactos. </li>
 <li>El icono de contacto puede utilizarse para instalar/eliminar el avatar de la imagen. </li>
 <li>Ver <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para más información
 información. </li>
 </ul>
 <h2>Problemas conocidos</h2>
 <ul>
-<li>En las videollamadas, el dispositivo debe mantenerse en horizontal
+<li>En las video‐llamadas, el dispositivo debe mantenerse en horizontal
 modo girado 90 grados a la izquierda de la orientación vertical. </li>
 <li>La vista de usuario no se muestra correctamente cuando se transmite vídeo. </li>
 </ul>
@@ -324,7 +330,7 @@ También se pueden comunicar problemas.
 ]]></string>
     <string name="about_title_plus">Acerca de baresip+</string>
     <string name="reg_int">Intervalo de inscripción</string>
-    <string name="invalid_reg_int">Intervalo de registro no válido\'%1$s\'</string>
+    <string name="invalid_reg_int">Intervalo de registro no válido \'%1$s\'</string>
     <string name="rtcp_mux">Multiplexación RTCP</string>
     <string name="country_code">Código del país</string>
     <string name="reg_int_help">Indica la frecuencia (en segundos) con la que baresip envía peticiones REGISTRO. Los valores válidos van de 60 a 3600.</string>
@@ -365,7 +371,7 @@ También se pueden comunicar problemas.
     <string name="unknown">Desconocido</string>
     <string name="invalid_sip_or_tel_uri">URI del teléfono o SIP no válido \'%1$s\'</string>
     <string name="packets">Paquetes</string>
-    <string name="audio_permissions">baresip necesita el permiso \"Micrófono\" para las llamadas de voz, el permiso \"Dispositivos cercanos\" para la detección de micrófonos/altavoces Bluetooth y el permiso \"Notificaciones\" para la publicación de notificaciones.</string>
+    <string name="audio_permissions">baresip necesita el permiso «Micrófono» para las llamadas de voz, el permiso «Dispositivos cercanos» para la detección de micrófonos/altavoces Bluetooth, el permiso «Notificaciones» para publicar notificaciones, y permisos de «Almacén» en Android 9 para operaciones de Respaldo/Restauración.</string>
     <string name="missed_calls">Llamadas perdidas</string>
     <string name="country_code_help">Código de país E.164 de esta cuenta. Si la parte de usuario From URI de la llamada entrante o del mensaje contiene un número de teléfono que no empieza por el signo \"+\" y si falla la búsqueda de contacto, se antepone al número este prefijo de país y se vuelve a intentar la búsqueda de contacto. Si el número de teléfono comienza con un solo dígito \"0\", el dígito \"0\" se elimina antes de anteponer el prefijo al número.</string>
     <string name="time">Tiempo</string>
@@ -413,4 +419,55 @@ También se pueden comunicar problemas.
     <string name="microphone_gain_help">Multiplica el volumen del micrófono por este número decimal. El valor mínimo es 1.0 (predeterminado de fábrica) que desactiva la ganancia del micrófono. Los valores más altos pueden afectar negativamente a la calidad del audio.</string>
     <string name="microphone_gain">Ganancia del micrófono</string>
     <string name="invalid_microphone_gain">Valor de ganancia de micrófono no válido</string>
+    <string name="check_origin">Comprobar origen</string>
+    <string name="check_origin_help">Si está marcado, las solicitudes entrantes solo están concedidas desde las direcciones IP donde el registro solicita fue enviado.</string>
+    <string name="block_unknown">Bloque Desconocido</string>
+    <string name="block_unknown_help">Llamadas y mensajes de bloque desde parejas que no son encontradas en contactos.</string>
+    <string name="numeric_keypad">Teclado Numérico</string>"
+    <string name="numeric_keypad_help">Si se marcó, el teclado numérico se muestra cuando el campo «Llamada a …» es enfocada.</string>"
+    <string name="is_calling">está llamando</string>
+    <string name="call_blocked">Auto‐rechazar llamadas bloqueadas desde %1$s</string>
+    <string name="message_blocked">Auto‐rechazar mensaje bloqueado desde %1$s</string>
+    <string name="blocked">Bloqueado</string>
+    <string name="blocked_calls">Llamadas Bloqueadas</string>
+    <string name="blocked_messages">Mensajes Bloqueados</string>
+    <string name="blocked_delete_alert">¿Desea borrar solicitudes bloqueadas de «%1$s»?</string>
+    <string name="blocked_contact_question">¿Desea añadir pareja «%1$s» a contactos?</string>
+    <string name="call_answered">Llamada respondida</string>
+    <string name="call_answered_elsewhere">Llamada respondida donde sea</string>
+    <string name="call_missed">Llamada perdida</string>
+    <string name="call_rejected">Llamada rechazada</string>
+    <string name="playing_recording">Reproduce registro …</string>
+    <string name="save_recording">Guardar Registro</string>
+    <string name="save_recording_question">¿Desea guardar esta grabación?</string>
+    <string name="recording_saved">Grabación guardada</string>
+    <string name="delete_call_alert">¿Desea eliminar esta llamada desde el historial?</string>
+    <string name="transport_protocols">Protocolos de transporte</string>
+    <string name="transport_protocols_help">Lista separada por comas de los protocolos de transporte de solicitud/respuesta SIP compatibles. Si se deja vacía, el valor predeterminado es \'udp,tcp,tls,ws,wss\', que incluye todos los protocolos de transporte compatibles. Incluya solo los que necesite. No se recomienda el uso de UDP por motivos de seguridad y otros.</string>
+    <string name="invalid_transport_protocols">Listado no válidos del Protocolos de Transporte</string>
+    <string name="no_read_permission">Sin permiso de lectura en Almacén Externo</string>
+    <string name="unique_contact_uri">URI de Contacto único</string>
+    <string name="unique_contact_uri_help">Si está marcado, está garantizada la URI de contacto para ser única. Necesita ser comprobado si hay más que una cuenta con el mismo URI SIP como parte de usuario, pero además mejora la protección de las cuentas desde ataques.</string>
+    <string name="dynamic_colors">Colores dinámicos</string>
+    <string name="dynamic_colors_help">Utilice colores dinámicos si habilitó un Ajuste de Androin</string>
+    <string name="colorblind">Daltonía</string>
+    <string name="colorblind_help">Utilizar registro amigable de estado de iconos para daltónicos</string>
+    <string name="proximity_sensing">Detección de proximidad</string>"&gt;
+    <string name="proximity_sensing_help">Si está marcada, la detección de proximidad estará activa durante las llamadas.</string>
+    <string name="ringtone">Tono de llamada</string>
+    <string name="select_ringtone">Seleccionar tono de llamada</string>
+    <string name="favorite_help">Si está marcada, se muestra el contacto entre otros favoritos en la cima del listado de contactos.</string>
+    <string name="search">Búsqueda</string>
+    <string name="stop">Detener</string>
+    <string name="reply">Responder</string>
+    <string name="save">Guardar</string>
+    <string name="call_is_connected">Llamada conectada</string>
+    <string name="replaces_not_supported">Pareja no admite característica REPLACES</string>
+    <string name="no_aec">¡Sin Cancelación de Eco Acústico por hardware!</string>
+    <string name="call_recording_title">Grabación de Llamada</string>
+    <string name="call_recording_tip">Si está activado, las llamadas entrantes y salientes serán grabadas. Las grabaciones pueden ser reproducidas en la página Detalles de Llamada.</string>
+    <string name="microphone_title">Micrófono</string>
+    <string name="microphone_tip">Si está activado durante la llamada, el micrófono está enmudecido.</string>
+    <string name="speakerphone_title">Altavoz</string>
+    <string name="speakerphone_tip">Si está activado, el sonido es reproducido por medio de dispositivo de altavoz.</string>
 </resources>

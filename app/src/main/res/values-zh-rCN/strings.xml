@@ -427,4 +427,6 @@
     <string name="search">搜索</string>
     <string name="unique_contact_uri">唯一联系人 URI</string>
     <string name="unique_contact_uri_help">如果选中，则保证联系人 URI 是唯一的。如果存在多个账号具有相同的 SIP URI 用户部分时需要选中，同时还能保护账号免受攻击。</string>
+    <string name="call_is_connected">通话已连接</string>
+    <string name="replaces_not_supported">对方不支持 REPLACES 功能</string>
 </resources>
