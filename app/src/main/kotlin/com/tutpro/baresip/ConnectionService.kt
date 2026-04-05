@@ -201,8 +201,6 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onHold() {
-            // Do NOT call super.onHold() first, as it might change internal state
-            // before we can grab the call object.
             Log.d(TAG, "Telecom Connection onHold $callp")
             val call = Call.ofCallp(callp)
             if (call != null && !call.conferenceCall) {

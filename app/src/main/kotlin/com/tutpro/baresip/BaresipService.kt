@@ -889,27 +889,19 @@ class BaresipService: Service() {
                         val newHeldState = when (ev[1].toInt()) {Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
                             else -> false
                         }
-
                         val connection = ConnectionService.connections[callp]
-
-                        // Handle Remote Un-hold
                         if (call!!.held && !newHeldState) {
                             Log.d(TAG, "Call ${call.callp} un-held by peer.")
-
-                            // Clear our local manual hold flag so resume() can execute
                             call.onhold = false
-
-                            // We use a Coroutine with a small delay to let the SIP
+                            // Use a Coroutine with a small delay to let the SIP
                             // transaction (the re-INVITE from the peer) finish
-                            // before we try to hold the other call and resume this one.
+                            // before trying to hold the other call and resume this one.
                             CoroutineScope(Dispatchers.Main).launch {
                                 delay(100)
                                 call.resume()
                             }
                         }
-
                         call.held = newHeldState
-
                         if (newHeldState) {
                             // Peer put us on hold
                             call.showOnHoldNotice.value = true
@@ -918,15 +910,12 @@ class BaresipService: Service() {
                         } else {
                             // Peer un-held us
                             call.showOnHoldNotice.value = false
-
                             // Only clear the UI if we aren't also manually holding it
-                            // (If we just called call.resume() above, it will handle this)
                             if (!call.onhold) {
                                 call.callOnHold.value = false
                                 connection?.setActive()
                             }
                         }
-
                         if (call.state() == Api.CALL_STATE_EARLY) {
                             if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                                 stopMediaPlayer()
@@ -935,7 +924,6 @@ class BaresipService: Service() {
                                 playRingBack()
                             }
                         }
-
                         if (call.status.value == "connected" && !call.held && !call.onhold) {
                             if (call.callOnHold.value || call.showOnHoldNotice.value) {
                                 Log.d(TAG, "Safety guard: Clearing stuck hold flags for ${call.callp}")
@@ -1006,9 +994,17 @@ class BaresipService: Service() {
                     }
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
-                        ConnectionService.connections[callp]?.let {
-                            it.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
-                            it.destroy()
+                        val connection = ConnectionService.connections[callp]
+                        if (connection != null) {
+                            val cause = when {
+                                ev[1].contains("200") -> DisconnectCause.LOCAL
+                                ev[1].contains("486") -> DisconnectCause.BUSY
+                                ev[1].contains("404") -> DisconnectCause.ERROR
+                                ev[1].contains("403") || ev[1].contains("401") -> DisconnectCause.RESTRICTED
+                                else -> DisconnectCause.REMOTE
+                            }
+                            connection.setDisconnected(DisconnectCause(cause))
+                            connection.destroy()
                             ConnectionService.connections.remove(callp)
                         }
                         nm.cancel(CALL_NOTIFICATION_ID)
@@ -1032,9 +1028,10 @@ class BaresipService: Service() {
                                 onHoldCall.referTo = ""
                                 call.onHoldCall = null
                             }
+                            val isConference = call.conferenceCall
                             call.remove()
                             updateStatusNotification()
-                            if (call.conferenceCall && ua.calls().isEmpty())
+                            if (isConference && ua.calls().isEmpty())
                                 Api.module_unload("mixminus")
                             val reason = ev[1]
                             val tone = ev[2]

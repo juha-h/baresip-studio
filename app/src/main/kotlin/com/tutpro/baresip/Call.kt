@@ -62,8 +62,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         if (Api.call_hold(callp, true)) {
             onhold = true
             callOnHold.value = true
-            // Fix: Do NOT set showOnHoldNotice to true here.
-            // That notice is for when the PEER holds us.
             showOnHoldNotice.value = false
             ConnectionService.connections[callp]?.setOnHold()
             return true
@@ -73,7 +71,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
     fun resume(): Boolean {
         if (!onhold && !held) return true
-
         // 1. Hold other calls first
         for (c in BaresipService.calls) {
             if (c.callp != this.callp && !c.onhold && !c.held) {
@@ -81,15 +78,12 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
                 c.hold()
             }
         }
-
         val connection = ConnectionService.connections[callp]
-
         // 2. SIP Signaling
         if (Api.call_hold(callp, false)) {
             onhold = false
             callOnHold.value = false
             showOnHoldNotice.value = false
-
             // 3. Telecom Sync
             connection?.setAddress("sip:$peerUri".toUri(), android.telecom.TelecomManager.PRESENTATION_ALLOWED)
             connection?.setActive()
@@ -99,10 +93,8 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     }
 
     fun transfer(uri: String): Boolean {
-        if (!Api.call_hold(callp, true))
-            return false
-        onhold = true
-        referTo = uri
+        if (!onhold) hold()
+        Log.d(TAG, "Transferring call $callp to $uri")
         return Api.call_transfer(callp, uri) == 0
     }
 
