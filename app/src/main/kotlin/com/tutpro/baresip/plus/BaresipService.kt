@@ -943,6 +943,10 @@ class BaresipService: Service() {
                             return
                     }
                     "call update" -> {
+                        if (call!!.conferenceCall) {
+                            Log.d(TAG, "Refusing to update conference call ${call.callp}")
+                            return
+                        }
                         val newHeldState = when (ev[1].toInt()) {
                             Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
                             else -> false
