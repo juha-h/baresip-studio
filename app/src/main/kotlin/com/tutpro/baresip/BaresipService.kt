@@ -894,7 +894,7 @@ class BaresipService: Service() {
                             else -> false
                         }
                         val connection = ConnectionService.connections[callp]
-                        if (call!!.held && !newHeldState) {
+                        if (call.held && !newHeldState) {
                             Log.d(TAG, "Call ${call.callp} un-held by peer.")
                             call.onhold = false
                             // Use a Coroutine with a small delay to let the SIP
@@ -1346,6 +1346,7 @@ class BaresipService: Service() {
                     call.onHoldCall = onHoldCall
                     call.conferenceCall = conferenceCall
                     call.add()
+                    updateStatusNotification()
                     if (onHoldCall != null)
                         onHoldCall.newCall = call
                     if (!call.connect(uri)) {
@@ -1353,6 +1354,7 @@ class BaresipService: Service() {
                         ConnectionService.onCallClosed(callp)
                         call.remove()
                         call.destroy()
+                        updateStatusNotification()
                     }
                 }
                 else
@@ -1464,6 +1466,7 @@ class BaresipService: Service() {
     }
 
     fun updateStatusNotification() {
+
         val activeCall = Call.calls().find {
             it.status.value == "connected" || it.status.value == "outgoing" || it.status.value == "answered"
         }
@@ -1499,9 +1502,17 @@ class BaresipService: Service() {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
                 .setUsesChronometer(true)
-                .setContentText(if (activeCall.onhold) getString(R.string.call_is_on_hold) else getString(R.string.call_is_connected))
+                .setContentText(
+                    if (activeCall.onhold)
+                        getString(R.string.call_is_on_hold)
+                    else
+                        when (activeCall.status.value) {
+                            "outgoing", "incoming" -> getString(R.string.call_is_ringing)
+                            "connected", "answered" -> getString(R.string.call_is_connected)
+                            else -> getString(R.string.call)
+                        }
+                )
         } else {
-            // IMPORTANT: Explicitly clear the style first to ensure CallStyle is removed
             builder.setStyle(null)
             builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCategory(Notification.CATEGORY_SERVICE)
