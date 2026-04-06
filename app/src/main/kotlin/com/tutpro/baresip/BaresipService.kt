@@ -34,6 +34,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.Uri
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Build.VERSION
 import android.os.CountDownTimer
 import android.os.Handler
@@ -786,10 +787,12 @@ class BaresipService: Service() {
                     }
                     "call ringing" -> {
                         ConnectionService.connections[callp]?.setRinging()
+                        ensureCommunicationMode()
                         playRingBack()
                         return
                     }
                     "call progress" -> {
+                        ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else {
@@ -866,6 +869,7 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopMediaPlayer()
+                        ensureCommunicationMode()
                         if (call!!.status.value == "incoming")
                             call.status.value = "answered"
                         else
@@ -876,6 +880,7 @@ class BaresipService: Service() {
                     }
                     "call established" -> {
                         ConnectionService.connections[callp]?.setActive()
+                        ensureCommunicationMode()
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
                         call!!.status.value = "connected"
@@ -1042,6 +1047,7 @@ class BaresipService: Service() {
                             if (tone == "busy")
                                 playBusy()
                             else if (!Call.inCall()) {
+                                am.mode = AudioManager.MODE_NORMAL
                                 resetCallVolume()
                                 proximitySensing(false)
                             }
@@ -1864,6 +1870,16 @@ class BaresipService: Service() {
             }
     }
 
+    private fun ensureCommunicationMode() {
+        // On Android 11+, Telecom usually handles this.
+        // On Android 10 and below, we must be more aggressive.
+        if (VERSION.SDK_INT < 31 || am.mode != MODE_IN_COMMUNICATION) {
+            if (Call.inCall()) {
+                Log.d(TAG, "Manual Mode Guard: Setting MODE_IN_COMMUNICATION")
+                am.mode = MODE_IN_COMMUNICATION
+            }
+        }
+    }
     @SuppressLint("WakelockTimeout", "Wakelock")
     private fun proximitySensing(enable: Boolean) {
         if (enable) {
