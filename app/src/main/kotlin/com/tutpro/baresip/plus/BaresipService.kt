@@ -952,7 +952,7 @@ class BaresipService: Service() {
                             else -> false
                         }
                         val connection = ConnectionService.connections[callp]
-                        if (call!!.held && !newHeldState) {
+                        if (call.held && !newHeldState) {
                             Log.d(TAG, "Call ${call.callp} un-held by peer.")
                             call.onhold = false
                             // Use a Coroutine with a small delay to let the SIP
@@ -1570,7 +1570,16 @@ class BaresipService: Service() {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
                 .setUsesChronometer(true)
-                .setContentText(if (activeCall.onhold) getString(R.string.call_is_on_hold) else getString(R.string.call_is_connected))
+                .setContentText(
+                    if (activeCall.onhold)
+                        getString(R.string.call_is_on_hold)
+                    else
+                        when (activeCall.status.value) {
+                            "outgoing", "incoming" -> getString(R.string.call_is_ringing)
+                            "connected", "answered" -> getString(R.string.call_is_connected)
+                            else -> getString(R.string.call)
+                        }
+                )
         } else {
             builder.setStyle(null)
             builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())

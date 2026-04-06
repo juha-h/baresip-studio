@@ -520,6 +520,7 @@
     <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'\?</string>
     <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'\?</string>
     <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'\?</string>
+    <string name="call_is_ringing">Puhelu soi</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="call_is_connected">Puhelu on yhdistetty</string>
     <string name="rec_in_call">Tallennus voidaan asettaa päälle tai pois vain silloin, kun puhelu
