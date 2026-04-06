@@ -195,7 +195,10 @@ class ConnectionService : ConnectionService() {
                 }
                 val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
                 BaresipService.postServiceEvent(
-                    ServiceEvent("speaker,${isSpeaker}", arrayListOf(uap, callp), System.nanoTime())
+                    ServiceEvent("speaker update,${isSpeaker}",
+                        arrayListOf(uap, callp),
+                        System.nanoTime()
+                    )
                 )
             }
         }

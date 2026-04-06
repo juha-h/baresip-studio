@@ -2180,7 +2180,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         }
         Log.d(TAG, "Showing call ${call.callp} from ${call.ua.account.aor} with status ${call.status.value}")
         when (call.status.value) {
-            "outgoing", "transferring", "answered", "disconnecting" -> {
+            "outgoing", "transferring", "answered" -> {
                 call.callUriLabel.value = if (call.status.value == "answered")
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
@@ -2347,9 +2347,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         "call update" -> {
             showCall(ctx, viewModel, ua)
         }
-        "update calls" -> {
-            viewModel.updateCalls(Call.calls().toList())
-        }
         "call verify" -> {
             val callp = params[1] as Long
             val call = Call.ofCallp(callp)
@@ -2475,7 +2472,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             else
                 viewModel.updateMicIcon(Icons.Filled.Mic)
         }
-        "speaker" -> {
+        "speaker update" -> {
             viewModel.updateSpeakerPhoneStatus(ev[1].toBoolean())
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
