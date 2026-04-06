@@ -14,9 +14,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
 import android.content.res.Configuration
 import android.database.ContentObserver
 import android.graphics.ImageDecoder
@@ -1413,6 +1410,7 @@ class BaresipService: Service() {
                     call.videoCall = videoCall
                     call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
                     call.add()
+                    updateStatusNotification()
                     if (onHoldCall != null)
                         onHoldCall.newCall = call
                     if (!call.connect(uri)) {
@@ -1420,6 +1418,7 @@ class BaresipService: Service() {
                         ConnectionService.onCallClosed(callp)
                         call.remove()
                         call.destroy()
+                        updateStatusNotification()
                     }
                 }
                 else
@@ -1531,6 +1530,7 @@ class BaresipService: Service() {
     }
 
     fun updateStatusNotification() {
+
         val activeCall = Call.calls().find {
             it.status.value == "connected" || it.status.value == "outgoing" || it.status.value == "answered"
         }
@@ -1568,7 +1568,6 @@ class BaresipService: Service() {
                 .setUsesChronometer(true)
                 .setContentText(if (activeCall.onhold) getString(R.string.call_is_on_hold) else getString(R.string.call_is_connected))
         } else {
-            // IMPORTANT: Explicitly clear the style first to ensure CallStyle is removed
             builder.setStyle(null)
             builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCategory(Notification.CATEGORY_SERVICE)
@@ -1578,7 +1577,6 @@ class BaresipService: Service() {
                 .setUsesChronometer(false)
                 .setContentTitle("")
                 .setContentText("")
-
             val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
             for (i in 0..3) {
                 val resId = when (i) {
@@ -1613,26 +1611,19 @@ class BaresipService: Service() {
             if (activeCall != null) {
                 // Calculate types for Android 30+ (including Microhone and Camera if permitted)
                 val type = if (VERSION.SDK_INT >= 30) {
-                    var types = FOREGROUND_SERVICE_TYPE_PHONE_CALL
-
+                    var types = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
                     if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-                        types = types or FOREGROUND_SERVICE_TYPE_MICROPHONE
-
+                        types = types or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
                     if (ContextCompat.checkSelfPermission(this, CAMERA) == PackageManager.PERMISSION_GRANTED)
-                        types = types or FOREGROUND_SERVICE_TYPE_CAMERA
-                    else
-                        Log.w(TAG, "updateStatusNotification: CAMERA permission not granted")
-
+                        types = types or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
                     types
-                } else {
-                    0 // For SDK < 30, types are not required in startForeground
                 }
-
+                else
+                    0 // For SDK < 30, types are not required in startForeground
                 if (VERSION.SDK_INT >= 29)
                     startForeground(STATUS_NOTIFICATION_ID, notification, type)
                 else
                     startForeground(STATUS_NOTIFICATION_ID, notification)
-
                 isNotificationInCall = true
             } else {
                 if (isNotificationInCall) {
