@@ -136,6 +136,8 @@ class ConnectionService : ConnectionService() {
 
     inner class BaresipConnection(val uap: Long, var callp: Long) : Connection() {
 
+        private var isDisconnecting = false
+
         override fun onAnswer() {
             Log.d(TAG, "Telecom Connection onAnswer $callp")
             val intent = Intent(this@ConnectionService, MainActivity::class.java)
@@ -156,15 +158,25 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onDisconnect() {
+            if (isDisconnecting) return
             Log.d(TAG, "Telecom Connection onDisconnect $callp")
-            if (callp != 0L) {
-                Api.ua_hangup(uap, callp, 0, "")
-                connections.remove(callp)
-            } else {
+            isDisconnecting = true
+            if (callp == 0L) {
                 pendingOutgoingConnection = null
+                setDisconnected(DisconnectCause(DisconnectCause.CANCELED))
+                destroy()
+                return
             }
+            val call = Call.ofCallp(callp)
+            if (call != null)
+                Api.ua_hangup(uap, callp, 0, "")
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
             destroy()
+            // Allow other disconnects after a short period
+            // to prevent the "Telecom Cascade" effect
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                isDisconnecting = false
+            }, 1000)
         }
 
         override fun onAbort() {
