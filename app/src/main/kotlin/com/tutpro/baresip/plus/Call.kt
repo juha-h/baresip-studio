@@ -1,8 +1,11 @@
 package com.tutpro.baresip.plus
 
+import android.content.Context
+import android.media.AudioManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import java.util.*
 
 class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
@@ -75,25 +78,49 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     }
 
     fun hold(): Boolean {
-        return Api.call_hold(callp, true) == 0
+        if (onhold) return true
+        if (Api.call_hold(callp, true)) {
+            onhold = true
+            callOnHold.value = true
+            showOnHoldNotice.value = false
+            ConnectionService.connections[callp]?.setOnHold()
+            return true
+        }
+        return false
     }
 
     fun resume(): Boolean {
-        return Api.call_hold(callp, false) == 0
+        if (!onhold && !held) return true
+        // 1. Hold other calls first
+        for (c in BaresipService.calls) {
+            if (c.callp != this.callp && !c.onhold && !c.held) {
+                Log.d("Baresip", "Auto-holding active call ${c.callp}")
+                c.hold()
+            }
+        }
+        val connection = ConnectionService.connections[callp]
+        // 2. SIP Signaling
+        if (Api.call_hold(callp, false)) {
+            onhold = false
+            callOnHold.value = false
+            showOnHoldNotice.value = false
+            // 3. Telecom Sync
+            connection?.setAddress("sip:$peerUri".toUri(), android.telecom.TelecomManager.PRESENTATION_ALLOWED)
+            connection?.setActive()
+            return true
+        }
+        return false
     }
 
     fun transfer(uri: String): Boolean {
-        val err = Api.call_hold(callp, true)
-        if (err != 0)
-            return false
-        onhold = true
-        referTo = uri
+        if (!onhold) hold()
+        Log.d(TAG, "Transferring call $callp to $uri")
         return Api.call_transfer(callp, uri) == 0
     }
 
     fun executeTransfer(): Boolean {
         return if (onHoldCall != null) {
-            if (Api.call_hold(callp, true) == 0)
+            if (Api.call_hold(callp, true))
                 Api.call_replace_transfer(onHoldCall!!.callp, callp)
             else
                 false
@@ -183,5 +210,12 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             return BaresipService.calls.isNotEmpty()
         }
 
+        fun isAnyCallActive(ctx: Context): Boolean {
+            // Check if there exist SIP calls that are not onhold or held
+            if (BaresipService.calls.any { !it.onhold && !it.held }) return true
+            // MODE_IN_CALL indicates a PSTN call is active
+            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            return am.mode == AudioManager.MODE_IN_CALL
+        }
     }
 }

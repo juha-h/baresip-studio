@@ -1473,7 +1473,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_call_1notify_1sipfrag(
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }
 
-JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1hold(
+JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1hold(
         JNIEnv *env, jobject obj, jlong call, jboolean hold)
 {
     (void)env;
@@ -1492,7 +1492,7 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1hold(
     }
     if (err)
         LOGW("call_hold error: %d\n", err);
-    return err;
+    return err == 0;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1ismuted(
@@ -1501,6 +1501,14 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1ismuted(
     (void)env;
     (void)obj;
     return audio_ismuted(call_audio((struct call *)call));
+}
+
+JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1supported(
+        JNIEnv *env, jobject obj, jlong call, jint tags)
+{
+    (void)env;
+    (void)obj;
+    return call_supported((struct call *)call, tags);
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1transfer(

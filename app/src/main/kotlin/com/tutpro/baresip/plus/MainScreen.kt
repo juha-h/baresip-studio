@@ -58,7 +58,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -125,6 +124,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -179,8 +179,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Timer
-import kotlin.concurrent.schedule
 
 private val showVideoLayout = mutableStateOf(false)
 
@@ -214,10 +212,6 @@ private var password = mutableStateOf("")
 private val selectItems = mutableStateOf(listOf<String>())
 private val selectItemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
 private val showSelectItemDialog = mutableStateOf(false)
-
-private var callRunnable: Runnable? = null
-private var callHandler: Handler = Handler(Looper.getMainLooper())
-private var audioModeChangedListener: AudioManager.OnModeChangedListener? = null
 
 fun NavGraphBuilder.mainScreenRoute(
     navController: NavController,
@@ -255,19 +249,12 @@ private fun MainScreen(
                 Lifecycle.Event.ON_RESUME -> {
                     Log.d(TAG, "Resumed to MainScreen")
                     BaresipService.isMainVisible = true
-                    val incomingCall = Call.call("incoming")
                     viewModel.updateCalls(Call.calls().toList())
-                    if (incomingCall != null)
-                        spinToAor(viewModel, incomingCall.ua.account.aor)
-                    else {
-                        if (uas.value.isNotEmpty()) {
-                            if (viewModel.selectedAor.value == "") {
-                                if (Call.inCall())
-                                    spinToAor(viewModel, Call.calls().last().ua.account.aor)
-                                else
-                                    spinToAor(viewModel, uas.value.first().account.aor)
-                            }
-                        }
+                    (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
+                        spinToAor(viewModel, it.ua.account.aor)
+                    } ?: run {
+                        if (uas.value.isNotEmpty() && viewModel.selectedAor.value == "")
+                            spinToAor(viewModel, uas.value.first().account.aor)
                     }
                     val ua = UserAgent.ofAor(viewModel.selectedAor.value)
                     if (ua != null) {
@@ -622,8 +609,8 @@ private fun TopAppBar(
 
     val recOffImage = Icons.Filled.VoiceOverOff
     val recOnImage = Icons.Filled.RecordVoiceOver
-    val isSpeakerOn = remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
     var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
+    val isSpeakerOn by viewModel.isSpeakerOn.collectAsState()
     var menuExpanded by remember { mutableStateOf(false) }
 
     val about = stringResource(R.string.about)
@@ -742,11 +729,23 @@ private fun TopAppBar(
                     .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
-                            if (Build.VERSION.SDK_INT >= 31)
-                                Log.d(TAG, "Toggling speakerphone when dev/mode is " +
-                                        "${am.communicationDevice!!.type}/${am.mode}")
-                            isSpeakerOn.value = !Utils.isSpeakerPhoneOn(am)
-                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                            val isCurrentlyOn = isSpeakerOn
+                            val aor = viewModel.selectedAor.value
+                            val ua = uas.value.find { it.account.aor == aor }
+                            val call = ua?.currentCall()
+                            val connection =
+                                if (call != null) ConnectionService.connections[call.callp] else null
+                            if (connection != null) {
+                                @Suppress("DEPRECATION")
+                                connection.setAudioRoute(
+                                    if (isCurrentlyOn)
+                                        android.telecom.CallAudioState.ROUTE_EARPIECE
+                                    else
+                                        android.telecom.CallAudioState.ROUTE_SPEAKER
+                                )
+                            } else {
+                                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                            }
                         },
                         onLongClick = {
                             alertTitle.value = speakerPhoneTitle
@@ -758,7 +757,7 @@ private fun TopAppBar(
                 Icon(
                     imageVector = Icons.Filled.SpeakerPhone,
                     contentDescription = null,
-                    tint = if (isSpeakerOn.value)
+                    tint = if (isSpeakerOn)
                         MaterialTheme.colorScheme.error
                     else
                         MaterialTheme.colorScheme.onPrimary,
@@ -965,10 +964,9 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
 
     val calls by viewModel.calls.collectAsState()
     val selectedAor by viewModel.selectedAor.collectAsState()
-    val filteredCalls = calls.filter { it.ua.account.aor == selectedAor }
-
-    val dialingOrRinging = filteredCalls.any { it.status.value == "outgoing" || it.status.value == "incoming" }
-    val conferenceCall = filteredCalls.any { it.conferenceCall }
+    val aorCalls = calls.filter { it.ua.account.aor == selectedAor }
+    val hasActiveCalls = aorCalls.any { !it.callOnHold.value }
+    val conferenceCall = aorCalls.any { it.conferenceCall }
 
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
@@ -1050,12 +1048,13 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
     ) {
         AccountSpinner(ctx, viewModel, navController)
 
-        filteredCalls.forEach { call ->
-            CallCard(ctx = ctx, viewModel = viewModel, call = call, dialerState = null)
+        aorCalls.forEach { call ->
+            key(call.callp) {
+                CallCard(ctx = ctx, viewModel = viewModel, call = call, dialerState = null)
+            }
         }
 
-        // Only show the dialer if we are not in a transient state
-        if (!dialingOrRinging && (filteredCalls.isEmpty() || conferenceCall))
+        if (!hasActiveCalls || conferenceCall)
             CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
 
         Indicator(
@@ -1580,12 +1579,14 @@ private fun CallRow(
                     enabled = !call.terminated.value,
                     onClick = {
                         if (call.terminated.value) return@IconButton
-                        abandonAudioFocus(ctx)
-                        Log.d(
-                            TAG,
-                            "AoR ${call.ua.account.aor} canceling call ${call.callp} with ${call.callUri.value}"
-                        )
-                        Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                        call.terminated.value = true
+                        val connection = ConnectionService.connections[call.callp]
+                        if (connection != null)
+                            connection.onDisconnect()
+                        else {
+                            Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
+                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                        }
                     },
                 ) {
                     Icon(
@@ -1605,12 +1606,13 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        abandonAudioFocus(ctx)
-                        Log.d(
-                            TAG,
-                            "AoR ${call.ua.account.aor} hanging up call ${call.callp} with ${call.callUri.value}"
-                        )
-                        Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                        val connection = ConnectionService.connections[call.callp]
+                        if (connection != null)
+                            connection.onDisconnect()
+                        else {
+                            Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
+                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                        }
                     }
                 ) {
                     Icon(
@@ -1643,36 +1645,28 @@ private fun CallRow(
                         )
                     }
 
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = {
-                        if (call.onhold) {
-                            Log.d(
-                                TAG,
-                                "AoR ${call.ua.account.aor} resuming call ${call.callp} with ${call.callUri.value}"
-                            )
-                            call.resume()
-                            call.onhold = false
-                        } else {
-                            Log.d(
-                                TAG,
-                                "AoR ${call.ua.account.aor} holding call ${call.callp} with ${call.callUri.value}"
-                            )
-                            call.hold()
-                            call.onhold = true
-                        }
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.PauseCircle,
-                        modifier = Modifier.size(42.dp),
-                        tint = if (call.callOnHold.value)
-                            MaterialTheme.colorScheme.error
-                        else
-                            MaterialTheme.colorScheme.secondary,
-                        contentDescription = null,
-                    )
-                }
+                if (!call.conferenceCall)
+                    IconButton(    modifier = Modifier.size(48.dp),
+                        onClick = {
+                            if (call.callOnHold.value) {
+                                Log.d(TAG, "User requested resume for ${call.callp}")
+                                call.resume() // This now automatically holds other calls
+                            } else {
+                                Log.d(TAG, "User requested hold for ${call.callp}")
+                                call.hold()
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.PauseCircle,
+                            modifier = Modifier.size(42.dp),
+                            tint = if (call.callOnHold.value)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.secondary,
+                            contentDescription = null,
+                        )
+                    }
 
                 var showTransferDialog by remember { mutableStateOf(false) }
 
@@ -1682,12 +1676,22 @@ private fun CallRow(
                         enabled = call.transferButtonEnabled.value,
                         onClick = {
                             if (call.onHoldCall != null) {
-                                if (!call.executeTransfer()) {
-                                    alertTitle.value = ctx.getString(R.string.notice)
-                                    alertMessage.value = ctx.getString(R.string.transfer_failed)
+                                if (!Api.call_supported(call.callp, Api.REPLACES)) {
+                                   alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.replaces_not_supported)
                                     showAlert.value = true
                                 }
-                            } else
+                                else {
+                                    val connection = ConnectionService.connections[call.callp]
+                                    connection?.onHold()
+                                    if (!call.executeTransfer()) {
+                                        alertTitle.value = ctx.getString(R.string.notice)
+                                        alertMessage.value = ctx.getString(R.string.transfer_failed)
+                                        showAlert.value = true
+                                    }
+                                }
+                            }
+                            else
                                 showTransferDialog = true
                         },
                     ) {
@@ -2096,21 +2100,20 @@ private fun CallRow(
     }
 }
 
-
 @Composable
 private fun OnHoldNotice() {
-    OutlinedButton(
-        onClick = {},
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-        modifier = Modifier
-            .padding(16.dp)
-            .wrapContentSize(),
-        shape = RoundedCornerShape(20)
-    ) {
-        Text(
-            text = stringResource(R.string.call_is_on_hold),
-            fontSize = 18.sp
-        )
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        OutlinedButton(
+            onClick = {},
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+            modifier = Modifier.padding(16.dp),
+            shape = RoundedCornerShape(20)
+        ) {
+            Text(
+                text = stringResource(R.string.call_is_on_hold),
+                fontSize = 18.sp
+            )
+        }
     }
 }
 
@@ -2121,7 +2124,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
 
     var isFrontCamera by remember { mutableStateOf(BaresipService.isCameraFront) }
     val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-    var isSpeakerOn by remember { mutableStateOf(Utils.isSpeakerPhoneOn(am)) }
+    val isSpeakerOn by viewModel.isSpeakerOn.collectAsState()
     var isMicMuted by remember { mutableStateOf(BaresipService.isMicMuted) }
 
     val iconSize = 48.dp
@@ -2313,9 +2316,22 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 // Speaker button
                 IconButton(
                     onClick = {
-                        Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                        Timer().schedule(250) {
-                            isSpeakerOn = Utils.isSpeakerPhoneOn(am)
+                        val isCurrentlyOn = isSpeakerOn
+                        val aor = viewModel.selectedAor.value
+                        val ua = uas.value.find { it.account.aor == aor }
+                        val call = ua?.currentCall()
+                        val connection =
+                            if (call != null) ConnectionService.connections[call.callp] else null
+                        if (connection != null) {
+                            @Suppress("DEPRECATION")
+                            connection.setAudioRoute(
+                                if (isCurrentlyOn)
+                                    android.telecom.CallAudioState.ROUTE_EARPIECE
+                                else
+                                    android.telecom.CallAudioState.ROUTE_SPEAKER
+                            )
+                        } else {
+                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
                         }
                     }
                 ) {
@@ -2400,12 +2416,17 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 // Hangup Button
                 IconButton(
                     onClick = {
-                        abandonAudioFocus(ctx)
                         if (call != null && !call!!.terminated.value) {
                             call!!.terminated.value = true
                             if (!Utils.isCameraAvailable(ctx))
                                 call!!.setVideoDirection(Api.SDP_INACTIVE)
-                            Api.ua_hangup(call!!.ua.uap, call!!.callp, 487, "Request Terminated")
+                            val connection = ConnectionService.connections[call!!.callp]
+                            if (connection != null)
+                                connection.onDisconnect()
+                            else {
+                                Log.d(TAG, "AoR ${call!!.ua.account.aor} hanging up call ${call!!.callp}")
+                                Api.ua_hangup(call!!.ua.uap, call!!.callp, 487, "Request Terminated")
+                            }
                         }
                     }
                 ) {
@@ -2418,8 +2439,6 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 }
             }
         }
-
-
     }
 }
 
@@ -2492,17 +2511,16 @@ fun videoClick(ctx: Context, call: Call) {
     showVideoLayout.value = true
 }
 
-
 private fun makeCall(
     ctx: Context,
     viewModel: ViewModel,
     uriText: String,
     conferenceCall: Boolean,
-    video: Boolean
+    videoCall: Boolean,
+    onHoldCallp: Long = 0L
 ) {
-    val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-    val aor = ua.account.aor
+    val aor = viewModel.selectedAor.value
+    val ua = UserAgent.ofAor(aor)!!
     val peerUri = if (Utils.isTelNumber(uriText))
         "tel:$uriText"
     else
@@ -2523,109 +2541,64 @@ private fun makeCall(
         alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
         showAlert.value = true
     }
-    else if (!BaresipService.requestAudioFocus(ctx))
-        Toast.makeText(ctx, R.string.audio_focus_denied, Toast.LENGTH_SHORT).show()
-    else if (Call.calls().any { it.ua.account.aor != ua.account.aor })
+    else if (Utils.isPSTNCallActive(ctx) || Call.calls().any { it.ua.account.aor != ua.account.aor } )
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
-        viewModel.dialerState.callButtonsEnabled.value = false
-        if (Build.VERSION.SDK_INT < 31) {
-            Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
-            am.mode = AudioManager.MODE_IN_COMMUNICATION
-            runCall(ctx, viewModel, ua, uri, conferenceCall, video)
-        } else {
-            if (am.mode == AudioManager.MODE_IN_COMMUNICATION) {
-                runCall(ctx, viewModel, ua, uri, conferenceCall, video)
-            } else {
-                audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
-                    if (mode == AudioManager.MODE_IN_COMMUNICATION) {
-                        Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION using " +
-                                "device ${am.communicationDevice!!.type}")
-                        if (audioModeChangedListener != null) {
-                            am.removeOnModeChangedListener(audioModeChangedListener!!)
-                            audioModeChangedListener = null
-                        }
-                        runCall(ctx, viewModel, ua, uri, conferenceCall, video)
-                    } else {
-                        Log.d(TAG, "Audio mode changed to mode ${am.mode} using " +
-                                "device ${am.communicationDevice!!.type}")
-                    }
-                }
-                am.addOnModeChangedListener(ctx.mainExecutor, audioModeChangedListener!!)
-                Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
-                am.mode = AudioManager.MODE_IN_COMMUNICATION
-            }
+        val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
+        val extras = android.os.Bundle()
+        extras.putParcelable(android.telecom.TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
+            BaresipService.getPhoneAccountHandle(ctx))
+        val callExtras = android.os.Bundle()
+        callExtras.putBoolean("conferenceCall", conferenceCall)
+        callExtras.putBoolean("videoCall", videoCall)
+        callExtras.putLong("uap", ua.uap)
+        if (onHoldCallp != 0L)
+            callExtras.putLong("onHoldCallp", onHoldCallp)
+        extras.putBundle(android.telecom.TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+        try {
+            Log.d(TAG, "Placing Telecom call to $uri with uap=${ua.uap}")
+            tm.placeCall(uri.toUri(), extras)
+        } catch (e: SecurityException) {
+            Log.e(TAG, "placeCall failed: ${e.message}")
         }
     }
 }
 
-private fun runCall(
-    ctx: Context,
-    viewModel: ViewModel,
-    ua: UserAgent,
-    uri: String,
-    conferenceCall: Boolean,
-    video: Boolean
-) {
-    callRunnable = Runnable {
-        callRunnable = null
-        val newCall = call(ctx, viewModel, ua, uri, conferenceCall, video)
-        if (newCall == null) {
-            BaresipService.abandonAudioFocus(ctx)
-            viewModel.dialerState.callButtonsEnabled.value = true
-        }
-    }
-    callHandler.postDelayed(callRunnable!!, BaresipService.audioDelay)
-}
-
-private fun call(
-    ctx: Context,
-    viewModel: ViewModel,
-    ua: UserAgent,
-    uri: String,
-    conferenceCall: Boolean,
-    video: Boolean,
-    onHoldCall: Call? = null
-): Call? {
-    spinToAor(viewModel, ua.account.aor)
-    if (conferenceCall && ua.calls().isEmpty())
-        Api.module_load("mixminus")
-    val videoDir = if (video) {
-        if (Utils.isCameraAvailable(ctx)) Api.SDP_SENDRECV else Api.SDP_RECVONLY
-    }
-    else
-        Api.SDP_INACTIVE
-    val callp = ua.callAlloc(0L, Api.VIDMODE_ON)
-    return if (callp != 0L) {
-        Log.d(TAG, "Adding outgoing call ${ua.uap}/$callp/$uri")
-        val call = Call(callp, ua, uri, "out", "outgoing")
-        call.onHoldCall = onHoldCall
-        call.conferenceCall = conferenceCall
-        call.videoCall = video
+private fun answer(ctx: Context, call: Call, videoCall: Boolean) {
+    Log.d(TAG, "AoR ${call.ua.account.aor} answering call from ${call.callUri.value}")
+    if (videoCall) {
+        val videoDir = if (Utils.isCameraAvailable(ctx))
+            Api.SDP_SENDRECV
+        else
+            Api.SDP_RECVONLY
         call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
-        call.add()
-        if (onHoldCall != null)
-            onHoldCall.newCall = call
-        if (call.connect(uri)) {
-            showCall(ctx, viewModel, ua)
-            call
-        } else {
-            Log.w(TAG, "call_connect $callp failed")
-            if (onHoldCall != null)
-                onHoldCall.newCall = null
-            call.remove()
-            call.destroy()
-            showCall(ctx, viewModel, ua)
-            null
+        if (call.videoEnabled()) {
+            Log.d(TAG, "Enabling video layout at answer")
+            showVideoLayout.value = true
         }
-    } else {
-        Log.w(TAG, "callAlloc for ${ua.uap} to $uri failed")
-        if (conferenceCall && ua.calls().isEmpty())
-            Api.module_unload("mixminus")
-        null
     }
+    else {
+        call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
+        call.disableVideoStream(true)
+    }
+    ConnectionService.connections[call.callp]?.setActive()
+    val intent = Intent(ctx, BaresipService::class.java)
+    intent.action = "Call Answer"
+    intent.putExtra("uap", call.ua.uap)
+    intent.putExtra("callp", call.callp)
+    ctx.startService(intent)
 }
 
+private fun reject(call: Call) {
+    Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp} from ${call.callUri.value}")
+    val connection = ConnectionService.connections[call.callp]
+    if (connection != null)
+        connection.onReject()
+    else {
+        call.rejected = true
+        Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
+    }
+}
 
 private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText: String, attended: Boolean) {
     val uri = if (Utils.isTelUri(uriText))
@@ -2641,16 +2614,27 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
         val call = ua.currentCall()
         if (call != null) {
             if (attended) {
-                if (call.hold()) {
+                val connection = ConnectionService.connections[call.callp]
+                val success = if (connection != null) {
+                    connection.onHold()
+                    true
+                } else {
+                    call.hold()
+                }
+                if (success) {
+                    call.onhold = true
                     call.referTo = uri
-                    call(ctx, viewModel, ua, uri,
+                    makeCall(ctx, viewModel, uri,
                         conferenceCall = false,
-                        video = false,
-                        onHoldCall = call
+                        videoCall = false,
+                        onHoldCallp = call.callp
                     )
+                    showCall(ctx, viewModel, ua, call)
                 }
             }
             else {
+                val connection = ConnectionService.connections[call.callp]
+                connection?.onHold()
                 if (!call.transfer(uri)) {
                     alertTitle.value = ctx.getString(R.string.notice)
                     alertMessage.value = ctx.getString(R.string.transfer_failed)
@@ -2660,36 +2644,6 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
             showCall(ctx, viewModel, ua)
         }
     }
-}
-
-private fun answer(ctx: Context, call: Call, video: Boolean) {
-    Log.d(TAG, "AoR ${call.ua.account.aor} answering call from ${call.callUri.value}")
-    if (video) {
-        val videoDir = if (Utils.isCameraAvailable(ctx))
-            Api.SDP_SENDRECV
-        else
-            Api.SDP_RECVONLY
-        call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
-        if (call.videoEnabled()) {
-            Log.d(TAG, "Enabling video layout at answer")
-            showVideoLayout.value = true
-        }
-    }
-    else {
-        call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
-        call.disableVideoStream(true)
-    }
-    val intent = Intent(ctx, BaresipService::class.java)
-    intent.action = "Call Answer"
-    intent.putExtra("uap", call.ua.uap)
-    intent.putExtra("callp", call.callp)
-    ctx.startService(intent)
-}
-
-private fun reject(call: Call) {
-    Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp}from ${call.callUri.value}")
-    call.rejected = true
-    Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
 }
 
 private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCall: Call? = null) {
@@ -2730,7 +2684,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             call.focusDtmf.value = true
             viewModel.requestShowKeyboard()
         }
-
+        Log.d(TAG, "Showing call ${call.callp} from ${call.ua.account.aor} with status ${call.status.value}")
         when (call.status.value) {
             "outgoing", "transferring", "answered" -> {
                 call.callUriLabel.value = if (call.status.value == "answered")
@@ -3000,7 +2954,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 if (call in Call.calls())
                     acceptTransfer(ctx, viewModel, ua, call!!, ev[1])
                 else
-                    makeCall(ctx, viewModel, ev[1], conferenceCall = false, video = false)
+                    makeCall(ctx, viewModel, ev[1], conferenceCall = false, videoCall = false)
             }
             showDialog.value = true
         }
@@ -3009,13 +2963,14 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
                 Api.ua_hangup(uap, callp, 487, "Request Terminated")
-            call(ctx, viewModel, ua, ev[1], conferenceCall = false, video = false)
+            makeCall(ctx, viewModel, ev[1], conferenceCall = false, videoCall = false)
             showCall(ctx, viewModel, ua)
         }
         "transfer failed" -> {
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
+            viewModel.updateCalls(Call.calls().toList())
             val activity = ctx as? Activity
             if (activity != null) {
                 val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -3049,6 +3004,16 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             }
             if (aor == viewModel.selectedAor.value)
                 viewModel.triggerAccountUpdate()
+        }
+        "mic muted" -> {
+            val muted = ev[1].toBoolean()
+            if (muted)
+                viewModel.updateMicIcon(Icons.Filled.MicOff)
+            else
+                viewModel.updateMicIcon(Icons.Filled.Mic)
+        }
+        "speaker update" -> {
+            viewModel.updateSpeakerPhoneStatus(ev[1].toBoolean())
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
@@ -3333,21 +3298,4 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     showDialog.value = true
 
     downloadsOutputUri = null
-}
-
-private fun abandonAudioFocus(ctx: Context) {
-    if (Build.VERSION.SDK_INT < 31) {
-        if (callRunnable != null) {
-            callHandler.removeCallbacks(callRunnable!!)
-            callRunnable = null
-            BaresipService.abandonAudioFocus(ctx)
-        }
-    } else {
-        if (audioModeChangedListener != null) {
-            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-            am.removeOnModeChangedListener(audioModeChangedListener!!)
-            audioModeChangedListener = null
-            BaresipService.abandonAudioFocus(ctx)
-        }
-    }
 }

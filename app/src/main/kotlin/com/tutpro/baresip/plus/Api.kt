@@ -20,6 +20,8 @@ object Api {
 
     const val CALL_STATE_EARLY = 4
 
+    const val REPLACES = 1
+
     external fun account_set_display_name(acc: Long, dn: String): Int
     external fun account_display_name(acc: Long): String
     external fun account_aor(acc: Long): String
@@ -90,7 +92,7 @@ object Api {
     external fun bevent_stop(event: Long)
 
     external fun call_connect(callp: Long, peer_uri: String): Int
-    external fun call_hold(callp: Long, hold: Boolean): Int
+    external fun call_hold(callp: Long, hold: Boolean): Boolean
     @Suppress("unused")
     external fun call_ismuted(callp: Long): Boolean
     external fun call_transfer(callp: Long, peer_uri: String): Int
@@ -113,6 +115,8 @@ object Api {
     external fun call_replace_transfer(xfer_callp: Long, callp: Long): Boolean
     external fun call_peer_uri(callp: Long): String
     external fun call_diverter_uri(callp: Long): String
+
+    external fun call_supported(callp: Long, header: Int): Boolean
     external fun call_destroy(callp: Long)
 
     external fun calls_mute(mute: Boolean)

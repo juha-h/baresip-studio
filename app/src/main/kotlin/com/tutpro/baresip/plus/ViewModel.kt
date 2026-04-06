@@ -66,6 +66,9 @@ class ViewModel: ViewModel() {
     private val _micIcon = MutableStateFlow(Icons.Filled.Mic)
     val micIcon = _micIcon.asStateFlow()
 
+    private val _isSpeakerOn = MutableStateFlow(false)
+    val isSpeakerOn = _isSpeakerOn.asStateFlow()
+
     private val _isDialpadVisible = MutableStateFlow(false)
     val isDialpadVisible = _isDialpadVisible.asStateFlow()
 
@@ -110,6 +113,10 @@ class ViewModel: ViewModel() {
 
     fun updateMicIcon(icon: ImageVector) {
         _micIcon.value = icon
+    }
+
+    fun updateSpeakerPhoneStatus(on: Boolean) {
+        _isSpeakerOn.value = on
     }
 
     fun toggleDialpadVisibility() {
