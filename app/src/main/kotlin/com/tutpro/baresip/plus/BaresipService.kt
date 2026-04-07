@@ -858,15 +858,15 @@ class BaresipService: Service() {
                             }
                             else {
                                 val name = "callwaiting_$toneCountry"
-                                val resourceId = applicationContext.resources.getIdentifier(
+                                val resourceId = resources.getIdentifier(
                                     name,
                                     "raw",
-                                    applicationContext.packageName
+                                    packageName
                                 )
                                 if (resourceId != 0) {
                                     playUnInterrupted(resourceId, 1)
                                 } else {
-                                    Log.e(TAG, "Callwaiting tone $name.wav not found\")")
+                                    Log.e(TAG, "Callwaiting tone $name.wav not found")
                                 }
                                 if (ua.account.callHistory) {
                                     CallHistoryNew(aor, peerUri, "in").add()
@@ -1860,10 +1860,10 @@ class BaresipService: Service() {
     private fun playRingBack() {
         if (mediaPlayer == null) {
             val name = "ringback_$toneCountry"
-            val resourceId = applicationContext.resources.getIdentifier(
+            val resourceId = resources.getIdentifier(
                 name,
                 "raw",
-                applicationContext.packageName)
+                packageName)
             if (resourceId != 0) {
                 mediaPlayer = MediaPlayer.create(this, resourceId)
                 mediaPlayer?.isLooping = true
@@ -1878,10 +1878,10 @@ class BaresipService: Service() {
     private fun playBusy() {
         if (mediaPlayer == null ) {
             val name = "busy_$toneCountry"
-            val resourceId = applicationContext.resources.getIdentifier(
+            val resourceId = resources.getIdentifier(
                 name,
                 "raw",
-                applicationContext.packageName)
+                packageName)
             if (resourceId != 0) {
                 mediaPlayer = MediaPlayer.create(this, resourceId)
                 mediaPlayer?.setOnCompletionListener {
