@@ -817,10 +817,12 @@ class BaresipService: Service() {
                     }
                     "call ringing" -> {
                         ConnectionService.connections[callp]?.setRinging()
+                        ensureCommunicationMode()
                         playRingBack()
                         return
                     }
                     "call progress" -> {
+                        ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else {
@@ -923,6 +925,7 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopMediaPlayer()
+                        ensureCommunicationMode()
                         if (call!!.status.value == "incoming")
                             call.status.value = "answered"
                         else
@@ -933,6 +936,7 @@ class BaresipService: Service() {
                     }
                     "call established" -> {
                         ConnectionService.connections[callp]?.setActive()
+                        ensureCommunicationMode()
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
                         call!!.status.value = "connected"
@@ -1100,6 +1104,7 @@ class BaresipService: Service() {
                             if (tone == "busy")
                                 playBusy()
                             else if (!Call.inCall()) {
+                                am.mode = AudioManager.MODE_NORMAL
                                 resetCallVolume()
                                 proximitySensing(false)
                             }
@@ -1931,6 +1936,23 @@ class BaresipService: Service() {
                 am.setStreamVolume(streamType, streamVolume, 0)
                 Log.d(TAG, "Reset $streamType volume to ${am.getStreamVolume(streamType)}")
             }
+    }
+
+    private fun ensureCommunicationMode() {
+        // Android 11 (API 30) and below: Manual mode switching is often required
+        // to ensure the system routes audio through the correct VOIP hardware path.
+        if (VERSION.SDK_INT < 31) {
+            if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
+                Log.d(TAG, "Manual Mode Guard (SDK < 31): Setting MODE_IN_COMMUNICATION")
+                am.mode = MODE_IN_COMMUNICATION
+            }
+        }
+        else {
+            // For Android 12+, log if the system hasn't set the mode correctly.
+            if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
+                Log.w(TAG, "ConnectionService has not set MODE_IN_COMMUNICATION on Android 12+")
+            }
+        }
     }
 
     @SuppressLint("WakelockTimeout", "Wakelock")
