@@ -1196,7 +1196,7 @@ object Utils {
             Log.i(TAG, "Hardware AEC is NOT available")
 
         if (AutomaticGainControl.isAvailable()) {
-            val agc = AcousticEchoCanceler.create(sessionId)
+            val agc = AutomaticGainControl.create(sessionId)
             if (agc != null) {
                 BaresipService.agcAvailable = true
                 agc.release()
