@@ -34,7 +34,6 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.Uri
 import android.net.wifi.WifiManager
-import android.os.Build
 import android.os.Build.VERSION
 import android.os.CountDownTimer
 import android.os.Handler
@@ -1871,15 +1870,22 @@ class BaresipService: Service() {
     }
 
     private fun ensureCommunicationMode() {
-        // On Android 11+, Telecom usually handles this.
-        // On Android 10 and below, we must be more aggressive.
-        if (VERSION.SDK_INT < 31 || am.mode != MODE_IN_COMMUNICATION) {
-            if (Call.inCall()) {
-                Log.d(TAG, "Manual Mode Guard: Setting MODE_IN_COMMUNICATION")
+        // Android 11 (API 30) and below: Manual mode switching is often required
+        // to ensure the system routes audio through the correct VOIP hardware path.
+        if (VERSION.SDK_INT < 31) {
+            if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
+                Log.d(TAG, "Manual Mode Guard (SDK < 31): Setting MODE_IN_COMMUNICATION")
                 am.mode = MODE_IN_COMMUNICATION
             }
         }
+        else {
+            // For Android 12+, log if the system hasn't set the mode correctly.
+            if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
+                Log.w(TAG, "ConnectionService has not set MODE_IN_COMMUNICATION on Android 12+")
+            }
+        }
     }
+
     @SuppressLint("WakelockTimeout", "Wakelock")
     private fun proximitySensing(enable: Boolean) {
         if (enable) {
