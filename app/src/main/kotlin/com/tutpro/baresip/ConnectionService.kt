@@ -18,6 +18,7 @@ class ConnectionService : ConnectionService() {
     companion object {
         val connections = ConcurrentHashMap<Long, BaresipConnection>()
         var pendingOutgoingConnection: BaresipConnection? = null
+        var lastDisconnectTime = 0L
 
         fun promoteOutgoingConnection(callp: Long) {
             pendingOutgoingConnection?.let {
@@ -159,8 +160,16 @@ class ConnectionService : ConnectionService() {
 
         override fun onDisconnect() {
             if (isDisconnecting) return
+
+            if (System.currentTimeMillis() - lastDisconnectTime < 500) {
+                Log.d(TAG, "Ignoring cascaded onDisconnect for $callp")
+                return
+            }
+
             Log.d(TAG, "Telecom Connection onDisconnect $callp")
             isDisconnecting = true
+            lastDisconnectTime = System.currentTimeMillis()
+
             if (callp == 0L) {
                 pendingOutgoingConnection = null
                 setDisconnected(DisconnectCause(DisconnectCause.CANCELED))

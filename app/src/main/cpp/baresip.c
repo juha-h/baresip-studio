@@ -210,7 +210,7 @@ static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
             break;
         case BEVENT_CALL_REMOTE_SDP:
             ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
-            len = re_snprintf(event_buf, sizeof event_buf, "call update,%d", ardir);
+            len = re_snprintf(event_buf, sizeof event_buf, "call update,%d,%ld", ardir, (long)event);
             break;
         case BEVENT_CALL_MENC:
             if (prm[0] == '0')

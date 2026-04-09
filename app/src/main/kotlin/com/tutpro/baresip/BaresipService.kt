@@ -802,7 +802,6 @@ class BaresipService: Service() {
                     }
                     "incoming call" -> {
                         val peerUri = ev[1]
-                        val bevent = ev[2].toLong()
                         val toastMsg = if (Call.isAnyCallActive(applicationContext))
                             String.format(getString(R.string.call_auto_rejected),
                                 Utils.friendlyUri(this, peerUri, ua.account))
@@ -816,7 +815,7 @@ class BaresipService: Service() {
                         if (toastMsg != "") {
                             Log.d(TAG, "Auto-rejecting incoming call to $uap from $peerUri")
                             Api.sip_treply(callp, 486, "Busy Here")
-                            Api.bevent_stop(bevent)
+                            Api.bevent_stop(ev[2].toLong())
                             toast(toastMsg)
                             if (toastMsg.contains(getString(R.string.call_blocked))) {
                                 if (ua.account.callHistory)
@@ -892,6 +891,7 @@ class BaresipService: Service() {
                     "call update" -> {
                         if (call!!.conferenceCall) {
                             Log.d(TAG, "Refusing to update conference call ${call.callp}")
+                            Api.bevent_stop(ev[2].toLong())
                             return
                         }
                         val newHeldState = when (ev[1].toInt()) {Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
@@ -1002,6 +1002,7 @@ class BaresipService: Service() {
                     }
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
+                        ConnectionService.lastDisconnectTime = System.currentTimeMillis()
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
                             val cause = when {
