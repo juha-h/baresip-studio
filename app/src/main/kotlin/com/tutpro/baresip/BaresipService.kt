@@ -1871,19 +1871,12 @@ class BaresipService: Service() {
     }
 
     private fun ensureCommunicationMode() {
-        // Android 11 (API 30) and below: Manual mode switching is often required
-        // to ensure the system routes audio through the correct VOIP hardware path.
-        if (VERSION.SDK_INT < 31) {
-            if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
+        if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
+            am.mode = MODE_IN_COMMUNICATION
+            if (VERSION.SDK_INT < 31)
                 Log.d(TAG, "Manual Mode Guard (SDK < 31): Setting MODE_IN_COMMUNICATION")
-                am.mode = MODE_IN_COMMUNICATION
-            }
-        }
-        else {
-            // For Android 12+, log if the system hasn't set the mode correctly.
-            if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
-                Log.w(TAG, "ConnectionService has not set MODE_IN_COMMUNICATION on Android 12+")
-            }
+            else
+                Log.d(TAG, "Manual Mode Guard (SDK >= 31): Setting MODE_IN_COMMUNICATION")
         }
     }
 
