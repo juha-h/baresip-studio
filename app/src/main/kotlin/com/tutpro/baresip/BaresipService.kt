@@ -21,6 +21,7 @@ import android.graphics.ImageDecoder
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.AudioManager.MODE_IN_COMMUNICATION
+import android.media.AudioManager.MODE_NORMAL
 import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
@@ -1013,8 +1014,10 @@ class BaresipService: Service() {
                                 else -> DisconnectCause.REMOTE
                             }
                             connection.setDisconnected(DisconnectCause(cause))
-                            connection.destroy()
-                            ConnectionService.connections.remove(callp)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                connection.destroy()
+                                ConnectionService.connections.remove(callp)
+                            }, 500)
                         }
                         nm.cancel(CALL_NOTIFICATION_ID)
                         if (call != null) {
@@ -1046,8 +1049,8 @@ class BaresipService: Service() {
                             val tone = ev[2]
                             if (tone == "busy")
                                 playBusy()
-                            else if (!Call.inCall()) {
-                                am.mode = AudioManager.MODE_NORMAL
+                            else {
+                                ensureCommunicationMode()
                                 resetCallVolume()
                                 proximitySensing(false)
                             }
@@ -1060,15 +1063,15 @@ class BaresipService: Service() {
                             val completedElsewhere = missed && ev[2].startsWith("SIP") &&
                                     ev[2].contains(";cause=200")
                             if (ua.account.callHistory) {
-                                val history = CallHistoryNew(aor, call.peerUri, call.dir)
-                                history.stopTime = GregorianCalendar()
-                                history.startTime = if (completedElsewhere) history.stopTime else call.startTime
-                                history.rejected = call.rejected
-                                if (call.dumpfiles[0] != "") {
-                                    history.recording = call.dumpfiles
-                                }
-                                history.add()
                                 CoroutineScope(Dispatchers.IO).launch {
+                                    val history = CallHistoryNew(aor, call.peerUri, call.dir)
+                                    history.stopTime = GregorianCalendar()
+                                    history.startTime = if (completedElsewhere) history.stopTime else call.startTime
+                                    history.rejected = call.rejected
+                                    if (call.dumpfiles[0] != "") {
+                                        history.recording = call.dumpfiles
+                                    }
+                                    history.add()
                                     if (call.startTime != null && call.dumpfiles[0] != "") {
                                         delay(500)
                                         val rxFile = File(call.dumpfiles[0])
@@ -1871,12 +1874,17 @@ class BaresipService: Service() {
     }
 
     private fun ensureCommunicationMode() {
-        if (Call.inCall() && am.mode != MODE_IN_COMMUNICATION) {
-            am.mode = MODE_IN_COMMUNICATION
-            if (VERSION.SDK_INT < 31)
-                Log.d(TAG, "Manual Mode Guard (SDK < 31): Setting MODE_IN_COMMUNICATION")
-            else
-                Log.d(TAG, "Manual Mode Guard (SDK >= 31): Setting MODE_IN_COMMUNICATION")
+        if (Call.inCall()) {
+            if (am.mode != MODE_IN_COMMUNICATION) {
+                am.mode = MODE_IN_COMMUNICATION
+                Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Setting MODE_IN_COMMUNICATION")
+            }
+        } else {
+            if (am.mode != MODE_NORMAL) {
+                am.mode = MODE_NORMAL
+                Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Resetting to MODE_NORMAL")
+            }
+            Utils.clearCommunicationDevice(am)
         }
     }
 
