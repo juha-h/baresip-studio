@@ -1426,10 +1426,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
 
     if (acc.regint == 0)
         Api.account_set_check_origin(ua.account.accp, false)
-    else {
+    else
         Api.account_set_check_origin(ua.account.accp, viewModel.checkOrigin.value)
-        acc.checkOrigin = Api.account_check_origin(ua.account.accp)
-    }
+    acc.checkOrigin = Api.account_check_origin(ua.account.accp)
 
     val newMediaEnc = viewModel.mediaEnc.value
     if (newMediaEnc != acc.mediaEnc) {
