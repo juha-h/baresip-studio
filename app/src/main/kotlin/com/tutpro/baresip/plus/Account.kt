@@ -21,7 +21,7 @@ class Account(val accp: Long) {
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
     var regint = Api.account_regint(accp)
-    var checkOrigin = true
+    var checkOrigin = Api.account_check_origin(accp)
     var configuredRegInt = REGISTRATION_INTERVAL
     var mediaEnc = Api.account_mediaenc(accp)
     var rtcpMux = Api.account_rtcp_mux(accp)

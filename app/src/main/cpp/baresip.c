@@ -253,8 +253,8 @@ static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
             //stream_debug_log(video_strm(call_video(call)));
             //call_video_debug_log(call);
             ardir = sdp_media_rdir(stream_sdpmedia(audio_strm(call_audio(call))));
-            len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d,%d", prm,
-                    call_has_video(call), remote_has_video, ldir, rdir, ardir);
+            len = re_snprintf(event_buf, sizeof event_buf, "remote call %sed,%d,%d,%d,%d,%d,%ld",
+                    prm, call_has_video(call), remote_has_video, ldir, rdir, ardir, (long)event);
             break;
         case BEVENT_CALL_RINGING:
             len = re_snprintf(event_buf, sizeof event_buf, "call ringing", "");

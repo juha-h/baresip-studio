@@ -13,11 +13,13 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
 
-    private val TAG = "BaresipConnection"
-
     companion object {
+
+        private const val TAG = "BaresipConnection"
+
         val connections = ConcurrentHashMap<Long, BaresipConnection>()
         var pendingOutgoingConnection: BaresipConnection? = null
+        var lastDisconnectTime = 0L
 
         fun promoteOutgoingConnection(callp: Long) {
             pendingOutgoingConnection?.let {
@@ -162,8 +164,16 @@ class ConnectionService : ConnectionService() {
 
         override fun onDisconnect() {
             if (isDisconnecting) return
+
+            if (System.currentTimeMillis() - lastDisconnectTime < 500) {
+                Log.d(TAG, "Ignoring cascaded onDisconnect for $callp")
+                return
+            }
+
             Log.d(TAG, "Telecom Connection onDisconnect $callp")
             isDisconnecting = true
+            lastDisconnectTime = System.currentTimeMillis()
+
             if (callp == 0L) {
                 pendingOutgoingConnection = null
                 setDisconnected(DisconnectCause(DisconnectCause.CANCELED))
@@ -175,8 +185,7 @@ class ConnectionService : ConnectionService() {
                 Api.ua_hangup(uap, callp, 0, "")
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
             destroy()
-            // Allow other disconnects after a short period
-            // to prevent the "Telecom Cascade" effect
+            // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 isDisconnecting = false
             }, 1000)
@@ -209,12 +218,15 @@ class ConnectionService : ConnectionService() {
                     )
                 }
                 val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
-                BaresipService.postServiceEvent(
-                    ServiceEvent("speaker update,${isSpeaker}",
-                        arrayListOf(uap, callp),
-                        System.nanoTime()
+                if (BaresipService.speakerPhone != isSpeaker) {
+                    BaresipService.speakerPhone = isSpeaker
+                    BaresipService.postServiceEvent(
+                        ServiceEvent("speaker update,${isSpeaker}",
+                            arrayListOf(uap, callp),
+                            System.nanoTime()
+                        )
                     )
-                )
+                }
             }
         }
 

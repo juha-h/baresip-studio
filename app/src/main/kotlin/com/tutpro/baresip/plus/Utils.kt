@@ -636,6 +636,7 @@ object Utils {
 
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
+            @Suppress("unused")
             private const val serialVersionUID: Long = -29238082928391L
         }
     }
@@ -921,60 +922,50 @@ object Utils {
 
     private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 31) {
+            if (!enable) {
+                Log.d(TAG, "Disabling speakerphone")
+                clearCommunicationDevice(am)
+                if (inCall() && am.mode == AudioManager.MODE_NORMAL) {
+                    Log.d(TAG, "Restoring MODE_IN_COMMUNICATION")
+                    am.mode = AudioManager.MODE_IN_COMMUNICATION
+                }
+                return
+            }
             val current = am.communicationDevice!!.type
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
             var speakerDevice: AudioDeviceInfo? = null
-            if (enable) {
-                for (device in am.availableCommunicationDevices)
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
-                        speakerDevice = device
-                        break
-                    }
-            } else {
-                for (device in am.availableCommunicationDevices)
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
-                        speakerDevice = device
-                        break
-                    }
-            }
+            for (device in am.availableCommunicationDevices)
+                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                    speakerDevice = device
+                    break
+                }
             if (speakerDevice == null) {
                 Log.w(TAG,"Could not find requested communication device")
                 return
             }
             if (current != speakerDevice.type) {
-                if (speakerDevice.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
-                    clearCommunicationDevice(am)
-                    Log.d(TAG, "Setting com device to TYPE_BUILTIN_EARPIECE")
+                // Currently at API levels 31+, speakerphone needs normal mode
+                if (am.mode == AudioManager.MODE_NORMAL) {
+                    Log.d(TAG, "Setting com device to ${speakerDevice.type} in MODE_NORMAL")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
-                    if (inCall() && am.mode == AudioManager.MODE_NORMAL) {
-                        Log.d(TAG, "Setting mode to communication")
-                        am.mode = AudioManager.MODE_IN_COMMUNICATION
-                    }
                 } else {
-                    // Currently at API levels 31+, speakerphone needs normal mode
-                    if (am.mode == AudioManager.MODE_NORMAL) {
-                        Log.d(TAG, "Setting com device to ${speakerDevice.type} in MODE_NORMAL")
-                        if (!am.setCommunicationDevice(speakerDevice))
-                            Log.e(TAG, "Could not set com device")
-                    } else {
-                        val normalListener = object : AudioManager.OnModeChangedListener {
-                            override fun onModeChanged(mode: Int) {
-                                if (mode == AudioManager.MODE_NORMAL) {
-                                    am.removeOnModeChangedListener(this)
-                                    Log.d(
-                                        TAG, "Setting com device to ${speakerDevice.type}" +
-                                                " in mode ${am.mode}"
-                                    )
-                                    if (!am.setCommunicationDevice(speakerDevice))
-                                        Log.e(TAG, "Could not set com device")
-                                }
+                    val normalListener = object : AudioManager.OnModeChangedListener {
+                        override fun onModeChanged(mode: Int) {
+                            if (mode == AudioManager.MODE_NORMAL) {
+                                am.removeOnModeChangedListener(this)
+                                Log.d(
+                                    TAG, "Setting com device to ${speakerDevice.type}" +
+                                            " in mode ${am.mode}"
+                                )
+                                if (!am.setCommunicationDevice(speakerDevice))
+                                    Log.e(TAG, "Could not set com device")
                             }
                         }
-                        am.addOnModeChangedListener(executor, normalListener)
-                        Log.d(TAG, "Setting mode to NORMAL")
-                        am.mode = AudioManager.MODE_NORMAL
                     }
+                    am.addOnModeChangedListener(executor, normalListener)
+                    Log.d(TAG, "Setting mode to NORMAL")
+                    am.mode = AudioManager.MODE_NORMAL
                 }
                 Log.d(TAG, "New com device/mode is ${am.communicationDevice!!.type}/${am.mode}")
             }
@@ -987,17 +978,17 @@ object Utils {
 
     fun toggleSpeakerPhone(executor: Executor, am: AudioManager) {
         if (Build.VERSION.SDK_INT >= 31) {
-            if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)
-                setSpeakerPhone(executor, am, true)
-            else if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
+            if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
                 setSpeakerPhone(executor, am, false)
+            else
+                setSpeakerPhone(executor, am, true)
         } else {
             @Suppress("DEPRECATION")
             setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
         }
     }
 
-    private fun clearCommunicationDevice(am: AudioManager) {
+    fun clearCommunicationDevice(am: AudioManager) {
         if (Build.VERSION.SDK_INT >= 31) {
             am.clearCommunicationDevice()
         } else {
