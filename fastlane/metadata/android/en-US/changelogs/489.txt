@@ -1,0 +1,4 @@
+- Prevent other conference calls from closing when one participant hangs up
+- Fixed initialization of account Check Origin setting
+- Audio improvements
+- New translations (Chinese and Spanish)
