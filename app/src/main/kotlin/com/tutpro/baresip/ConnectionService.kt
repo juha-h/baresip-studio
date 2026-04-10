@@ -181,8 +181,7 @@ class ConnectionService : ConnectionService() {
                 Api.ua_hangup(uap, callp, 0, "")
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
             destroy()
-            // Allow other disconnects after a short period
-            // to prevent the "Telecom Cascade" effect
+            // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 isDisconnecting = false
             }, 1000)
@@ -215,12 +214,15 @@ class ConnectionService : ConnectionService() {
                     )
                 }
                 val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
-                BaresipService.postServiceEvent(
-                    ServiceEvent("speaker update,${isSpeaker}",
-                        arrayListOf(uap, callp),
-                        System.nanoTime()
+                if (BaresipService.speakerPhone != isSpeaker) {
+                    BaresipService.speakerPhone = isSpeaker
+                    BaresipService.postServiceEvent(
+                        ServiceEvent("speaker update,${isSpeaker}",
+                            arrayListOf(uap, callp),
+                            System.nanoTime()
+                        )
                     )
-                )
+                }
             }
         }
 
