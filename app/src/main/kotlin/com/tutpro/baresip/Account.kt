@@ -40,6 +40,7 @@ class Account(val accp: Long) {
     var telProvider = Utils.aorDomain(aor)
     var resumeUri = ""
     var numericKeypad = false
+    var customParams = ""
 
     init {
 
@@ -80,6 +81,7 @@ class Account(val accp: Long) {
         if (Utils.paramExists(extra, "tel_provider"))
             telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
         numericKeypad = Utils.paramExists(extra, "numeric_keypad")
+        customParams = extra.substringAfter("last=empty").substringAfter(";")
     }
 
     fun print() : String {
@@ -166,7 +168,8 @@ class Account(val accp: Long) {
         if (blockUnknown)
             extra += ";block_unknown=yes"
 
-        extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
+        if (telProvider != "")
+            extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
 
         if (countryCode != "")
             extra += ";country_code=$countryCode"
@@ -177,8 +180,15 @@ class Account(val accp: Long) {
         if (numericKeypad)
             extra += ";numeric_keypad=yes"
 
-        if (extra !="")
-            res += ";extra=\"" + extra.substringAfter(";") + "\""
+        extra += ";last=empty"
+
+        if (customParams != "")
+            extra += ";$customParams"
+
+        res += ";extra=\"" + extra.substringAfter(";") + "\""
+
+        if (customParams != "")
+            res += ";$customParams"
 
         return res
     }
@@ -261,7 +271,7 @@ class Account(val accp: Long) {
                 BaresipService.filesPath + "/accounts",
                 accounts.toByteArray(Charsets.UTF_8)
             )
-            // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+            Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
         fun ofAor(aor: String): Account? {

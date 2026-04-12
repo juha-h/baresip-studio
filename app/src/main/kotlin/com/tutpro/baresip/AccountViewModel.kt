@@ -28,8 +28,10 @@ class AccountViewModel: ViewModel() {
     val vmUri = MutableStateFlow("")
     val countryCode = MutableStateFlow("")
     val telProvider = MutableStateFlow("")
-    val defaultAccount = MutableStateFlow(false)
     val numericKeypad = MutableStateFlow(false)
+
+    val defaultAccount = MutableStateFlow(false)
+    val customParams = MutableStateFlow("")
 
     private var isLoaded = false
 
@@ -63,5 +65,6 @@ class AccountViewModel: ViewModel() {
         telProvider.value = acc.telProvider
         numericKeypad.value = acc.numericKeypad
         defaultAccount.value = UserAgent.findAorIndex(acc.aor)!! == 0
+        customParams.value = acc.customParams
     }
 }

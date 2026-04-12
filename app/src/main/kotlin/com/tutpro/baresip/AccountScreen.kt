@@ -1194,6 +1194,35 @@ private fun AccountContent(
         }
     }
 
+    @Composable
+    fun CustomParams() {
+        val customParamsTitle = stringResource(R.string.custom_parameters)
+        val customParamsHelp = stringResource(R.string.custom_parameters_help)
+        val customParams by viewModel.customParams.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            OutlinedTextField(
+                value = customParams,
+                placeholder = { Text(customParamsTitle) },
+                onValueChange = { viewModel.customParams.value = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = customParamsTitle
+                        alertMessage.value = customParamsHelp
+                        showAlert.value = true
+                    },
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(customParamsTitle) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
     if (showAlert.value) {
         AlertDialog(
             showDialog = showAlert,
@@ -1248,6 +1277,7 @@ private fun AccountContent(
         TelProvider()
         NumericKeypad()
         DefaultAccount()
+        CustomParams()
     }
 }
 
@@ -1613,6 +1643,12 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newNumericKeypad != acc.numericKeypad) {
         acc.numericKeypad = newNumericKeypad
         Log.d(TAG, "New numericKeyboard is ${acc.numericKeypad}")
+    }
+
+    val newCustomParams = viewModel.customParams.value
+    if (newCustomParams != acc.customParams) {
+        acc.customParams = newCustomParams
+        Log.d(TAG, "New customParams is ${acc.customParams}")
     }
 
     if (viewModel.defaultAccount.value) ua.makeDefault()
