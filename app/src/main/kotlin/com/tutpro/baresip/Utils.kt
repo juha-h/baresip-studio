@@ -328,11 +328,6 @@ object Utils {
         return false
     }
 
-    fun customParams(params: String): String {
-        return params.substringAfter("last=empty")
-
-    }
-
     fun checkHostPortParams(hpp: String) : Boolean {
         val restParams = hpp.split(";", limit = 2)
         return if (restParams.size == 1)
@@ -633,6 +628,7 @@ object Utils {
 
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
+            @Suppress("unused")
             private const val serialVersionUID: Long = -29238082928391L
         }
     }
