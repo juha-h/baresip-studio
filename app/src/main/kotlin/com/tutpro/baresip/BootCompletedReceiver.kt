@@ -3,7 +3,7 @@ package com.tutpro.baresip
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
+import androidx.core.content.ContextCompat
 
 import java.nio.charset.StandardCharsets
 
@@ -17,14 +17,12 @@ class BootCompletedReceiver : BroadcastReceiver() {
         val config = Utils.getFileContents(configPath) ?: return
         val asCv = Utils.getNameValue(String(config, StandardCharsets.ISO_8859_1), "auto_start")
         if ((asCv.isNotEmpty()) && (asCv[0] == "yes")) {
-            Log.i(TAG, "Start baresip upon boot completed")
-            val i = Intent(context, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                val b = Bundle()
-                b.putBoolean("onStartup", true)
-                putExtras(b)
+            Log.i(TAG, "Start baresip service upon boot completed")
+            val baresipService = Intent(context, BaresipService::class.java).apply {
+                action = "Start"
+                putExtra("onStartup", true)
             }
-            context.startActivity(i)
+            ContextCompat.startForegroundService(context, baresipService)
         }
 
     }
