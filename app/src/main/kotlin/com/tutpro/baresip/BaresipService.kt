@@ -115,8 +115,6 @@ class BaresipService: Service() {
     private var isNotificationInCall = false
     private var isServiceClean = false
 
-    private val TAG = "BaresipService"
-
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
         super.onCreate()
@@ -748,7 +746,7 @@ class BaresipService: Service() {
             if (uas.value[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
-                        updatePartialWakeLock(brief = true)
+                        updatePartialWakeLock()
                         ua.updateStatus(circleYellow.getValue(colorblind))
                         updateStatusNotification()
                         if (isMainVisible)
@@ -756,7 +754,7 @@ class BaresipService: Service() {
                         return
                     }
                     "registered" -> {
-                        updatePartialWakeLock(brief = true)
+                        updatePartialWakeLock()
                         ua.updateStatus(
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
@@ -769,7 +767,7 @@ class BaresipService: Service() {
                         return
                     }
                     "registering failed" -> {
-                        updatePartialWakeLock(brief = true)
+                        updatePartialWakeLock()
                         ua.updateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
@@ -1642,25 +1640,13 @@ class BaresipService: Service() {
     }
 
     @SuppressLint("WakelockTimeout")
-    private fun updatePartialWakeLock(brief: Boolean = false) {
-        // Only hold a permanent wake lock during active calls.
-        // For registration standby, rely on the foreground service and kernel socket wakes.
-        // Also hold it briefly for registration events or network transitions.
-        val needsToStayAwake = calls.isNotEmpty()
+    private fun updatePartialWakeLock() {
+        // Hold the wake lock as long as the service is active to ensure
+        // native SIP timers (registration, keep-alives) continue to run.
         try {
-            if (needsToStayAwake) {
-                if (!partialWakeLock.isHeld) {
-                    Log.d(TAG, "Acquiring Partial Wake Lock (Call in progress)")
-                    partialWakeLock.acquire()
-                }
-            } else if (brief) {
-                Log.d(TAG, "Acquiring Brief Partial Wake Lock (2s)")
-                partialWakeLock.acquire(2000L)
-            } else {
-                if (partialWakeLock.isHeld) {
-                    Log.d(TAG, "Releasing Partial Wake Lock (No calls in progress)")
-                    partialWakeLock.release()
-                }
+            if (!partialWakeLock.isHeld) {
+                Log.d(TAG, "Acquiring Partial Wake Lock")
+                partialWakeLock.acquire()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error managing partialWakeLock: ${e.message}")
@@ -1963,7 +1949,7 @@ class BaresipService: Service() {
     private fun updateNetwork() {
         if (!isNativeReady) return
 
-        updatePartialWakeLock(brief = true)
+        updatePartialWakeLock()
         updateDnsServers()
 
         val addresses = linkAddresses()
@@ -2159,6 +2145,8 @@ class BaresipService: Service() {
 
     @SuppressLint("MutableCollectionMutableState")
     companion object {
+
+        private const val TAG = "BaresipService"
 
         var instance: BaresipService? = null
         var isServiceRunning = false
