@@ -430,4 +430,6 @@
     <string name="call_is_connected">通话已连接</string>
     <string name="replaces_not_supported">对方不支持 REPLACES 功能</string>
     <string name="call_is_ringing">通话正在响铃</string>
+    <string name="custom_parameters">自定义参数</string>
+    <string name="custom_parameters_help">以英文分号分隔的自定义账号参数列表</string>
 </resources>
