@@ -1641,7 +1641,7 @@ class BaresipService: Service() {
         // native SIP timers (registration, keep-alives) continue to run.
         try {
             if (!partialWakeLock.isHeld) {
-                Log.d(TAG, "Acquiring Partial Wake Lock")
+                Log.i(TAG, "Acquiring Partial Wake Lock")
                 partialWakeLock.acquire()
             }
         } catch (e: Exception) {
