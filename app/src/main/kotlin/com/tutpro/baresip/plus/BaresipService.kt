@@ -174,8 +174,10 @@ class BaresipService: Service() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 Log.d(TAG, "Network $network is available")
-                if (network !in allNetworks)
-                    allNetworks.add(network)
+                synchronized(allNetworks) {
+                    if (network !in allNetworks)
+                        allNetworks.add(network)
+                }
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -186,16 +188,20 @@ class BaresipService: Service() {
             override fun onLost(network: Network) {
                 super.onLost(network)
                 Log.d(TAG, "Network $network is lost")
-                if (network in allNetworks)
-                    allNetworks.remove(network)
+                synchronized(allNetworks) {
+                    if (network in allNetworks)
+                        allNetworks.remove(network)
+                }
                 if (isServiceRunning)
                     updateNetwork()
             }
 
             override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
                 super.onCapabilitiesChanged(network, caps)
-                if (network !in allNetworks)
-                    allNetworks.add(network)
+                synchronized(allNetworks) {
+                    if (network !in allNetworks)
+                        allNetworks.add(network)
+                }
                 if (isServiceRunning)
                     updateNetwork()
             }
@@ -203,8 +209,10 @@ class BaresipService: Service() {
             override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                 super.onLinkPropertiesChanged(network, props)
                 Log.d(TAG, "Network $network link properties changed: $props")
-                if (network !in allNetworks)
-                    allNetworks.add(network)
+                synchronized(allNetworks) {
+                    if (network !in allNetworks)
+                        allNetworks.add(network)
+                }
                 if (isServiceRunning)
                     updateNetwork()
             }
@@ -353,6 +361,7 @@ class BaresipService: Service() {
                 }
 
                 updateDnsServers()
+                updatePartialWakeLock()
 
                 val assets = arrayOf("accounts", "config", "contacts")
                 var file = File(filesPath)
@@ -1476,6 +1485,7 @@ class BaresipService: Service() {
     @Keep
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
+        isNativeReady = true
         Api.net_debug()
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
@@ -1490,6 +1500,7 @@ class BaresipService: Service() {
     @Keep
     fun stopped(error: String) {
         Log.d(TAG, "Received 'stopped' from baresip with start error '$error'")
+        isNativeReady = false
         quitTimer.cancel()
         cleanService()
         isServiceRunning = false
@@ -1694,25 +1705,16 @@ class BaresipService: Service() {
             Log.e(TAG, "Failed to update foreground notification: ${e.message}")
             nm.notify(STATUS_NOTIFICATION_ID, notification)
         }
-
-        updatePartialWakeLock()
     }
 
     @SuppressLint("WakelockTimeout")
     private fun updatePartialWakeLock() {
-        val isAnyUaActive = uasStatus.value.values.any { it != R.drawable.circle_white }
-        val needsToStayAwake = isAnyUaActive || calls.isNotEmpty()
+        // Hold the wake lock as long as the service is active to ensure
+        // native SIP timers (registration, keep-alives) continue to run.
         try {
-            if (needsToStayAwake) {
-                if (!partialWakeLock.isHeld) {
-                    Log.d(TAG, "Acquiring Partial Wake Lock (UA Active or Call in progress)")
-                    partialWakeLock.acquire()
-                }
-            } else {
-                if (partialWakeLock.isHeld) {
-                    Log.d(TAG, "Releasing Partial Wake Lock (All UAs idle and no calls)")
-                    partialWakeLock.release()
-                }
+            if (!partialWakeLock.isHeld) {
+                Log.d(TAG, "Acquiring Partial Wake Lock")
+                partialWakeLock.acquire()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error managing partialWakeLock: ${e.message}")
@@ -2012,6 +2014,8 @@ class BaresipService: Service() {
     }
 
     private fun updateNetwork() {
+        if (!isNativeReady) return
+
         updateDnsServers()
 
         val addresses = linkAddresses()
@@ -2068,15 +2072,18 @@ class BaresipService: Service() {
 
     private fun linkAddresses(): MutableMap<String, String> {
         val addresses = mutableMapOf<String, String>()
-        for (n in allNetworks) {
-            val caps = cm.getNetworkCapabilities(n) ?: continue
-            if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
-                val props = cm.getLinkProperties(n) ?: continue
-                for (la in props.linkAddresses)
-                    if (la.scope == OsConstants.RT_SCOPE_UNIVERSE &&
+        synchronized(allNetworks) {
+            for (n in allNetworks) {
+                val caps = cm.getNetworkCapabilities(n) ?: continue
+                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
+                    val props = cm.getLinkProperties(n) ?: continue
+                    for (la in props.linkAddresses)
+                        if (la.scope == OsConstants.RT_SCOPE_UNIVERSE &&
                             props.interfaceName != null && la.address.hostAddress != null &&
-                            afMatch(la.address.hostAddress!!))
-                        addresses[la.address.hostAddress!!] = props.interfaceName!!
+                            afMatch(la.address.hostAddress!!)
+                        )
+                            addresses[la.address.hostAddress!!] = props.interfaceName!!
+                }
             }
         }
         if (hotSpotIsEnabled) {
@@ -2209,6 +2216,7 @@ class BaresipService: Service() {
 
         var instance: BaresipService? = null
         var isServiceRunning = false
+        var isNativeReady = false
         var isStartReceived = false
         var isConfigInitialized = false
         var libraryLoaded = false

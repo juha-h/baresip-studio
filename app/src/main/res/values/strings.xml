@@ -229,6 +229,8 @@
     <string name="default_account">Default Account</string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.
     </string>
+    <string name="custom_parameters">Custom Parameters</string>
+    <string name="custom_parameters_help">Semicolor separeted list of custom account parameters</string>
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="new_account">SIP URI of New Account</string>

@@ -3,6 +3,7 @@ package com.tutpro.baresip.plus
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 
 class TaskReceiver : BroadcastReceiver() {
 
@@ -46,7 +47,7 @@ class TaskReceiver : BroadcastReceiver() {
                 val baresipService = Intent(context, BaresipService::class.java)
                 if (BaresipService.isServiceRunning) {
                     baresipService.action = "Stop"
-                    context.startService(baresipService)
+                    ContextCompat.startForegroundService(context, baresipService)
                 }
             }
 

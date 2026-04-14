@@ -21,6 +21,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -74,7 +75,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -1567,7 +1567,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             }
         }
         Contact.contactsUpdate()
-        ctx.startService(baresipService)
+        ContextCompat.startForegroundService(ctx, baresipService)
         save = true
     }
 
@@ -1603,7 +1603,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         UserAgent.updateColorblindStatus()
         val baresipService = Intent(ctx, BaresipService::class.java)
         baresipService.action = "Update Notification"
-        ctx.startService(baresipService)
+        ContextCompat.startForegroundService(ctx, baresipService)
         save = true
     }
 

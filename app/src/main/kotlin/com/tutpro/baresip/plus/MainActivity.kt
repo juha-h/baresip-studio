@@ -35,6 +35,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import androidx.core.content.ContextCompat
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
@@ -150,7 +151,7 @@ class MainActivity : ComponentActivity() {
             if (BaresipService.isServiceRunning) {
                 restart = true
                 baresipService.action = "Stop"
-                startService(baresipService)
+                ContextCompat.startForegroundService(this, baresipService)
             } else {
                 finishAndRemoveTask()
                 val pm = applicationContext.packageManager
@@ -171,7 +172,7 @@ class MainActivity : ComponentActivity() {
             if (BaresipService.isServiceRunning) {
                 restart = false
                 baresipService.action = "Stop"
-                startService(baresipService)
+                ContextCompat.startForegroundService(this, baresipService)
             } else {
                 finishAndRemoveTask()
                 exitProcess(0)
@@ -245,7 +246,7 @@ class MainActivity : ComponentActivity() {
                     else {
                         if (!BaresipService.isStartReceived) {
                             baresipService.action = "Start"
-                            startService(baresipService)
+                            ContextCompat.startForegroundService(this, baresipService)
                             if (atStartup)
                                 moveTaskToBack(true)
                         }
@@ -397,7 +398,7 @@ class MainActivity : ComponentActivity() {
         if (BaresipService.isServiceRunning) {
             restart = reStart
             baresipService.action = "Stop"
-            startService(baresipService)
+            ContextCompat.startForegroundService(this, baresipService)
         } else {
             finishAndRemoveTask()
             if (reStart)

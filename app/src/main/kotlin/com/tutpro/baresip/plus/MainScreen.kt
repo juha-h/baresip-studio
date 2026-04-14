@@ -2586,7 +2586,7 @@ private fun answer(ctx: Context, call: Call, videoCall: Boolean) {
     intent.action = "Call Answer"
     intent.putExtra("uap", call.ua.uap)
     intent.putExtra("callp", call.callp)
-    ctx.startService(intent)
+    ContextCompat.startForegroundService(ctx, intent)
 }
 
 private fun reject(call: Call) {

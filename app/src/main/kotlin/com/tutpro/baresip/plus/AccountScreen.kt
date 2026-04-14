@@ -1214,6 +1214,35 @@ private fun AccountContent(
         }
     }
 
+    @Composable
+    fun CustomParams() {
+        val customParamsTitle = stringResource(R.string.custom_parameters)
+        val customParamsHelp = stringResource(R.string.custom_parameters_help)
+        val customParams by viewModel.customParams.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            OutlinedTextField(
+                value = customParams,
+                placeholder = { Text(customParamsTitle) },
+                onValueChange = { viewModel.customParams.value = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        alertTitle.value = customParamsTitle
+                        alertMessage.value = customParamsHelp
+                        showAlert.value = true
+                    },
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 18.sp),
+                label = { Text(customParamsTitle) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+        }
+    }
+
     if (showAlert.value) {
         AlertDialog(
             showDialog = showAlert,
@@ -1269,6 +1298,7 @@ private fun AccountContent(
         TelProvider()
         NumericKeypad()
         DefaultAccount()
+        CustomParams()
     }
 }
 
@@ -1445,20 +1475,11 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             acc.configuredRegInt = regInt
     }
 
-    if (acc.regint == 0)
-        Api.account_set_check_origin(ua.account.accp, false)
-    else
-        Api.account_set_check_origin(ua.account.accp, viewModel.checkOrigin.value)
-    acc.checkOrigin = Api.account_check_origin(ua.account.accp)
-
-    val newMediaEnc = viewModel.mediaEnc.value
-    if (newMediaEnc != acc.mediaEnc) {
-        if (Api.account_set_mediaenc(acc.accp, newMediaEnc) == 0) {
-            acc.mediaEnc = Api.account_mediaenc(acc.accp)
-            Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
-        }
-        else
-            Log.e(TAG, "Setting of mediaenc $newMediaEnc failed")
+    val newCheckOrigin = viewModel.checkOrigin.value
+    if (newCheckOrigin != acc.checkOrigin) {
+        Api.account_set_check_origin(ua.account.accp, newCheckOrigin)
+        acc.checkOrigin = Api.account_check_origin(ua.account.accp)
+        Log.d(TAG, "New checkOrigin is ${acc.checkOrigin}")
     }
 
     val newMediaNat = viewModel.mediaNat.value
@@ -1634,6 +1655,12 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newNumericKeypad != acc.numericKeypad) {
         acc.numericKeypad = newNumericKeypad
         Log.d(TAG, "New numericKeyboard is ${acc.numericKeypad}")
+    }
+
+    val newCustomParams = viewModel.customParams.value
+    if (newCustomParams != acc.customParams) {
+        acc.customParams = newCustomParams
+        Log.d(TAG, "New customParams is ${acc.customParams}")
     }
 
     if (viewModel.defaultAccount.value) ua.makeDefault()
