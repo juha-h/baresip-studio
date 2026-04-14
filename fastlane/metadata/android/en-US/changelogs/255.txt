@@ -1,0 +1,3 @@
+- Added Custom Parameters account setting
+- Retain value of account's Check Origin when Register is toggled
+- New translations (Chinese)
