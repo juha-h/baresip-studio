@@ -13,7 +13,7 @@ class AccountViewModel: ViewModel() {
     val outbound2 = MutableStateFlow("")
     val register = MutableStateFlow(false)
     val regInt = MutableStateFlow("")
-    val checkOrigin = MutableStateFlow(false)
+    val checkOrigin = MutableStateFlow(true)
     val mediaEnc = MutableStateFlow("")
     val mediaNat = MutableStateFlow("")
     val stunServer = MutableStateFlow("")
