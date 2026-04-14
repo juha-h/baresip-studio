@@ -352,6 +352,7 @@ class BaresipService: Service() {
                 }
 
                 updateDnsServers()
+                updatePartialWakeLock()
 
                 val assets = arrayOf("accounts", "config", "contacts")
                 var file = File(filesPath)
@@ -746,7 +747,6 @@ class BaresipService: Service() {
             if (uas.value[accountIndex].account.aor == aor) {
                 when (ev[0]) {
                     "registering", "unregistering" -> {
-                        updatePartialWakeLock()
                         ua.updateStatus(circleYellow.getValue(colorblind))
                         updateStatusNotification()
                         if (isMainVisible)
@@ -754,7 +754,6 @@ class BaresipService: Service() {
                         return
                     }
                     "registered" -> {
-                        updatePartialWakeLock()
                         ua.updateStatus(
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
@@ -767,7 +766,6 @@ class BaresipService: Service() {
                         return
                     }
                     "registering failed" -> {
-                        updatePartialWakeLock()
                         ua.updateStatus(if (Api.account_regint(ua.account.accp) == 0)
                             R.drawable.circle_white
                         else
@@ -1635,8 +1633,6 @@ class BaresipService: Service() {
             Log.e(TAG, "Failed to update foreground notification: ${e.message}")
             nm.notify(STATUS_NOTIFICATION_ID, notification)
         }
-
-        updatePartialWakeLock()
     }
 
     @SuppressLint("WakelockTimeout")
@@ -1949,7 +1945,6 @@ class BaresipService: Service() {
     private fun updateNetwork() {
         if (!isNativeReady) return
 
-        updatePartialWakeLock()
         updateDnsServers()
 
         val addresses = linkAddresses()
