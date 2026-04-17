@@ -266,7 +266,7 @@
     <string name="verify_server">Verificar los certificados del servidor</string>
     <string name="transfer_request_to">Solicitud de transferencia de llamada a</string>
     <string name="missed_call_from">Llamada perdida desde</string>
-    <string name="accounts_help">URL SIP de cuenta nueva de formulario &lt;usuario&gt;@&lt;dominio&gt;[:&lt;puerto&gt;][;transport=udp|tcp|tls]. Si se indica &lt;puerto&gt; y no se indica el protocolo de transporte, el protocolo de transporte será por defecto udp. Si no se da &lt;puerto&gt; y se da el protocolo de transporte, &lt;puerto&gt; es por defecto 5060 o 5061 (TLS). Si no se indica ninguno de los dos y no se especifica ningún proxy de salida, el registrador de la cuenta (si lo hay) se determina únicamente a partir de la información DNS del dominio.</string>
+    <string name="accounts_help">URL SIP de cuenta nueva de formulario @[:][;transport=udp|tcp|tls]. Si se indica y no se indica el protocolo de transporte, el protocolo de transporte será por defecto udp. Si no se da y se da el protocolo de transporte, es por defecto 5060 o 5061 (TLS). Si no se indica ninguno de los dos y no se especifica ningún proxy de salida, el registrador de la cuenta (si lo hay) se determina únicamente a partir de la información DNS del dominio.</string>
     <string name="new_account">URI SIP de cuenta nueva</string>
     <string name="dtmf_info">Solicitudes SIP INFO</string>
     <string name="dtmf_inband">Eventos RTP en banda</string>
@@ -480,4 +480,6 @@
     <string name="speakerphone_title">Altavoz</string>
     <string name="speakerphone_tip">Si está activado, el sonido es reproducido por medio de dispositivo de altavoz.</string>
     <string name="call_is_ringing">La llamada está sonando</string>
+    <string name="custom_parameters">Parámetros personales</string>
+    <string name="custom_parameters_help">Listado separador por punto y coma de parámetros de cuenta personal</string>
 </resources>
