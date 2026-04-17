@@ -123,7 +123,9 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
                     @Suppress("UNCHECKED_CAST")
-                    BaresipService.messages = ois.readObject() as ArrayList<Message>
+                    val restoredMessages = ois.readObject() as? List<Message>
+                    if (restoredMessages != null)
+                        BaresipService.messages = restoredMessages
                     ois.close()
                     fis.close()
                     Log.d(TAG, "Restored ${BaresipService.messages.size} messages")
