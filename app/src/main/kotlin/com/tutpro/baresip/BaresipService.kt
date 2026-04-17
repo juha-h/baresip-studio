@@ -1935,7 +1935,7 @@ class BaresipService: Service() {
     private fun updateNetwork() {
         if (!isNativeReady) return
 
-        updateDnsServers()
+        val dnsChanged = updateDnsServers()
 
         val addresses = linkAddresses()
         if (linkAddresses != addresses)
@@ -1960,10 +1960,10 @@ class BaresipService: Service() {
             }
 
         val active = cm.activeNetwork
-        if (added != removed || activeNetwork != active)
-            Log.d(TAG, "Added/Removed = $added/$removed Old/New Active = $activeNetwork/$active")
+        if (added != removed || activeNetwork != active || dnsChanged)
+            Log.d(TAG, "Added/Removed = $added/$removed Old/New Active = $activeNetwork/$active DNS Changed = $dnsChanged")
 
-        if (added > 0 || removed > 0 || active != activeNetwork) {
+        if (added > 0 || removed > 0 || active != activeNetwork || dnsChanged) {
             Api.net_debug()
             linkAddresses = addresses
             activeNetwork = active
@@ -1994,13 +1994,14 @@ class BaresipService: Service() {
         synchronized(allNetworks) {
             for (n in allNetworks) {
                 val caps = cm.getNetworkCapabilities(n) ?: continue
-                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
+                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND) ||
+                    caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                ) {
                     val props = cm.getLinkProperties(n) ?: continue
                     for (la in props.linkAddresses)
                         if (la.scope == OsConstants.RT_SCOPE_UNIVERSE &&
-                            props.interfaceName != null && la.address.hostAddress != null &&
-                            afMatch(la.address.hostAddress!!)
-                        )
+                                props.interfaceName != null && la.address.hostAddress != null &&
+                                afMatch(la.address.hostAddress!!))
                             addresses[la.address.hostAddress!!] = props.interfaceName!!
                 }
             }
@@ -2021,9 +2022,9 @@ class BaresipService: Service() {
         }
     }
 
-    private fun updateDnsServers() {
+    private fun updateDnsServers(): Boolean {
         if (isServiceRunning && !dynDns)
-            return
+            return false
         val servers = mutableListOf<InetAddress>()
         // Use DNS servers first from active network (if available)
         val activeNetwork = cm.activeNetwork
@@ -2047,8 +2048,10 @@ class BaresipService: Service() {
             } else {
                 // Log.d(TAG, "Updated DNS servers: '${servers}'")
                 dnsServers = servers
+                return true
             }
         }
+        return false
     }
 
     private fun registerAndroidContactsObserver() {
