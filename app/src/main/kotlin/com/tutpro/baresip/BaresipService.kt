@@ -1818,14 +1818,22 @@ class BaresipService: Service() {
     private fun playRingBack() {
         if (mediaPlayer == null) {
             val name = "ringback_$toneCountry"
-            val resourceId = resources.getIdentifier(
-                name,
-                "raw",
-                packageName)
+            val resourceId = resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
-                mediaPlayer = MediaPlayer.create(this, resourceId)
-                mediaPlayer?.isLooping = true
-                mediaPlayer?.start()
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(audioAttributes)
+                    val afd = resources.openRawResourceFd(resourceId)
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
+                    isLooping = true
+                    prepare()
+                    start()
+                }
             } else {
                 Log.e(TAG, "Ringback tone $name.wav not found")
             }
@@ -1834,19 +1842,27 @@ class BaresipService: Service() {
 
     @SuppressLint("DiscouragedApi")
     private fun playBusy() {
-        if (mediaPlayer == null ) {
+        if (mediaPlayer == null) {
             val name = "busy_$toneCountry"
-            val resourceId = resources.getIdentifier(
-                name,
-                "raw",
-                packageName)
+            val resourceId = resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
-                mediaPlayer = MediaPlayer.create(this, resourceId)
-                mediaPlayer?.setOnCompletionListener {
-                    stopMediaPlayer()
-                    ensureCommunicationMode()
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(audioAttributes)
+                    val afd = resources.openRawResourceFd(resourceId)
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
+                    setOnCompletionListener {
+                        stopMediaPlayer()
+                        ensureCommunicationMode()
+                    }
+                    prepare()
+                    start()
                 }
-                mediaPlayer?.start()
             } else {
                 Log.e(TAG, "Busy tone $name.wav not found")
             }
