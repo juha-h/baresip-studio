@@ -455,16 +455,6 @@ class BaresipService: Service() {
 
                 showStatusNotification()
 
-                val accounts = Utils.getFileContents("$filesPath/accounts")
-                if ((accounts != null) && accounts.isNotEmpty()) {
-                    Utils.putFileContents("$filesPath/accounts",
-                        accounts.toString(Charsets.UTF_8).replace(
-                            "pubint=0;call_transfer",
-                            "pubint=0;inreq_allowed=yes;call_transfer"
-                        ).toByteArray(Charsets.UTF_8)
-                    )
-                }
-
                 if (linkAddresses.isEmpty())
                     toast(getString(R.string.no_network), Toast.LENGTH_LONG)
 
@@ -1713,7 +1703,7 @@ class BaresipService: Service() {
         // native SIP timers (registration, keep-alives) continue to run.
         try {
             if (!partialWakeLock.isHeld) {
-                Log.d(TAG, "Acquiring Partial Wake Lock")
+                Log.i(TAG, "Acquiring Partial Wake Lock")
                 partialWakeLock.acquire()
             }
         } catch (e: Exception) {
@@ -1899,14 +1889,22 @@ class BaresipService: Service() {
     private fun playRingBack() {
         if (mediaPlayer == null) {
             val name = "ringback_$toneCountry"
-            val resourceId = resources.getIdentifier(
-                name,
-                "raw",
-                packageName)
+            val resourceId = resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
-                mediaPlayer = MediaPlayer.create(this, resourceId)
-                mediaPlayer?.isLooping = true
-                mediaPlayer?.start()
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(audioAttributes)
+                    val afd = resources.openRawResourceFd(resourceId)
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
+                    isLooping = true
+                    prepare()
+                    start()
+                }
             } else {
                 Log.e(TAG, "Ringback tone $name.wav not found")
             }
@@ -1915,19 +1913,27 @@ class BaresipService: Service() {
 
     @SuppressLint("DiscouragedApi")
     private fun playBusy() {
-        if (mediaPlayer == null ) {
+        if (mediaPlayer == null) {
             val name = "busy_$toneCountry"
-            val resourceId = resources.getIdentifier(
-                name,
-                "raw",
-                packageName)
+            val resourceId = resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
-                mediaPlayer = MediaPlayer.create(this, resourceId)
-                mediaPlayer?.setOnCompletionListener {
-                    stopMediaPlayer()
-                    ensureCommunicationMode()
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(audioAttributes)
+                    val afd = resources.openRawResourceFd(resourceId)
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
+                    setOnCompletionListener {
+                        stopMediaPlayer()
+                        ensureCommunicationMode()
+                    }
+                    prepare()
+                    start()
                 }
-                mediaPlayer?.start()
             } else {
                 Log.e(TAG, "Busy tone $name.wav not found")
             }
@@ -2016,7 +2022,7 @@ class BaresipService: Service() {
     private fun updateNetwork() {
         if (!isNativeReady) return
 
-        updateDnsServers()
+        val dnsChanged = updateDnsServers()
 
         val addresses = linkAddresses()
         if (linkAddresses != addresses)
@@ -2041,10 +2047,10 @@ class BaresipService: Service() {
             }
 
         val active = cm.activeNetwork
-        if (added != removed || activeNetwork != active)
-            Log.d(TAG, "Added/Removed = $added/$removed Old/New Active = $activeNetwork/$active")
+        if (added != removed || activeNetwork != active || dnsChanged)
+            Log.d(TAG, "Added/Removed = $added/$removed Old/New Active = $activeNetwork/$active DNS Changed = $dnsChanged")
 
-        if (added > 0 || removed > 0 || active != activeNetwork) {
+        if (added > 0 || removed > 0 || active != activeNetwork || dnsChanged) {
             Api.net_debug()
             linkAddresses = addresses
             activeNetwork = active
@@ -2075,13 +2081,14 @@ class BaresipService: Service() {
         synchronized(allNetworks) {
             for (n in allNetworks) {
                 val caps = cm.getNetworkCapabilities(n) ?: continue
-                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)) {
+                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND) ||
+                    caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                ) {
                     val props = cm.getLinkProperties(n) ?: continue
                     for (la in props.linkAddresses)
                         if (la.scope == OsConstants.RT_SCOPE_UNIVERSE &&
-                            props.interfaceName != null && la.address.hostAddress != null &&
-                            afMatch(la.address.hostAddress!!)
-                        )
+                                props.interfaceName != null && la.address.hostAddress != null &&
+                                afMatch(la.address.hostAddress!!))
                             addresses[la.address.hostAddress!!] = props.interfaceName!!
                 }
             }
@@ -2102,9 +2109,9 @@ class BaresipService: Service() {
         }
     }
 
-    private fun updateDnsServers() {
+    private fun updateDnsServers(): Boolean {
         if (isServiceRunning && !dynDns)
-            return
+            return false
         val servers = mutableListOf<InetAddress>()
         // Use DNS servers first from active network (if available)
         val activeNetwork = cm.activeNetwork
@@ -2128,8 +2135,10 @@ class BaresipService: Service() {
             } else {
                 // Log.d(TAG, "Updated DNS servers: '${servers}'")
                 dnsServers = servers
+                return true
             }
         }
+        return false
     }
 
     private fun registerAndroidContactsObserver() {

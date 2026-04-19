@@ -69,9 +69,9 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
                     Api.account_set_video_codecs(account.accp, codecList)
                 if (success == 0) {
                     if (media == "audio")
-                        account.audioCodec = enabledCodecNames as ArrayList<String>
+                        account.audioCodec = ArrayList(enabledCodecNames)
                     else
-                        account.videoCodec = enabledCodecNames as ArrayList<String>
+                        account.videoCodec = ArrayList(enabledCodecNames)
                     Account.saveAccounts()
                     Log.d("CodecsSave", "Codecs saved successfully.")
                 }

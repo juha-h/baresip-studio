@@ -2014,7 +2014,7 @@ private fun CallRow(
                     onClick = {
                         val stats = call.stats("audio")
                         if (stats.isNotEmpty() && call.startTime != null) {
-                            val parts = stats.split(",") as java.util.ArrayList
+                            val parts = ArrayList(stats.split(","))
                             if (parts[2] == "0/0") {
                                 parts[2] = "?/?"
                                 parts[3] = "?/?"

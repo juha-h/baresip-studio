@@ -84,7 +84,9 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
                     @Suppress("UNCHECKED_CAST")
-                    BaresipService.callHistory = ois.readObject() as ArrayList<CallHistoryNew>
+                    val restoredHistory = ois.readObject() as? List<CallHistoryNew>
+                    if (restoredHistory != null)
+                        BaresipService.callHistory = ArrayList(restoredHistory)
                     ois.close()
                     fis.close()
                     Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls")
@@ -132,7 +134,9 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
                     @Suppress("UNCHECKED_CAST")
-                    result = ois.readObject() as ArrayList<CallHistory>
+                    val restoredHistory = ois.readObject() as? List<CallHistory>
+                    if (restoredHistory != null)
+                        result = ArrayList(restoredHistory)
                     ois.close()
                     fis.close()
                     Log.d(TAG, "Got history of ${result.size} calls")
