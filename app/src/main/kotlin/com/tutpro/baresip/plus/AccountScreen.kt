@@ -1482,6 +1482,16 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         Log.d(TAG, "New checkOrigin is ${acc.checkOrigin}")
     }
 
+    val newMediaEnc = viewModel.mediaEnc.value
+    if (newMediaEnc != acc.mediaEnc) {
+        if (Api.account_set_mediaenc(acc.accp, newMediaEnc) == 0) {
+            acc.mediaEnc = Api.account_mediaenc(acc.accp)
+            Log.d(TAG, "New mediaenc is ${acc.mediaEnc}")
+        }
+        else
+            Log.e(TAG, "Setting of mediaenc $newMediaEnc failed")
+    }
+
     val newMediaNat = viewModel.mediaNat.value
     if (newMediaNat != acc.mediaNat) {
         if (Api.account_set_medianat(acc.accp, newMediaNat) == 0) {
