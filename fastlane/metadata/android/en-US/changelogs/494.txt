@@ -1,0 +1,5 @@
+- Fixed Account's Media Encoding setting
+- Prevent Google from removing ringback, busy and call waiting tones
+- Ensure that ringback and busy tone are played in communication mode
+- Improved network and DNS server update management
+- New translations (Spanish)
