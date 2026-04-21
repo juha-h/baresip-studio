@@ -888,16 +888,11 @@ class BaresipService: Service() {
                             return
                     }
                     "call update" -> {
-                        if (call!!.conferenceCall) {
-                            Log.d(TAG, "Refusing to update conference call ${call.callp}")
-                            Api.bevent_stop(ev[2].toLong())
-                            return
-                        }
                         val newHeldState = when (ev[1].toInt()) {Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
                             else -> false
                         }
                         val connection = ConnectionService.connections[callp]
-                        if (call.held && !newHeldState) {
+                        if (call!!.held && !newHeldState) {
                             Log.d(TAG, "Call ${call.callp} un-held by peer.")
                             call.onhold = false
                             // Use a Coroutine with a small delay to let the SIP
