@@ -2070,7 +2070,8 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
         alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
         showAlert.value = true
     }
-    else if (Utils.isPSTNCallActive(ctx) || Call.calls().any { it.ua.account.aor != ua.account.aor } )
+    else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
+            !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
