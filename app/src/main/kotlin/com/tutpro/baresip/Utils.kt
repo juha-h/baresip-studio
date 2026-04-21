@@ -26,6 +26,8 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.telecom.TelecomManager
+import android.telecom.Call
 import android.text.format.DateUtils
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
@@ -849,10 +851,32 @@ object Utils {
                         Configuration.UI_MODE_NIGHT_YES
     }
 
+    @Suppress("unused")
     fun isPSTNCallActive(ctx: Context): Boolean {
-        // MODE_IN_CALL indicates a PSTN call is active
+        val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
+        try {
+            val getCallsMethod = TelecomManager::class.java.getMethod("getCalls")
+            val calls = getCallsMethod.invoke(tm) as? List<*>
+            if (calls != null) {
+                for (c in calls) {
+                    if (c == null) continue
+                    val call = c as? Call ?: continue
+                    val state =  call.javaClass.getMethod("getState").invoke(call) as Int
+                    if (state == Call.STATE_ACTIVE ||
+                            state == Call.STATE_DIALING ||
+                            state == Call.STATE_CONNECTING)
+                        return true
+                }
+            }
+        } catch (_: Exception) {
+            // treat as no active PSTN call
+        }
+        return false
+    }
+
+    fun isAudioMode(ctx: Context, mode: Int): Boolean {
         val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        return am.mode == AudioManager.MODE_IN_CALL
+        return am.mode == mode
     }
 
     fun relativeTime(ctx: Context, time: GregorianCalendar): String {

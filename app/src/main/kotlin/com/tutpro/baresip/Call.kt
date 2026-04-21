@@ -174,8 +174,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             // Check if there exist SIP calls that are not onhold or held
             if (BaresipService.calls.any { !it.onhold && !it.held }) return true
             // MODE_IN_CALL indicates a PSTN call is active
-            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            return am.mode == AudioManager.MODE_IN_CALL
+            return Utils.isAudioMode(ctx, AudioManager.MODE_IN_CALL)
         }
     }
 }
