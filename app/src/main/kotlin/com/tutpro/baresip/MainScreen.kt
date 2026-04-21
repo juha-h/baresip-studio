@@ -2151,7 +2151,9 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         pullToRefreshEnabled.value = true
         viewModel.dialerState.callUri.value = ua.account.resumeUri
         viewModel.dialerState.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-        viewModel.dialerState.callUriEnabled.value = true
+        Handler(Looper.getMainLooper()).postDelayed({
+            viewModel.dialerState.callUriEnabled.value = true
+        }, 100)
         viewModel.dialerState.showCallButton.value = true
         viewModel.dialerState.showCallConferenceButton.value = true
         viewModel.dialerState.callButtonsEnabled.value = true
