@@ -11,7 +11,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.media.AudioManager
 import android.net.Uri
-import android.os.Build
+import android.os.Build.VERSION
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
@@ -134,6 +134,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -276,7 +278,7 @@ private fun MainScreen(
     val noticeTitle = stringResource(R.string.notice)
     val noBackupMessage = stringResource(R.string.no_backup)
     fun launchBackupRequest() {
-        if (Build.VERSION.SDK_INT < 29) {
+        if (VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = noBackupMessage
@@ -321,7 +323,7 @@ private fun MainScreen(
 
     val noRestoreMessage = stringResource(R.string.no_restore)
     fun launchRestoreRequest() {
-        if (Build.VERSION.SDK_INT < 29) {
+        if (VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(READ_EXTERNAL_STORAGE))) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = noRestoreMessage
@@ -365,7 +367,7 @@ private fun MainScreen(
     }
 
     fun launchLogcatRequest() {
-        if (Build.VERSION.SDK_INT >= 29) {
+        if (VERSION.SDK_INT >= 29) {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "text/plain"
@@ -695,7 +697,7 @@ private fun TopAppBar(
             DropdownMenu(
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false },
-                items = if (Build.VERSION.SDK_INT >= 29)
+                items = if (VERSION.SDK_INT >= 29)
                     listOf(about, settings, accounts, backup, restore, logcat, restart, quit)
                 else
                     listOf(about, settings, accounts, backup, restore, restart, quit),
@@ -1270,9 +1272,19 @@ private fun CallUriRow(
                 },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = if (isDialpadVisible)
-                    KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Default
+                    )
                 else
-                    KeyboardOptions(keyboardType = KeyboardType.Text)
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Default
+                    )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Column(
