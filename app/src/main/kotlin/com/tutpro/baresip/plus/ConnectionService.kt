@@ -52,7 +52,10 @@ class ConnectionService : ConnectionService() {
         val connection = BaresipConnection(uap, callp)
         connections[callp] = connection
         connection.setAddress(Uri.fromParts("sip", peerUri, null), TelecomManager.PRESENTATION_ALLOWED)
-        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or Connection.CAPABILITY_HOLD
+        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
+                Connection.CAPABILITY_HOLD or
+                Connection.CAPABILITY_MERGE_CONFERENCE or
+                Connection.CAPABILITY_SWAP_CONFERENCE
 
         val call = Call.ofCallp(callp)
         if (call != null)
@@ -114,7 +117,10 @@ class ConnectionService : ConnectionService() {
         }
 
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
-        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or Connection.CAPABILITY_HOLD
+        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
+                Connection.CAPABILITY_HOLD or
+                Connection.CAPABILITY_MERGE_CONFERENCE or
+                Connection.CAPABILITY_SWAP_CONFERENCE
 
         // Start the SIP connection logic
         if (uap != 0L) {
@@ -141,7 +147,7 @@ class ConnectionService : ConnectionService() {
 
     inner class BaresipConnection(val uap: Long, var callp: Long) : Connection() {
 
-        private var isDisconnecting = false
+        var isDisconnecting = false
 
         override fun onAnswer() {
             Log.d(TAG, "Telecom Connection onAnswer $callp")
@@ -163,10 +169,8 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onDisconnect() {
-            if (isDisconnecting) return
-
-            if (System.currentTimeMillis() - lastDisconnectTime < 500) {
-                Log.d(TAG, "Ignoring cascaded onDisconnect for $callp")
+            if (isDisconnecting) {
+                Log.d(TAG, "onDisconnect already in progress for $callp")
                 return
             }
 
@@ -188,7 +192,7 @@ class ConnectionService : ConnectionService() {
             // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 isDisconnecting = false
-            }, 1000)
+            }, 500)
         }
 
         override fun onAbort() {

@@ -13,8 +13,8 @@ configure<ApplicationExtension> {
         applicationId = "com.tutpro.baresip.plus"
         minSdk = 28
         targetSdk = 36
-        versionCode = 258
-        versionName = "67.1.3"
+        versionCode = 259
+        versionName = "67.1.4"
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
@@ -89,5 +89,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.ui.text)
 }
 

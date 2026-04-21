@@ -13,7 +13,7 @@ import android.content.res.Configuration
 import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
-import android.os.Build
+import android.os.Build.VERSION
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
@@ -151,6 +151,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -445,7 +447,7 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     val noticeTitle = stringResource(R.string.notice)
     val noBackupMessage = stringResource(R.string.no_backup)
     fun launchBackupRequest() {
-        if (Build.VERSION.SDK_INT < 29) {
+        if (VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = noBackupMessage
@@ -491,7 +493,7 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
 
     val noRestoreMessage = stringResource(R.string.no_restore)
     fun launchRestoreRequest() {
-        if (Build.VERSION.SDK_INT < 29) {
+        if (VERSION.SDK_INT < 29) {
             if (!Utils.checkPermissions(ctx, arrayOf(READ_EXTERNAL_STORAGE))) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = noRestoreMessage
@@ -536,7 +538,7 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     }
 
     fun launchLogcatRequest() {
-        if (Build.VERSION.SDK_INT >= 29) {
+        if (VERSION.SDK_INT >= 29) {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "text/plain"
@@ -778,7 +780,7 @@ private fun TopAppBar(
             DropdownMenu(
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false },
-                items = if (Build.VERSION.SDK_INT >= 29)
+                items = if (VERSION.SDK_INT >= 29)
                     listOf(about, settings, accounts, backup, restore, logcat, restart, quit)
                 else
                     listOf(about, settings, accounts, backup, restore, restart, quit),
@@ -1321,9 +1323,19 @@ private fun CallUriRow(
                 },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = if (isDialpadVisible)
-                    KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Default
+                    )
                 else
-                    KeyboardOptions(keyboardType = KeyboardType.Text)
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Default
+                    )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Column(
@@ -2209,7 +2221,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 }
 
                 // Snapshot Button
-                if (Build.VERSION.SDK_INT >= 29 ||
+                if (VERSION.SDK_INT >= 29 ||
                     Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))
                 ) {
                     Spacer(modifier = Modifier.height(16.dp)) // Gap between buttons
@@ -2541,7 +2553,8 @@ private fun makeCall(
         alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
         showAlert.value = true
     }
-    else if (Utils.isPSTNCallActive(ctx) || Call.calls().any { it.ua.account.aor != ua.account.aor } )
+    else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
+            !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
@@ -2655,7 +2668,9 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         showVideoLayout.value = false
         viewModel.dialerState.callUri.value = ua.account.resumeUri
         viewModel.dialerState.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-        viewModel.dialerState.callUriEnabled.value = true
+        Handler(Looper.getMainLooper()).postDelayed({
+            viewModel.dialerState.callUriEnabled.value = true
+        }, 100)
         viewModel.dialerState.showCallButton.value = true
         viewModel.dialerState.showCallConferenceButton.value = true
         viewModel.dialerState.showCallVideoButton.value = true
