@@ -51,7 +51,10 @@ class ConnectionService : ConnectionService() {
         val connection = BaresipConnection(uap, callp)
         connections[callp] = connection
         connection.setAddress(Uri.fromParts("sip", peerUri, null), TelecomManager.PRESENTATION_ALLOWED)
-        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or Connection.CAPABILITY_HOLD
+        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
+                Connection.CAPABILITY_HOLD or
+                Connection.CAPABILITY_MERGE_CONFERENCE or
+                Connection.CAPABILITY_SWAP_CONFERENCE
 
         val call = Call.ofCallp(callp)
         if (call != null)
@@ -110,7 +113,10 @@ class ConnectionService : ConnectionService() {
         }
 
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
-        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or Connection.CAPABILITY_HOLD
+        connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
+                Connection.CAPABILITY_HOLD or
+                Connection.CAPABILITY_MERGE_CONFERENCE or
+                Connection.CAPABILITY_SWAP_CONFERENCE
 
         // Start the SIP connection logic
         if (uap != 0L) {
@@ -161,7 +167,7 @@ class ConnectionService : ConnectionService() {
         override fun onDisconnect() {
             if (isDisconnecting) return
 
-            if (System.currentTimeMillis() - lastDisconnectTime < 500) {
+            if (System.currentTimeMillis() - lastDisconnectTime < 2000) {
                 Log.d(TAG, "Ignoring cascaded onDisconnect for $callp")
                 return
             }
