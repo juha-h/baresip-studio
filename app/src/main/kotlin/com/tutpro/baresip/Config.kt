@@ -188,7 +188,7 @@ object Config {
                 (module == "libg722" && "g722.so" in previousModules))
                     config = "${config}module ${module}.so\n"
 
-        Utils.aecAgcCheck()
+        Utils.aecAgcNsCheck()
 
         val micGain = previousVariable("augain")
         config = if (BaresipService.agcAvailable || micGain == ""  || micGain == "1.0")
