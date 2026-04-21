@@ -710,10 +710,15 @@ object Utils {
 
     fun encryptToUri(ctx: Context, uri: Uri, content: ByteArray, password: String): Boolean {
         val obj = encrypt(content, password.toCharArray())
-        val stream = ctx.contentResolver.openOutputStream(uri) as FileOutputStream
         try {
-            ObjectOutputStream(stream).use {
-                it.writeObject(obj)
+            val stream = ctx.contentResolver.openOutputStream(uri)
+            if (stream != null)
+                ObjectOutputStream(stream).use {
+                    it.writeObject(obj)
+                }
+            else {
+                Log.w(TAG, "encryptToUri: could not open output stream")
+                return false
             }
         } catch (e: Exception) {
             Log.w(TAG, "encryptToUri failed: $e")
