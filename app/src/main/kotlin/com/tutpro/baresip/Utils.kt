@@ -17,6 +17,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.AcousticEchoCanceler
 import android.media.audiofx.AutomaticGainControl
+import android.media.audiofx.NoiseSuppressor
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -929,15 +930,13 @@ object Utils {
     }
 
     fun toggleSpeakerPhone(executor: Executor, am: AudioManager) {
-        if (Build.VERSION.SDK_INT >= 31) {
-            if (am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER)
-                setSpeakerPhone(executor, am, false)
-            else
-                setSpeakerPhone(executor, am, true)
+        val isSpeakerOn = if (Build.VERSION.SDK_INT >= 31) {
+            am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
         } else {
             @Suppress("DEPRECATION")
-            setSpeakerPhone(executor, am, !am.isSpeakerphoneOn)
+            am.isSpeakerphoneOn
         }
+        setSpeakerPhone(executor, am, !isSpeakerOn)
     }
 
     fun clearCommunicationDevice(am: AudioManager) {
@@ -945,8 +944,7 @@ object Utils {
             am.clearCommunicationDevice()
         } else {
             @Suppress("DEPRECATION")
-            if (am.isSpeakerphoneOn)
-                am.isSpeakerphoneOn = false
+            am.isSpeakerphoneOn = false
         }
     }
 
@@ -984,10 +982,10 @@ object Utils {
         }
     }
 
-    fun aecAgcCheck() {
+    fun aecAgcNsCheck() {
         val sessionId = Api.AAudio_open_stream()
-        if (sessionId == -1) {
-            Log.e(TAG, "Failed to open AAudio stream")
+        if (sessionId <= 0) {
+            Log.e(TAG, "Failed to open AAudio stream or invalid sessionId ($sessionId)")
             return
         }
 
@@ -1016,6 +1014,19 @@ object Utils {
         }
         else
             Log.i(TAG, "Hardware AGC is NOT available")
+
+        if (NoiseSuppressor.isAvailable()) {
+            val ns = NoiseSuppressor.create(sessionId)
+            if (ns != null) {
+                BaresipService.nsAvailable = true
+                ns.release()
+                Log.d(TAG, "Creation of hardware NS for $sessionId succeeded")
+            } else {
+                Log.w(TAG, "Creation of hardware NS for $sessionId failed")
+            }
+        }
+        else
+            Log.i(TAG, "Hardware NS is NOT available")
 
         Api.AAudio_close_stream()
     }
