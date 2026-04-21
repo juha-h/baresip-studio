@@ -143,7 +143,7 @@ class ConnectionService : ConnectionService() {
 
     inner class BaresipConnection(val uap: Long, var callp: Long) : Connection() {
 
-        private var isDisconnecting = false
+        var isDisconnecting = false
 
         override fun onAnswer() {
             Log.d(TAG, "Telecom Connection onAnswer $callp")
@@ -165,10 +165,8 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onDisconnect() {
-            if (isDisconnecting) return
-
-            if (System.currentTimeMillis() - lastDisconnectTime < 2000) {
-                Log.d(TAG, "Ignoring cascaded onDisconnect for $callp")
+            if (isDisconnecting) {
+                Log.d(TAG, "onDisconnect already in progress for $callp")
                 return
             }
 
