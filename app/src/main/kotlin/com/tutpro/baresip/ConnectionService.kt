@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
 
-    private val TAG = "BaresipConnection"
-
     companion object {
+
+        private const val TAG = "BaresipConnection"
         val connections = ConcurrentHashMap<Long, BaresipConnection>()
         var pendingOutgoingConnection: BaresipConnection? = null
         var lastDisconnectTime = 0L
@@ -188,7 +188,7 @@ class ConnectionService : ConnectionService() {
             // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 isDisconnecting = false
-            }, 1000)
+            }, 500)
         }
 
         override fun onAbort() {
