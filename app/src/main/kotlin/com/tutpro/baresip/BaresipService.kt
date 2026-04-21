@@ -19,6 +19,7 @@ import android.content.res.Configuration
 import android.database.ContentObserver
 import android.graphics.ImageDecoder
 import android.media.AudioAttributes
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_NORMAL
@@ -671,47 +672,49 @@ class BaresipService: Service() {
         }
 
         if (ev[0] == "recorder sessionid") {
-            recorderSessionId = ev[1].toInt()
-            Log.d(TAG, "got recorder sessionid $recorderSessionId")
-            if (recorderSessionId != 0) {
+            val sessionId = ev[1].toInt()
+            if (sessionId > 0 && sessionId != recorderSessionId) {
+                Log.d(TAG, "got new recorder sessionid $sessionId (was $recorderSessionId)")
+                recorderSessionId = sessionId
+                aec?.release()
+                aec = null
+                agc?.release()
+                agc = null
+                ns?.release()
+                ns = null
                 if (aecAvailable) {
-                    aec = AcousticEchoCanceler.create(recorderSessionId)
-                    if (aec != null) {
-                        if (!aec!!.enabled) {
+                    try {
+                        aec = AcousticEchoCanceler.create(sessionId)
+                        if (aec != null) {
                             aec!!.enabled = true
-                            if (aec!!.enabled)
-                                Log.d(TAG, "AEC is enabled")
-                            else
-                                Log.w(TAG, "Failed to enable AEC")
+                            Log.d(TAG, "AEC is ${if (aec!!.enabled) "enabled" else "not enabled"}")
                         }
-                        else
-                            Log.d(TAG, "AEC is already enabled")
-                    } else
-                        Log.w(TAG, "Failed to create AEC for session $recorderSessionId")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Exception creating AEC: $e")
+                    }
                 }
                 if (agcAvailable) {
-                    agc = AutomaticGainControl.create(recorderSessionId)
-                    if (agc != null) {
-                        if (!agc!!.enabled) {
+                    try {
+                        agc = AutomaticGainControl.create(sessionId)
+                        if (agc != null) {
                             agc!!.enabled = true
-                            if (agc!!.enabled)
-                                Log.d(TAG, "AGC is enabled")
+                            Log.d(TAG, "AGC is ${if (agc!!.enabled) "enabled" else "not enabled"}")
                         }
-                    } else
-                        Log.w(TAG, "Failed to create AGC")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Exception creating AGC: $e")
+                    }
                 }
                 if (nsAvailable) {
-                    ns = NoiseSuppressor.create(recorderSessionId)
-                    if (ns != null) {
-                        if (!ns!!.enabled) {
+                    try {
+                        ns = NoiseSuppressor.create(sessionId)
+                        if (ns != null) {
                             ns!!.enabled = true
-                            if (ns!!.enabled)
-                                Log.d(TAG, "NS is enabled")
+                            Log.d(TAG, "NS is ${if (ns!!.enabled) "enabled" else "failed to enable"}")
                         }
-                    } else
-                        Log.w(TAG, "Failed to create NS")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Exception creating NS: $e")
+                    }
                 }
-                recorderSessionId = 0
             }
             return
         }
@@ -996,6 +999,10 @@ class BaresipService: Service() {
                     }
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
+                        if (call != null) {
+                            call.terminated.value = true
+                            call.remove()
+                        }
                         ConnectionService.lastDisconnectTime = System.currentTimeMillis()
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
@@ -1016,12 +1023,6 @@ class BaresipService: Service() {
                         if (call != null) {
                             stopRinging()
                             stopMediaPlayer()
-                            aec?.release()
-                            aec = null
-                            agc?.release()
-                            agc = null
-                            ns?.release()
-                            ns = null
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -1034,10 +1035,26 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             val isConference = call.conferenceCall
-                            call.remove()
+                            val hasOtherCalls = calls.any { it.ua == ua }
+                            if (calls.isEmpty()) {
+                                aec?.release()
+                                aec = null
+                                agc?.release()
+                                agc = null
+                                ns?.release()
+                                ns = null
+                                recorderSessionId = 0
+                            }
                             updateStatusNotification()
-                            if (isConference && ua.calls().isEmpty())
-                                Api.module_unload("mixminus")
+                            if (isConference && !hasOtherCalls) {
+                                Log.d(TAG, "Last conference call closed, scheduling mixminus unload")
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    if (calls.none { it.conferenceCall }) {
+                                        Log.d(TAG, "Unloading mixminus module")
+                                        Api.module_unload("mixminus")
+                                    }
+                                }, 1000)
+                            }
                             val reason = ev[1]
                             val tone = ev[2]
                             if (tone == "busy")
@@ -1049,6 +1066,7 @@ class BaresipService: Service() {
                                         !reason.startsWith("408") &&
                                         !reason.startsWith("480") &&
                                         !reason.startsWith("Connection reset by")
+
                             val missed = call.dir == "in" && call.startTime == null && !call.rejected
                             val completedElsewhere = missed && ev[2].startsWith("SIP") &&
                                     ev[2].contains(";cause=200")
@@ -1900,28 +1918,55 @@ class BaresipService: Service() {
     }
 
     private fun ensureCommunicationMode() {
-        if (Call.inCall()) {
-            if (am.mode != MODE_IN_COMMUNICATION) {
-                am.mode = MODE_IN_COMMUNICATION
-                Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Setting MODE_IN_COMMUNICATION")
-            }
-        } else {
-            if (am.mode != MODE_NORMAL) {
-                am.mode = MODE_NORMAL
-                Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Resetting to MODE_NORMAL")
-            }
-            Utils.clearCommunicationDevice(am)
-            if (speakerPhone) {
-                speakerPhone = false
-                postServiceEvent(ServiceEvent("speaker update,false", arrayListOf(0L, 0L), System.nanoTime()))
-            }
-            if (isMicMuted) {
-                isMicMuted = false
-                postServiceEvent(ServiceEvent("mic muted,false", arrayListOf(0L, 0L), System.nanoTime()))
-            }
-            resetCallVolume()
-            proximitySensing(false)
+        val targetMode = if (Call.inCall()) MODE_IN_COMMUNICATION else MODE_NORMAL
+        val currentMode = am.mode
+        val isSpeakerphoneOn = if (VERSION.SDK_INT >= 31)
+            am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
+        else {
+            @Suppress("DEPRECATION")
+            am.isSpeakerphoneOn
         }
+        if (targetMode == currentMode && (targetMode == MODE_NORMAL || isSpeakerphoneOn == speakerPhone)) {
+            Log.d(TAG, "ensureCommunicationMode: Already in $targetMode with correct speaker state, skipping.")
+            return
+        }
+        Log.d(TAG, "Scheduling ensureCommunicationMode ($targetMode) in 500ms")
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (Call.inCall()) {
+                if (am.mode != MODE_IN_COMMUNICATION) {
+                    am.mode = MODE_IN_COMMUNICATION
+                    Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Setting MODE_IN_COMMUNICATON")
+                }
+            } else {
+                if (am.mode != MODE_NORMAL) {
+                    am.mode = MODE_NORMAL
+                    Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Resetting to MODE_NORMAL")
+                    Utils.clearCommunicationDevice(am)
+                    if (speakerPhone) {
+                        speakerPhone = false
+                        postServiceEvent(
+                            ServiceEvent(
+                                "speaker update,false",
+                                arrayListOf(0L, 0L),
+                                System.nanoTime()
+                            )
+                        )
+                    }
+                    if (isMicMuted) {
+                        isMicMuted = false
+                        postServiceEvent(
+                            ServiceEvent(
+                                "mic muted,false",
+                                arrayListOf(0L, 0L),
+                                System.nanoTime()
+                            )
+                        )
+                    }
+                    resetCallVolume()
+                    proximitySensing(false)
+                }
+            }
+        }, 500)
     }
 
     @SuppressLint("WakelockTimeout", "Wakelock")
@@ -2194,8 +2239,13 @@ class BaresipService: Service() {
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var aecAvailable = false
-        private var aec: AcousticEchoCanceler? = null
         var agcAvailable = false
+        var nsAvailable = false
+        private var aec: AcousticEchoCanceler? = null
+        private var agc: AutomaticGainControl? = null
+        private var ns: NoiseSuppressor? = null
+        private var recorderSessionId = 0
+
         var rt: Ringtone? = null
 
         var colorblind = false
@@ -2205,11 +2255,6 @@ class BaresipService: Service() {
             false to R.drawable.circle_yellow)
         val circleRed = mapOf(true to R.drawable.circle_red_blind,
             false to R.drawable.circle_red)
-
-        private var agc: AutomaticGainControl? = null
-        private val nsAvailable = NoiseSuppressor.isAvailable()
-        private var ns: NoiseSuppressor? = null
-        private var recorderSessionId = 0
 
         internal const val KEY_TEXT_REPLY = "key_text_reply_baresip"
         private const val PHONE_ACCOUNT_ID = "baresip_phone_account"
