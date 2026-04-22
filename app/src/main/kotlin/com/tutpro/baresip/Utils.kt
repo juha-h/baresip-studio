@@ -27,7 +27,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.telecom.TelecomManager
-import android.telecom.Call
+import android.telecom.PhoneAccountHandle
 import android.text.format.DateUtils
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
@@ -854,22 +854,26 @@ object Utils {
     @Suppress("unused")
     fun isPSTNCallActive(ctx: Context): Boolean {
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
+        val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
         try {
             val getCallsMethod = TelecomManager::class.java.getMethod("getCalls")
             val calls = getCallsMethod.invoke(tm) as? List<*>
             if (calls != null) {
                 for (c in calls) {
                     if (c == null) continue
-                    val call = c as? Call ?: continue
-                    val state =  call.javaClass.getMethod("getState").invoke(call) as Int
-                    if (state == Call.STATE_ACTIVE ||
-                            state == Call.STATE_DIALING ||
-                            state == Call.STATE_CONNECTING)
-                        return true
+                    val state = c.javaClass.getMethod("getState").invoke(c) as Int
+                    if (state == 1 || state == 2 || state == 3 || state == 4) { // 1=DIALING, 2=RINGING, 3=HOLDING, 4=ACTIVE
+                        val details = c.javaClass.getMethod("getDetails").invoke(c)
+                        val accountHandle = details?.javaClass?.getMethod("getAccountHandle")?.invoke(details) as? PhoneAccountHandle
+                        if (accountHandle != baresipHandle) {
+                            Log.d(TAG, "External call detected from account: $accountHandle")
+                            return true
+                        }
+                    }
                 }
             }
-        } catch (_: Exception) {
-            // treat as no active PSTN call
+        } catch (e: Exception) {
+            Log.e(TAG, "isPSTNCallActive reflection error: $e")
         }
         return false
     }
