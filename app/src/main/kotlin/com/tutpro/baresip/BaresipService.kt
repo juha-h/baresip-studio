@@ -470,7 +470,6 @@ class BaresipService: Service() {
                 val callp = intent.getLongExtra("callp", 0L)
                 stopRinging()
                 stopMediaPlayer()
-                am.mode = MODE_IN_COMMUNICATION
                 setCallVolume()
                 proximitySensing(proximitySensing)
                 Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
@@ -1393,13 +1392,14 @@ class BaresipService: Service() {
             am.mode = MODE_IN_COMMUNICATION
             executeCall()
         } else {
-            if (am.mode == MODE_IN_COMMUNICATION) {
-                Log.d(TAG, "Audio mode already in MODE_IN_COMMUNICATION")
+            val isAnyCallMode = am.mode == MODE_IN_COMMUNICATION || am.mode == AudioManager.MODE_IN_CALL
+            if (isAnyCallMode) {
+                Log.d(TAG, "Audio mode already in a call mode (${am.mode})")
                 executeCall()
             } else {
                 audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
-                    if (mode == MODE_IN_COMMUNICATION) {
-                        Log.d(TAG, "Audio mode changed to MODE_IN_COMMUNICATION")
+                    if (mode == MODE_IN_COMMUNICATION || mode == AudioManager.MODE_IN_CALL) {
+                        Log.d(TAG, "Audio mode changed to $mode")
                         audioModeChangedListener?.let {
                             am.removeOnModeChangedListener(it)
                             audioModeChangedListener = null
@@ -1918,25 +1918,33 @@ class BaresipService: Service() {
     }
 
     private fun ensureCommunicationMode() {
-        val targetMode = if (Call.inCall()) MODE_IN_COMMUNICATION else MODE_NORMAL
         val currentMode = am.mode
+        val isAnyCallMode = currentMode == MODE_IN_COMMUNICATION || currentMode == AudioManager.MODE_IN_CALL
+
         val isSpeakerphoneOn = if (VERSION.SDK_INT >= 31)
             am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
         else {
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn
         }
-        if (targetMode == currentMode && (targetMode == MODE_NORMAL || isSpeakerphoneOn == speakerPhone)) {
-            Log.d(TAG, "ensureCommunicationMode: Already in $targetMode with correct speaker state, skipping.")
+
+        if (Call.inCall() && isAnyCallMode) {
+            if (isSpeakerphoneOn == speakerPhone) {
+                Log.d(TAG, "Already in valid call mode ($currentMode) with correct speaker state.")
+                return
+            }
+        } else if (!Call.inCall() && currentMode == MODE_NORMAL) {
             return
         }
-        Log.d(TAG, "Scheduling ensureCommunicationMode ($targetMode) in 500ms")
+
+        Log.d(TAG, "Scheduling ensureCommunicationMode (current: $currentMode) in 500ms")
         Handler(Looper.getMainLooper()).postDelayed({
             if (Call.inCall()) {
-                if (am.mode != MODE_IN_COMMUNICATION) {
+                if (am.mode != MODE_IN_COMMUNICATION && am.mode != AudioManager.MODE_IN_CALL) {
                     am.mode = MODE_IN_COMMUNICATION
-                    Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Setting MODE_IN_COMMUNICATON")
+                    Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Setting MODE_IN_COMMUNICATON from ${am.mode}")
                 }
+                Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
             } else {
                 if (am.mode != MODE_NORMAL) {
                     am.mode = MODE_NORMAL

@@ -897,7 +897,7 @@ object Utils {
         }
     }
 
-    private fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
+    fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 31) {
             if (!enable) {
                 Log.d(TAG, "Disabling speakerphone")
