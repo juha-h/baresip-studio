@@ -842,60 +842,6 @@ private fun SettingsContent(
         }
     }
 
-
-
-    @Composable
-    fun Ringtone() {
-        val ringToneTitle = stringResource(R.string.ringtone)
-        val selectRingToneMessage = stringResource(R.string.select_ringtone)
-        val launcher = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == RESULT_OK) {
-                val uri: Uri? = if (VERSION.SDK_INT >= 33)
-                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
-                else
-                    @Suppress("DEPRECATION")
-                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                if (uri != null)
-                    viewModel.ringtoneUri.value = uri.toString()
-            }
-        }
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(
-                text = ringToneTitle,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-                        intent.putExtra(
-                            RingtoneManager.EXTRA_RINGTONE_TYPE,
-                            RingtoneManager.TYPE_RINGTONE
-                        )
-                        intent.putExtra(
-                            RingtoneManager.EXTRA_RINGTONE_TITLE,
-                            selectRingToneMessage
-                        )
-                        intent.putExtra(
-                            RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                            viewModel.ringtoneUri.value.toUri()
-                        )
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                        launcher.launch(intent)
-                    },
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-
     @Composable
     fun BatteryOptimizations() {
         val batteryOptimizationsTitle = stringResource(R.string.battery_optimizations)
@@ -1023,6 +969,7 @@ private fun SettingsContent(
             )
         }
     }
+
     @Composable
     fun ProximitySensing() {
         val proximitySensingTitle = stringResource(R.string.proximity_sensing)
@@ -1211,7 +1158,6 @@ private fun SettingsContent(
         }
     }
 
-
     val scrollState = rememberScrollState()
 
     Column(
@@ -1234,7 +1180,6 @@ private fun SettingsContent(
         UserAgent()
         UniqueContactUri()
         AudioSettings(navController)
-        Ringtone()
         BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 31)
@@ -1355,10 +1300,6 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         save = true
         restart = true
     }
-
-    val ringtoneUri = viewModel.ringtoneUri.value
-    Preferences(ctx).ringtoneUri = ringtoneUri
-    BaresipService.rt = RingtoneManager.getRingtone(ctx, ringtoneUri.toUri())
 
     val darkTheme = viewModel.darkTheme.value
     val newDisplayTheme = if (darkTheme)

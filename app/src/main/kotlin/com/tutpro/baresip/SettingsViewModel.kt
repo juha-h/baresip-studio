@@ -4,7 +4,6 @@ import android.app.role.RoleManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Context.ROLE_SERVICE
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.PowerManager
 import androidx.appcompat.app.AppCompatDelegate
@@ -25,7 +24,6 @@ class SettingsViewModel: ViewModel() {
     val caFile = MutableStateFlow(false)
     val userAgent = MutableStateFlow("")
     val uniqueContactUri =  MutableStateFlow(true)
-    val ringtoneUri = MutableStateFlow("")
     val batteryOptimizations = MutableStateFlow(false)
     val darkTheme = MutableStateFlow(false)
     val dynamicColors = MutableStateFlow(false)
@@ -63,11 +61,6 @@ class SettingsViewModel: ViewModel() {
         userAgent.value = Config.variable("user_agent")
 
         uniqueContactUri.value =  Config.variable("sip_cuser_random") == "yes"
-
-        ringtoneUri.value = if (Preferences(ctx).ringtoneUri == "")
-            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
-        else
-            Preferences(ctx).ringtoneUri!!
 
         val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
         batteryOptimizations.value = !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)

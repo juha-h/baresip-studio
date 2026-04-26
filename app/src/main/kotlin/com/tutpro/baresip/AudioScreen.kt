@@ -1,6 +1,13 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build.VERSION
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -155,6 +163,7 @@ private var oldOpusPacketLoss = ""
 private var newOpusPacketLoss = oldOpusPacketLoss
 private var newAudioDelay = BaresipService.audioDelay.toString()
 private var newToneCountry = BaresipService.toneCountry
+private var newRingtoneUri = ""
 
 private var save = false
 
@@ -191,14 +200,164 @@ private fun AudioContent(contentPadding: PaddingValues) {
             .verticalScroll(state = scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        ToneCountry()
+        Ringtone()
+        SpeakerPhone()
         CallVolume()
         MicGain()
-        SpeakerPhone()
         AudioModules()
         OpusBitRate()
         OpusPacketLoss()
         AudioDelay()
-        ToneCountry()
+    }
+}
+
+@Composable
+private fun ToneCountry() {
+    Row(
+        Modifier.fillMaxWidth().padding(end = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val toneCountryTitle = stringResource(R.string.tone_country)
+        val toneCountryHelp = stringResource(R.string.tone_country_help)
+        Text(text = toneCountryTitle,
+            modifier = Modifier.weight(1f)
+                .clickable {
+                    alertTitle.value = toneCountryTitle
+                    alertMessage.value = toneCountryHelp
+                    showAlert.value = true
+                },
+            fontSize = 18.sp)
+        val isDropDownExpanded = remember {
+            mutableStateOf(false)
+        }
+        val countryNames = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
+        val countryValues = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
+        val itemPosition = remember {
+            mutableIntStateOf(countryValues.indexOf(BaresipService.toneCountry))
+        }
+        Box {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable {
+                    isDropDownExpanded.value = true
+                }
+            ) {
+                Text(text = countryNames[itemPosition.intValue])
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+            DropdownMenu(
+                expanded = isDropDownExpanded.value,
+                onDismissRequest = {
+                    isDropDownExpanded.value = false
+                }) {
+                countryNames.forEachIndexed { index, name ->
+                    DropdownMenuItem(text = {
+                        Text(text = name)
+                    },
+                        onClick = {
+                            isDropDownExpanded.value = false
+                            itemPosition.intValue = index
+                            newToneCountry = countryValues[index]
+                        })
+                    if (index < 10)
+                        HorizontalDivider(thickness = 1.dp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Ringtone() {
+    val ringToneTitle = stringResource(R.string.ringtone)
+    val selectRingToneMessage = stringResource(R.string.select_ringtone)
+    val ctx = LocalContext.current
+    var ringtoneUri by remember {
+        mutableStateOf(if (Preferences(ctx).ringtoneUri == "")
+            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
+        else
+            Preferences(ctx).ringtoneUri!!)
+    }
+    newRingtoneUri = ringtoneUri
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val uri: Uri? = if (VERSION.SDK_INT >= 33)
+                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
+            else
+                @Suppress("DEPRECATION")
+                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            if (uri != null) {
+                ringtoneUri = uri.toString()
+                newRingtoneUri = ringtoneUri
+            }
+        }
+    }
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(
+            text = ringToneTitle,
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_TYPE,
+                        RingtoneManager.TYPE_RINGTONE
+                    )
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_TITLE,
+                        selectRingToneMessage
+                    )
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                        ringtoneUri.toUri()
+                    )
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                    launcher.launch(intent)
+                },
+            fontSize = 18.sp,
+        )
+    }
+}
+
+@Composable
+private fun SpeakerPhone() {
+    Row(
+        Modifier.fillMaxWidth().padding(end=10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val speakerPhoneTitle = stringResource(R.string.speaker_phone)
+        val speakerPhoneHelp = stringResource(R.string.speaker_phone_help)
+        Text(text = speakerPhoneTitle,
+            modifier = Modifier.weight(1f)
+                .clickable {
+                    alertTitle.value = speakerPhoneTitle
+                    alertMessage.value = speakerPhoneHelp
+                    showAlert.value = true
+                },
+            fontSize = 18.sp)
+        var speakerPhone by remember { mutableStateOf(BaresipService.speakerPhone) }
+        Switch(
+            checked = speakerPhone,
+            onCheckedChange = {
+                speakerPhone = it
+                newSpeakerPhone = speakerPhone
+            }
+        )
     }
 }
 
@@ -295,34 +454,6 @@ private fun MicGain() {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
-}
-
-@Composable
-private fun SpeakerPhone() {
-    Row(
-        Modifier.fillMaxWidth().padding(end=10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val speakerPhoneTitle = stringResource(R.string.speaker_phone)
-        val speakerPhoneHelp = stringResource(R.string.speaker_phone_help)
-        Text(text = speakerPhoneTitle,
-            modifier = Modifier.weight(1f)
-                .clickable {
-                    alertTitle.value = speakerPhoneTitle
-                    alertMessage.value = speakerPhoneHelp
-                    showAlert.value = true
-                },
-            fontSize = 18.sp)
-        var speakerPhone by remember { mutableStateOf(BaresipService.speakerPhone) }
-        Switch(
-            checked = speakerPhone,
-            onCheckedChange = {
-                speakerPhone = it
-                newSpeakerPhone = speakerPhone
-            }
-        )
-    }
 }
 
 @Composable
@@ -427,7 +558,7 @@ private fun OpusPacketLoss() {
 @Composable
 private fun AudioDelay() {
     Row(
-        Modifier.fillMaxWidth().padding(end = 10.dp, top = 8.dp),
+        Modifier.fillMaxWidth().padding(end = 10.dp, top = 8.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
@@ -456,71 +587,14 @@ private fun AudioDelay() {
     }
 }
 
-@Composable
-private fun ToneCountry() {
-    Row(
-        Modifier.fillMaxWidth().padding(end=10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val toneCountryTitle = stringResource(R.string.tone_country)
-        val toneCountryHelp = stringResource(R.string.tone_country_help)
-        Text(text = toneCountryTitle,
-            modifier = Modifier.weight(1f)
-                .clickable {
-                    alertTitle.value = toneCountryTitle
-                    alertMessage.value = toneCountryHelp
-                    showAlert.value = true
-                },
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
-        val countryNames = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
-        val countryValues = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
-        val itemPosition = remember {
-            mutableIntStateOf(countryValues.indexOf(BaresipService.toneCountry))
-        }
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = countryNames[itemPosition.intValue])
-                Icon(
-                    imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp)
-                )
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
-                countryNames.forEachIndexed { index, name ->
-                    DropdownMenuItem(text = {
-                        Text(text = name)
-                    },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            itemPosition.intValue = index
-                            newToneCountry = countryValues[index]
-                        })
-                    if (index < 10)
-                        HorizontalDivider(thickness = 1.dp)
-                }
-            }
-        }
-    }
-}
-
 private fun checkOnClick(ctx: Context): Result {
 
     var restart = false
+
+    if (Preferences(ctx).ringtoneUri != newRingtoneUri) {
+        Preferences(ctx).ringtoneUri = newRingtoneUri
+        BaresipService.rt = RingtoneManager.getRingtone(ctx, newRingtoneUri.toUri())
+    }
 
     if (BaresipService.callVolume != newCallVolume) {
         BaresipService.callVolume = newCallVolume
