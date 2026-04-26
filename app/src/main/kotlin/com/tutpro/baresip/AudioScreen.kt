@@ -638,6 +638,7 @@ private fun checkOnClick(ctx: Context): Result {
 
     if (newSpeakerPhone != oldSpeakerPhone) {
         Config.replaceVariable("speaker_phone", if (newSpeakerPhone) "yes" else "no")
+        BaresipService.speakerPhoneAuto = newSpeakerPhone
         save = true
     }
 

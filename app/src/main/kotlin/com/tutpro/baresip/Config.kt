@@ -177,8 +177,11 @@ object Config {
         val speakerPhone = previousVariable("speaker_phone")
         if (speakerPhone != "") {
             config = "${config}speaker_phone $speakerPhone\n"
-        } else {
+            BaresipService.speakerPhoneAuto = speakerPhone == "yes"
+        }
+        else {
             config = "${config}speaker_phone no\n"
+            BaresipService.speakerPhoneAuto = false
         }
         BaresipService.speakerPhone = false
 

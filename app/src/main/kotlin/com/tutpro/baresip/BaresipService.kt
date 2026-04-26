@@ -782,7 +782,7 @@ class BaresipService: Service() {
                     "call outgoing" -> {
                         if (call!!.status.value == "transferring")
                             break
-                        if (Config.variable("speaker_phone") == "yes") {
+                        if (speakerPhoneAuto) {
                             Log.d(TAG, "Auto-on speakerphone for outgoing call")
                             speakerPhone = true
                         }
@@ -792,16 +792,12 @@ class BaresipService: Service() {
                         proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
-                        if (Config.variable("speaker_phone") == "yes")
-                            speakerPhone = true
                         ConnectionService.connections[callp]?.setRinging()
                         ensureCommunicationMode()
                         playRingBack()
                         return
                     }
                     "call progress" -> {
-                        if (Config.variable("speaker_phone") == "yes")
-                            speakerPhone = true
                         ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
@@ -812,6 +808,10 @@ class BaresipService: Service() {
                         return
                     }
                     "incoming call" -> {
+                        if (speakerPhoneAuto) {
+                            Log.d(TAG, "Auto-on speakerphone for incoming call")
+                            speakerPhone = true
+                        }
                         val peerUri = ev[1]
                         val toastMsg = if (Call.isAnyCallActive(applicationContext))
                             String.format(getString(R.string.call_auto_rejected),
@@ -845,6 +845,7 @@ class BaresipService: Service() {
                                     packageName
                                 )
                                 if (resourceId != 0) {
+                                    ensureCommunicationMode()
                                     playUnInterrupted(resourceId, 1)
                                 } else {
                                     Log.e(TAG, "Callwaiting tone $name.wav not found")
@@ -861,10 +862,6 @@ class BaresipService: Service() {
                         return
                     }
                     "call incoming" -> {
-                        if (Config.variable("speaker_phone") == "yes") {
-                            Log.d(TAG, "Auto-on speakerphone for incoming call")
-                            speakerPhone = true
-                        }
                         val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         if (Call.ofCallp(callp) == null)
@@ -881,8 +878,6 @@ class BaresipService: Service() {
                         return
                     }
                     "call answered" -> {
-                        if (Config.variable("speaker_phone") == "yes")
-                            speakerPhone = true
                         stopMediaPlayer()
                         ensureCommunicationMode()
                         if (call!!.status.value == "incoming")
@@ -894,8 +889,6 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                     }
                     "call established" -> {
-                        if (Config.variable("speaker_phone") == "yes")
-                            speakerPhone = true
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
                         nm.cancel(CALL_NOTIFICATION_ID)
@@ -2258,6 +2251,7 @@ class BaresipService: Service() {
         var callVolume = 0
         @Volatile
         var speakerPhone = false
+        var speakerPhoneAuto = false
         var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 500L
         var dynDns = false
         var filesPath = ""

@@ -70,7 +70,7 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
-            if (BaresipService.speakerPhone || Config.variable("speaker_phone") == "yes") {
+            if (BaresipService.speakerPhone || BaresipService.speakerPhoneAuto) {
                 BaresipService.speakerPhone = true
                 @Suppress("DEPRECATION")
                 connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
@@ -122,7 +122,7 @@ class ConnectionService : ConnectionService() {
         val connection = BaresipConnection(uap, 0L)
         pendingOutgoingConnection = connection
 
-        if (BaresipService.speakerPhone || Config.variable("speaker_phone") == "yes") {
+        if (BaresipService.speakerPhone || BaresipService.speakerPhoneAuto) {
             BaresipService.speakerPhone = true
             @Suppress("DEPRECATION")
             connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
