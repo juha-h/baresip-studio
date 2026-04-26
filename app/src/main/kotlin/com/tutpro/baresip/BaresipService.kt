@@ -115,6 +115,7 @@ class BaresipService: Service() {
     private var hotSpotReceiverRegistered = false
     private var isNotificationInCall = false
     private var isServiceClean = false
+    private var cleanupRunnable: Runnable? = null
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -781,17 +782,26 @@ class BaresipService: Service() {
                     "call outgoing" -> {
                         if (call!!.status.value == "transferring")
                             break
+                        if (Config.variable("speaker_phone") == "yes") {
+                            Log.d(TAG, "Auto-on speakerphone for outgoing call")
+                            speakerPhone = true
+                        }
                         stopMediaPlayer()
                         setCallVolume()
+                        ensureCommunicationMode()
                         proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
+                        if (Config.variable("speaker_phone") == "yes")
+                            speakerPhone = true
                         ConnectionService.connections[callp]?.setRinging()
                         ensureCommunicationMode()
                         playRingBack()
                         return
                     }
                     "call progress" -> {
+                        if (Config.variable("speaker_phone") == "yes")
+                            speakerPhone = true
                         ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
@@ -851,6 +861,10 @@ class BaresipService: Service() {
                         return
                     }
                     "call incoming" -> {
+                        if (Config.variable("speaker_phone") == "yes") {
+                            Log.d(TAG, "Auto-on speakerphone for incoming call")
+                            speakerPhone = true
+                        }
                         val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         if (Call.ofCallp(callp) == null)
@@ -867,6 +881,8 @@ class BaresipService: Service() {
                         return
                     }
                     "call answered" -> {
+                        if (Config.variable("speaker_phone") == "yes")
+                            speakerPhone = true
                         stopMediaPlayer()
                         ensureCommunicationMode()
                         if (call!!.status.value == "incoming")
@@ -878,6 +894,8 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                     }
                     "call established" -> {
+                        if (Config.variable("speaker_phone") == "yes")
+                            speakerPhone = true
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
                         nm.cancel(CALL_NOTIFICATION_ID)
@@ -1929,52 +1947,83 @@ class BaresipService: Service() {
         }
 
         if (Call.inCall() && isAnyCallMode) {
+            cleanupRunnable?.let {
+                Log.d(TAG, "Canceling pending speakerphone cleanup because call is active")
+                Handler(Looper.getMainLooper()).removeCallbacks(it)
+                cleanupRunnable = null
+            }
             if (isSpeakerphoneOn == speakerPhone) {
                 Log.d(TAG, "Already in valid call mode ($currentMode) with correct speaker state.")
                 return
             }
         } else if (!Call.inCall() && currentMode == MODE_NORMAL) {
+            if (speakerPhone) {
+                Log.d(TAG, "Resetting speakerPhone UI state while idle")
+                speakerPhone = false
+                postServiceEvent(
+                    ServiceEvent(
+                        "speaker update,false",
+                        arrayListOf(0L, 0L),
+                        System.nanoTime()
+                    )
+                )
+            }
             return
         }
 
-        Log.d(TAG, "Scheduling ensureCommunicationMode (current: $currentMode) in 500ms")
-        Handler(Looper.getMainLooper()).postDelayed({
+        Log.d(TAG, "Scheduling ensureCommunicationMode (current: $currentMode) in 500ms (target speaker: $speakerPhone)")
+        val handler = Handler(Looper.getMainLooper())
+        cleanupRunnable?.let { handler.removeCallbacks(it) }
+
+        val runnable = Runnable {
+            cleanupRunnable = null
             if (Call.inCall()) {
                 if (am.mode != MODE_IN_COMMUNICATION && am.mode != AudioManager.MODE_IN_CALL) {
                     am.mode = MODE_IN_COMMUNICATION
-                    Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Setting MODE_IN_COMMUNICATON from ${am.mode}")
+                    Log.d(TAG, "Manual Mode Guard: Setting MODE_IN_COMMUNICATON from ${am.mode}")
                 }
-                Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
+                Log.d(TAG, "Applying speakerphone state: $speakerPhone")
+                if (!Call.calls().any { ConnectionService.connections.containsKey(it.callp) }) {
+                    Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
+                    Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
+                } else {
+                    for (c in Call.calls()) {
+                        ConnectionService.setOutput(c.callp, speakerPhone)
+                    }
+                }
             } else {
                 if (am.mode != MODE_NORMAL) {
                     am.mode = MODE_NORMAL
-                    Log.d(TAG, "Manual Mode Guard (SDK ${VERSION.SDK_INT}): Resetting to MODE_NORMAL")
+                    Log.d(TAG, "Manual Mode Guard: Resetting to MODE_NORMAL")
                     Utils.clearCommunicationDevice(am)
-                    if (speakerPhone) {
-                        speakerPhone = false
-                        postServiceEvent(
-                            ServiceEvent(
-                                "speaker update,false",
-                                arrayListOf(0L, 0L),
-                                System.nanoTime()
-                            )
-                        )
-                    }
-                    if (isMicMuted) {
-                        isMicMuted = false
-                        postServiceEvent(
-                            ServiceEvent(
-                                "mic muted,false",
-                                arrayListOf(0L, 0L),
-                                System.nanoTime()
-                            )
-                        )
-                    }
-                    resetCallVolume()
-                    proximitySensing(false)
                 }
+                if (speakerPhone) {
+                    Log.d(TAG, "Resetting speakerPhone runtime state after call")
+                    speakerPhone = false
+                    postServiceEvent(
+                        ServiceEvent(
+                            "speaker update,false",
+                            arrayListOf(0L, 0L),
+                            System.nanoTime()
+                        )
+                    )
+                }
+                if (isMicMuted) {
+                    isMicMuted = false
+                    postServiceEvent(
+                        ServiceEvent(
+                            "mic muted,false",
+                            arrayListOf(0L, 0L),
+                            System.nanoTime()
+                        )
+                    )
+                }
+                resetCallVolume()
+                proximitySensing(false)
             }
-        }, 500)
+        }
+        cleanupRunnable = runnable
+        handler.postDelayed(runnable, 500)
     }
 
     @SuppressLint("WakelockTimeout", "Wakelock")
@@ -2207,6 +2256,7 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var callVolume = 0
+        @Volatile
         var speakerPhone = false
         var audioDelay = if (VERSION.SDK_INT < 31) 1500L else 500L
         var dynDns = false

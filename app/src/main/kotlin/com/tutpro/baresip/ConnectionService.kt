@@ -35,6 +35,14 @@ class ConnectionService : ConnectionService() {
                 connections.remove(callp)
             }
         }
+
+        fun setOutput(callp: Long, speaker: Boolean) {
+            connections[callp]?.let {
+                Log.d(TAG, "Setting audio route for $callp to speaker=$speaker")
+                @Suppress("DEPRECATION")
+                it.setAudioRoute(if (speaker) CallAudioState.ROUTE_SPEAKER else CallAudioState.ROUTE_EARPIECE)
+            }
+        }
     }
 
     override fun onCreateIncomingConnection(
@@ -62,9 +70,16 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
-            if (BaresipService.speakerPhone) {
+            if (BaresipService.speakerPhone || Config.variable("speaker_phone") == "yes") {
+                BaresipService.speakerPhone = true
                 @Suppress("DEPRECATION")
                 connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
+                BaresipService.postServiceEvent(
+                    ServiceEvent("speaker update,true",
+                        arrayListOf(uap, callp),
+                        System.nanoTime()
+                    )
+                )
             }
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering call $callp")
@@ -107,9 +122,16 @@ class ConnectionService : ConnectionService() {
         val connection = BaresipConnection(uap, 0L)
         pendingOutgoingConnection = connection
 
-        if (BaresipService.speakerPhone) {
+        if (BaresipService.speakerPhone || Config.variable("speaker_phone") == "yes") {
+            BaresipService.speakerPhone = true
             @Suppress("DEPRECATION")
             connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
+            BaresipService.postServiceEvent(
+                ServiceEvent("speaker update,true",
+                    arrayListOf(uap, 0L),
+                    System.nanoTime()
+                )
+            )
         }
 
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
@@ -218,15 +240,25 @@ class ConnectionService : ConnectionService() {
                     )
                 }
                 val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
-                if (BaresipService.speakerPhone != isSpeaker) {
-                    BaresipService.speakerPhone = isSpeaker
-                    BaresipService.postServiceEvent(
-                        ServiceEvent("speaker update,${isSpeaker}",
-                            arrayListOf(uap, callp),
-                            System.nanoTime()
-                        )
-                    )
+                val call = Call.ofCallp(callp)
+                val status = call?.status?.value ?: "idle"
+                val hasPendingOrActiveConnection = connections.isNotEmpty() || pendingOutgoingConnection != null
+                if (isSpeaker != BaresipService.speakerPhone && (status != "connected" || hasPendingOrActiveConnection)) {
+                    if (status != "connected") {
+                        Log.d(TAG, "Suppressing speaker update,$isSpeaker during call setup (status=$status, intent=${BaresipService.speakerPhone})")
+                        return@let
+                    }
                 }
+                if (status == "connected" && BaresipService.speakerPhone != isSpeaker) {
+                    Log.d(TAG, "Syncing speakerPhone variable to hardware state: $isSpeaker")
+                    BaresipService.speakerPhone = isSpeaker
+                }
+                BaresipService.postServiceEvent(
+                    ServiceEvent("speaker update,$isSpeaker",
+                        arrayListOf(uap, callp),
+                        System.nanoTime()
+                    )
+                )
             }
         }
 

@@ -174,6 +174,8 @@ private val showAlert = mutableStateOf(false)
 @Composable
 private fun AudioContent(contentPadding: PaddingValues) {
 
+    oldSpeakerPhone = Config.variable("speaker_phone") == "yes"
+    newSpeakerPhone = oldSpeakerPhone
     oldAudioModules = Config.variables("module")
     oldOpusBitrate = Config.variable("opus_bitrate")
     oldOpusPacketLoss = Config.variable("opus_packet_loss")
@@ -350,7 +352,7 @@ private fun SpeakerPhone() {
                     showAlert.value = true
                 },
             fontSize = 18.sp)
-        var speakerPhone by remember { mutableStateOf(BaresipService.speakerPhone) }
+        var speakerPhone by remember { mutableStateOf(oldSpeakerPhone) }
         Switch(
             checked = speakerPhone,
             onCheckedChange = {
@@ -634,10 +636,8 @@ private fun checkOnClick(ctx: Context): Result {
         }
     }
 
-    if (newSpeakerPhone != BaresipService.speakerPhone) {
-        BaresipService.speakerPhone = newSpeakerPhone
-        Config.replaceVariable("speaker_phone",
-            if (BaresipService.speakerPhone) "yes" else "no")
+    if (newSpeakerPhone != oldSpeakerPhone) {
+        Config.replaceVariable("speaker_phone", if (newSpeakerPhone) "yes" else "no")
         save = true
     }
 
