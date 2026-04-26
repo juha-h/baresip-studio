@@ -2241,7 +2241,7 @@ class BaresipService: Service() {
         var callHistory = ArrayList<CallHistoryNew>()
         var blocked = ArrayList<Blocked>()
 
-        var contactsMode = "baresip"
+        var contactsMode by mutableStateOf("baresip")
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
         // <aor, password> of those accounts that have auth username without auth password

@@ -25,7 +25,6 @@ class SettingsViewModel: ViewModel() {
     val caFile = MutableStateFlow(false)
     val userAgent = MutableStateFlow("")
     val uniqueContactUri =  MutableStateFlow(true)
-    val contactsMode = MutableStateFlow("")
     val ringtoneUri = MutableStateFlow("")
     val batteryOptimizations = MutableStateFlow(false)
     val darkTheme = MutableStateFlow(false)
@@ -64,8 +63,6 @@ class SettingsViewModel: ViewModel() {
         userAgent.value = Config.variable("user_agent")
 
         uniqueContactUri.value =  Config.variable("sip_cuser_random") == "yes"
-
-        contactsMode.value = Config.variable("contacts_mode").lowercase()
 
         ringtoneUri.value = if (Preferences(ctx).ringtoneUri == "")
             RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
