@@ -254,6 +254,13 @@ private fun SettingsContent(
                     viewModel.autoStart.value = true
                     pendingAutoStart = false
                 }
+                if (viewModel.autoStart.value && !isAppearOnTopPermissionGranted(ctx)) {
+                    viewModel.autoStart.value = false
+                    if (Config.variable("auto_start") == "yes") {
+                        Config.replaceVariable("auto_start", "no")
+                        Config.save()
+                    }
+                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -1204,11 +1211,6 @@ private fun SettingsContent(
         }
     }
 
-    if (Config.variable("auto_start") == "yes" &&
-            !isAppearOnTopPermissionGranted(LocalContext.current)) {
-        Config.replaceVariable("auto_start", "no")
-        save = true
-    }
 
     val scrollState = rememberScrollState()
 
