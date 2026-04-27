@@ -14,7 +14,7 @@ Then in Android Studio (tested with Android Studio Panda 2 | 2025.3.2):
 
 - Build -> Generate Signed Bundle / APK ...
 
-Ready to be installed baresip app is available from <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a>, <a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip">Play Store</a>, and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.  Signing certificate SHA-256 fingerprint of the GitHub APKs is FE:CC:79:C2:0A:B7:25:B9:B7:8B:B1:6A:75:BA:9A:04:09:28:22:CF:52:BA:32:E4:A4:37:17:0A:68:02:06:02.  Use `keytool -printcert -jarfile app-release.apk` to verify.
+Ready to be installed baresip app is available from <a href="https://f-droid.org/app/com.tutpro.baresip">F-Droid</a>, <a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip">Play Store</a>, and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.  Signing certificate SHA-256 fingerprint of baresip APKs is `fecc79c20ab725b9b78bb16a75ba9a04092822cf52ba32e4a437170a68020602` and baresip+ APKs `6d56a8f65191e9028e5c4225b2ca0c3531a037e4fff2a028e8cc23e4b61dd38e`.  Use `apksigner verify  --print-certs app-release.apk` to verify.
 
 Language translations are managed via baresip <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> project.
 
