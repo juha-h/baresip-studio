@@ -228,9 +228,10 @@ class ConnectionService : ConnectionService() {
         @Deprecated("Deprecated in Java")
         @Suppress("DEPRECATION")
         override fun onCallAudioStateChanged(state: CallAudioState?) {
+            if (state == null || isDisconnecting || getState() == STATE_DISCONNECTED) return
             super.onCallAudioStateChanged(state)
             Log.d(TAG, "onCallAudioStateChanged: $state")
-            state?.let {
+            state.let {
                 if (BaresipService.isMicMuted != it.isMuted) {
                     BaresipService.isMicMuted = it.isMuted
                     Api.calls_mute(it.isMuted)
