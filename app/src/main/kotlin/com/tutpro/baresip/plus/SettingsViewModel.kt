@@ -4,7 +4,6 @@ import android.app.role.RoleManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Context.ROLE_SERVICE
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.PowerManager
 import androidx.appcompat.app.AppCompatDelegate
@@ -25,8 +24,6 @@ class SettingsViewModel: ViewModel() {
     val caFile = MutableStateFlow(false)
     val userAgent = MutableStateFlow("")
     val uniqueContactUri =  MutableStateFlow(true)
-    val contactsMode = MutableStateFlow("")
-    val ringtoneUri = MutableStateFlow("")
     val videoSize = MutableStateFlow("")
     val videoFps = MutableStateFlow("")
     val batteryOptimizations = MutableStateFlow(false)
@@ -66,13 +63,6 @@ class SettingsViewModel: ViewModel() {
         userAgent.value = Config.variable("user_agent")
 
         uniqueContactUri.value =  Config.variable("sip_cuser_random") == "yes"
-
-        contactsMode.value = Config.variable("contacts_mode").lowercase()
-
-        ringtoneUri.value = if (Preferences(ctx).ringtoneUri == "")
-            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
-        else
-            Preferences(ctx).ringtoneUri!!
 
         videoSize.value = Config.variable("video_size")
 

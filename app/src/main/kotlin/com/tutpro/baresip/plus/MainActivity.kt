@@ -23,7 +23,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -40,7 +39,6 @@ import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var imm: InputMethodManager
     private lateinit var nm: NotificationManager
     private lateinit var am: AudioManager
     private lateinit var kgm: KeyguardManager
@@ -76,7 +74,6 @@ class MainActivity : ComponentActivity() {
         this.setTurnScreenOn( true)
         Utils.requestDismissKeyguard(this)
 
-        imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
         kgm = getSystemService(KEYGUARD_SERVICE) as KeyguardManager

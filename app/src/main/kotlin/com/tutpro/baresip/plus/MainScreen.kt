@@ -251,6 +251,7 @@ private fun MainScreen(
                 Lifecycle.Event.ON_RESUME -> {
                     Log.d(TAG, "Resumed to MainScreen")
                     BaresipService.isMainVisible = true
+                    viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
                     viewModel.updateCalls(Call.calls().toList())
                     (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
                         spinToAor(viewModel, it.ua.account.aor)
@@ -405,17 +406,18 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     val hideKeyboard by viewModel.hideKeyboard.collectAsState()
 
     LaunchedEffect(showKeyboard) {
-        if (viewModel.showKeyboard.value > 0)
+        if (showKeyboard > 0)
             keyboardController?.show()
     }
 
     LaunchedEffect(hideKeyboard) {
-        if (viewModel.hideKeyboard.value > 0)
+        if (hideKeyboard > 0)
             keyboardController?.hide()
     }
 
     val configuration = LocalConfiguration.current
-    val ua = uas.value.find { it.account.aor == viewModel.selectedAor.value }
+    val selectedAor by viewModel.selectedAor.collectAsState()
+    val ua = uas.value.find { it.account.aor == selectedAor }
     val call = ua?.currentCall()
 
     LaunchedEffect(key1 = call?.status, key2 = configuration.orientation) {
@@ -607,8 +609,6 @@ private fun TopAppBar(
     val ctx = LocalContext.current
     val currentMicIcon by viewModel.micIcon.collectAsState()
 
-    val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-
     val recOffImage = Icons.Filled.VoiceOverOff
     val recOnImage = Icons.Filled.RecordVoiceOver
     var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
@@ -731,7 +731,6 @@ private fun TopAppBar(
                     .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
-                            val isCurrentlyOn = isSpeakerOn
                             val aor = viewModel.selectedAor.value
                             val ua = uas.value.find { it.account.aor == aor }
                             val call = ua?.currentCall()
@@ -740,13 +739,14 @@ private fun TopAppBar(
                             if (connection != null) {
                                 @Suppress("DEPRECATION")
                                 connection.setAudioRoute(
-                                    if (isCurrentlyOn)
+                                    if (isSpeakerOn)
                                         android.telecom.CallAudioState.ROUTE_EARPIECE
                                     else
                                         android.telecom.CallAudioState.ROUTE_SPEAKER
                                 )
                             } else {
-                                Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                                BaresipService.speakerPhone = !isSpeakerOn
+                                viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
                             }
                         },
                         onLongClick = {
@@ -2802,14 +2802,32 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         return
     }
 
+    val ev = event.split(",")
     val uap = params[0] as Long
+
+    when (ev[0]) {
+        "mic muted" -> {
+            val muted = ev[1].toBoolean()
+            if (muted)
+                viewModel.updateMicIcon(Icons.Filled.MicOff)
+            else
+                viewModel.updateMicIcon(Icons.Filled.Mic)
+            handleNextEvent()
+            return
+        }
+        "speaker update" -> {
+            viewModel.updateSpeakerPhoneStatus(ev[1].toBoolean())
+            handleNextEvent()
+            return
+        }
+    }
+
     val ua = UserAgent.ofUap(uap)
     if (ua == null) {
         handleNextEvent("handleServiceEvent '$event' did not find ua $uap")
         return
     }
 
-    val ev = event.split(",")
     Log.d(TAG, "Handling service event '${ev[0]}' for $uap")
     val acc = ua.account
     val aor = ua.account.aor
@@ -3019,16 +3037,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             }
             if (aor == viewModel.selectedAor.value)
                 viewModel.triggerAccountUpdate()
-        }
-        "mic muted" -> {
-            val muted = ev[1].toBoolean()
-            if (muted)
-                viewModel.updateMicIcon(Icons.Filled.MicOff)
-            else
-                viewModel.updateMicIcon(Icons.Filled.Mic)
-        }
-        "speaker update" -> {
-            viewModel.updateSpeakerPhoneStatus(ev[1].toBoolean())
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }

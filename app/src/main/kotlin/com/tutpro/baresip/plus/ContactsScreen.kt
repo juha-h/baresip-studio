@@ -1,8 +1,14 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.ContactsContract
+import android.util.Log
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,6 +54,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -92,7 +101,113 @@ private fun ContactsScreen(
 ) {
 
     val ctx = LocalContext.current
+    val activity = LocalActivity.current!!
     var searchContactName by remember { mutableStateOf("") }
+
+    val consentRequest = stringResource(R.string.consent_request)
+    val contactsConsent = stringResource(R.string.contacts_consent)
+    val deny = stringResource(R.string.deny)
+    val accept = stringResource(R.string.accept)
+    val notice = stringResource(R.string.notice)
+    val noAndroidContacts = stringResource(R.string.no_android_contacts)
+    val ok = stringResource(R.string.ok)
+
+    var expanded by remember { mutableStateOf(false) }
+    val both = stringResource(R.string.both)
+    val contactNames = remember(BaresipService.contactsMode) {
+        val names = mutableListOf("baresip", "Android", both)
+        val values = listOf("baresip", "android", "both")
+        val index = values.indexOf(BaresipService.contactsMode)
+        if (index != -1) {
+            val name = names.removeAt(index)
+            names.add(0, name)
+        }
+        names
+    }
+    val contactValues = remember(BaresipService.contactsMode) {
+        val values = mutableListOf("baresip", "android", "both")
+        val index = values.indexOf(BaresipService.contactsMode)
+        if (index != -1) {
+            val value = values.removeAt(index)
+            values.add(0, value)
+        }
+        values
+    }
+
+    val showDialog = remember { mutableStateOf(false) }
+    val showNoticeDialog = remember { mutableStateOf(false) }
+    val title = remember { mutableStateOf("") }
+    val message = remember { mutableStateOf("") }
+    val firstButtonText = remember { mutableStateOf("") }
+    val onFirstClicked = remember { mutableStateOf({}) }
+    val lastButtonText = remember { mutableStateOf("") }
+    val onLastClicked = remember { mutableStateOf({}) }
+    var pendingMode by remember { mutableStateOf("") }
+
+    AlertDialog(
+        showDialog = showDialog,
+        title = title.value,
+        message = message.value,
+        firstButtonText = firstButtonText.value,
+        onFirstClicked = onFirstClicked.value,
+        lastButtonText = lastButtonText.value,
+        onLastClicked = onLastClicked.value,
+    )
+
+    fun setContactsMode(mode: String) {
+        if (Config.variable("contacts_mode").lowercase() != mode) {
+            Config.replaceVariable("contacts_mode", mode)
+            BaresipService.contactsMode = mode
+            val baresipService = Intent(ctx, BaresipService::class.java)
+            when (mode) {
+                "baresip" -> {
+                    BaresipService.androidContacts.value = listOf()
+                    Contact.restoreBaresipContacts()
+                    baresipService.action = "Stop Content Observer"
+                }
+                "android" -> {
+                    BaresipService.baresipContacts.value = mutableListOf()
+                    Contact.loadAndroidContacts(ctx)
+                    baresipService.action = "Start Content Observer"
+                }
+                "both" -> {
+                    Contact.restoreBaresipContacts()
+                    Contact.loadAndroidContacts(ctx)
+                    baresipService.action = "Start Content Observer"
+                }
+            }
+            Contact.contactsUpdate()
+            Config.save()
+            ContextCompat.startForegroundService(ctx, baresipService)
+        }
+    }
+
+    val requestPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.READ_CONTACTS] == true &&
+            permissions[Manifest.permission.WRITE_CONTACTS] == true) {
+            if (pendingMode.isNotEmpty()) {
+                setContactsMode(pendingMode)
+            }
+        }
+        pendingMode = ""
+    }
+
+    AlertDialog(
+        showDialog = showNoticeDialog,
+        title = notice,
+        message = noAndroidContacts,
+        lastButtonText = ok,
+        onLastClicked = {
+            requestPermissionsLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.WRITE_CONTACTS
+                )
+            )
+        }
+    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -117,6 +232,7 @@ private fun ContactsScreen(
                         containerColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     navigationIcon = {
                         IconButton(
@@ -127,6 +243,65 @@ private fun ContactsScreen(
                                 contentDescription = "Back",
                             )
                         }
+                    },
+                    actions = {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
+                        CustomElements.DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            items = contactNames,
+                            onItemClick = { name ->
+                                expanded = false
+                                val mode = contactValues[contactNames.indexOf(name)]
+                                val contactsPermissions = arrayOf(
+                                    Manifest.permission.READ_CONTACTS,
+                                    Manifest.permission.WRITE_CONTACTS
+                                )
+                                if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
+                                    title.value = consentRequest
+                                    message.value = contactsConsent
+                                    firstButtonText.value = deny
+                                    onFirstClicked.value = { }
+                                    lastButtonText.value = accept
+                                    onLastClicked.value = {
+                                        showDialog.value = false
+                                        if (ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.READ_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                                                ctx,
+                                                Manifest.permission.WRITE_CONTACTS
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            Log.d(TAG, "Contacts permissions already granted")
+                                            setContactsMode(mode)
+                                        } else {
+                                            if (shouldShowRequestPermissionRationale(
+                                                    activity, Manifest.permission.READ_CONTACTS
+                                                ) ||
+                                                shouldShowRequestPermissionRationale(
+                                                    activity, Manifest.permission.WRITE_CONTACTS
+                                                )
+                                            ) {
+                                                pendingMode = mode
+                                                showNoticeDialog.value = true
+                                            } else {
+                                                pendingMode = mode
+                                                requestPermissionsLauncher.launch(contactsPermissions)
+                                            }
+                                        }
+                                    }
+                                    showDialog.value = true
+                                } else {
+                                    setContactsMode(mode)
+                                }
+                            }
+                        )
                     },
                     windowInsets = WindowInsets(0, 0, 0, 0),
                 )

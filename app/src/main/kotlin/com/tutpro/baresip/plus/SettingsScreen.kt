@@ -10,18 +10,14 @@ import android.content.Context.POWER_SERVICE
 import android.content.Context.ROLE_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build.VERSION
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +54,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -75,7 +72,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.core.net.toUri
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -236,6 +236,31 @@ private fun SettingsContent(
     activity: Activity,
     onRestartApp: () -> Unit
 ) {
+    val ctx = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var pendingAutoStart by remember { mutableStateOf(false) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (pendingAutoStart && isAppearOnTopPermissionGranted(ctx)) {
+                    viewModel.autoStart.value = true
+                    pendingAutoStart = false
+                }
+                if (viewModel.autoStart.value && !isAppearOnTopPermissionGranted(ctx)) {
+                    viewModel.autoStart.value = false
+                    if (Config.variable("auto_start") == "yes") {
+                        Config.replaceVariable("auto_start", "no")
+                        Config.save()
+                    }
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     val alertTitleText = stringResource(R.string.alert)
     val errorTitleText = stringResource(R.string.error)
@@ -299,6 +324,7 @@ private fun SettingsContent(
                             lastButtonText.value = okButtonText
                             onLastClicked.value = {
                                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+                                pendingAutoStart = true
                                 ctx.startActivity(intent)
                             }
                             showDialog.value = true
@@ -787,196 +813,6 @@ private fun SettingsContent(
     }
 
     @Composable
-    fun Contacts(activity: Activity) {
-        val contactsTitle = stringResource(R.string.contacts)
-        val contactsHelp = stringResource(R.string.contacts_help)
-        val consentRequestTitle = stringResource(R.string.consent_request)
-        val contactsConsentMessage = stringResource(R.string.contacts_consent)
-        val denyText = stringResource(R.string.deny)
-        val acceptText = stringResource(R.string.accept)
-        val both = stringResource(R.string.both)
-        val noAndroidContactsMessage = stringResource(R.string.no_android_contacts)
-        val showAlertDialog = remember { mutableStateOf(false) }
-        Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp).padding(end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            val ctx = LocalContext.current
-            Text(text = contactsTitle,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        alertTitle.value = contactsTitle
-                        alertMessage.value = contactsHelp
-                        showAlert.value = true
-                    },
-                fontSize = 18.sp
-            )
-            val isDropDownExpanded = remember {
-                mutableStateOf(false)
-            }
-            val contactNames = listOf(
-                "baresip",
-                "Android",
-                both
-            )
-            val contactsMode by viewModel.contactsMode.collectAsState()
-            val contactValues = listOf("baresip",  "android", "both")
-            val itemPosition = remember {
-                mutableIntStateOf(contactValues.indexOf(contactsMode))
-            }
-            val requestPermissionsLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestMultiplePermissions()
-            ) {}
-            val contactsPermissions = arrayOf(Manifest.permission.READ_CONTACTS,
-                Manifest.permission.WRITE_CONTACTS)
-            Box {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
-                ) {
-                    Text(text = contactNames[itemPosition.intValue])
-                    Icon(
-                        imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = null,
-                        modifier = Modifier.size(36.dp)
-                    )
-                }
-                DropdownMenu(
-                    expanded = isDropDownExpanded.value,
-                    onDismissRequest = {
-                        isDropDownExpanded.value = false
-                    }) {
-                    contactNames.forEachIndexed { index, name ->
-                        DropdownMenuItem(
-                            text = { Text(text = name) },
-                            onClick = {
-                                isDropDownExpanded.value = false
-                                val mode = contactValues[index]
-                                if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
-                                    dialogTitle.value = consentRequestTitle
-                                    dialogMessage.value = contactsConsentMessage
-                                    firstButtonText.value = denyText
-                                    onFirstClicked.value = {
-                                        itemPosition.intValue = contactValues.indexOf(contactsMode)
-                                    }
-                                    lastButtonText.value = acceptText
-                                    onLastClicked.value = {
-                                        showDialog.value = false
-                                        viewModel.contactsMode.value = mode
-                                        if (ContextCompat.checkSelfPermission(
-                                                ctx,
-                                                Manifest.permission.READ_CONTACTS
-                                            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                                                ctx,
-                                                Manifest.permission.WRITE_CONTACTS
-                                            ) == PackageManager.PERMISSION_GRANTED
-                                        ) {
-                                            Log.d(TAG, "Contacts permissions already granted")
-                                        }
-                                        else {
-                                            if (shouldShowRequestPermissionRationale(
-                                                    activity, Manifest.permission.READ_CONTACTS
-                                                ) ||
-                                                shouldShowRequestPermissionRationale(
-                                                    activity, Manifest.permission.WRITE_CONTACTS
-                                                )
-                                            )
-                                                showAlertDialog.value = true
-                                            else
-                                                requestPermissionsLauncher.launch(
-                                                    arrayOf(
-                                                        Manifest.permission.READ_CONTACTS,
-                                                        Manifest.permission.WRITE_CONTACTS
-                                                    )
-                                                )
-                                        }
-                                    }
-                                    showDialog.value = true
-                                }
-                                else {
-                                    itemPosition.intValue = index
-                                    viewModel.contactsMode.value = contactValues[index]
-                                }
-                            })
-                        if (index < 2)
-                            HorizontalDivider(thickness = 1.dp)
-                    }
-                }
-            }
-            if (showAlertDialog.value)
-                AlertDialog(
-                    showDialog = showAlertDialog,
-                    title = noticeTitleText,
-                    message = noAndroidContactsMessage,
-                    firstButtonText = "",
-                    onFirstClicked = {},
-                    lastButtonText = okButtonText,
-                    onLastClicked = { requestPermissionsLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.WRITE_CONTACTS
-                        )
-                    )},
-                )
-        }
-    }
-
-    @Composable
-    fun Ringtone() {
-        val ringToneTitle = stringResource(R.string.ringtone)
-        val selectRingToneMessage = stringResource(R.string.select_ringtone)
-        val launcher = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == RESULT_OK) {
-                val uri: Uri? = if (VERSION.SDK_INT >= 33)
-                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
-                else
-                    @Suppress("DEPRECATION")
-                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                if (uri != null)
-                    viewModel.ringtoneUri.value = uri.toString()
-            }
-        }
-        Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(
-                text = ringToneTitle,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-                        intent.putExtra(
-                            RingtoneManager.EXTRA_RINGTONE_TYPE,
-                            RingtoneManager.TYPE_RINGTONE
-                        )
-                        intent.putExtra(
-                            RingtoneManager.EXTRA_RINGTONE_TITLE,
-                            selectRingToneMessage
-                        )
-                        intent.putExtra(
-                            RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                            viewModel.ringtoneUri.value.toUri()
-                        )
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                        launcher.launch(intent)
-                    },
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-
-    @Composable
     fun VideoSize() {
         Row(
             Modifier.fillMaxWidth().padding(top = 12.dp),
@@ -1190,6 +1026,7 @@ private fun SettingsContent(
             )
         }
     }
+
     @Composable
     fun ProximitySensing() {
         val proximitySensingTitle = stringResource(R.string.proximity_sensing)
@@ -1367,12 +1204,6 @@ private fun SettingsContent(
         }
     }
 
-    if (Config.variable("auto_start") == "yes" &&
-            !isAppearOnTopPermissionGranted(LocalContext.current)) {
-        Config.replaceVariable("auto_start", "no")
-        save = true
-    }
-
     val scrollState = rememberScrollState()
 
     Column(
@@ -1395,8 +1226,6 @@ private fun SettingsContent(
         UserAgent()
         UniqueContactUri()
         AudioSettings(navController)
-        Contacts(activity)
-        Ringtone()
         VideoSize()
         VideoFps()
         BatteryOptimizations()
@@ -1538,37 +1367,6 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             if (viewModel.uniqueContactUri.value) "yes" else "no")
         save = true
         restart = true
-    }
-
-    val ringtoneUri = viewModel.ringtoneUri.value
-    Preferences(ctx).ringtoneUri = ringtoneUri
-    BaresipService.rt = RingtoneManager.getRingtone(ctx, ringtoneUri.toUri())
-
-    val contactsMode = viewModel.contactsMode.value
-    if (Config.variable("contacts_mode").lowercase() != contactsMode) {
-        Config.replaceVariable("contacts_mode", contactsMode)
-        BaresipService.contactsMode = contactsMode
-        val baresipService = Intent(ctx, BaresipService::class.java)
-        when (contactsMode) {
-            "baresip" -> {
-                BaresipService.androidContacts.value = listOf()
-                Contact.restoreBaresipContacts()
-                baresipService.action = "Stop Content Observer"
-            }
-            "android" -> {
-                BaresipService.baresipContacts.value = mutableListOf()
-                Contact.loadAndroidContacts(ctx)
-                baresipService.action = "Start Content Observer"
-            }
-            "both" -> {
-                Contact.restoreBaresipContacts()
-                Contact.loadAndroidContacts(ctx)
-                baresipService.action = "Start Content Observer"
-            }
-        }
-        Contact.contactsUpdate()
-        ContextCompat.startForegroundService(ctx, baresipService)
-        save = true
     }
 
     val darkTheme = viewModel.darkTheme.value

@@ -4,30 +4,31 @@ cardview = "1.0.0"
 constraintlayout = "2.2.1"
 activityCompose = "1.13.0"
 coilCompose = "2.7.0"
-composeBom = "2026.03.01"
+composeBom = "2026.04.01"
 coreKtx = "1.18.0"
 exifinterface = "1.4.2"
 fragmentKtx = "1.8.9"
-gradleVersion = "9.1.1"
+gradleVersion = "9.2.0"
 kotlin = "2.3.20"
 kotlinStdlibJdk8 = "2.3.10"
 kotlinSerializationPlugin = "2.3.20"
 kotlinxCoroutinesAndroid = "1.10.2"
 kotlinxSerializationJson = "1.11.0"
 lifecycleProcess = "2.10.0"
+lifecycleRuntimeCompose = "2.10.0"
 lifecycleViewmodelKtx = "2.10.0"
 material = "1.13.0"
 media = "1.7.1"
-navigationCompose = "2.9.7"
-navigationRuntimeAndroid = "2.9.7"
+navigationCompose = "2.9.8"
+navigationRuntimeAndroid = "2.9.8"
 preferenceKtx = "1.2.1"
-ui = "1.10.6"
-foundationAndroid = "1.10.6"
-runtimeLivedata = "1.10.6"
+ui = "1.11.0"
+foundationAndroid = "1.11.0"
+runtimeLivedata = "1.11.0"
 composeMaterial3 = "1.4.0"
 composeMaterialIcons = "1.7.8"
-runtime = "1.10.6"
-uiText = "1.10.6"
+runtime = "1.11.0"
+uiText = "1.11.0"
 
 [libraries]
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
@@ -40,6 +41,7 @@ androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-media = { module = "androidx.media:media", version.ref = "media" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
