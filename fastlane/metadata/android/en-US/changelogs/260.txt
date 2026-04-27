@@ -1,0 +1,6 @@
+= Moved Contacts Mode selection from Settings screen to Contacts screen menu
+- Moved Ringtone selection from Settings screen to Audio Settings screen
+- Several Speaker Phone fixes and improvements
+- Start Automatically setting improvements
+- Support both MODE_IN_CALL and MODE_IN_COMMUNICATION as call audio modes
+- Avoid IME related crash in buggy devices
