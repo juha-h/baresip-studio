@@ -40,7 +40,13 @@ class ConnectionService : ConnectionService() {
             connections[callp]?.let {
                 Log.d(TAG, "Setting audio route for $callp to speaker=$speaker")
                 @Suppress("DEPRECATION")
-                it.setAudioRoute(if (speaker) CallAudioState.ROUTE_SPEAKER else CallAudioState.ROUTE_EARPIECE)
+                val currentRoute = it.callAudioState?.route ?: CallAudioState.ROUTE_EARPIECE
+                @Suppress("DEPRECATION")
+                if (speaker) {
+                    it.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
+                } else if (currentRoute == CallAudioState.ROUTE_SPEAKER) {
+                    it.setAudioRoute(CallAudioState.ROUTE_EARPIECE)
+                }
             }
         }
     }

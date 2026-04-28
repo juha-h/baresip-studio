@@ -410,7 +410,7 @@
     <string name="proximity_sensing_help">If checked, proximity sensing is active during calls.</string>
     <string name="telecom">Telecom Framework</string>
     <string name="telecom_help">Use Android Telecom framework for calls. Uncheck this if peer does
-        not hear your audio.  Bluetooth is supported only when Telecom Framework is in use.</string>
+        not hear your audio.</string>
     <string name="video_size">Video Frame Size</string>
     <string name="video_size_help">Size of transmitted video frames (width x height)</string>
     <string name="video_fps">Video Frames Per Second</string>

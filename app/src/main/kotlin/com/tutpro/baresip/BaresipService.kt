@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -7,6 +8,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothHeadset
+import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -59,6 +63,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.MessagingStyle
 import androidx.core.app.Person
@@ -93,10 +98,12 @@ class BaresipService: Service() {
     private lateinit var pm: PowerManager
     private lateinit var wm: WifiManager
     private lateinit var tm: TelecomManager
+    private lateinit var btm: BluetoothManager
     private lateinit var vibrator: Vibrator
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
     private lateinit var wifiLock: WifiManager.WifiLock
+    private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
     private lateinit var androidContactsObserver: ContentObserver
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
@@ -113,6 +120,7 @@ class BaresipService: Service() {
     private var mediaPlayer: MediaPlayer? = null
     private var androidContactsObserverRegistered = false
     private var hotSpotReceiverRegistered = false
+    private var bluetoothReceiverRegistered = false
     private var isNotificationInCall = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
@@ -281,7 +289,64 @@ class BaresipService: Service() {
         hotSpotReceiverRegistered = true
 
         tm = getSystemService(TELECOM_SERVICE) as TelecomManager
-        registerPhoneAccount()
+
+        btm = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        btAdapter = btm.adapter
+
+        bluetoothReceiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                when (intent.action) {
+                    BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
+                        val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
+                                BluetoothHeadset.STATE_DISCONNECTED)
+                        when (state) {
+                            BluetoothHeadset.STATE_CONNECTED -> {
+                                Log.d(TAG, "Bluetooth headset is connected")
+                                if (audioFocusRequest != null)
+                                    startBluetoothSco(applicationContext, 1000L, 3)
+                            }
+                            BluetoothHeadset.STATE_DISCONNECTED -> {
+                                Log.d(TAG, "Bluetooth headset is disconnected")
+                                if (audioFocusRequest != null)
+                                    stopBluetoothSco(applicationContext)
+                            }
+
+                        }
+                    }
+                    BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED -> {
+                        val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
+                                BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
+                        when (state) {
+                            BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
+                                Log.d(TAG, "Bluetooth headset audio is connected")
+                            }
+                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED -> {
+                                Log.d(TAG, "Bluetooth headset audio is disconnected")
+                            }
+                        }
+                    }
+                    AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
+                        val state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE,
+                                AudioManager.SCO_AUDIO_STATE_DISCONNECTED)
+                        when (state) {
+                            AudioManager.SCO_AUDIO_STATE_CONNECTING -> {
+                                Log.d(TAG, "Bluetooth headset SCO is connecting")
+                            }
+                            AudioManager.SCO_AUDIO_STATE_CONNECTED -> {
+                                Log.d(TAG, "Bluetooth headset SCO is connected")
+                            }
+                            AudioManager.SCO_AUDIO_STATE_DISCONNECTED -> {
+                                Log.d(TAG, "Bluetooth headset SCO is disconnected")
+                                resetCallVolume()
+                            }
+                            AudioManager.SCO_AUDIO_STATE_ERROR -> {
+                                Log.d(TAG, "Bluetooth headset SCO state ERROR")
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
                 "com.tutpro.baresip:proximity_wakelock")
@@ -374,8 +439,9 @@ class BaresipService: Service() {
                     } else {
                         Log.i(TAG, "Asset '$a' already copied")
                     }
-                    if (a == "config")
+                    if (a == "config") {
                         Config.initialize(applicationContext)
+                    }
                 }
 
                 if (contactsMode != "android")
@@ -426,6 +492,19 @@ class BaresipService: Service() {
                 Log.i(TAG, "Link addresses: $addresses")
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
+
+                if (telecom)
+                    registerPhoneAccount()
+                else
+                    if (btAdapter != null) {
+                        Log.i(TAG, "Registering bluetooth receiver")
+                        val filter = IntentFilter()
+                        filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
+                        filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
+                        filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+                        this.registerReceiver(bluetoothReceiver, filter)
+                        bluetoothReceiverRegistered = true
+                    }
 
                 Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
@@ -800,7 +879,6 @@ class BaresipService: Service() {
                         if (call!!.status.value == "transferring")
                             break
                         speakerPhone = speakerPhoneAuto
-                        // stopRinging()
                         stopMediaPlayer()
                         val hasTelecom = ConnectionService.connections.containsKey(callp) ||
                                 ConnectionService.pendingOutgoingConnection != null
@@ -2238,6 +2316,12 @@ class BaresipService: Service() {
             } catch (_: IllegalArgumentException) {
                 Log.e(TAG, "hotSpotReceiver was not registered with applicationContext")
             }
+            if (bluetoothReceiverRegistered) {
+                try {
+                    unregisterReceiver(bluetoothReceiver)
+                    bluetoothReceiverRegistered = false
+                } catch (_: IllegalArgumentException) {}
+            }
             val callps = ConnectionService.connections.keys.toList()
             for (callp in callps)
                 ConnectionService.onCallClosed(callp)
@@ -2289,6 +2373,7 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var callVolume = 0
+
         @Volatile
         var speakerPhone = false
         var speakerPhoneAuto = false
@@ -2329,6 +2414,7 @@ class BaresipService: Service() {
         var contactsMode by mutableStateOf("baresip")
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
+
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()
         var aecAvailable = false
@@ -2338,17 +2424,24 @@ class BaresipService: Service() {
         private var agc: AutomaticGainControl? = null
         private var ns: NoiseSuppressor? = null
         private var recorderSessionId = 0
+        private var btAdapter: BluetoothAdapter? = null
         private var audioFocusRequest: androidx.media.AudioFocusRequestCompat? = null
 
         var rt: Ringtone? = null
 
         var colorblind = false
-        val circleGreen = mapOf(true to R.drawable.circle_green_blind,
-            false to R.drawable.circle_green)
-        val circleYellow = mapOf(true to R.drawable.circle_yellow_blind,
-            false to R.drawable.circle_yellow)
-        val circleRed = mapOf(true to R.drawable.circle_red_blind,
-            false to R.drawable.circle_red)
+        val circleGreen = mapOf(
+            true to R.drawable.circle_green_blind,
+            false to R.drawable.circle_green
+        )
+        val circleYellow = mapOf(
+            true to R.drawable.circle_yellow_blind,
+            false to R.drawable.circle_yellow
+        )
+        val circleRed = mapOf(
+            true to R.drawable.circle_red_blind,
+            false to R.drawable.circle_red
+        )
 
         internal const val KEY_TEXT_REPLY = "key_text_reply_baresip"
         private const val PHONE_ACCOUNT_ID = "baresip_phone_account"
@@ -2363,9 +2456,9 @@ class BaresipService: Service() {
             if (serviceEvents.size == 1) {
                 Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
                 serviceEvent.postValue(Event(event.timeStamp))
-            } else {
-                Log.d(TAG, "Added service event ${event.event}")
             }
+            else
+                Log.d(TAG, "Added service event ${event.event}")
         }
 
         fun requestAudioFocus(ctx: Context): Boolean {
@@ -2390,7 +2483,10 @@ class BaresipService: Service() {
                 ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             ) {
                 Log.d(TAG, "requestAudioFocus granted")
-            } else {
+                if (!telecom && isBluetoothHeadsetConnected(ctx))
+                    startBluetoothSco(ctx, 250L, 3)
+            }
+            else {
                 Log.w(TAG, "requestAudioFocus denied")
                 audioFocusRequest = null
             }
@@ -2408,11 +2504,75 @@ class BaresipService: Service() {
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED
                 ) {
                     audioFocusRequest = null
-                } else {
-                    Log.e(TAG, "Failed to abandon audio focus")
+                    if (!telecom && isBluetoothHeadsetConnected(ctx))
+                        stopBluetoothSco(ctx)
                 }
+                else
+                    Log.e(TAG, "Failed to abandon audio focus")
             }
             am.mode = MODE_NORMAL
+        }
+
+        private fun isBluetoothHeadsetConnected(ctx: Context): Boolean {
+            if (VERSION.SDK_INT >= 31 &&
+                ActivityCompat.checkSelfPermission(
+                    ctx,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ) == PackageManager.PERMISSION_DENIED
+            )
+                return false
+            return btAdapter != null && btAdapter!!.isEnabled &&
+                    btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
+                        BluetoothAdapter.STATE_CONNECTED
+        }
+
+        private fun isBluetoothScoOn(am: AudioManager): Boolean {
+            return if (VERSION.SDK_INT < 31)
+                @Suppress("DEPRECATION")
+                am.isBluetoothScoOn
+            else
+                if (am.communicationDevice != null)
+                    am.communicationDevice!!.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                else
+                    false
+        }
+
+        private fun startBluetoothSco(ctx: Context, delay: Long, count: Int) {
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
+            if (isBluetoothScoOn(am)) {
+                Log.d(TAG, "Bluetooth SCO is already on")
+                return
+            }
+            Log.d(TAG, "Starting Bluetooth SCO at count $count")
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (VERSION.SDK_INT < 31) {
+                    @Suppress("DEPRECATION")
+                    am.startBluetoothSco()
+                }
+                else
+                    Utils.setCommunicationDevice(am, AudioDeviceInfo.TYPE_BLUETOOTH_SCO)
+                if (!isBluetoothScoOn(am) && count > 1)
+                    startBluetoothSco(ctx, delay, count - 1)
+                else
+                    am.isBluetoothScoOn = true
+            }, delay)
+        }
+
+        private fun stopBluetoothSco(ctx: Context) {
+            Log.d(TAG, "Stopping Bluetooth SCO")
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
+            if (!isBluetoothScoOn(am)) {
+                Log.d(TAG, "Bluetooth SCO is already off")
+                return
+            }
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (VERSION.SDK_INT < 31)
+                    @Suppress("DEPRECATION")
+                    am.stopBluetoothSco()
+                else
+                    am.clearCommunicationDevice()
+                am.isBluetoothScoOn = false
+            }, 100)
         }
     }
 }
