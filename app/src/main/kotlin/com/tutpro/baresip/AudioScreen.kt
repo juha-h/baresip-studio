@@ -207,8 +207,8 @@ private fun AudioContent(contentPadding: PaddingValues) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Telecom()
-        ToneCountry()
         Ringtone()
+        ToneCountry()
         SpeakerPhone()
         CallVolume()
         MicGain()
@@ -246,6 +246,65 @@ private fun Telecom() {
                 telecom = it
                 newTelecom = telecom
             }
+        )
+    }
+}
+
+@Composable
+private fun Ringtone() {
+    val ringToneTitle = stringResource(R.string.ringtone)
+    val selectRingToneMessage = stringResource(R.string.select_ringtone)
+    val ctx = LocalContext.current
+    var ringtoneUri by remember {
+        mutableStateOf(if (Preferences(ctx).ringtoneUri == "")
+            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
+        else
+            Preferences(ctx).ringtoneUri!!)
+    }
+    newRingtoneUri = ringtoneUri
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val uri: Uri? = if (VERSION.SDK_INT >= 33)
+                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
+            else
+                @Suppress("DEPRECATION")
+                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            if (uri != null) {
+                ringtoneUri = uri.toString()
+                newRingtoneUri = ringtoneUri
+            }
+        }
+    }
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(
+            text = ringToneTitle,
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_TYPE,
+                        RingtoneManager.TYPE_RINGTONE
+                    )
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_TITLE,
+                        selectRingToneMessage
+                    )
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                        ringtoneUri.toUri()
+                    )
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                    launcher.launch(intent)
+                },
+            fontSize = 18.sp,
         )
     }
 }
@@ -309,65 +368,6 @@ private fun ToneCountry() {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Ringtone() {
-    val ringToneTitle = stringResource(R.string.ringtone)
-    val selectRingToneMessage = stringResource(R.string.select_ringtone)
-    val ctx = LocalContext.current
-    var ringtoneUri by remember {
-        mutableStateOf(if (Preferences(ctx).ringtoneUri == "")
-            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
-        else
-            Preferences(ctx).ringtoneUri!!)
-    }
-    newRingtoneUri = ringtoneUri
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val uri: Uri? = if (VERSION.SDK_INT >= 33)
-                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
-            else
-                @Suppress("DEPRECATION")
-                result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            if (uri != null) {
-                ringtoneUri = uri.toString()
-                newRingtoneUri = ringtoneUri
-            }
-        }
-    }
-    Row(
-        Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(
-            text = ringToneTitle,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-                    intent.putExtra(
-                        RingtoneManager.EXTRA_RINGTONE_TYPE,
-                        RingtoneManager.TYPE_RINGTONE
-                    )
-                    intent.putExtra(
-                        RingtoneManager.EXTRA_RINGTONE_TITLE,
-                        selectRingToneMessage
-                    )
-                    intent.putExtra(
-                        RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                        ringtoneUri.toUri()
-                    )
-                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                    launcher.launch(intent)
-                },
-            fontSize = 18.sp,
-        )
     }
 }
 
@@ -629,9 +629,23 @@ private fun checkOnClick(ctx: Context): Result {
 
     var restart = false
 
+    if (newTelecom != oldTelecom) {
+        Config.replaceVariable("telecom", if (newTelecom) "yes" else "no")
+        BaresipService.telecom = newTelecom
+        restart = true
+        save = true
+    }
+
     if (Preferences(ctx).ringtoneUri != newRingtoneUri) {
         Preferences(ctx).ringtoneUri = newRingtoneUri
         BaresipService.rt = RingtoneManager.getRingtone(ctx, newRingtoneUri.toUri())
+    }
+
+
+    if (BaresipService.toneCountry != newToneCountry) {
+        BaresipService.toneCountry = newToneCountry
+        Config.replaceVariable("tone_country", newToneCountry)
+        save = true
     }
 
     if (BaresipService.callVolume != newCallVolume) {
@@ -736,18 +750,6 @@ private fun checkOnClick(ctx: Context): Result {
         }
         Config.replaceVariable("audio_delay", audioDelay)
         BaresipService.audioDelay = audioDelay.toLong()
-        save = true
-    }
-
-    if (BaresipService.toneCountry != newToneCountry) {
-        BaresipService.toneCountry = newToneCountry
-        Config.replaceVariable("tone_country", newToneCountry)
-        save = true
-    }
-
-    if (newTelecom != oldTelecom) {
-        Config.replaceVariable("telecom", if (newTelecom) "yes" else "no")
-        BaresipService.telecom = newTelecom
         save = true
     }
 
