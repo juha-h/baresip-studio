@@ -435,6 +435,9 @@
     <string name="proximity_sensing">Läheisyyden tunnistus</string>
     <string name="proximity_sensing_help">Jos merkitty, läheisyyden tunnistus on aktiivinen
         puhelun aikana.</string>
+    <string name="telecom">Telecom-kehys</string>
+    <string name="telecom_help">Käytä Android Telecom-kehystä puheluihin. Poista valinta, jos
+        puhelun toinen osapuoli ei kuule ääntäsi.</string>
     <string name="video_size">Videon kehyskoko</string>
     <string name="video_size_help">Lähetettävän videon kehyskoko (leveys x korkeus)</string>
     <string name="video_fps">Videokehysten lähetystaajuus</string>

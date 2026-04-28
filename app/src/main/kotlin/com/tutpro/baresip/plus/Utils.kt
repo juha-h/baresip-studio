@@ -1020,10 +1020,22 @@ object Utils {
         setSpeakerPhone(executor, am, !isSpeakerOn)
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
+    fun setCommunicationDevice(am: AudioManager, type: Int) {
+        val current = am.communicationDevice!!.type
+        Log.d(TAG, "Current com dev/mode $current/${am.mode}")
+        for (device in am.availableCommunicationDevices)
+            if (device.type == type) {
+                am.setCommunicationDevice(device)
+                break
+            }
+        Log.d(TAG, "New com dev/mode ${am.communicationDevice!!.type}/${am.mode}")
+    }
+
     fun clearCommunicationDevice(am: AudioManager) {
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (Build.VERSION.SDK_INT >= 31)
             am.clearCommunicationDevice()
-        } else {
+        else {
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn = false
         }
