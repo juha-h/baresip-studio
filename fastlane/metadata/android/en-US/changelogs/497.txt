@@ -1,0 +1,4 @@
+- Added Telecom Framework audio setting to allow disabling use of Android Telecom Framework
+- Show yellow call button when outgoing call is still in the process of being made
+- Fixed Bluetooth support when Telecom Framework is in use
+
