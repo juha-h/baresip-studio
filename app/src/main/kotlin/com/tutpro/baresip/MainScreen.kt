@@ -2031,6 +2031,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
             if (dialerState != null) {
                 val uriText = dialerState.callUri.value.trim()
                 if (uriText.isNotEmpty()) {
+                    dialerState.callButtonsEnabled.value = false
                     val uris = Contact.contactUris(uriText)
                     if (uris.isEmpty())
                         makeCall(ctx, viewModel, uriText, dialerState.showCallConferenceButton.value)
