@@ -1505,10 +1505,15 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        val connection = ConnectionService.connections[call.callp]
-                        if (connection != null)
-                            connection.onDisconnect()
-                        else {
+                        if (BaresipService.telecom) {
+                            val connection = ConnectionService.connections[call.callp]
+                            if (connection != null)
+                                connection.onDisconnect()
+                            else {
+                                Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
+                                Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                            }
+                        } else {
                             Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
                             Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
                         }
@@ -1532,10 +1537,15 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        val connection = ConnectionService.connections[call.callp]
-                        if (connection != null)
-                            connection.onDisconnect()
-                        else {
+                        if (BaresipService.telecom) {
+                            val connection = ConnectionService.connections[call.callp]
+                            if (connection != null)
+                                connection.onDisconnect()
+                            else {
+                                Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
+                                Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
+                            }
+                        } else {
                             Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
                             Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
                         }
@@ -2074,28 +2084,40 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
-        val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
-        val extras = android.os.Bundle()
-        extras.putParcelable(android.telecom.TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
-            BaresipService.getPhoneAccountHandle(ctx))
-        val callExtras = android.os.Bundle()
-        callExtras.putBoolean("conferenceCall", conferenceCall)
-        callExtras.putLong("uap", ua.uap)
-        if (onHoldCallp != 0L)
-            callExtras.putLong("onHoldCallp", onHoldCallp)
-        extras.putBundle(android.telecom.TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
-        try {
-            Log.d(TAG, "Placing Telecom call to $uri with uap=${ua.uap}")
-            tm.placeCall(uri.toUri(), extras)
-        } catch (e: SecurityException) {
-            Log.e(TAG, "placeCall failed: ${e.message}")
+        if (BaresipService.telecom) {
+            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
+            val extras = android.os.Bundle()
+            extras.putParcelable(android.telecom.TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
+                BaresipService.getPhoneAccountHandle(ctx))
+            val callExtras = android.os.Bundle()
+            callExtras.putBoolean("conferenceCall", conferenceCall)
+            callExtras.putLong("uap", ua.uap)
+            if (onHoldCallp != 0L)
+                callExtras.putLong("onHoldCallp", onHoldCallp)
+            extras.putBundle(android.telecom.TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+            try {
+                Log.d(TAG, "Placing Telecom call to $uri with uap=${ua.uap}")
+                tm.placeCall(uri.toUri(), extras)
+            } catch (e: SecurityException) {
+                Log.e(TAG, "placeCall failed: ${e.message}")
+            }
+        }
+        else {
+            val intent = Intent(ctx, BaresipService::class.java)
+            intent.action = "Start Call"
+            intent.putExtra("uap", ua.uap)
+            intent.putExtra("uri", uri)
+            intent.putExtra("conferenceCall", conferenceCall)
+            intent.putExtra("onHoldCallp", onHoldCallp)
+            ctx.startService(intent)
         }
     }
 }
 
 private fun answer(ctx: Context, call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} answering call from ${call.callUri.value}")
-    ConnectionService.connections[call.callp]?.setActive()
+    if (BaresipService.telecom)
+        ConnectionService.connections[call.callp]?.setActive()
     val intent = Intent(ctx, BaresipService::class.java)
     intent.action = "Call Answer"
     intent.putExtra("uap", call.ua.uap)
@@ -2105,9 +2127,15 @@ private fun answer(ctx: Context, call: Call) {
 
 private fun reject(call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp} from ${call.callUri.value}")
-    val connection = ConnectionService.connections[call.callp]
-    if (connection != null)
-        connection.onReject()
+    if (BaresipService.telecom) {
+        val connection = ConnectionService.connections[call.callp]
+        if (connection != null)
+            connection.onReject()
+        else {
+            call.rejected = true
+            Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
+        }
+    }
     else {
         call.rejected = true
         Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
@@ -2323,6 +2351,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
 
     when (ev[0]) {
         "call rejected" -> {
+            if (!BaresipService.telecom)
+                BaresipService.abandonAudioFocus(ctx)
             if (aor == viewModel.selectedAor.value)
                 viewModel.triggerAccountUpdate()
         }

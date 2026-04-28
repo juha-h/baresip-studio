@@ -406,8 +406,10 @@
     <string name="dynamic_colors_help">Use dynamic colors if enabled in Android Settings</string>
     <string name="colorblind">Colorblind</string>
     <string name="colorblind_help">Use colorblind friendly registration status icons</string>
-    <string name="proximity_sensing">Proximity Sensing</string>">
+    <string name="proximity_sensing">Proximity Sensing</string>
     <string name="proximity_sensing_help">If checked, proximity sensing is active during calls.</string>
+    <string name="telecom">Telecom Framework</string>
+    <string name="telecom_help">Use Android Telecom framework for calls. Uncheck this if peer does not hear your audio or if you have issues with Bluetooth headsets.</string>
     <string name="video_size">Video Frame Size</string>
     <string name="video_size_help">Size of transmitted video frames (width x height)</string>
     <string name="video_fps">Video Frames Per Second</string>

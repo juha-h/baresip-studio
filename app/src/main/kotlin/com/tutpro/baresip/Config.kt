@@ -224,6 +224,13 @@ object Config {
             BaresipService.toneCountry = toneCountry
         config = "${config}tone_country ${BaresipService.toneCountry}\n"
 
+        val telecom = previousVariable("telecom")
+        if (telecom != "")
+            BaresipService.telecom = telecom == "yes"
+        else
+            BaresipService.telecom = true
+        config = "${config}telecom ${if (BaresipService.telecom) "yes" else "no"}\n"
+
         save()
         BaresipService.isConfigInitialized = true
 

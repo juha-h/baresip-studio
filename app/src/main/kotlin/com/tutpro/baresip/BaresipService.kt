@@ -473,7 +473,12 @@ class BaresipService: Service() {
                 stopMediaPlayer()
                 setCallVolume()
                 proximitySensing(proximitySensing)
-                Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
+                if (telecom)
+                    Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
+                else {
+                    Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
+                    ensureCommunicationMode()
+                }
             }
 
             "Call Reject" -> {
@@ -581,6 +586,18 @@ class BaresipService: Service() {
 
             "Update Notification" -> {
                 updateStatusNotification()
+            }
+
+            "Start Call" -> {
+                val uap = intent!!.getLongExtra("uap", 0L)
+                val uri = intent.getStringExtra("uri")!!
+                val conferenceCall = intent.getBooleanExtra("conferenceCall", false)
+                val onHoldCallp = intent.getLongExtra("onHoldCallp", 0L)
+                if (!requestAudioFocus(applicationContext)) {
+                    toast(getString(R.string.audio_focus_denied))
+                    return START_STICKY
+                }
+                runCall(uap, uri, conferenceCall, onHoldCallp)
             }
 
             "Stop" -> {
@@ -782,12 +799,13 @@ class BaresipService: Service() {
                     "call outgoing" -> {
                         if (call!!.status.value == "transferring")
                             break
-                        if (speakerPhoneAuto) {
-                            Log.d(TAG, "Auto-on speakerphone for outgoing call")
-                            speakerPhone = true
-                        }
+                        speakerPhone = speakerPhoneAuto
+                        // stopRinging()
                         stopMediaPlayer()
-                        setCallVolume()
+                        val hasTelecom = ConnectionService.connections.containsKey(callp) ||
+                                ConnectionService.pendingOutgoingConnection != null
+                        if (!hasTelecom)
+                            setCallVolume()
                         ensureCommunicationMode()
                         proximitySensing(proximitySensing)
                     }
@@ -808,10 +826,7 @@ class BaresipService: Service() {
                         return
                     }
                     "incoming call" -> {
-                        if (speakerPhoneAuto) {
-                            Log.d(TAG, "Auto-on speakerphone for incoming call")
-                            speakerPhone = true
-                        }
+                        speakerPhone = speakerPhoneAuto
                         val peerUri = ev[1]
                         val toastMsg = if (Call.isAnyCallActive(applicationContext))
                             String.format(getString(R.string.call_auto_rejected),
@@ -866,14 +881,23 @@ class BaresipService: Service() {
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         if (Call.ofCallp(callp) == null)
                             Call(callp, ua, peerUri, "in", "incoming").add()
-                        val extras = android.os.Bundle()
-                        extras.putLong("uap", uap)
-                        extras.putLong("callp", callp)
-                        extras.putString("peerUri", peerUri)
-                        try {
-                            tm.addNewIncomingCall(getPhoneAccountHandle(this), extras)
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Telecom addNewIncomingCall failed: ${e.message}")
+                        if (telecom) {
+                            val extras = android.os.Bundle()
+                            extras.putLong("uap", uap)
+                            extras.putLong("callp", callp)
+                            extras.putString("peerUri", peerUri)
+                            try {
+                                tm.addNewIncomingCall(getPhoneAccountHandle(this), extras)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Telecom addNewIncomingCall failed: ${e.message}")
+                            }
+                        } else {
+                            if (!requestAudioFocus(applicationContext)) {
+                                Log.w(TAG, "Audio focus denied for incoming call")
+                                Api.ua_hangup(uap, callp, 486, "Busy Here")
+                                return
+                            }
+                            handleIncomingCall(Call.ofCallp(callp)!!)
                         }
                         return
                     }
@@ -1069,8 +1093,13 @@ class BaresipService: Service() {
                             val tone = ev[2]
                             if (tone == "busy")
                                 playBusy()
-                            else
+                            else {
+                                if (!telecom && !Call.inCall())
+                                    abandonAudioFocus(applicationContext)
                                 ensureCommunicationMode()
+                            }
+                            if (!telecom && !Call.inCall())
+                                abandonAudioFocus(applicationContext)
                             if (call.dir == "out")
                                 call.rejected = call.startTime == null &&
                                         !reason.startsWith("408") &&
@@ -1398,16 +1427,22 @@ class BaresipService: Service() {
             }, audioDelay)
         }
 
-        if (VERSION.SDK_INT < 31) {
+        val isTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) } ||
+                ConnectionService.pendingOutgoingConnection != null
+        if (isTelecom)
+            executeCall()
+        else if (VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
             am.mode = MODE_IN_COMMUNICATION
             executeCall()
-        } else {
+        }
+        else {
             val isAnyCallMode = am.mode == MODE_IN_COMMUNICATION || am.mode == AudioManager.MODE_IN_CALL
             if (isAnyCallMode) {
                 Log.d(TAG, "Audio mode already in a call mode (${am.mode})")
                 executeCall()
-            } else {
+            }
+            else {
                 audioModeChangedListener = AudioManager.OnModeChangedListener { mode ->
                     if (mode == MODE_IN_COMMUNICATION || mode == AudioManager.MODE_IN_CALL) {
                         Log.d(TAG, "Audio mode changed to $mode")
@@ -1946,8 +1981,11 @@ class BaresipService: Service() {
                 cleanupRunnable = null
             }
             if (isSpeakerphoneOn == speakerPhone) {
-                Log.d(TAG, "Already in valid call mode ($currentMode) with correct speaker state.")
-                return
+                val hasTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) }
+                if (hasTelecom || currentMode == MODE_IN_COMMUNICATION) {
+                    Log.d(TAG, "Already in valid call mode ($currentMode) with correct speaker state.")
+                    return
+                }
             }
         } else if (!Call.inCall() && currentMode == MODE_NORMAL) {
             if (speakerPhone) {
@@ -1971,12 +2009,13 @@ class BaresipService: Service() {
         val runnable = Runnable {
             cleanupRunnable = null
             if (Call.inCall()) {
-                if (am.mode != MODE_IN_COMMUNICATION && am.mode != AudioManager.MODE_IN_CALL) {
+                val hasTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) }
+                if (!hasTelecom && am.mode != MODE_IN_COMMUNICATION && am.mode != AudioManager.MODE_IN_CALL) {
                     am.mode = MODE_IN_COMMUNICATION
                     Log.d(TAG, "Manual Mode Guard: Setting MODE_IN_COMMUNICATON from ${am.mode}")
                 }
                 Log.d(TAG, "Applying speakerphone state: $speakerPhone")
-                if (!Call.calls().any { ConnectionService.connections.containsKey(it.callp) }) {
+                if (!hasTelecom) {
                     Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
                     Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
                 } else {
@@ -2011,7 +2050,8 @@ class BaresipService: Service() {
                         )
                     )
                 }
-                resetCallVolume()
+                if (!Call.calls().any { ConnectionService.connections.containsKey(it.callp) })
+                    resetCallVolume()
                 proximitySensing(false)
             }
         }
@@ -2264,6 +2304,7 @@ class BaresipService: Service() {
         var isRecOn = false
         var toneCountry = "us"
         var proximitySensing = true
+        var telecom = true
 
         val uas = mutableStateOf(emptyList<UserAgent>())
         val uasStatus = mutableStateOf(emptyMap<String, Int>())
@@ -2297,6 +2338,7 @@ class BaresipService: Service() {
         private var agc: AutomaticGainControl? = null
         private var ns: NoiseSuppressor? = null
         private var recorderSessionId = 0
+        private var audioFocusRequest: androidx.media.AudioFocusRequestCompat? = null
 
         var rt: Ringtone? = null
 
@@ -2324,6 +2366,53 @@ class BaresipService: Service() {
             } else {
                 Log.d(TAG, "Added service event ${event.event}")
             }
+        }
+
+        fun requestAudioFocus(ctx: Context): Boolean {
+            Log.d(TAG, "Requesting audio focus")
+            if (audioFocusRequest != null) {
+                Log.d(TAG, "Already focused")
+                return true
+            }
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
+            val attributes = androidx.media.AudioAttributesCompat.Builder()
+                .setUsage(androidx.media.AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
+                .setContentType(androidx.media.AudioAttributesCompat.CONTENT_TYPE_SPEECH)
+                .build()
+            audioFocusRequest =
+                androidx.media.AudioFocusRequestCompat.Builder(androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+                    .setAudioAttributes(attributes)
+                    .setOnAudioFocusChangeListener { }
+                    .build()
+            if (androidx.media.AudioManagerCompat.requestAudioFocus(
+                    am,
+                    audioFocusRequest!!
+                ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+            ) {
+                Log.d(TAG, "requestAudioFocus granted")
+            } else {
+                Log.w(TAG, "requestAudioFocus denied")
+                audioFocusRequest = null
+            }
+            return audioFocusRequest != null
+        }
+
+        fun abandonAudioFocus(ctx: Context) {
+            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
+            if (audioFocusRequest != null) {
+                Log.d(TAG, "Abandoning audio focus")
+                if (androidx.media.AudioManagerCompat.abandonAudioFocusRequest(
+                        am,
+                        audioFocusRequest!!
+                    ) ==
+                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+                ) {
+                    audioFocusRequest = null
+                } else {
+                    Log.e(TAG, "Failed to abandon audio focus")
+                }
+            }
+            am.mode = MODE_NORMAL
         }
     }
 }
