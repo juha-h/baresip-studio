@@ -432,4 +432,6 @@
     <string name="call_is_ringing">通话正在响铃</string>
     <string name="custom_parameters">自定义参数</string>
     <string name="custom_parameters_help">以英文分号分隔的自定义账号参数列表</string>
+    <string name="telecom">Telecom 框架</string>
+    <string name="telecom_help">使用 Android Telecom 框架进行通话。如果对方听不到您的声音，请取消选中此选项。</string>
 </resources>
