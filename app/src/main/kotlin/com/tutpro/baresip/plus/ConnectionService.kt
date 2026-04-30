@@ -179,6 +179,11 @@ class ConnectionService : ConnectionService() {
 
         override fun onAnswer() {
             Log.d(TAG, "Telecom Connection onAnswer $callp")
+            val answerIntent = Intent(this@ConnectionService, BaresipService::class.java)
+            answerIntent.action = "Call Answer"
+            answerIntent.putExtra("uap", uap)
+            answerIntent.putExtra("callp", callp)
+            startService(answerIntent)
             val intent = Intent(this@ConnectionService, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             intent.putExtra("action", "call answer")
