@@ -2476,7 +2476,6 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
             if (dialerState != null) {
                 val uriText = dialerState.callUri.value.trim()
                 if (uriText.isNotEmpty()) {
-                    dialerState.callButtonsEnabled.value = false
                     val uris = Contact.contactUris(uriText)
                     if (uris.isEmpty())
                         makeCall(ctx,
@@ -2568,6 +2567,7 @@ private fun makeCall(
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
+        viewModel.dialerState.callButtonsEnabled.value = false
         if (BaresipService.telecom) {
             val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
             val extras = android.os.Bundle()
@@ -2585,6 +2585,7 @@ private fun makeCall(
                 tm.placeCall(uri.toUri(), extras)
             } catch (e: SecurityException) {
                 Log.e(TAG, "placeCall failed: ${e.message}")
+                viewModel.dialerState.callButtonsEnabled.value = true
             }
         }
         else {
