@@ -41,8 +41,7 @@ class Blocked (
                 val jsonString = Json.encodeToString(BaresipService.blocked)
                 file.writeText(jsonString)
             } catch (e: Exception) {
-                Log.e(TAG, "Serialization exception: $e")
-                e.printStackTrace()
+                Log.e(TAG, "Serialization exception", e)
             }
         }
 

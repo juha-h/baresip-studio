@@ -511,16 +511,16 @@ object Utils {
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
         try {
-            val `is` = context.assets.open(asset)
-            val os = FileOutputStream(path)
-            val buffer = ByteArray(512)
-            var byteRead: Int = `is`.read(buffer)
-            while (byteRead  != -1) {
-                os.write(buffer, 0, byteRead)
-                byteRead = `is`.read(buffer)
+            context.assets.open(asset).use { `is` ->
+                FileOutputStream(path).use { os ->
+                    val buffer = ByteArray(512)
+                    var byteRead: Int = `is`.read(buffer)
+                    while (byteRead != -1) {
+                        os.write(buffer, 0, byteRead)
+                        byteRead = `is`.read(buffer)
+                    }
+                }
             }
-            os.close()
-            `is`.close()
         } catch (e: IOException) {
             Log.e(TAG, "Failed to copy asset '$asset' to file: $e")
         }
@@ -564,10 +564,10 @@ object Utils {
         return try {
             File(filePath).readBytes()
         } catch (e: FileNotFoundException) {
-            Log.e(TAG, "File '$filePath' not found: ${e.printStackTrace()}")
+            Log.e(TAG, "File '$filePath' not found", e)
             null
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to read file '$filePath': ${e.printStackTrace()}")
+            Log.e(TAG, "Failed to read file '$filePath'", e)
             null
         }
     }
@@ -628,7 +628,7 @@ object Utils {
         if (cursor != null) {
             val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             cursor.moveToFirst()
-            name = cursor.getString(index)
+            name = cursor.getString(index) ?: ""
             cursor.close()
         }
         return if (name == "")
@@ -674,7 +674,7 @@ object Utils {
             cipherData.copyInto(res, salt.size + 2 + iv.size)
             return res
         } catch (e: Exception) {
-            Log.e(TAG, "Encrypt failed: ${e.printStackTrace()}")
+            Log.e(TAG, "Encrypt failed", e)
         }
         return null
     }
@@ -697,7 +697,7 @@ object Utils {
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             return cipher.doFinal(data)
         } catch (e: Exception) {
-            Log.e(TAG, "Decrypt failed: ${e.printStackTrace()}")
+            Log.e(TAG, "Decrypt failed", e)
         }
         return null
     }
@@ -714,7 +714,7 @@ object Utils {
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             plainData = cipher.doFinal(obj.data)
         } catch (e: Exception) {
-            Log.e(TAG, "Decrypt failed: ${e.printStackTrace()}")
+            Log.e(TAG, "Decrypt failed", e)
         }
         return plainData
     }
@@ -742,7 +742,8 @@ object Utils {
         var plainData: ByteArray? = null
         var stream: FileInputStream
         try {
-            stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
+            stream = (ctx.contentResolver.openInputStream(uri) as? FileInputStream)
+                ?: return null
         } catch(e: Exception) {
             Log.w(TAG, "decryptFromUri could not open stream: $e")
             return null
@@ -965,7 +966,7 @@ object Utils {
                 }
                 return
             }
-            val current = am.communicationDevice!!.type
+            val current = am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN
             Log.d(TAG, "Current com dev/mode is $current/${am.mode}")
             var speakerDevice: AudioDeviceInfo? = null
             for (device in am.availableCommunicationDevices)
@@ -1001,7 +1002,8 @@ object Utils {
                     Log.d(TAG, "Setting mode to NORMAL")
                     am.mode = AudioManager.MODE_NORMAL
                 }
-                Log.d(TAG, "New com device/mode is ${am.communicationDevice!!.type}/${am.mode}")
+                Log.d(TAG, "New com device/mode is " +
+                        "${am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN}/${am.mode}")
             }
         } else {
             @Suppress("DEPRECATION")
@@ -1022,14 +1024,15 @@ object Utils {
 
     @RequiresApi(Build.VERSION_CODES.S)
     fun setCommunicationDevice(am: AudioManager, type: Int) {
-        val current = am.communicationDevice!!.type
+        val current = am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN
         Log.d(TAG, "Current com dev/mode $current/${am.mode}")
         for (device in am.availableCommunicationDevices)
             if (device.type == type) {
                 am.setCommunicationDevice(device)
                 break
             }
-        Log.d(TAG, "New com dev/mode ${am.communicationDevice!!.type}/${am.mode}")
+        Log.d(TAG, "New com dev/mode is " +
+                "${am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN}/${am.mode}")
     }
 
     fun clearCommunicationDevice(am: AudioManager) {
@@ -1194,11 +1197,11 @@ object Utils {
                 setDataSource(ctx, path.toUri())
                 prepareAsync()
             } catch (e: IllegalArgumentException) {
-                Log.e(TAG, "MediaPlayer IllegalArgumentException: ${e.printStackTrace()}")
+                Log.e(TAG, "MediaPlayer IllegalArgumentException: ${e.message}")
             } catch (e: IOException) {
-                Log.e(TAG, "MediaPlayer IOException: ${e.printStackTrace()}")
+                Log.e(TAG, "MediaPlayer IOException: ${e.message}")
             } catch (e: Exception) {
-                Log.e(TAG, "MediaPlayer Exception: ${e.printStackTrace()}")
+                Log.e(TAG, "MediaPlayer Exception: ${e.message}")
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.tutpro.baresip.plus
 
 import java.io.*
-import java.util.ArrayList
 
 class Message(val aor: String, val peerUri: String, val message: String, val timeStamp: Long,
               var direction: Int, var responseCode: Int, var responseReason: String,
@@ -111,8 +110,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 fos.close()
                 Log.d(TAG, "Saved ${BaresipService.messages.size} messages")
             } catch (e: IOException) {
-                Log.e(TAG, "OutputStream exception: $e")
-                e.printStackTrace()
+                Log.e(TAG, "OutputStream exception", e)
             }
         }
 
