@@ -30,6 +30,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
 
     companion object {
 
+        @Suppress("unused")
         private const val serialVersionUID: Long = 3
         private const val CALL_HISTORY_SIZE = 256
 
@@ -124,6 +125,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
 
     companion object {
 
+        @Suppress("unused")
         private const val serialVersionUID: Long = 2
 
         fun get(): ArrayList<CallHistory> {
@@ -142,7 +144,7 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
                     Log.d(TAG, "Got history of ${result.size} calls")
                     file.delete()
                 } catch (e: Exception) {
-                    Log.e(TAG, "InputStream exception: - $e")
+                    Log.e(TAG, "InputStream exception", e)
                 }
             }
             return result

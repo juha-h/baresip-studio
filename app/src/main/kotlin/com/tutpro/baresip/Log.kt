@@ -31,6 +31,10 @@ object Log {
     }
 
     fun e(tag: String, msg: String) {
-        if (logLevel < LogLevel.OFF) android.util.Log.w(tag, msg)
+        if (logLevel < LogLevel.OFF) android.util.Log.e(tag, msg)
+    }
+
+    fun e(tag: String, msg: String, tr: Throwable) {
+        if (logLevel < LogLevel.OFF) android.util.Log.e(tag, msg, tr)
     }
 }
