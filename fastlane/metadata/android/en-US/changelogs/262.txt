@@ -1,0 +1,5 @@
+- Added handling of Bluetooth device call answer/reject/end button clicks in Telecom Framework
+- Fixed disabling/enabling of call buttons
+- Set dark theme correctly after restore
+- Added some null checks in order to avoid possible crashes
+- New translations (Chinese, Spanish)
