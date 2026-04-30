@@ -124,8 +124,10 @@ object Config {
         val darkTheme = previousVariable("dark_theme")
         Preferences(ctx).displayTheme = if (darkTheme == "yes") {
             config = "${config}dark_theme yes\n"
+            BaresipService.darkTheme.value = true
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
+            BaresipService.darkTheme.value = false
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
 
