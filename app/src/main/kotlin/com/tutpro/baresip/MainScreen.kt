@@ -1024,16 +1024,22 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     val selected: String by viewModel.selectedAor.collectAsState()
+    val uasValue by uas
 
-    if (uas.value.isEmpty())
-        viewModel.updateSelectedAor("")
-    else
-        if (selected == "" || UserAgent.ofAor(selected) == null) {
-            viewModel.updateSelectedAor(uas.value.first().account.aor)
+    LaunchedEffect(uasValue, selected) {
+        if (uasValue.isEmpty()) {
+            if (selected != "") viewModel.updateSelectedAor("")
+        } else {
+            if (selected == "" || UserAgent.ofAor(selected) == null) {
+                viewModel.updateSelectedAor(uasValue.first().account.aor)
+            }
         }
-
-    showCall(ctx, viewModel, UserAgent.ofAor(selected))
-    viewModel.triggerAccountUpdate()
+        val ua = UserAgent.ofAor(selected)
+        if (ua != null) {
+            showCall(ctx, viewModel, ua)
+            viewModel.triggerAccountUpdate()
+        }
+    }
 
     if (selected == "") {
         OutlinedButton(
