@@ -2477,49 +2477,50 @@ private fun spinToAor(viewModel: ViewModel, aor: String) {
 }
 
 private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?, video: Boolean) {
-    if (viewModel.selectedAor.value != "") {
-        if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
-            if (dialerState != null) {
-                val uriText = dialerState.callUri.value.trim()
-                if (uriText.isNotEmpty()) {
-                    val uris = Contact.contactUris(uriText)
-                    if (uris.isEmpty())
-                        makeCall(ctx,
-                            viewModel,
-                            uriText,
-                            dialerState.showCallConferenceButton.value,
-                            video)
-                    else if (uris.size == 1)
+    if (viewModel.selectedAor.value != "" && dialerState != null) {
+        val uriText = dialerState.callUri.value.trim()
+        if (uriText.isNotEmpty()) {
+            if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
+                val uris = Contact.contactUris(uriText)
+                if (uris.isEmpty())
+                    makeCall(
+                        ctx,
+                        viewModel,
+                        uriText,
+                        dialerState.showCallConferenceButton.value,
+                        video
+                    )
+                else if (uris.size == 1)
+                    makeCall(
+                        ctx,
+                        viewModel,
+                        uris[0],
+                        dialerState.showCallConferenceButton.value,
+                        video
+                    )
+                else {
+                    selectItems.value = uris
+                    selectItemAction.value = { index ->
                         makeCall(
                             ctx,
                             viewModel,
-                            uris[0],
+                            uris[index],
                             dialerState.showCallConferenceButton.value,
                             video
                         )
-                    else {
-                        selectItems.value = uris
-                        selectItemAction.value = { index ->
-                            makeCall(
-                                ctx,
-                                viewModel,
-                                uris[index],
-                                dialerState.showCallConferenceButton.value,
-                                video
-                            )
-                        }
-                        showSelectItemDialog.value = true
                     }
-                } else {
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                    val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
-                    if (latestPeerUri != null)
-                        dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
+                    showSelectItemDialog.value = true
                 }
             }
+            else
+                Toast.makeText(ctx, R.string.no_calls, Toast.LENGTH_SHORT).show()
         }
-        else
-            Toast.makeText(ctx, R.string.no_calls, Toast.LENGTH_SHORT).show()
+        else {
+            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+            val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
+            if (latestPeerUri != null)
+                dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
+        }
     }
 }
 
