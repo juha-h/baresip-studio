@@ -17,8 +17,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
 import android.content.res.Configuration
 import android.database.ContentObserver
 import android.graphics.ImageDecoder
@@ -889,10 +887,8 @@ class BaresipService: Service() {
                         proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
-                        if (!telecom) {
-                            ensureCommunicationMode()
-                            playRingBack()
-                        }
+                        if (!telecom) ensureCommunicationMode()
+                        playRingBack()
                         return
                     }
                     "call progress" -> {
@@ -900,7 +896,7 @@ class BaresipService: Service() {
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else {
-                            if (!telecom) playRingBack()
+                            playRingBack()
                         }
                         return
                     }
@@ -982,6 +978,7 @@ class BaresipService: Service() {
                     }
                     "call answered" -> {
                         stopMediaPlayer()
+                        ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
                         if (call!!.status.value == "incoming")
                             call.status.value = "answered"
@@ -992,7 +989,6 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                     }
                     "call established" -> {
-                        ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
                         stopMediaPlayer()
                         nm.cancel(CALL_NOTIFICATION_ID)
@@ -1039,8 +1035,10 @@ class BaresipService: Service() {
                             if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                                 stopMediaPlayer()
                             else {
-                                ConnectionService.connections[callp]?.setRinging()
-                                playRingBack()
+                                if (!telecom) {
+                                    ConnectionService.connections[callp]?.setRinging()
+                                    playRingBack()
+                                }
                             }
                         }
                         if (call.status.value == "connected" && !call.held && !call.onhold) {
@@ -1755,16 +1753,15 @@ class BaresipService: Service() {
     }
 
     private fun foregroundServiceType(): Int {
-        return if (VERSION.SDK_INT >= 34) {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        } else if (VERSION.SDK_INT >= 30) {
-            if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-                FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE
-            else
-                FOREGROUND_SERVICE_TYPE_PHONE_CALL
-        } else {
-            0
+        var type = 0
+        if (VERSION.SDK_INT >= 30) {
+            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
         }
+        if (VERSION.SDK_INT >= 34) {
+            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        }
+        return type
     }
 
     @SuppressLint("WakelockTimeout")

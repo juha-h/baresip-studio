@@ -69,7 +69,8 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
-        connection.audioModeIsVoip = true
+        if (android.os.Build.VERSION.SDK_INT >= 31)
+            connection.audioModeIsVoip = true
 
         val call = Call.ofCallp(callp)
         if (call != null)
@@ -123,7 +124,8 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
-        connection.audioModeIsVoip = true
+        if (android.os.Build.VERSION.SDK_INT >= 31)
+            connection.audioModeIsVoip = true
 
         // Start the SIP connection logic
         if (uap != 0L) {
