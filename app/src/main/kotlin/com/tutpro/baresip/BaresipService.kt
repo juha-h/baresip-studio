@@ -882,24 +882,25 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         val hasTelecom = ConnectionService.connections.containsKey(callp) ||
                                 ConnectionService.pendingOutgoingConnection != null
-                        if (!hasTelecom)
+                        if (!hasTelecom) {
                             setCallVolume()
-                        ensureCommunicationMode()
+                            ensureCommunicationMode()
+                        }
                         proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
-                        ConnectionService.connections[callp]?.setRinging()
-                        ensureCommunicationMode()
-                        playRingBack()
+                        if (!telecom) {
+                            ensureCommunicationMode()
+                            playRingBack()
+                        }
                         return
                     }
                     "call progress" -> {
-                        ensureCommunicationMode()
+                        if (!telecom) ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else {
-                            ConnectionService.connections[callp]?.setRinging()
-                            playRingBack()
+                            if (!telecom) playRingBack()
                         }
                         return
                     }
@@ -939,7 +940,7 @@ class BaresipService: Service() {
                                 )
                                 if (resourceId != 0) {
                                     ensureCommunicationMode()
-                                    playUnInterrupted(resourceId, 1)
+                                    if (!telecom) playUnInterrupted(resourceId, 1)
                                 } else {
                                     Log.e(TAG, "Callwaiting tone $name.wav not found")
                                 }
@@ -993,6 +994,7 @@ class BaresipService: Service() {
                     "call established" -> {
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
+                        stopMediaPlayer()
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
                         call!!.status.value = "connected"
@@ -1628,9 +1630,8 @@ class BaresipService: Service() {
             .setCustomContentView(notificationLayout)
         val notification = buildStatusNotification()
         try {
-            if (VERSION.SDK_INT >= 34)
-                startForeground(STATUS_NOTIFICATION_ID, notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+            if (VERSION.SDK_INT >= 29)
+                startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
             else
                 startForeground(STATUS_NOTIFICATION_ID, notification)
         } catch (e: Exception) {
@@ -1728,14 +1729,8 @@ class BaresipService: Service() {
 
         try {
             if (activeCall != null) {
-                val type = if (VERSION.SDK_INT >= 30) {
-                    if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-                        FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE
-                    else
-                        FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                } else 0
                 if (VERSION.SDK_INT >= 29)
-                    startForeground(STATUS_NOTIFICATION_ID, notification, type)
+                    startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
                 else
                     startForeground(STATUS_NOTIFICATION_ID, notification)
                 isNotificationInCall = true
@@ -1743,11 +1738,8 @@ class BaresipService: Service() {
                 if (isNotificationInCall) {
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     isNotificationInCall = false
-                    if (VERSION.SDK_INT >= 34)
-                        startForeground(STATUS_NOTIFICATION_ID, notification,
-                            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-                    else if (VERSION.SDK_INT >= 30)
-                        startForeground(STATUS_NOTIFICATION_ID, notification, 0)
+                    if (VERSION.SDK_INT >= 29)
+                        startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
                     else
                         startForeground(STATUS_NOTIFICATION_ID, notification)
                 } else {
@@ -1759,6 +1751,19 @@ class BaresipService: Service() {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update foreground notification: ${e.message}")
             nm.notify(STATUS_NOTIFICATION_ID, notification)
+        }
+    }
+
+    private fun foregroundServiceType(): Int {
+        return if (VERSION.SDK_INT >= 34) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        } else if (VERSION.SDK_INT >= 30) {
+            if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
+                FOREGROUND_SERVICE_TYPE_PHONE_CALL or FOREGROUND_SERVICE_TYPE_MICROPHONE
+            else
+                FOREGROUND_SERVICE_TYPE_PHONE_CALL
+        } else {
+            0
         }
     }
 
