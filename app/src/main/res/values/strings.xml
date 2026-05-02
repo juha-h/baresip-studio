@@ -409,8 +409,8 @@
     <string name="proximity_sensing">Proximity Sensing</string>
     <string name="proximity_sensing_help">If checked, proximity sensing is active during calls.</string>
     <string name="telecom">Telecom Framework</string>
-    <string name="telecom_help">Use Android Telecom framework for calls. Uncheck this if peer does
-        not hear your audio.</string>
+    <string name="telecom_help">Use Android Telecom framework for calls. If you experience audio
+        related issues, try if it helps when you turn Telecom Framework off.</string>
     <string name="video_size">Video Frame Size</string>
     <string name="video_size_help">Size of transmitted video frames (width x height)</string>
     <string name="video_fps">Video Frames Per Second</string>

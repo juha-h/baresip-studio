@@ -1025,7 +1025,6 @@ class BaresipService: Service() {
                         } else {
                             // Peer un-held us
                             call.showOnHoldNotice.value = false
-                            // Only clear the UI if we aren't also manually holding it
                             if (!call.onhold) {
                                 call.callOnHold.value = false
                                 connection?.setActive()
