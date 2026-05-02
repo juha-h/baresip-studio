@@ -102,7 +102,12 @@ fun NavGraphBuilder.settingsScreenRoute(
             ctx = ctx,
             navController = navController,
             settingsViewModel = viewModel,
-            onBack = { navController.navigateUp() },
+            onBack = {
+                if (restart)
+                    showRestartDialog.value = true
+                else
+                    navController.navigateUp()
+            },
             checkOnClick = {
                 if (checkOnClick(ctx, viewModel)) {
                     if (restart)
