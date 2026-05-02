@@ -70,6 +70,7 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
+        connection.audioModeIsVoip = true
 
         val call = Call.ofCallp(callp)
         if (call != null)
@@ -77,17 +78,6 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
-            if (BaresipService.speakerPhone || BaresipService.speakerPhoneAuto) {
-                BaresipService.speakerPhone = true
-                @Suppress("DEPRECATION")
-                connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
-                BaresipService.postServiceEvent(
-                    ServiceEvent("speaker update,true",
-                        arrayListOf(uap, callp),
-                        System.nanoTime()
-                    )
-                )
-            }
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering call $callp")
                 connection.onAnswer()
@@ -132,23 +122,12 @@ class ConnectionService : ConnectionService() {
         val connection = BaresipConnection(uap, 0L)
         pendingOutgoingConnection = connection
 
-        if (BaresipService.speakerPhone || BaresipService.speakerPhoneAuto) {
-            BaresipService.speakerPhone = true
-            @Suppress("DEPRECATION")
-            connection.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
-            BaresipService.postServiceEvent(
-                ServiceEvent("speaker update,true",
-                    arrayListOf(uap, 0L),
-                    System.nanoTime()
-                )
-            )
-        }
-
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
         connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
+        connection.audioModeIsVoip = true
 
         // Start the SIP connection logic
         if (uap != 0L) {
