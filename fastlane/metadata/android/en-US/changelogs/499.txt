@@ -1,0 +1,3 @@
+- Audio related fixes and improvements (tested on Android versions 10-16)
+- In settings, check if restart is needed also when touching back button
+- Modified Telecom Framework help text
