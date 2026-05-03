@@ -35,6 +35,8 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     val callUri: MutableState<String> = mutableStateOf("")
     val callUriEnabled: MutableState<Boolean> = mutableStateOf(true)
     val callUriLabel: MutableState<String> = mutableStateOf("")
+    val callUri2: MutableState<String> = mutableStateOf("")
+    val callUriLabel2: MutableState<String> = mutableStateOf("")
     val securityIconTint: MutableState<Int> = mutableIntStateOf(-1)
     val showCallTimer: MutableState<Boolean> = mutableStateOf(false)
     var callDuration: Int = 0

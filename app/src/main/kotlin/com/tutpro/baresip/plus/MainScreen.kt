@@ -1343,6 +1343,25 @@ private fun CallUriRow(
                         imeAction = ImeAction.Default
                     )
             )
+            if (!isDialer && call!!.callUri2.value != "") {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = call.callUri2.value,
+                    readOnly = true,
+                    singleLine = true,
+                    onValueChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
+                    label = {
+                        Text(
+                            text = call.callUriLabel2.value,
+                            fontSize = 18.sp
+                        )
+                    },
+                    textStyle = TextStyle(fontSize = 18.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Column(
                 modifier = Modifier
@@ -2745,6 +2764,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
                 call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                call.callUri2.value = ""
                 call.showCallTimer.value = false
                 call.securityIconTint.value = -1
                 call.showCallButton.value = false
@@ -2759,14 +2779,15 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             "incoming" -> {
                 call.showCallTimer.value = false
                 call.securityIconTint.value = -1
+                call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
+                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                 val uri = call.diverterUri()
                 if (uri != "") {
-                    call.callUriLabel.value = ctx.getString(R.string.diverted_by_dots)
-                    call.callUri.value = Utils.friendlyUri(ctx, uri, ua.account)
+                    call.callUriLabel2.value = ctx.getString(R.string.diverted_by_dots)
+                    call.callUri2.value = Utils.friendlyUri(ctx, uri, ua.account)
                 }
                 else {
-                    call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    call.callUri2.value = ""
                 }
                 call.showCallButton.value = false
                 call.showCallVideoButton.value = false
@@ -2790,6 +2811,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                     call.transferButtonEnabled.value = true
                 }
+                call.callUri2.value = ""
                 call.callTransfer.value = call.onHoldCall != null
                 call.callDuration = call.duration()
                 call.showCallTimer.value = true
