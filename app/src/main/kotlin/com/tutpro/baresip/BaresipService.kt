@@ -1802,8 +1802,6 @@ class BaresipService: Service() {
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent, piFlags)
 
-            val channelId = HIGH_CHANNEL_ID
-            val nb = NotificationCompat.Builder(this, channelId)
             val caller = Utils.friendlyUri(this, peerUri, ua.account)
             val callerContact = Contact.findContact(peerUri)
             val contactColor = callerContact?.color() ?: "#B0B0B0"
@@ -1836,7 +1834,8 @@ class BaresipService: Service() {
             else
                 getString(R.string.is_calling)
 
-            nb.setSmallIcon(R.drawable.ic_notification_call)
+            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+            nb.setSmallIcon(R.drawable.ic_notification_b)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentIntent(pi)
                 .setCategory(Notification.CATEGORY_CALL)
@@ -1848,8 +1847,7 @@ class BaresipService: Service() {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .addPerson(person)
-
-            nb.setFullScreenIntent(pi, true)
+                .setFullScreenIntent(pi, true)
 
             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                 .putExtra("action", "call answer")
