@@ -1367,7 +1367,7 @@ class BaresipService: Service() {
                     }
                 }
             }
-            val senderPerson = personBuilder.setIcon(icon).build()
+            val senderPerson = personBuilder.setName(sender).setIcon(icon).build()
             val localUserPerson = Person.Builder()
                 .setName(getString(R.string.you))
                 .setKey(ua.account.aor)
