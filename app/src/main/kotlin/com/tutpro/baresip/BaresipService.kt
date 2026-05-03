@@ -1385,6 +1385,7 @@ class BaresipService: Service() {
                 .setStyle(messagingStyle)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .addPerson(senderPerson)
 
             // message inline reply
             val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
@@ -1835,7 +1836,7 @@ class BaresipService: Service() {
                 getString(R.string.is_calling)
 
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            nb.setSmallIcon(R.drawable.ic_notification_b)
+            nb.setSmallIcon(R.drawable.ic_notification_call)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentIntent(pi)
                 .setCategory(Notification.CATEGORY_CALL)
