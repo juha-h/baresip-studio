@@ -1825,7 +1825,11 @@ class BaresipService: Service() {
         var type = 0
         if (VERSION.SDK_INT >= 30) {
             type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED)
+                type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
             if (ContextCompat.checkSelfPermission(
                     this,
                     CAMERA
@@ -1863,7 +1867,7 @@ class BaresipService: Service() {
         val peerUri = call.peerUri
         val callp = call.callp
 
-        val callerNumber = peerUri.split(":")[1].split("@")[0]
+        val callerNumber = Utils.uriUserPart(peerUri)
         if (shouldStartRinging(callerNumber))
             startRinging()
 
@@ -1915,8 +1919,7 @@ class BaresipService: Service() {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
 
-            if (VERSION.SDK_INT < 34 || nm.canUseFullScreenIntent())
-                nb.setFullScreenIntent(pi, true)
+            nb.setFullScreenIntent(pi, true)
 
             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                 .putExtra("action", "call answer")
