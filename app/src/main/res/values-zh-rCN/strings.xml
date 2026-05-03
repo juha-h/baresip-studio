@@ -433,5 +433,5 @@
     <string name="custom_parameters">自定义参数</string>
     <string name="custom_parameters_help">以英文分号分隔的自定义账号参数列表</string>
     <string name="telecom">Telecom 框架</string>
-    <string name="telecom_help">使用 Android Telecom 框架进行通话。如果对方听不到您的声音，请取消选中此选项。</string>
+    <string name="telecom_help">使用 Android Telecom 框架进行通话。如果遇到音频相关的问题，请尝试关闭 Telecom 框架，看看是否有所帮助。</string>
 </resources>
