@@ -519,6 +519,7 @@
     <string name="outgoing_call_to_dots">Puhelu ulos …</string>
     <string name="incoming_call_from_dots">Puhelu sisään …</string>
     <string name="diverted_by_dots">Siirtäjä …</string>
+    <string name="diverted_by">siirtäjä</string>
     <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
     <string name="video_call">Videopuhelu</string>

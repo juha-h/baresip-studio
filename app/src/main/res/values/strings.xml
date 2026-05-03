@@ -503,6 +503,7 @@
     <string name="outgoing_call_to_dots">Call to …</string>
     <string name="incoming_call_from_dots">Call from …</string>
     <string name="diverted_by_dots">Diverted by …</string>
+    <string name="diverted_by">diverted by</string>
     <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>

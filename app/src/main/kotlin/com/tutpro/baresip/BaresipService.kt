@@ -1806,7 +1806,6 @@ class BaresipService: Service() {
             val nb = NotificationCompat.Builder(this, channelId)
             val caller = Utils.friendlyUri(this, peerUri, ua.account)
             val callerContact = Contact.findContact(peerUri)
-            val personBuilder = Person.Builder().setName(caller)
             val contactColor = callerContact?.color() ?: "#B0B0B0"
             val initial = if (caller.isNotEmpty()) caller.take(1) else "?"
             val textAvatarBitmap = Utils.createTextAvatar(initial, contactColor)
@@ -1815,8 +1814,9 @@ class BaresipService: Service() {
             if (callerContact is Contact.BaresipContact) {
                 if (callerContact.avatarImage != null)
                     icon = IconCompat.createWithBitmap(callerContact.avatarImage!!.toCircle())
-            } else if (callerContact is Contact.AndroidContact) {
-                if (callerContact.thumbnailUri != null) {
+            }
+            else if (callerContact is Contact.AndroidContact)
+                if (callerContact.thumbnailUri != null)
                     try {
                         val source = ImageDecoder.createSource(contentResolver, callerContact.thumbnailUri!!)
                         val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
@@ -1826,21 +1826,28 @@ class BaresipService: Service() {
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to load Android contact avatar: $e")
                     }
-                }
-            }
 
-            val person = personBuilder.setIcon(icon).build()
+            val person = Person.Builder().setName(caller).setIcon(icon).build()
+            val diverterUri = call.diverterUri()
+            val contentText = if (diverterUri != "")
+                "${getString(R.string.is_calling)} " +
+                        "(${getString(R.string.diverted_by)} " +
+                        "${Utils.friendlyUri(this, diverterUri, ua.account)})"
+            else
+                getString(R.string.is_calling)
+
             nb.setSmallIcon(R.drawable.ic_notification_call)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentIntent(pi)
                 .setCategory(Notification.CATEGORY_CALL)
                 .setAutoCancel(false)
                 .setOngoing(true)
-                .setContentText(getString(R.string.is_calling))
+                .setContentText(contentText)
                 .setWhen(System.currentTimeMillis())
                 .setShowWhen(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
+                .addPerson(person)
 
             nb.setFullScreenIntent(pi, true)
 
