@@ -104,7 +104,7 @@ fun AppTheme(
     }
 
     val view = LocalView.current
-    if (!view.isInEditMode) {
+    if (!view.isInEditMode)
         SideEffect {
             val activity = view.context as? ComponentActivity
             if (activity != null) {
@@ -118,19 +118,23 @@ fun AppTheme(
                         android.graphics.Color.TRANSPARENT,
                     ) { isDark }
                 )
-            } else {
+                if (VERSION.SDK_INT >= 29)
+                    activity.window.isNavigationBarContrastEnforced = false
+            }
+            else {
                 val window = (view.context as Activity).window
                 val insetsController = WindowCompat.getInsetsController(window, view)
+                if (VERSION.SDK_INT < 35)
+                    @Suppress("DEPRECATION")
+                    window.navigationBarColor = android.graphics.Color.TRANSPARENT
+                if (VERSION.SDK_INT >= 29)
+                    window.isNavigationBarContrastEnforced = false
                 val isBackgroundEffectivelyLight =
                     ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
                 insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
                 insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
             }
         }
-    }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
+    MaterialTheme(colorScheme = colorScheme, content = content)
 }
