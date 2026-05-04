@@ -1,0 +1,4 @@
+- Bottom navigation bar color now matches screen background color
+- In case incoming call is diverted, show also diverter
+- Fixed possible crash when showing incoming call notification
+- New translations (Chinese)
