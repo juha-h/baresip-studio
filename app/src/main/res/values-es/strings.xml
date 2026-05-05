@@ -48,7 +48,7 @@
             <li> <b> Libre</b> G.722 codec</li>
             <li> <b> GNU GPLv3 </b> Codec G.729 </li>
         </ul>
-]]></string>
+        ]]></string>
     <!-- Account Activity -->
     <string name="account">Cuenta</string>
     <string name="display_name">Nombre para mostrar</string>
@@ -285,7 +285,7 @@
     <string name="about_text_plus"><![CDATA[
         <h1>Agente de usuario SIP basado en biblioteca Baresip con video‐llamadas</h1>
         <br>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>
         <p>Versión %1$s</p>
         <br>
         <h2>Consejos de uso</h2>
@@ -336,7 +336,7 @@
             <li>Códice H.264 y H.265 de <b>GNU GPLv2</b> </li>
             <li>Códice AV1 de <b>AOMedia</b></li>
         </ul>
-   ]]></string>
+      ]]></string>
     <string name="about_title_plus">Acerca de baresip+</string>
     <string name="reg_int">Intervalo de inscripción</string>
     <string name="invalid_reg_int">Intervalo de registro no válido \'%1$s\'</string>
@@ -483,5 +483,6 @@
     <string name="custom_parameters">Parámetros personales</string>
     <string name="custom_parameters_help">Listado separador por punto y coma de parámetros de cuenta personal</string>
     <string name="telecom">Marco de Telecom</string>
-    <string name="telecom_help">Utilice el marco Android Telecom para llamadas. Desmarque esto si la pareja no escucha su audio.</string>
+    <string name="telecom_help">Utilice el marco Android Telecom para llamadas. Si experimenta incidencias relacionadas con el sonido, pruebe si se soluciona cuando apague el Marco de Trabajo de Telecomunicaciones.</string>
+    <string name="diverted_by">desviado por</string>
 </resources>
