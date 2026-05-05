@@ -285,7 +285,7 @@
     <string name="about_text_plus"><![CDATA[
         <h1>Agente de usuario SIP basado en biblioteca Baresip con video‐llamadas</h1>
         <br>
-        <p>Juha Heinanen <jh@tutpro.com></p>
+        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>
         <p>Versión %1$s</p>
         <br>
         <h2>Consejos de uso</h2>
