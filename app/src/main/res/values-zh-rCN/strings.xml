@@ -122,7 +122,7 @@
     <string name="start_automatically_help">如果选中，在设备启动后或安装新版本 baresip 后，baresip 将自动启动。启动会延迟至设备解锁后执行。</string>
     <string name="appear_on_top_permission">自动启动需要“悬浮窗”权限。</string>
     <string name="battery_optimizations">电池优化</string>
-    <string name="battery_optimizations_help">如果您想降低 Android 限制 baresip 访问网络或让 baresip 进入待机状态的概率，请禁用电池优化（推荐）。</string>
+    <string name="battery_optimizations_help">如果您想降低 Android 限制 baresip 访问网络或让 baresip 进入待机状态的概率，请禁用电池优化。</string>
     <string name="default_phone_app">默认电话应用</string>
     <string name="dialer_role_not_available">拨号器角色不可用</string>
     <string name="default_phone_app_help">如果选中，则 baresip 是默认电话应用。如果您的设备还需要处理除 SIP 通话或消息之外的其他通话或消息，请勿选中。</string>
