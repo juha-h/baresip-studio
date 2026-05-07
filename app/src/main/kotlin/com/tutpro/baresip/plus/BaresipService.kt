@@ -1392,45 +1392,15 @@ class BaresipService: Service() {
         ua.account.unreadMessages = true
 
         if (!Utils.isVisible()) {
-
-            // common flags
             val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
-            // message show
             val intent = Intent(applicationContext, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_NEW_TASK
             intent.putExtra("action", "message show").putExtra("uap", uap).putExtra("peer", peerUri)
             val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent, piFlags)
 
-            // message notification builder
-            val sender = Utils.friendlyUri(this, peerUri, ua.account)
-            val senderContact = Contact.findContact(peerUri)
-            val personBuilder = Person.Builder().setName(sender)
-            val contactColor = senderContact?.color() ?: "#B0B0B0"
-            val initial = if (sender.isNotEmpty()) sender.take(1) else "?"
-            val textAvatarBitmap = Utils.createTextAvatar(initial,contactColor)
-            var icon = IconCompat.createWithBitmap(textAvatarBitmap)
-            if (senderContact is Contact.BaresipContact) {
-                if (senderContact.avatarImage != null)
-                    icon = IconCompat.createWithBitmap(senderContact.avatarImage!!.toCircle())
-            }
-            else if (senderContact is Contact.AndroidContact) {
-                if (senderContact.thumbnailUri != null) {
-                    try {
-                        val source = ImageDecoder.createSource(contentResolver,
-                            senderContact.thumbnailUri!!)
-                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
-                            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                            // decoder.setTargetSize(256, 256)
-                        }
-                        icon = IconCompat.createWithBitmap(bitmap.toCircle())
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to load Android contact avatar: $e")
-                    }
-                }
-            }
-            val senderPerson = personBuilder.setIcon(icon).build()
+            val sender = createPerson(this, peerUri, ua.account)
             val localUserPerson = Person.Builder()
                 .setName(getString(R.string.you))
                 .setKey(ua.account.aor)
@@ -1438,7 +1408,8 @@ class BaresipService: Service() {
             val messagingStyle = MessagingStyle(localUserPerson)
                 .setConversationTitle(null)
                 .setGroupConversation(false)
-                .addMessage(text, timeStamp, senderPerson)
+                .addMessage(text, timeStamp, sender)
+
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
@@ -1448,14 +1419,15 @@ class BaresipService: Service() {
                 .setStyle(messagingStyle)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .addPerson(sender)
 
-            // message inline reply
             val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
                 .setLabel(getString(R.string.reply))
                 .build()
             val directReplyIntent = Intent(this, BaresipService::class.java)
             directReplyIntent.action = "Message Inline Reply"
-            directReplyIntent.putExtra("uap", uap).putExtra("peer", peerUri).putExtra("time", timeStamp)
+            directReplyIntent.putExtra("uap", uap)
+                .putExtra("peer", peerUri).putExtra("time", timeStamp)
             val directReplyPendingIntent = PendingIntent.getService(
                 this,
                 DIRECT_REPLY_REQ_CODE,
@@ -1471,7 +1443,6 @@ class BaresipService: Service() {
                 .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).
                 build()
 
-            // message save
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
             saveIntent.putExtra("uap", uap).putExtra("time", timeStampString)
@@ -1482,7 +1453,6 @@ class BaresipService: Service() {
                 savePendingIntent
             ).build()
 
-            // message delete
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
             deleteIntent.putExtra("uap", uap).putExtra("time", timeStampString)
@@ -1879,63 +1849,82 @@ class BaresipService: Service() {
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE, intent, piFlags)
 
-            val channelId = HIGH_CHANNEL_ID
-            val nb = NotificationCompat.Builder(this, channelId)
-            val caller = Utils.friendlyUri(this, peerUri, ua.account)
-            val callerContact = Contact.findContact(peerUri)
-            val personBuilder = Person.Builder().setName(caller)
-            val contactColor = callerContact?.color() ?: "#B0B0B0"
-            val initial = if (caller.isNotEmpty()) caller.take(1) else "?"
-            val textAvatarBitmap = Utils.createTextAvatar(initial, contactColor)
-            var icon = IconCompat.createWithBitmap(textAvatarBitmap)
-
-            if (callerContact is Contact.BaresipContact) {
-                if (callerContact.avatarImage != null)
-                    icon = IconCompat.createWithBitmap(callerContact.avatarImage!!.toCircle())
-            } else if (callerContact is Contact.AndroidContact) {
-                if (callerContact.thumbnailUri != null) {
-                    try {
-                        val source = ImageDecoder.createSource(contentResolver, callerContact.thumbnailUri!!)
-                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
-                            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                        }
-                        icon = IconCompat.createWithBitmap(bitmap.toCircle())
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to load Android contact avatar: $e")
-                    }
-                }
-            }
-
-            val person = personBuilder.setIcon(icon).build()
+            val diverterUri = call.diverterUri()
+            val contentText = if (diverterUri != "")
+                "${getString(R.string.is_calling)} " +
+                        "(${getString(R.string.diverted_by)} " +
+                        "${Utils.friendlyUri(this, diverterUri, ua.account)})"
+            else
+                getString(R.string.is_calling)
+            val caller = createPerson(this, peerUri, ua.account)
+            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
             nb.setSmallIcon(R.drawable.ic_notification_call)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentIntent(pi)
                 .setCategory(Notification.CATEGORY_CALL)
                 .setAutoCancel(false)
                 .setOngoing(true)
-                .setContentText(getString(R.string.is_calling))
+                .setContentText(contentText)
                 .setWhen(System.currentTimeMillis())
                 .setShowWhen(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-
-            nb.setFullScreenIntent(pi, true)
+                .addPerson(caller)
+                .setFullScreenIntent(pi, true)
 
             val answerIntent = Intent(applicationContext, MainActivity::class.java)
                 .putExtra("action", "call answer")
                 .putExtra("callp", callp)
-            val api = PendingIntent.getActivity(applicationContext, ANSWER_REQ_CODE, answerIntent, piFlags)
+            val api = PendingIntent.getActivity(
+                applicationContext,
+                ANSWER_REQ_CODE,
+                answerIntent,
+                piFlags
+            )
 
             val rejectIntent = Intent(this, BaresipService::class.java)
             rejectIntent.action = "Call Reject"
             rejectIntent.putExtra("callp", callp)
             val rpi = PendingIntent.getService(this, REJECT_REQ_CODE, rejectIntent, piFlags)
 
-            nb.setStyle(NotificationCompat.CallStyle.forIncomingCall(person, rpi, api))
+            nb.setStyle(NotificationCompat.CallStyle.forIncomingCall(
+                caller,
+                rpi,
+                api
+            ))
             nm.notify(CALL_NOTIFICATION_ID, nb.build())
         }
 
-        postServiceEvent(ServiceEvent("call incoming", arrayListOf(ua.uap, callp), System.nanoTime()))
+        postServiceEvent(ServiceEvent(
+            "call incoming",
+            arrayListOf(ua.uap, callp),
+            System.nanoTime()
+        ))
+    }
+
+    private fun createPerson(ctx: Context, peerUri: String, account: Account): Person {
+        val peer = Utils.friendlyUri(ctx, peerUri, account)
+        val contact = Contact.findContact(peerUri)
+        val contactColor = contact?.color() ?: "#B0B0B0"
+        val initial = if (peer.isNotEmpty()) peer.take(1) else "?"
+        val textAvatarBitmap = Utils.createTextAvatar(initial, contactColor)
+        var icon = IconCompat.createWithBitmap(textAvatarBitmap)
+        if (contact is Contact.BaresipContact) {
+            if (contact.avatarImage != null)
+                icon = IconCompat.createWithBitmap(contact.avatarImage!!.toCircle())
+        }
+        else if (contact is Contact.AndroidContact)
+            if (contact.thumbnailUri != null)
+                try {
+                    val source = ImageDecoder.createSource(contentResolver, contact.thumbnailUri!!)
+                    val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                        decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                    }
+                    icon = IconCompat.createWithBitmap(bitmap.toCircle())
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to load Android contact avatar: $e")
+                }
+        return Person.Builder().setName(peer).setIcon(icon).build()
     }
 
     private fun startRinging() {
