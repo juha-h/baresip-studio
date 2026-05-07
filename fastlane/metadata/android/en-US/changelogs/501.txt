@@ -1,0 +1,5 @@
+- Show diverter (if exists) also in incoming call notification
+- Added sender's avatar also to incoming message notification
+- Reduced timeout of incoming calls to 60 sec
+- Removed recommendation to disable battery optimizations
+- New translations (Chinese, Finnish, Spanish)
