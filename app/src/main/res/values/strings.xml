@@ -316,7 +316,7 @@
     </string>
     <string name="appear_on_top_permission">Automatic start needs Appear on Top permission.</string>
     <string name="battery_optimizations">Battery Optimizations</string>
-    <string name="battery_optimizations_help">Disable battery optimizations (recommended) if you want
+    <string name="battery_optimizations_help">Disable battery optimizations if you want
         to reduce likelihood that Android restricts baresip\'s access to network or enters baresip
         to standby state.</string>
     <string name="default_phone_app">Default Phone App</string>
@@ -503,6 +503,7 @@
     <string name="outgoing_call_to_dots">Call to …</string>
     <string name="incoming_call_from_dots">Call from …</string>
     <string name="diverted_by_dots">Diverted by …</string>
+    <string name="diverted_by">diverted by</string>
     <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>
