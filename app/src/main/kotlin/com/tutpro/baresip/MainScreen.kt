@@ -12,12 +12,14 @@ import android.content.res.Configuration
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build.VERSION
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.telecom.TelecomManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -1473,12 +1475,14 @@ private fun CallRow(
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         if (isDialer) {
+            dialerState.showCallPstnButton.value = Utils.pstnAccountHandle(ctx) != null
             if (dialerState.showCallButton.value)
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = dialerState.callButtonsEnabled.value,
                     onClick = {
                         if (!dialerState.callButtonsEnabled.value) return@IconButton
+                        dialerState.showCallPstnButton.value = false
                         dialerState.showCallConferenceButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
@@ -1486,6 +1490,28 @@ private fun CallRow(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Call,
+                        modifier = Modifier.size(42.dp),
+                        tint = colorResource(if (dialerState.callButtonsEnabled.value)
+                            R.color.colorTrafficGreen
+                        else
+                            R.color.colorTrafficYellow),
+                        contentDescription = null,
+                    )
+                }
+            if (dialerState.showCallPstnButton.value)
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    enabled = dialerState.callButtonsEnabled.value,
+                    onClick = {
+                        if (!dialerState.callButtonsEnabled.value) return@IconButton
+                        dialerState.showCallButton.value = false
+                        dialerState.showCallConferenceButton.value = false
+                        dialerState.showSuggestions.value = false
+                        callClick(ctx, viewModel, dialerState)
+                    },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.call_tel),
                         modifier = Modifier.size(42.dp),
                         tint = colorResource(if (dialerState.callButtonsEnabled.value)
                             R.color.colorTrafficGreen
@@ -1502,6 +1528,7 @@ private fun CallRow(
                     onClick = {
                         if (!dialerState.callButtonsEnabled.value) return@IconButton
                         dialerState.showCallButton.value = false
+                        dialerState.showCallPstnButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
                     }
@@ -2061,14 +2088,14 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         ctx,
                         viewModel,
                         uriText,
-                        dialerState.showCallConferenceButton.value
+                        dialerState
                     )
                 else if (uris.size == 1)
                     makeCall(
                         ctx,
                         viewModel,
                         uris[0],
-                        dialerState.showCallConferenceButton.value
+                        dialerState
                     )
                 else {
                     selectItems.value = uris
@@ -2077,7 +2104,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                             ctx,
                             viewModel,
                             uris[index],
-                            dialerState.showCallConferenceButton.value
+                            dialerState
                         )
                     }
                     showSelectItemDialog.value = true
@@ -2095,8 +2122,8 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
     }
 }
 
-private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, conferenceCall: Boolean,
-                     onHoldCallp: Long = 0L) {
+private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
+                     dialerState: ViewModel.DialerState, onHoldCallp: Long = 0L) {
     val aor = viewModel.selectedAor.value
     val ua = UserAgent.ofAor(aor)!!
     val peerUri = if (Utils.isTelNumber(uriText))
@@ -2104,13 +2131,16 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
     else
         uriText
     val uri = if (Utils.isTelUri(peerUri)) {
-        if (ua.account.telProvider == "") {
+        if (dialerState.showCallPstnButton.value)
+            peerUri
+        else if (ua.account.telProvider == "") {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = String.format(ctx.getString(R.string.no_telephony_provider), aor)
             showAlert.value = true
             return
         }
-        Utils.telToSip(peerUri, ua.account)
+        else
+            Utils.telToSip(peerUri, ua.account)
     }
     else
         Utils.uriComplete(peerUri, aor)
@@ -2118,28 +2148,62 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
         showAlert.value = true
+        return
+    }
+    else if (dialerState.showCallPstnButton.value && !Utils.isTelUri(uri)) {
+            alertTitle.value = ctx.getString(R.string.notice)
+            alertMessage.value = "Telephone call can only be made to telephone number"
+            showAlert.value = true
+            return
     }
     else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
+        var error = ""
         if (BaresipService.telecom) {
-            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
-            val extras = android.os.Bundle()
-            extras.putParcelable(android.telecom.TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
-                BaresipService.getPhoneAccountHandle(ctx))
-            val callExtras = android.os.Bundle()
-            callExtras.putBoolean("conferenceCall", conferenceCall)
-            callExtras.putLong("uap", ua.uap)
-            if (onHoldCallp != 0L)
-                callExtras.putLong("onHoldCallp", onHoldCallp)
-            extras.putBundle(android.telecom.TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
-            try {
-                Log.d(TAG, "Placing Telecom call to $uri with uap=${ua.uap}")
-                tm.placeCall(uri.toUri(), extras)
-            } catch (e: SecurityException) {
-                Log.e(TAG, "placeCall failed: ${e.message}")
+            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            if (dialerState.showCallPstnButton.value) {
+                val phoneAccountHandle = Utils.pstnAccountHandle(ctx)
+                if (phoneAccountHandle != null) {
+                    val extras = Bundle().apply {
+                        putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
+                    }
+                    val callExtras = Bundle()
+                    callExtras.putBoolean("pstnCall", dialerState.showCallPstnButton.value)
+                    extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+                    try {
+                        Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
+                        tm.placeCall(uri.toUri(), extras)
+                    } catch (e: SecurityException) {
+                        error = "placeCall failed: ${e.message}"
+                    }
+                }
+                else
+                    error = "no phone account"
+            }
+            else {
+                val extras = Bundle()
+                extras.putParcelable(
+                    TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
+                    BaresipService.getPhoneAccountHandle(ctx)
+                )
+                val callExtras = Bundle()
+                callExtras.putBoolean("conferenceCall", dialerState.showCallConferenceButton.value)
+                callExtras.putLong("uap", ua.uap)
+                if (onHoldCallp != 0L)
+                    callExtras.putLong("onHoldCallp", onHoldCallp)
+                extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+                try {
+                    Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
+                    tm.placeCall(uri.toUri(), extras)
+                } catch (e: SecurityException) {
+                    error = "placeCall failed: ${e.message}"
+                }
+            }
+            if (error != "") {
+                Log.e(TAG, error)
                 viewModel.dialerState.callButtonsEnabled.value = true
             }
         }
@@ -2148,7 +2212,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String, confer
             intent.action = "Start Call"
             intent.putExtra("uap", ua.uap)
             intent.putExtra("uri", uri)
-            intent.putExtra("conferenceCall", conferenceCall)
+            intent.putExtra("conferenceCall", dialerState.showCallConferenceButton.value)
             intent.putExtra("onHoldCallp", onHoldCallp)
             ctx.startService(intent)
         }
@@ -2207,7 +2271,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
                 if (success) {
                     call.onhold = true
                     call.referTo = uri
-                    makeCall(ctx, viewModel, uri, false, call.callp)
+                    makeCall(ctx, viewModel, uri, viewModel.dialerState, call.callp)
                     showCall(ctx, viewModel, ua, call)
                 }
             }
@@ -2237,6 +2301,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             viewModel.dialerState.callUriEnabled.value = true
         }, 100)
         viewModel.dialerState.showCallButton.value = true
+        viewModel.dialerState.showCallPstnButton.value = true
         viewModel.dialerState.showCallConferenceButton.value = true
         viewModel.dialerState.callButtonsEnabled.value = true
         viewModel.dialerState.showSuggestions.value = false
@@ -2521,7 +2586,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 if (call in Call.calls())
                     acceptTransfer(ctx, viewModel, ua, call!!, ev[1])
                 else
-                    makeCall(ctx, viewModel, ev[1], false)
+                    makeCall(ctx, viewModel, ev[1], viewModel.dialerState)
             }
             showDialog.value = true
         }
@@ -2530,7 +2595,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
                 Api.ua_hangup(uap, callp, 487, "Request Terminated")
-            makeCall(ctx, viewModel, ev[1], false)
+            makeCall(ctx, viewModel, ev[1], viewModel.dialerState)
             showCall(ctx, viewModel, ua)
         }
         "transfer failed" -> {

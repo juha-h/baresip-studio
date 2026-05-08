@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
@@ -1321,6 +1322,26 @@ object Utils {
             file.delete()
         file.createNewFile()
         return file
+    }
+
+    fun pstnAccountHandle(ctx: Context):  PhoneAccountHandle? {
+        if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
+                PackageManager.PERMISSION_GRANTED) {
+            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            if (Build.VERSION.SDK_INT >= 29) {
+                val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
+                if (preferredHandle != null)
+                    return preferredHandle
+            }
+            val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
+            val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
+            return if (phoneAccounts.isNotEmpty())
+                phoneAccounts[0]
+            else
+                null
+        }
+        else
+            return null
     }
 
     @Suppress("unused")

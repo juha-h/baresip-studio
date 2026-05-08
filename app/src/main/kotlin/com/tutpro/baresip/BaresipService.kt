@@ -1748,6 +1748,77 @@ class BaresipService: Service() {
         }
     }
 
+    fun handleExternalCall(telecomCall: android.telecom.Call) {
+        val uri = telecomCall.details.handle?.schemeSpecificPart ?: "Unknown"
+        Log.d(TAG, "Handling external call from $uri")
+
+        if (uas.value.isEmpty()) {
+            Log.e(TAG, "No User Agents available to handle external call")
+            return
+        }
+        val ua = UserAgent.statusMap().keys.firstOrNull()?.let { UserAgent.ofAor(it) } ?: uas.value[0]
+
+        val telecomState = if (VERSION.SDK_INT >= 31)
+            telecomCall.details.state
+        else
+            @Suppress("DEPRECATION") telecomCall.state
+        val initialStatus = when (telecomState) {
+            android.telecom.Call.STATE_RINGING -> "incoming"
+            android.telecom.Call.STATE_DIALING, android.telecom.Call.STATE_CONNECTING -> "outgoing"
+            else -> "connected"
+        }
+
+        val call = Call.ExternalCall(
+            telecomCall,
+            ua,
+            uri,
+            if (telecomState == android.telecom.Call.STATE_RINGING) "in" else "out",
+            initialStatus
+        )
+
+        telecomCall.registerCallback(object : android.telecom.Call.Callback() {
+            override fun onStateChanged(call: android.telecom.Call, state: Int) {
+                super.onStateChanged(call, state)
+                val newStatus = when (state) {
+                    android.telecom.Call.STATE_RINGING -> "incoming"
+                    android.telecom.Call.STATE_DIALING, android.telecom.Call.STATE_CONNECTING -> "outgoing"
+                    android.telecom.Call.STATE_ACTIVE -> "connected"
+                    android.telecom.Call.STATE_DISCONNECTED -> "closed"
+                    android.telecom.Call.STATE_HOLDING -> {
+                        calls.find { it.callp == call.hashCode().toLong() }?.onhold = true
+                        "connected"
+                    }
+                    else -> "connected"
+                }
+                calls.find { it.callp == call.hashCode().toLong() }?.let {
+                    if (it.status.value != newStatus) {
+                        it.status.value = newStatus
+                        postServiceEvent(ServiceEvent(
+                            "call update",
+                            arrayListOf(it.ua.uap, it.callp),
+                            System.nanoTime())
+                        )
+                        if (newStatus == "closed")
+                            handleExternalCallRemoved(call)
+                    }
+                }
+            }
+        })
+
+        calls.add(call)
+        postServiceEvent(ServiceEvent(
+            "call incoming",
+            arrayListOf(ua.uap, call.callp),
+            System.nanoTime())
+        )
+    }
+
+    fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
+        val callp = telecomCall.hashCode().toLong()
+        calls.removeAll { it.callp == callp }
+        messageUpdate.postValue(System.currentTimeMillis())
+    }
+
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(this@BaresipService.applicationContext, message, length).show()

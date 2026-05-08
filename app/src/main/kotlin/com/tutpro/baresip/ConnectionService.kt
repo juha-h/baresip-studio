@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.content.Intent
+import android.net.Uri
 import android.telecom.CallAudioState
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
@@ -8,7 +9,6 @@ import android.telecom.ConnectionService
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.net.Uri
 import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
@@ -64,7 +64,8 @@ class ConnectionService : ConnectionService() {
 
         val connection = BaresipConnection(uap, callp)
         connections[callp] = connection
-        connection.setAddress(Uri.fromParts("sip", peerUri, null), TelecomManager.PRESENTATION_ALLOWED)
+        connection.setAddress(Uri.fromParts("sip", peerUri, null),
+            TelecomManager.PRESENTATION_ALLOWED)
         connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
@@ -108,6 +109,9 @@ class ConnectionService : ConnectionService() {
         val conferenceCall = rootExtras?.getBoolean("conferenceCall", false) ?:
         nestedExtras?.getBoolean("conferenceCall") ?: false
 
+        val pstnCall = rootExtras?.getBoolean("pstnCall", false) ?:
+        nestedExtras?.getBoolean("pstnCall") ?: false
+
         val onHoldCallp = rootExtras?.getLong("onHoldCallp", 0L).takeIf { it != 0L }
             ?: nestedExtras?.getLong("onHoldCallp") ?: 0L
 
@@ -123,20 +127,15 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
-        connection.audioModeIsVoip = true
 
-        // Start the SIP connection logic
-        if (uap != 0L) {
+        if (!pstnCall) {
+            connection.audioModeIsVoip = true
             val sipUri = if (destination.startsWith("sip:")) destination else "sip:$destination"
             BaresipService.instance?.runCall(uap, sipUri, conferenceCall, onHoldCallp)
-        } else {
-            Log.e(TAG, "Cannot start outgoing call: uap is 0")
-            connection.setDisconnected(DisconnectCause(DisconnectCause.ERROR, "No Account"))
-            connection.destroy()
-            pendingOutgoingConnection = null
         }
 
         connection.setDialing()
+
         return connection
     }
 
