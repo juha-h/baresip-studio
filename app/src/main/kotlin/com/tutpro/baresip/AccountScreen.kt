@@ -232,14 +232,25 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
+            val aorText = if (ua.account.isMobile) {
+                if (ua.account.aor == "tel:mobile")
+                    stringResource(R.string.not_available)
+                else
+                    ua.account.aor
+            } else
+                ua.account.luri
+
             OutlinedTextField(
-                value = ua.account.luri,
+                value = aorText,
                 enabled = false,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(fontSize = 18.sp),
                 label = {
-                    Text(text = stringResource(R.string.sip_uri), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(if (ua.account.isMobile) R.string.tel_uri else R.string.sip_uri),
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,

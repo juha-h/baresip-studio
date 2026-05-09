@@ -1472,17 +1472,15 @@ private fun CallRow(
     Row( modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        horizontalArrangement = Arrangement.Center
     ) {
         if (isDialer) {
-            dialerState.showCallPstnButton.value = Utils.pstnAccountHandle(ctx) != null
             if (dialerState.showCallButton.value)
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = dialerState.callButtonsEnabled.value,
                     onClick = {
                         if (!dialerState.callButtonsEnabled.value) return@IconButton
-                        dialerState.showCallPstnButton.value = false
                         dialerState.showCallConferenceButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
@@ -1498,37 +1496,14 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
-            if (dialerState.showCallPstnButton.value)
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    enabled = dialerState.callButtonsEnabled.value,
-                    onClick = {
-                        if (!dialerState.callButtonsEnabled.value) return@IconButton
-                        dialerState.showCallButton.value = false
-                        dialerState.showCallConferenceButton.value = false
-                        dialerState.showSuggestions.value = false
-                        callClick(ctx, viewModel, dialerState)
-                    },
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.call_tel),
-                        modifier = Modifier.size(42.dp),
-                        tint = colorResource(if (dialerState.callButtonsEnabled.value)
-                            R.color.colorTrafficGreen
-                        else
-                            R.color.colorTrafficYellow),
-                        contentDescription = null,
-                    )
-                }
             if (dialerState.showCallConferenceButton.value) {
-                Spacer(modifier = Modifier.weight(1f, true))
+                Spacer(modifier = Modifier.width(32.dp))
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = dialerState.callButtonsEnabled.value,
                     onClick = {
                         if (!dialerState.callButtonsEnabled.value) return@IconButton
                         dialerState.showCallButton.value = false
-                        dialerState.showCallPstnButton.value = false
                         dialerState.showSuggestions.value = false
                         callClick(ctx, viewModel, dialerState)
                     }
@@ -2131,7 +2106,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     else
         uriText
     val uri = if (Utils.isTelUri(peerUri)) {
-        if (dialerState.showCallPstnButton.value)
+        if (ua.account.isMobile)
             peerUri
         else if (ua.account.telProvider == "") {
             alertTitle.value = ctx.getString(R.string.notice)
@@ -2150,7 +2125,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
         showAlert.value = true
         return
     }
-    else if (dialerState.showCallPstnButton.value && !Utils.isTelUri(uri)) {
+    else if (ua.account.isMobile && !Utils.isTelUri(uri)) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = "Telephone call can only be made to telephone number"
             showAlert.value = true
@@ -2164,14 +2139,15 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
         var error = ""
         if (BaresipService.telecom) {
             val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            if (dialerState.showCallPstnButton.value) {
+            if (ua.account.isMobile) {
                 val phoneAccountHandle = Utils.pstnAccountHandle(ctx)
                 if (phoneAccountHandle != null) {
                     val extras = Bundle().apply {
                         putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
                     }
                     val callExtras = Bundle()
-                    callExtras.putBoolean("pstnCall", dialerState.showCallPstnButton.value)
+                    callExtras.putBoolean("pstnCall", true)
+                    callExtras.putString("aor", aor)
                     extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
                     try {
                         Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
@@ -2301,8 +2277,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             viewModel.dialerState.callUriEnabled.value = true
         }, 100)
         viewModel.dialerState.showCallButton.value = true
-        viewModel.dialerState.showCallPstnButton.value = true
-        viewModel.dialerState.showCallConferenceButton.value = true
+        viewModel.dialerState.showCallConferenceButton.value = !ua.account.isMobile
         viewModel.dialerState.callButtonsEnabled.value = true
         viewModel.dialerState.showSuggestions.value = false
         dialpadButtonEnabled.value = true

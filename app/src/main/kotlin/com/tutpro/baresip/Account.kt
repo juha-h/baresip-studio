@@ -5,86 +5,91 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.Locale
 
-class Account(val accp: Long) {
+class Account(val accp: Long, virtualAor: String? = null) {
 
+    var isMobile = false
     var nickName = ""
-    var displayName = Api.account_display_name(accp)
-    val aor = Api.account_aor(accp)
-    val luri = Api.account_luri(accp)
-    var authUser = Api.account_auth_user(accp)
-    var authPass = Api.account_auth_pass(accp)
+    var displayName = if (accp != 0L) Api.account_display_name(accp) else ""
+    val aor = if (accp != 0L) Api.account_aor(accp) else (virtualAor ?: "")
+    val luri = if (accp != 0L) Api.account_luri(accp) else (virtualAor ?: "")
+    var authUser = if (accp != 0L) Api.account_auth_user(accp) else ""
+    var authPass = if (accp != 0L) Api.account_auth_pass(accp) else ""
     var outbound = ArrayList<String>()
-    var mediaNat = Api.account_medianat(accp)
-    var stunServer = Api.account_stun_uri(accp)
-    var stunUser = Api.account_stun_user(accp)
-    var stunPass = Api.account_stun_pass(accp)
+    var mediaNat = if (accp != 0L) Api.account_medianat(accp) else ""
+    var stunServer = if (accp != 0L) Api.account_stun_uri(accp) else ""
+    var stunUser = if (accp != 0L) Api.account_stun_user(accp) else ""
+    var stunPass = if (accp != 0L) Api.account_stun_pass(accp) else ""
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
-    var regint = Api.account_regint(accp)
-    var checkOrigin = Api.account_check_origin(accp)
+    var regint = if (accp != 0L) Api.account_regint(accp) else 0
+    var checkOrigin = if (accp != 0L) Api.account_check_origin(accp) else true
     var configuredRegInt = REGISTRATION_INTERVAL
-    var mediaEnc = Api.account_mediaenc(accp)
-    var rtcpMux = Api.account_rtcp_mux(accp)
-    var rel100Mode = Api.account_rel100_mode(accp)
-    var dtmfMode = Api.account_dtmfmode(accp)
-    var answerMode = Api.account_answermode(accp)
-    var autoRedirect = Api.account_sip_autoredirect(accp)
+    var mediaEnc = if (accp != 0L) Api.account_mediaenc(accp) else ""
+    var rtcpMux = if (accp != 0L) Api.account_rtcp_mux(accp) else false
+    var rel100Mode = if (accp != 0L) Api.account_rel100_mode(accp) else Api.REL100_DISABLED
+    var dtmfMode = if (accp != 0L) Api.account_dtmfmode(accp) else Api.DTMFMODE_AUTO
+    var answerMode = if (accp != 0L) Api.account_answermode(accp) else Api.ANSWERMODE_MANUAL
+    var autoRedirect = if (accp != 0L) Api.account_sip_autoredirect(accp) else false
     var blockUnknown = false
-    var vmUri = Api.account_vm_uri(accp)
+    var vmUri = if (accp != 0L) Api.account_vm_uri(accp) else ""
     var vmNew = 0
     var vmOld = 0
     var missedCalls = false
     var unreadMessages = false
     var callHistory = true
     var countryCode = ""
-    var telProvider = Utils.aorDomain(aor)
+    var telProvider = if (accp != 0L) Utils.aorDomain(aor) else ""
     var resumeUri = ""
     var numericKeypad = false
     var customParams = ""
 
     init {
 
-        if (authPass == "")
-            authPass = NO_AUTH_PASS
+        if (accp != 0L) {
+            if (authPass == "")
+                authPass = NO_AUTH_PASS
 
-        var i = 0
-        while (true) {
-            val ob = Api.account_outbound(accp, i)
-            if (ob != "") {
-                outbound.add(ob)
-                i++
-            } else {
-                break
+            var i = 0
+            while (true) {
+                val ob = Api.account_outbound(accp, i)
+                if (ob != "") {
+                    outbound.add(ob)
+                    i++
+                } else {
+                    break
+                }
             }
-        }
 
-        i = 0
-        while (true) {
-            val ac = Api.account_audio_codec(accp, i)
-            if (ac != "") {
-                audioCodec.add(ac)
-                i++
-            } else {
-                break
+            i = 0
+            while (true) {
+                val ac = Api.account_audio_codec(accp, i)
+                if (ac != "") {
+                    audioCodec.add(ac)
+                    i++
+                } else {
+                    break
+                }
             }
-        }
 
-        val extra = Api.account_extra(accp)
-        if (Utils.paramExists(extra, "nickname"))
-            nickName = Utils.paramValue(extra, "nickname")
-        if (Utils.paramExists(extra, "regint"))
-            configuredRegInt = Utils.paramValue(extra, "regint").toInt()
-        callHistory = Utils.paramValue(extra, "call_history") == ""
-        blockUnknown= Utils.paramExists(extra, "block_unknown")
-        if (Utils.paramExists(extra, "country_code"))
-            countryCode = Utils.paramValue(extra, "country_code")
-        if (Utils.paramExists(extra, "tel_provider"))
-            telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
-        numericKeypad = Utils.paramExists(extra, "numeric_keypad")
-        customParams = extra.substringAfter("last=empty").substringAfter(";")
+            val extra = Api.account_extra(accp)
+            if (Utils.paramExists(extra, "nickname"))
+                nickName = Utils.paramValue(extra, "nickname")
+            if (Utils.paramExists(extra, "regint"))
+                configuredRegInt = Utils.paramValue(extra, "regint").toInt()
+            callHistory = Utils.paramValue(extra, "call_history") == ""
+            blockUnknown = Utils.paramExists(extra, "block_unknown")
+            if (Utils.paramExists(extra, "country_code"))
+                countryCode = Utils.paramValue(extra, "country_code")
+            if (Utils.paramExists(extra, "tel_provider"))
+                telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
+            numericKeypad = Utils.paramExists(extra, "numeric_keypad")
+            customParams = extra.substringAfter("last=empty").substringAfter(";")
+        }
     }
 
     fun print() : String {
+
+        if (isMobile) return ""
 
         var res = if (displayName != "")
             "\"${displayName}\" "

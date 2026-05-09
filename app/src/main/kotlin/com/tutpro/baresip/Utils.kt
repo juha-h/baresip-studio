@@ -27,6 +27,8 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.telecom.TelecomManager
 import android.telecom.PhoneAccountHandle
 import android.text.format.DateUtils
@@ -1342,6 +1344,36 @@ object Utils {
         }
         else
             return null
+    }
+
+    @SuppressLint("HardwareIds")
+    fun getLine1Number(ctx: Context): String? {
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED) {
+                    val sm = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                    val number = sm.getPhoneNumber(SubscriptionManager.DEFAULT_SUBSCRIPTION_ID)
+                    if (number != "") {
+                        Log.i(TAG, "Retrieved SIM number via SubscriptionManager")
+                        return number
+                    }
+                }
+            } else {
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                    val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    @Suppress("DEPRECATION")
+                    val number = tm.line1Number
+                    if (number != null) {
+                        Log.i(TAG, "Retrieved SIM number via TelephonyManager")
+                        return number
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "getLine1Number failed: ${e.message}")
+        }
+        return null
     }
 
     @Suppress("unused")

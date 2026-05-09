@@ -18,8 +18,8 @@ class InCallService : InCallService() {
             // We just need to ensure the InCallService stays bound.
         } else {
             Log.d(TAG, "InCallService: Identified as PSTN call from $handle")
-            // This is a cellular call. We need to wrap it so MainScreen can show it.
-            BaresipService.instance?.handleExternalCall(call)
+            val aor = call.details.intentExtras?.getString("aor")
+            BaresipService.instance?.handleExternalCall(call, aor)
         }
     }
 

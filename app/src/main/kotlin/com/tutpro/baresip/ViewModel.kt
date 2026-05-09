@@ -44,7 +44,6 @@ class ViewModel: ViewModel() {
         val callUriLabel: MutableState<String> = mutableStateOf(""),
         val showSuggestions: MutableState<Boolean> = mutableStateOf(false),
         val showCallButton: MutableState<Boolean> = mutableStateOf(true),
-        val showCallPstnButton: MutableState<Boolean> = mutableStateOf(true),
         val showCallConferenceButton: MutableState<Boolean> = mutableStateOf(true),
         val callButtonsEnabled: MutableState<Boolean> = mutableStateOf(true),
         val conferenceCall: MutableState<Boolean> = mutableStateOf(false),

@@ -491,9 +491,10 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                if (telecom)
+                if (telecom) {
                     registerPhoneAccount()
-                else
+                    addMobileUserAgent()
+                } else
                     if (btAdapter != null) {
                         Log.i(TAG, "Registering bluetooth receiver")
                         val filter = IntentFilter()
@@ -1512,6 +1513,7 @@ class BaresipService: Service() {
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
         isNativeReady = true
+        if (telecom) addMobileUserAgent()
         Api.net_debug()
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
@@ -1748,15 +1750,18 @@ class BaresipService: Service() {
         }
     }
 
-    fun handleExternalCall(telecomCall: android.telecom.Call) {
+    fun handleExternalCall(telecomCall: android.telecom.Call, preferredAor: String? = null) {
         val uri = telecomCall.details.handle?.schemeSpecificPart ?: "Unknown"
-        Log.d(TAG, "Handling external call from $uri")
+        Log.d(TAG, "Handling external call from $uri (preferredAor=$preferredAor)")
 
         if (uas.value.isEmpty()) {
             Log.e(TAG, "No User Agents available to handle external call")
             return
         }
-        val ua = UserAgent.statusMap().keys.firstOrNull()?.let { UserAgent.ofAor(it) } ?: uas.value[0]
+
+        val ua = preferredAor?.let { UserAgent.ofAor(it) }
+            ?: uas.value.find { it.account.isMobile }
+            ?: uas.value[0]
 
         val telecomState = if (VERSION.SDK_INT >= 31)
             telecomCall.details.state
@@ -1817,6 +1822,34 @@ class BaresipService: Service() {
         val callp = telecomCall.hashCode().toLong()
         calls.removeAll { it.callp == callp }
         messageUpdate.postValue(System.currentTimeMillis())
+    }
+
+    private fun addMobileUserAgent() {
+        if (!telecom || Utils.pstnAccountHandle(this) == null) return
+
+        val mobileAor = Utils.getLine1Number(this)?.let { "tel:$it" } ?: "tel:mobile"
+
+        val existingMobileUa = uas.value.find { it.account.isMobile }
+        if (existingMobileUa != null) {
+            // If we previously had tel:mobile but now have a real number, replace it
+            if (existingMobileUa.account.aor == "tel:mobile" && mobileAor != "tel:mobile") {
+                val updatedUas = uas.value.toMutableList()
+                updatedUas.remove(existingMobileUa)
+                uas.value = updatedUas.toList()
+            } else {
+                return
+            }
+        }
+
+        val account = Account(0L, mobileAor)
+        account.isMobile = true
+        account.nickName = "Mobile"
+        val mobileUa = UserAgent(0L, account)
+
+        val updatedUas = uas.value.toMutableList()
+        updatedUas.add(mobileUa)
+        uas.value = updatedUas.toList()
+        uasStatus.value = UserAgent.statusMap()
     }
 
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {

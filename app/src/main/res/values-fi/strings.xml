@@ -530,6 +530,7 @@
     <string name="call_is_ringing">Puhelu soi</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="call_is_connected">Puhelu on yhdistetty</string>
+    <string name="not_available">Ei saatavilla</string>
     <string name="rec_in_call">Tallennus voidaan asettaa päälle tai pois vain silloin, kun puhelu
         ei ole yhdistetty</string>
     <string name="call_transfer">Puhelun siirto</string>

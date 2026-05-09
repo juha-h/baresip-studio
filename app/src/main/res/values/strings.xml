@@ -480,6 +480,7 @@
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
     <string name="sip_uri" translatable="false">SIP URI</string>
+    <string name="tel_uri" translatable="false">TEL URI</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
@@ -513,6 +514,7 @@
     <string name="call_is_ringing">Call is ringing</string>
     <string name="call_is_on_hold">Call is on hold</string>
     <string name="call_is_connected">Call is connected</string>
+    <string name="not_available">Not available</string>
     <string name="rec_in_call">Recording can be turned on or off only when call is not
         connected</string>
     <string name="call_transfer">Call Transfer</string>
