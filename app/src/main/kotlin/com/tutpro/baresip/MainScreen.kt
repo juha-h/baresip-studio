@@ -1472,7 +1472,8 @@ private fun CallRow(
     Row( modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = if (isDialer || call?.showCancelButton?.value == true || call?.showAnswerRejectButtons?.value == true)
+            Arrangement.Center else Arrangement.SpaceBetween
     ) {
         if (isDialer) {
             if (dialerState.showCallButton.value)
@@ -1524,8 +1525,6 @@ private fun CallRow(
         }
         else {
             if (call!!.showCancelButton.value) {
-                if (!call.conferenceCall)
-                    Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
@@ -1543,11 +1542,9 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
             }
 
             if (call.showHangupButton.value) {
-
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
@@ -1565,311 +1562,313 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
+            }
 
-                if (!call.conferenceCall)
-                    IconButton(    modifier = Modifier.size(48.dp),
-                        onClick = {
-                            if (call.callOnHold.value) {
-                                Log.d(TAG, "User requested resume for ${call.callp}")
-                                call.resume() // This now automatically holds other calls
-                            } else {
-                                Log.d(TAG, "User requested hold for ${call.callp}")
-                                call.hold()
+            if (call.showHangupButton.value && !call.conferenceCall)
+                IconButton(    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        if (call.callOnHold.value) {
+                            Log.d(TAG, "User requested resume for ${call.callp}")
+                            call.resume() // This now automatically holds other calls
+                        } else {
+                            Log.d(TAG, "User requested hold for ${call.callp}")
+                            call.hold()
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.PauseCircle,
+                        modifier = Modifier.size(42.dp),
+                        tint = if (call.callOnHold.value)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
+
+            var showTransferDialog by remember { mutableStateOf(false) }
+
+            if (call.showHangupButton.value && !call.conferenceCall && !call.ua.account.isMobile)
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    enabled = call.transferButtonEnabled.value,
+                    onClick = {
+                        if (call.onHoldCall != null) {
+                            if (!Api.call_supported(call.callp, Api.REPLACES)) {
+                                alertTitle.value = ctx.getString(R.string.notice)
+                                alertMessage.value = ctx.getString(R.string.replaces_not_supported)
+                                showAlert.value = true
                             }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.PauseCircle,
-                            modifier = Modifier.size(42.dp),
-                            tint = if (call.callOnHold.value)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.secondary,
-                            contentDescription = null,
-                        )
-                    }
-
-                var showTransferDialog by remember { mutableStateOf(false) }
-
-                if (!call.conferenceCall)
-                    IconButton(
-                        modifier = Modifier.size(48.dp),
-                        enabled = call.transferButtonEnabled.value,
-                        onClick = {
-                            if (call.onHoldCall != null) {
-                                if (!Api.call_supported(call.callp, Api.REPLACES)) {
-                                   alertTitle.value = ctx.getString(R.string.notice)
-                                    alertMessage.value = ctx.getString(R.string.replaces_not_supported)
+                            else {
+                                call.hold()
+                                if (!call.executeTransfer()) {
+                                    alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.transfer_failed)
                                     showAlert.value = true
                                 }
-                                else {
-                                    call.hold()
-                                    if (!call.executeTransfer()) {
-                                        alertTitle.value = ctx.getString(R.string.notice)
-                                        alertMessage.value = ctx.getString(R.string.transfer_failed)
-                                        showAlert.value = true
+                            }
+                        }
+                        else
+                            showTransferDialog = true
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ArrowCircleRight,
+                        modifier = Modifier.size(42.dp),
+                        tint = if (call.callTransfer.value)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
+
+            if (showTransferDialog) {
+
+                val showDialog = remember { mutableStateOf(true) }
+                val blindChecked = remember { mutableStateOf(true) }
+
+                if (showDialog.value)
+                    BasicAlertDialog(
+                        onDismissRequest = {
+                            viewModel.requestHideKeyboard()
+                            showDialog.value = false
+                            showTransferDialog = false
+                        }
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = stringResource(R.string.call_transfer),
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                var transferUri by remember { mutableStateOf("") }
+                                val suggestions by remember { contactNames }
+                                var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
+                                val focusRequester = remember { FocusRequester() }
+                                val lazyListState = rememberLazyListState()
+                                OutlinedTextField(
+                                    value = transferUri,
+                                    singleLine = true,
+                                    onValueChange = {
+                                        if (it != transferUri) {
+                                            transferUri = it
+                                            if (it.length > 1) {
+                                                val normalizedInput = Utils.unaccent(it)
+                                                filteredSuggestions =
+                                                    suggestions.filter { suggestion ->
+                                                        Utils.unaccent(suggestion)
+                                                            .contains(normalizedInput, ignoreCase = true)
+                                                    }
+                                                        .map { suggestion ->
+                                                            Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                                                        }
+                                            }
+                                            call.showSuggestions.value = transferUri.length > 1
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        if (transferUri.isNotEmpty())
+                                            Icon(
+                                                Icons.Outlined.Clear,
+                                                contentDescription = null,
+                                                modifier = Modifier.clickable {
+                                                    if (call.showSuggestions.value)
+                                                        call.showSuggestions.value = false
+                                                    else
+                                                        transferUri = ""
+                                                },
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = 4.dp,
+                                            end = 4.dp,
+                                            top = 12.dp,
+                                            bottom = 2.dp
+                                        )
+                                        .focusRequester(focusRequester),
+                                    label = { Text(stringResource(R.string.transfer_destination)) },
+                                    textStyle = TextStyle(fontSize = 18.sp),
+                                    keyboardOptions = if (isDialpadVisible)
+                                        KeyboardOptions(keyboardType = KeyboardType.Phone)
+                                    else
+                                        KeyboardOptions(keyboardType = KeyboardType.Text)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .shadow(8.dp, RoundedCornerShape(8.dp))
+                                        .background(
+                                            color = MaterialTheme.colorScheme.surfaceVariant,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .animateContentSize()
+                                ) {
+                                    if (call.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
+                                        Box(modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(max = 150.dp)) {
+                                            LazyColumn(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .verticalScrollbar(
+                                                        state = lazyListState,
+                                                        width = 6.dp,
+                                                    ),
+                                                horizontalAlignment = Alignment.Start,
+                                                state = lazyListState,
+                                            ) {
+                                                items(
+                                                    items = filteredSuggestions,
+                                                    key = { suggestion -> suggestion.toString() }
+                                                ) { suggestion ->
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .clickable {
+                                                                transferUri =
+                                                                    suggestion.toString()
+                                                                call.showSuggestions.value =
+                                                                    false
+                                                            }
+                                                            .padding(12.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = suggestion,
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                            fontSize = 18.sp
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            else
-                                showTransferDialog = true
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowCircleRight,
-                            modifier = Modifier.size(42.dp),
-                            tint = if (call.callTransfer.value)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.secondary,
-                            contentDescription = null,
-                        )
-                    }
-
-                if (showTransferDialog) {
-
-                    val showDialog = remember { mutableStateOf(true) }
-                    val blindChecked = remember { mutableStateOf(true) }
-
-                    if (showDialog.value)
-                        BasicAlertDialog(
-                            onDismissRequest = {
-                                viewModel.requestHideKeyboard()
-                                showDialog.value = false
-                                showTransferDialog = false
-                            }
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                                )
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = stringResource(R.string.call_transfer),
-                                        fontSize = 20.sp,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                    )
-                                    var transferUri by remember { mutableStateOf("") }
-                                    val suggestions by remember { contactNames }
-                                    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
-                                    val focusRequester = remember { FocusRequester() }
-                                    val lazyListState = rememberLazyListState()
-                                    OutlinedTextField(
-                                        value = transferUri,
-                                        singleLine = true,
-                                        onValueChange = {
-                                            if (it != transferUri) {
-                                                transferUri = it
-                                                if (it.length > 1) {
-                                                    val normalizedInput = Utils.unaccent(it)
-                                                    filteredSuggestions =
-                                                        suggestions.filter { suggestion ->
-                                                            Utils.unaccent(suggestion)
-                                                                .contains(normalizedInput, ignoreCase = true)
-                                                        }
-                                                            .map { suggestion ->
-                                                                Utils.buildAnnotatedStringWithHighlight(suggestion, it)
-                                                            }
-                                                }
-                                                call.showSuggestions.value = transferUri.length > 1
-                                            }
-                                        },
-                                        trailingIcon = {
-                                            if (transferUri.isNotEmpty())
-                                                Icon(
-                                                    Icons.Outlined.Clear,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.clickable {
-                                                        if (call.showSuggestions.value)
-                                                            call.showSuggestions.value = false
-                                                        else
-                                                            transferUri = ""
-                                                    },
-                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                start = 4.dp,
-                                                end = 4.dp,
-                                                top = 12.dp,
-                                                bottom = 2.dp
-                                            )
-                                            .focusRequester(focusRequester),
-                                        label = { Text(stringResource(R.string.transfer_destination)) },
-                                        textStyle = TextStyle(fontSize = 18.sp),
-                                        keyboardOptions = if (isDialpadVisible)
-                                            KeyboardOptions(keyboardType = KeyboardType.Phone)
-                                        else
-                                            KeyboardOptions(keyboardType = KeyboardType.Text)
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .shadow(8.dp, RoundedCornerShape(8.dp))
-                                            .background(
-                                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                                shape = RoundedCornerShape(8.dp)
-                                            )
-                                            .animateContentSize()
-                                    ) {
-                                        if (call.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
-                                            Box(modifier = Modifier
-                                                .fillMaxWidth()
-                                                .heightIn(max = 150.dp)) {
-                                                LazyColumn(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .verticalScrollbar(
-                                                            state = lazyListState,
-                                                            width = 6.dp,
-                                                        ),
-                                                    horizontalAlignment = Alignment.Start,
-                                                    state = lazyListState,
-                                                ) {
-                                                    items(
-                                                        items = filteredSuggestions,
-                                                        key = { suggestion -> suggestion.toString() }
-                                                    ) { suggestion ->
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .clickable {
-                                                                    transferUri =
-                                                                        suggestion.toString()
-                                                                    call.showSuggestions.value =
-                                                                        false
-                                                                }
-                                                                .padding(12.dp)
-                                                        ) {
-                                                            Text(
-                                                                text = suggestion,
-                                                                modifier = Modifier.fillMaxWidth(),
-                                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                                fontSize = 18.sp
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (call.replaces())
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Start,
-                                        ) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = stringResource(R.string.blind),
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.padding(8.dp),
-                                                )
-                                                Switch(
-                                                    checked = blindChecked.value,
-                                                    onCheckedChange = {
-                                                        blindChecked.value = true
-                                                    }
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = stringResource(R.string.attended),
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.padding(8.dp),
-                                                )
-                                                Switch(
-                                                    checked = !blindChecked.value,
-                                                    onCheckedChange = {
-                                                        blindChecked.value = false
-                                                    }
-                                                )
-                                            }
-                                        }
+                                if (call.replaces())
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        horizontalArrangement = Arrangement.Start,
                                     ) {
-                                        TextButton(
-                                            onClick = {
-                                                viewModel.requestHideKeyboard()
-                                                showDialog.value = false
-                                                showTransferDialog = false
-                                            },
-                                            modifier = Modifier.padding(end = 32.dp),
-                                        ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
-                                                text = stringResource(R.string.cancel),
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                text = stringResource(R.string.blind),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(8.dp),
+                                            )
+                                            Switch(
+                                                checked = blindChecked.value,
+                                                onCheckedChange = {
+                                                    blindChecked.value = true
+                                                }
                                             )
                                         }
-                                        TextButton(
-                                            onClick = {
-                                                call.showSuggestions.value = false
-                                                var uriText = transferUri.trim()
-                                                if (uriText.isNotEmpty()) {
-                                                    val uris = Contact.contactUris(uriText)
-                                                    if (uris.size > 1) {
-                                                        selectItems.value = uris
-                                                        selectItemAction.value = { index ->
-                                                            val uri = uris[index]
-                                                            transfer(
-                                                                ctx,
-                                                                viewModel,
-                                                                call.ua,
-                                                                if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
-                                                                !blindChecked.value
-                                                            )
-                                                            showSelectItemDialog.value = false
-                                                        }
-                                                        showSelectItemDialog.value = true
-                                                    }
-                                                    else {
-                                                        if (uris.size == 1) uriText = uris[0]
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = stringResource(R.string.attended),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(8.dp),
+                                            )
+                                            Switch(
+                                                checked = !blindChecked.value,
+                                                onCheckedChange = {
+                                                    blindChecked.value = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TextButton(
+                                        onClick = {
+                                            viewModel.requestHideKeyboard()
+                                            showDialog.value = false
+                                            showTransferDialog = false
+                                        },
+                                        modifier = Modifier.padding(end = 32.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.cancel),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = {
+                                            call.showSuggestions.value = false
+                                            var uriText = transferUri.trim()
+                                            if (uriText.isNotEmpty()) {
+                                                val uris = Contact.contactUris(uriText)
+                                                if (uris.size > 1) {
+                                                    selectItems.value = uris
+                                                    selectItemAction.value = { index ->
+                                                        val uri = uris[index]
                                                         transfer(
                                                             ctx,
                                                             viewModel,
                                                             call.ua,
-                                                            if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                            if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
                                                             !blindChecked.value
                                                         )
+                                                        showSelectItemDialog.value = false
                                                     }
-                                                    viewModel.requestHideKeyboard()
-                                                    showDialog.value = false
-                                                    showTransferDialog = false
+                                                    showSelectItemDialog.value = true
                                                 }
-                                            },
-                                            modifier = Modifier.padding(end = 16.dp),
-                                        ) {
-                                            Text(
-                                                text = stringResource(
-                                                    if (blindChecked.value)
-                                                        R.string.transfer
-                                                    else
-                                                        R.string.call
-                                                ).uppercase(),
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
+                                                else {
+                                                    if (uris.size == 1) uriText = uris[0]
+                                                    transfer(
+                                                        ctx,
+                                                        viewModel,
+                                                        call.ua,
+                                                        if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                        !blindChecked.value
+                                                    )
+                                                }
+                                                viewModel.requestHideKeyboard()
+                                                showDialog.value = false
+                                                showTransferDialog = false
+                                            }
+                                        },
+                                        modifier = Modifier.padding(end = 16.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(
+                                                if (blindChecked.value)
+                                                    R.string.transfer
+                                                else
+                                                    R.string.call
+                                            ).uppercase(),
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
                                     }
                                 }
                             }
                         }
+                    }
 
-                }
+            }
 
-                val focusRequester = remember { FocusRequester() }
-                val shouldRequestFocus by call.focusDtmf
-                val interactionSource = remember { MutableInteractionSource() }
+            val focusRequester = remember { FocusRequester() }
+            val shouldRequestFocus by call.focusDtmf
+            val interactionSource = remember { MutableInteractionSource() }
+            if (call.showHangupButton.value)
                 BasicTextField(
                     value = call.dtmfText.value,
                     onValueChange = { newText ->
@@ -1924,6 +1923,7 @@ private fun CallRow(
                         )
                     }
                 )
+            if (call.showHangupButton.value)
                 LaunchedEffect(shouldRequestFocus) {
                     if (shouldRequestFocus) {
                         focusRequester.requestFocus()
@@ -1931,6 +1931,7 @@ private fun CallRow(
                     }
                 }
 
+            if (call.showHangupButton.value && !call.ua.account.isMobile)
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
@@ -1970,7 +1971,6 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
-            }
 
             if (call.showAnswerRejectButtons.value) {
 
