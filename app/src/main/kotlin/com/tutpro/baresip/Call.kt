@@ -247,6 +247,12 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
             return BaresipService.calls.isNotEmpty()
         }
 
+        fun hasTelecomCall(): Boolean {
+            return BaresipService.calls.any {
+                it is ExternalCall || ConnectionService.connections.containsKey(it.callp)
+            } || ConnectionService.pendingOutgoingConnection != null
+        }
+
         fun isAnyCallActive(ctx: Context): Boolean {
             // Check if there exist SIP calls that are not onhold or held
             if (BaresipService.calls.any { !it.onhold && !it.held }) return true
