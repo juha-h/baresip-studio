@@ -1,9 +1,16 @@
 package com.tutpro.baresip
 
+import android.content.Intent
+import android.os.IBinder
 import android.telecom.Call
 import android.telecom.InCallService
 
 class InCallService : InCallService() {
+
+    override fun onBind(intent: Intent): IBinder? {
+        instance = this
+        return super.onBind(intent)
+    }
 
     override fun onCallAdded(call: Call) {
         super.onCallAdded(call)
@@ -29,7 +36,13 @@ class InCallService : InCallService() {
         BaresipService.instance?.handleExternalCallRemoved(call)
     }
 
+    override fun onUnbind(intent: Intent?): Boolean {
+        instance = null
+        return super.onUnbind(intent)
+    }
+
     companion object {
         private const val TAG = "Baresip"
+        var instance: InCallService? = null
     }
 }
