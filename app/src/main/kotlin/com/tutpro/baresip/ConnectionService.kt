@@ -111,7 +111,7 @@ class ConnectionService : ConnectionService() {
         val onHoldCallp = rootExtras?.getLong("onHoldCallp", 0L).takeIf { it != 0L }
             ?: nestedExtras?.getLong("onHoldCallp") ?: 0L
 
-        val destination = request?.address?.schemeSpecificPart ?: ""
+        val destination = request?.address?.encodedSchemeSpecificPart ?: ""
 
         Log.d(TAG, "onCreateOutgoingConnection to $destination (uap=$uap)")
 
