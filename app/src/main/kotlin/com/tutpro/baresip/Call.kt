@@ -150,6 +150,26 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         Api.call_destroy(callp)
     }
 
+    open fun hangup(code: Int, reason: String) {
+        if (BaresipService.telecom) {
+            val connection = ConnectionService.connections[callp]
+            if (connection != null)
+                connection.onDisconnect()
+            else
+                Api.ua_hangup(ua.uap, callp, code, reason)
+        } else {
+            Api.ua_hangup(ua.uap, callp, code, reason)
+        }
+    }
+
+    open fun answer() {
+        Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
+    }
+
+    open fun reject() {
+        hangup(486, "Busy Here")
+    }
+
     class ExternalCall(
         val telecomCall: android.telecom.Call,
         ua: UserAgent,
@@ -161,6 +181,10 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         override fun connect(uri: String): Boolean {
             telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
             return true
+        }
+
+        override fun answer() {
+            telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
         }
 
         override fun hold(): Boolean {
@@ -175,6 +199,14 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
             onhold = false
             callOnHold.value = false
             return true
+        }
+
+        override fun hangup(code: Int, reason: String) {
+            telecomCall.disconnect()
+        }
+
+        override fun reject() {
+            telecomCall.disconnect()
         }
 
         override fun destroy() {

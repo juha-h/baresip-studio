@@ -1532,18 +1532,8 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        if (BaresipService.telecom) {
-                            val connection = ConnectionService.connections[call.callp]
-                            if (connection != null)
-                                connection.onDisconnect()
-                            else {
-                                Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
-                                Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                            }
-                        } else {
-                            Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
-                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                        }
+                        Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
+                        call.hangup(487, "Request Terminated")
                     },
                 ) {
                     Icon(
@@ -1564,18 +1554,8 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        if (BaresipService.telecom) {
-                            val connection = ConnectionService.connections[call.callp]
-                            if (connection != null)
-                                connection.onDisconnect()
-                            else {
-                                Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
-                                Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                            }
-                        } else {
-                            Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
-                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                        }
+                        Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
+                        call.hangup(487, "Request Terminated")
                     }
                 ) {
                     Icon(
@@ -1623,8 +1603,7 @@ private fun CallRow(
                                     showAlert.value = true
                                 }
                                 else {
-                                    val connection = ConnectionService.connections[call.callp]
-                                    connection?.onHold()
+                                    call.hold()
                                     if (!call.executeTransfer()) {
                                         alertTitle.value = ctx.getString(R.string.notice)
                                         alertMessage.value = ctx.getString(R.string.transfer_failed)
@@ -2197,8 +2176,6 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
 
 private fun answer(ctx: Context, call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} answering call from ${call.callUri.value}")
-    if (BaresipService.telecom)
-        ConnectionService.connections[call.callp]?.setActive()
     val intent = Intent(ctx, BaresipService::class.java)
     intent.action = "Call Answer"
     intent.putExtra("uap", call.ua.uap)
@@ -2208,19 +2185,7 @@ private fun answer(ctx: Context, call: Call) {
 
 private fun reject(call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp} from ${call.callUri.value}")
-    if (BaresipService.telecom) {
-        val connection = ConnectionService.connections[call.callp]
-        if (connection != null)
-            connection.onReject()
-        else {
-            call.rejected = true
-            Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
-        }
-    }
-    else {
-        call.rejected = true
-        Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
-    }
+    call.reject()
 }
 
 private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText: String, attended: Boolean) {
@@ -2237,14 +2202,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
         val call = ua.currentCall()
         if (call != null) {
             if (attended) {
-                val connection = ConnectionService.connections[call.callp]
-                val success = if (connection != null) {
-                    connection.onHold()
-                    true
-                } else {
-                    call.hold()
-                }
-                if (success) {
+                if (call.hold()) {
                     call.onhold = true
                     call.referTo = uri
                     makeCall(ctx, viewModel, uri, viewModel.dialerState, call.callp)
@@ -2252,8 +2210,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
                 }
             }
             else {
-                val connection = ConnectionService.connections[call.callp]
-                connection?.onHold()
+                call.hold()
                 if (!call.transfer(uri)) {
                     alertTitle.value = ctx.getString(R.string.notice)
                     alertMessage.value = ctx.getString(R.string.transfer_failed)
@@ -2353,7 +2310,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                         call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
                         call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                     }
-                    call.transferButtonEnabled.value = true
+                    call.transferButtonEnabled.value = !ua.account.isMobile
                 }
                 call.callUri2.value = ""
                 call.callTransfer.value = call.onHoldCall != null
@@ -2569,7 +2526,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val callp = params[1] as Long
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
-                Api.ua_hangup(uap, callp, 487, "Request Terminated")
+                call!!.hangup(487, "Request Terminated")
             makeCall(ctx, viewModel, ev[1], viewModel.dialerState)
             showCall(ctx, viewModel, ua)
         }

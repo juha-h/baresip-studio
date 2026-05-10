@@ -545,18 +545,15 @@ class BaresipService: Service() {
             }
 
             "Call Answer" -> {
-                val uap = intent!!.getLongExtra("uap", 0L)
-                val callp = intent.getLongExtra("callp", 0L)
+                val callp = intent!!.getLongExtra("callp", 0L)
+                val call = Call.ofCallp(callp)
                 stopRinging()
                 stopMediaPlayer()
                 setCallVolume()
                 proximitySensing(proximitySensing)
-                if (telecom)
-                    Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
-                else {
-                    Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
+                call?.answer()
+                if (!telecom)
                     ensureCommunicationMode()
-                }
             }
 
             "Call Reject" -> {
@@ -569,20 +566,15 @@ class BaresipService: Service() {
                     val aor = call.ua.account.aor
                     Log.d(TAG, "Aor $aor rejected incoming call $callp from $peerUri")
                     call.rejected = true
-                    Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
+                    call.reject()
                 }
             }
 
             "Call Hangup" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
                 Log.d(TAG, "onStartCommand Hangup action for $callp")
-                val connection = ConnectionService.connections[callp]
-                if (connection != null) {
-                    connection.onDisconnect() // This calls Api.ua_hangup(..., 0, "")
-                } else {
-                    val call = Call.ofCallp(callp)
-                    if (call != null) Api.ua_hangup(call.ua.uap, callp, 0, "")
-                }
+                val call = Call.ofCallp(callp)
+                call?.hangup(0, "")
             }
 
             "Transfer Deny" -> {
@@ -1798,6 +1790,8 @@ class BaresipService: Service() {
                 calls.find { it.callp == call.hashCode().toLong() }?.let {
                     if (it.status.value != newStatus) {
                         it.status.value = newStatus
+                        if (newStatus == "connected")
+                            it.startTime = GregorianCalendar()
                         postServiceEvent(ServiceEvent(
                             "call update",
                             arrayListOf(it.ua.uap, it.callp),
@@ -1820,7 +1814,23 @@ class BaresipService: Service() {
 
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
         val callp = telecomCall.hashCode().toLong()
-        calls.removeAll { it.callp == callp }
+        val call = calls.find { it.callp == callp }
+        if (call != null) {
+            if (call.ua.account.callHistory) {
+                val history = CallHistoryNew(call.ua.account.aor, call.peerUri, call.dir)
+                history.stopTime = GregorianCalendar()
+                history.startTime = call.startTime
+                history.rejected = call.rejected
+                history.add()
+                if (call.dir == "in" && call.startTime == null && !call.rejected)
+                    call.ua.account.missedCalls = true
+            }
+            calls.remove(call)
+        }
+        if (!Call.inCall()) {
+            proximitySensing(false)
+            stopMediaPlayer()
+        }
         messageUpdate.postValue(System.currentTimeMillis())
     }
 
