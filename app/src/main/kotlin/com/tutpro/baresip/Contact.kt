@@ -76,9 +76,10 @@ sealed class Contact {
         fun contactName(uri: String): String {
             var contact = findContact(uri)
             if (contact == null) {
-                val userPart = Utils.uriUserPart(uri)
-                if (Utils.isTelNumber(userPart))
+                val userPart = Utils.uriUserPart(uri).replace("%23", "#")
+                if (Utils.isTelNumber(userPart)) {
                     contact = findContact("tel:$userPart")
+                }
             }
             if (contact != null)
                 return contact.name()
