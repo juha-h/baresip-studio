@@ -264,7 +264,7 @@
     <string name="start_automatically">הפעל אוטומטית</string>
     <string name="start_automatically_help">אם האפשרות מסומנת, baresip יופעל אוטומטית לאחר אתחול המכשיר או לאחר התקנת גרסה חדשה של baresip. ההפעלה תתבצע רק לאחר ביטול נעילת המכשיר.</string>
     <string name="appear_on_top_permission">הפעלה אוטומטית דורשת הרשאת \"הצג מעל יישומים אחרים\".</string>
-    <string name="battery_optimizations_help">השבת מיטובי סוללה (מומלץ) אם ברצונך להפחית את הסיכוי שאנדרואיד תגביל את הגישה של baresip לרשת או תעביר את baresip למצב המתנה.</string>
+    <string name="battery_optimizations_help">השבת מיטובי סוללה אם ברצונך להפחית את הסיכוי שאנדרואיד תגביל את הגישה של baresip לרשת או תעביר את baresip למצב המתנה.</string>
     <string name="default_phone_app">יישומון הטלפון המוגדר כברירת מחדל</string>
     <string name="dialer_role_not_available">תפקיד חייגן אינו זמין</string>
     <string name="default_phone_app_help">אם האפשרות מסומנת, baresip יוגדר כיישומון טלפון ברירת מחדל. אין לסמן אפשרות זו אם המכשיר שלך צריך לטפל גם בשיחות או הודעות שאינן מסוג SIP.</string>
@@ -439,4 +439,12 @@
     <string name="speakerphone_tip">אם האפשרות מופעלת, השמע יושמע דרך הרמקול של המכשיר.</string>
     <string name="unique_contact_uri">URI ייחודי של איש קשר</string>
     <string name="unique_contact_uri_help">אם מסומן, URI של איש הקשר מובטח להיות ייחודי. יש לסמן זאת אם קיימים יותר מחשבון אחד עם חלק המשתמש זהה ב־SIP URI, אך גם משפר את ההגנה על החשבונות מפני תקיפות.</string>
+    <string name="custom_parameters">פרמטרים מותאמים אישית</string>
+    <string name="custom_parameters_help">רשימה מופרדת בנקודה־פסיק של פרמטרי חשבון מותאמים אישית</string>
+    <string name="telecom">מסגרת טלקום</string>
+    <string name="telecom_help">השתמש במסגרת טלקום של אנדרואיד עבור שיחות. אם אתם חווים בעיות הקשורות לאודיו, נסו לבדוק אם כיבוי מסגרת הטלקום עוזר.</string>
+    <string name="diverted_by">הועברה ע\"י</string>
+    <string name="call_is_ringing">שיחה מצלצלת</string>
+    <string name="call_is_connected">שיחה מחוברת</string>
+    <string name="replaces_not_supported">הצד השני אינו תומך בתכונת REPLACES</string>
 </resources>
