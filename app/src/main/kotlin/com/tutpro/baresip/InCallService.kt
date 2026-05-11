@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.telecom.Call
 import android.telecom.InCallService
+import java.lang.ref.WeakReference
 
 class InCallService : InCallService() {
 
@@ -21,8 +22,7 @@ class InCallService : InCallService() {
 
         if (handle == baresipHandle) {
             Log.d(TAG, "InCallService: Identified as SIP call")
-            // The SIP call is already managed by ConnectionService/BaresipService.
-            // We just need to ensure the InCallService stays bound.
+            // SIP call is already managed by ConnectionService/BaresipService
         } else {
             Log.d(TAG, "InCallService: Identified as PSTN call from $handle")
             val aor = call.details.intentExtras?.getString("aor")
@@ -43,6 +43,11 @@ class InCallService : InCallService() {
 
     companion object {
         private const val TAG = "Baresip"
-        var instance: InCallService? = null
+        private var _instance = WeakReference<InCallService>(null)
+        var instance: InCallService?
+            get() = _instance.get()
+            set(value) {
+                _instance = WeakReference(value)
+            }
     }
 }
