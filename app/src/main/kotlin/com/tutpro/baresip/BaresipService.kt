@@ -538,6 +538,7 @@ class BaresipService: Service() {
                 setCallVolume()
                 proximitySensing(proximitySensing)
                 call?.answer()
+                updateStatusNotification()
             }
 
             "Call Reject" -> {
@@ -1070,6 +1071,8 @@ class BaresipService: Service() {
                         if (call != null) {
                             call.terminated.value = true
                             call.remove()
+                            if (!Call.inCall())
+                                proximitySensing(false)
                         }
                         ConnectionService.lastDisconnectTime = System.currentTimeMillis()
                         val connection = ConnectionService.connections[callp]
@@ -2236,7 +2239,6 @@ class BaresipService: Service() {
                 }
                 if (!Call.hasTelecomCall())
                     resetCallVolume()
-                proximitySensing(false)
             }
         }
         cleanupRunnable = runnable
