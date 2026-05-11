@@ -871,12 +871,8 @@ class BaresipService: Service() {
                             break
                         speakerPhone = speakerPhoneAuto
                         stopMediaPlayer()
-                        val hasTelecom = ConnectionService.connections.containsKey(callp) ||
-                                ConnectionService.pendingOutgoingConnection != null
-                        if (!hasTelecom) {
-                            setCallVolume()
-                            ensureCommunicationMode()
-                        }
+                        setCallVolume()
+                        ensureCommunicationMode()
                         proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
@@ -1467,9 +1463,7 @@ class BaresipService: Service() {
             }, audioDelay)
         }
 
-        val isTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) } ||
-                ConnectionService.pendingOutgoingConnection != null
-        if (isTelecom)
+        if (Call.hasTelecomCall())
             executeCall()
         else if (VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
@@ -1823,6 +1817,8 @@ class BaresipService: Service() {
         })
 
         calls.add(call)
+        setCallVolume()
+        ensureCommunicationMode()
         postServiceEvent(ServiceEvent(
             "call incoming",
             arrayListOf(ua.uap, call.callp),
@@ -1854,12 +1850,10 @@ class BaresipService: Service() {
 
     private fun addMobileUserAgent() {
         if (!telecom || Utils.pstnAccountHandle(this) == null) return
-
         val mobileAor = Utils.getLine1Number(this)?.let { "tel:$it" } ?: "tel:mobile"
-
         val existingMobileUa = uas.value.find { it.account.isMobile }
         if (existingMobileUa != null) {
-            // If we previously had tel:mobile but now have a real number, replace it
+            // Replace previous tel:mobile with real number
             if (existingMobileUa.account.aor == "tel:mobile" && mobileAor != "tel:mobile") {
                 val updatedUas = uas.value.toMutableList()
                 updatedUas.remove(existingMobileUa)
@@ -2181,8 +2175,7 @@ class BaresipService: Service() {
                 cleanupRunnable = null
             }
             if (isSpeakerphoneOn == speakerPhone) {
-                val hasTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) }
-                if (hasTelecom || currentMode == MODE_IN_COMMUNICATION) {
+                if (Call.hasTelecomCall() || currentMode == MODE_IN_COMMUNICATION) {
                     Log.d(TAG, "Already in valid call mode ($currentMode) with correct speaker state.")
                     return
                 }
@@ -2209,13 +2202,17 @@ class BaresipService: Service() {
         val runnable = Runnable {
             cleanupRunnable = null
             if (Call.inCall()) {
-                val hasTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) }
+                val hasTelecom = Call.hasTelecomCall()
                 if (!hasTelecom && am.mode != MODE_IN_COMMUNICATION && am.mode != AudioManager.MODE_IN_CALL) {
                     am.mode = MODE_IN_COMMUNICATION
                     Log.d(TAG, "Manual Mode Guard: Setting MODE_IN_COMMUNICATON from ${am.mode}")
                 }
                 Log.d(TAG, "Applying speakerphone state: $speakerPhone")
-                if (!hasTelecom) {
+                if (InCallService.instance != null) {
+                    Log.d(TAG, "Using InCallService for audio route: $speakerPhone")
+                    @Suppress("DEPRECATION")
+                    InCallService.instance!!.setAudioRoute(if (speakerPhone) android.telecom.CallAudioState.ROUTE_SPEAKER else android.telecom.CallAudioState.ROUTE_EARPIECE)
+                } else if (!hasTelecom) {
                     Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
                     Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
                 } else {
@@ -2250,7 +2247,7 @@ class BaresipService: Service() {
                         )
                     )
                 }
-                if (!Call.calls().any { ConnectionService.connections.containsKey(it.callp) })
+                if (!Call.hasTelecomCall())
                     resetCallVolume()
                 proximitySensing(false)
             }
