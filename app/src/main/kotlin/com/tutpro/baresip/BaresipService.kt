@@ -491,10 +491,9 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                if (telecom) {
+                if (telecom)
                     registerPhoneAccount()
-                    addMobileUserAgent()
-                } else
+                else
                     if (btAdapter != null) {
                         Log.i(TAG, "Registering bluetooth receiver")
                         val filter = IntentFilter()
@@ -726,7 +725,9 @@ class BaresipService: Service() {
         if (ev[0] == "create") {
 
             val ua = UserAgent(uap)
-            ua.status = if (ua.account.regint == 0)
+            ua.status = if (ua.account.isMobile)
+                R.drawable.circle_green
+            else if (ua.account.regint == 0)
                 R.drawable.circle_white
             else
                 circleYellow.getValue(colorblind)
@@ -1850,28 +1851,34 @@ class BaresipService: Service() {
 
     private fun addMobileUserAgent() {
         if (!telecom || Utils.pstnAccountHandle(this) == null) return
-        val mobileAor = Utils.getLine1Number(this)?.let { "tel:$it" } ?: "tel:mobile"
+
+        val userPart = Utils.getLine1Number(this) ?: "mobile"
+        val mobileAor = "sip:$userPart@pstn"
+
         val existingMobileUa = uas.value.find { it.account.isMobile }
         if (existingMobileUa != null) {
-            // Replace previous tel:mobile with real number
-            if (existingMobileUa.account.aor == "tel:mobile" && mobileAor != "tel:mobile") {
+            // Replace previous sip:mobile@pstn with real number if available
+            if (existingMobileUa.account.aor == "sip:mobile@pstn" && mobileAor != "sip:mobile@pstn") {
                 val updatedUas = uas.value.toMutableList()
                 updatedUas.remove(existingMobileUa)
                 uas.value = updatedUas.toList()
-            } else {
+            } else
                 return
-            }
         }
 
         val account = Account(0L, mobileAor)
         account.isMobile = true
         account.nickName = "Mobile"
+        account.regint = 0
+        account.telProvider = ""
         val mobileUa = UserAgent(0L, account)
 
         val updatedUas = uas.value.toMutableList()
         updatedUas.add(mobileUa)
         uas.value = updatedUas.toList()
         uasStatus.value = UserAgent.statusMap()
+
+        Account.saveAccounts()
     }
 
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {

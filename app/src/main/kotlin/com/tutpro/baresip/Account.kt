@@ -44,7 +44,6 @@ class Account(val accp: Long, virtualAor: String? = null) {
     var customParams = ""
 
     init {
-
         if (accp != 0L) {
             if (authPass == "")
                 authPass = NO_AUTH_PASS
@@ -70,35 +69,40 @@ class Account(val accp: Long, virtualAor: String? = null) {
                     break
                 }
             }
-
-            val extra = Api.account_extra(accp)
-            if (Utils.paramExists(extra, "nickname"))
-                nickName = Utils.paramValue(extra, "nickname")
-            if (Utils.paramExists(extra, "regint"))
-                configuredRegInt = Utils.paramValue(extra, "regint").toInt()
-            callHistory = Utils.paramValue(extra, "call_history") == ""
-            blockUnknown = Utils.paramExists(extra, "block_unknown")
-            if (Utils.paramExists(extra, "country_code"))
-                countryCode = Utils.paramValue(extra, "country_code")
-            if (Utils.paramExists(extra, "tel_provider"))
-                telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
-            numericKeypad = Utils.paramExists(extra, "numeric_keypad")
-            customParams = extra.substringAfter("last=empty").substringAfter(";")
         }
+
+        val extra = Api.account_extra(accp)
+        if (Utils.paramExists(extra, "nickname"))
+            nickName = Utils.paramValue(extra, "nickname")
+        isMobile = Utils.paramExists(extra, "is_mobile")
+        if (Utils.paramExists(extra, "regint"))
+            configuredRegInt = Utils.paramValue(extra, "regint").toInt()
+        callHistory = Utils.paramValue(extra, "call_history") == ""
+        blockUnknown = Utils.paramExists(extra, "block_unknown")
+        if (Utils.paramExists(extra, "country_code"))
+            countryCode = Utils.paramValue(extra, "country_code")
+        if (Utils.paramExists(extra, "tel_provider"))
+            telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
+        numericKeypad = Utils.paramExists(extra, "numeric_keypad")
+        customParams = extra.substringAfter("last=empty").substringAfter(";")
     }
 
     fun print() : String {
 
-        if (isMobile) return ""
+        var res = if (isMobile) {
+            "<${aor};transport=udp>"
+        } else {
+            if (displayName != "")
+                "\"${displayName}\" "
+            else
+                ""
+        }
 
-        var res = if (displayName != "")
-            "\"${displayName}\" "
-        else
-            ""
+        if (!isMobile) {
+            res = "$res<$luri>"
 
-        res = "$res<$luri>"
-
-        if (authUser != "") res += ";auth_user=\"${authUser}\""
+            if (authUser != "") res += ";auth_user=\"${authUser}\""
+        }
 
         if ((authPass != "") && !BaresipService.aorPasswords.containsKey(aor))
             res += ";auth_pass=\"${authPass}\""
@@ -160,12 +164,18 @@ class Account(val accp: Long, virtualAor: String? = null) {
         if (autoRedirect)
             res += ";sip_autoredirect=yes"
 
-        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;inreq_allowed=yes;call_transfer=yes"
+        res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;inreq_allowed=yes"
+
+        if (isMobile)
+            res += ";call_transfer=no"
 
         var extra = ""
 
         if (nickName != "")
             extra += ";nickname=${nickName}"
+
+        if (isMobile)
+            extra += ";is_mobile=yes"
 
         if (!callHistory)
             extra += ";call_history=no"

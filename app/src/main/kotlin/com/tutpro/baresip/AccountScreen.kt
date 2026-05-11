@@ -233,7 +233,7 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val aorText = if (ua.account.isMobile) {
-                if (ua.account.aor == "tel:mobile")
+                if (ua.account.aor == "sip:mobile@pstn")
                     stringResource(R.string.not_available)
                 else
                     ua.account.aor
@@ -1258,37 +1258,44 @@ private fun AccountContent(
     ) {
         AoR()
         Nickname()
-        DisplayName()
-        AuthUser()
-        AuthPass()
-        if (showPasswordDialog.value)
-            AskPassword(ctx, navController, ua)
-        Outbound()
-        Register()
-        if (viewModel.register.collectAsState().value) {
-            RegInt()
-            CheckOrigin()
+        if (!ua.account.isMobile) {
+            DisplayName()
+            AuthUser()
+            AuthPass()
+            if (showPasswordDialog.value)
+                AskPassword(ctx, navController, ua)
+            Outbound()
+            Register()
+            if (viewModel.register.collectAsState().value) {
+                RegInt()
+                CheckOrigin()
+            }
         }
         BlockUnknown()
-        AudioCodecs(navController, aor)
-        MediaEnc()
-        MediaNat()
-        if (showStun) {
-            StunServer()
-            StunUser()
-            StunPass()
+        if (!ua.account.isMobile) {
+            AudioCodecs(navController, aor)
+            MediaEnc()
+            MediaNat()
+            if (showStun) {
+                StunServer()
+                StunUser()
+                StunPass()
+            }
+            RtcpMux()
+            Rel100()
+            Dtmf()
+            Redirect()
         }
-        RtcpMux()
-        Rel100()
-        Dtmf()
         Answer()
-        Redirect()
         Voicemail()
-        CountryCode()
-        TelProvider()
+        if (!ua.account.isMobile) {
+            CountryCode()
+            TelProvider()
+        }
         NumericKeypad()
         DefaultAccount()
-        CustomParams()
+        if (!ua.account.isMobile)
+            CustomParams()
     }
 }
 
