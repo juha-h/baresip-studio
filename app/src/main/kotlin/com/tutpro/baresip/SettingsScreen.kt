@@ -80,7 +80,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
