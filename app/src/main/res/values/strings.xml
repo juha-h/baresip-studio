@@ -206,7 +206,7 @@
     <string name="block_unknown">Block Unknown</string>
     <string name="block_unknown_help">Block calls and messages from peers that are not found in contacts.</string>
     <string name="voicemail_uri">Voicemail URI</string>
-    <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
+    <string name="voicemain_uri_help">SIP or TEL URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
     </string>
     <string name="country_code">Country Code</string>

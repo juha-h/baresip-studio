@@ -100,7 +100,6 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
         if (!isMobile) {
             res = "$res<$luri>"
-
             if (authUser != "") res += ";auth_user=\"${authUser}\""
         }
 

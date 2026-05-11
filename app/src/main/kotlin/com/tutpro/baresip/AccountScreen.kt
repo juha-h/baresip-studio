@@ -1285,8 +1285,8 @@ private fun AccountContent(
             Rel100()
             Dtmf()
             Redirect()
+            Answer()
         }
-        Answer()
         Voicemail()
         if (!ua.account.isMobile) {
             CountryCode()
@@ -1616,8 +1616,13 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     var newVmUri = viewModel.vmUri.value.trim()
     if (newVmUri != acc.vmUri) {
         if (newVmUri != "") {
-            if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
-            if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+            if (acc.isMobile) {
+                if (!newVmUri.startsWith("tel:")) newVmUri = "tel:$newVmUri"
+            }
+            else {
+                if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
+                if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+            }
             if (!Utils.checkUri(newVmUri)) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri),
