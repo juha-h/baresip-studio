@@ -1176,6 +1176,11 @@ class BaresipService: Service() {
                         if (call != null) {
                             call.terminated.value = true
                             call.remove()
+                            if (!Call.inCall()) {
+                                proximitySensing(false)
+                                if (!telecom)
+                                    abandonAudioFocus(applicationContext)
+                            }
                         }
                         ConnectionService.lastDisconnectTime = System.currentTimeMillis()
                         val connection = ConnectionService.connections[callp]
@@ -1233,13 +1238,9 @@ class BaresipService: Service() {
                             val tone = ev[2]
                             if (tone == "busy")
                                 playBusy()
-                            else {
-                                if (!telecom && !Call.inCall())
-                                    abandonAudioFocus(applicationContext)
-                                ensureCommunicationMode()
-                            }
-                            if (!telecom && !Call.inCall())
-                                abandonAudioFocus(applicationContext)
+                            else
+                                if (!Call.inCall())
+                                    ensureCommunicationMode()
                             if (call.dir == "out")
                                 call.rejected = call.startTime == null &&
                                         !reason.startsWith("408") &&
@@ -2196,7 +2197,6 @@ class BaresipService: Service() {
                 }
                 if (!Call.calls().any { ConnectionService.connections.containsKey(it.callp) })
                     resetCallVolume()
-                proximitySensing(false)
             }
         }
         cleanupRunnable = runnable
