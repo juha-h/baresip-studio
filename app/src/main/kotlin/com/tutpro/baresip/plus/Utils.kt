@@ -379,6 +379,15 @@ object Utils {
                 "@" + hostPart + ";user=phone"
     }
 
+    fun sipToTel(sipUri: String): String {
+        if (sipUri.contains(";user=phone")) {
+            val user = uriUserPart(sipUri)
+            if (user != "")
+                return "tel:${user.replace("%23", "#")}"
+        }
+        return sipUri
+    }
+
     fun checkName(name: String): Boolean {
         return name.isNotEmpty() && name == String(name.toByteArray(), Charsets.UTF_8) &&
                 name.lines().size == 1 && !name.contains('"')

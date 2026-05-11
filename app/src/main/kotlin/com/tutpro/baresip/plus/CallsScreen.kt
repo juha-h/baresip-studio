@@ -2,6 +2,7 @@ package com.tutpro.baresip.plus
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -386,7 +387,8 @@ private fun Calls(
                                     )
                                     secondButtonText.value = ctx.getString(R.string.add_contact)
                                     secondAction.value = {
-                                        navController.navigate("baresip_contact/$peerUri/new")
+                                        val uri = Utils.sipToTel(peerUri)
+                                        navController.navigate("baresip_contact/$uri/new")
                                     }
                                     thirdButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
