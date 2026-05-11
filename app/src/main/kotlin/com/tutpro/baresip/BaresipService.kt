@@ -550,12 +550,10 @@ class BaresipService: Service() {
                 stopMediaPlayer()
                 setCallVolume()
                 proximitySensing(proximitySensing)
-                if (telecom)
-                    Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
-                else {
-                    Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
+                Api.ua_answer(uap, callp, Api.VIDMODE_OFF)
+                updateStatusNotification()
+                if (!telecom)
                     ensureCommunicationMode()
-                }
             }
 
             "Call Reject" -> {
