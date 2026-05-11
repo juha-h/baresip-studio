@@ -1,0 +1,4 @@
+- TEL URI related bug fixes and improvements
+- Turn proximity sensing off immediately when last call is closed
+- Update status notification when call is answered
+- New translations (Hebrew)
