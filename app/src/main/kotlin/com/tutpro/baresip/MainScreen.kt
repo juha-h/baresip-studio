@@ -2116,60 +2116,49 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
         var error = ""
-        if (BaresipService.telecom) {
-            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            if (ua.account.isMobile) {
-                val phoneAccountHandle = Utils.pstnAccountHandle(ctx)
-                if (phoneAccountHandle != null) {
-                    val extras = Bundle().apply {
-                        putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
-                    }
-                    val callExtras = Bundle()
-                    callExtras.putBoolean("pstnCall", true)
-                    callExtras.putString("aor", aor)
-                    extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
-                    try {
-                        Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
-                        tm.placeCall(uri.toUri(), extras)
-                    } catch (e: SecurityException) {
-                        error = "placeCall failed: ${e.message}"
-                    }
+        val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+        if (ua.account.isMobile) {
+            val phoneAccountHandle = Utils.pstnAccountHandle(ctx)
+            if (phoneAccountHandle != null) {
+                val extras = Bundle().apply {
+                    putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
                 }
-                else
-                    error = "no phone account"
-            }
-            else {
-                val extras = Bundle()
-                extras.putParcelable(
-                    TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
-                    BaresipService.getPhoneAccountHandle(ctx)
-                )
                 val callExtras = Bundle()
-                callExtras.putBoolean("conferenceCall", dialerState.showCallConferenceButton.value)
-                callExtras.putLong("uap", ua.uap)
-                if (onHoldCallp != 0L)
-                    callExtras.putLong("onHoldCallp", onHoldCallp)
+                callExtras.putBoolean("pstnCall", true)
+                callExtras.putString("aor", aor)
                 extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
                 try {
-                    Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
+                    Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
                     tm.placeCall(uri.toUri(), extras)
                 } catch (e: SecurityException) {
                     error = "placeCall failed: ${e.message}"
                 }
             }
-            if (error != "") {
-                Log.e(TAG, error)
-                viewModel.dialerState.callButtonsEnabled.value = true
-            }
+            else
+                error = "no phone account"
         }
         else {
-            val intent = Intent(ctx, BaresipService::class.java)
-            intent.action = "Start Call"
-            intent.putExtra("uap", ua.uap)
-            intent.putExtra("uri", uri)
-            intent.putExtra("conferenceCall", dialerState.showCallConferenceButton.value)
-            intent.putExtra("onHoldCallp", onHoldCallp)
-            ctx.startService(intent)
+            val extras = Bundle()
+            extras.putParcelable(
+                TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
+                BaresipService.getPhoneAccountHandle(ctx)
+            )
+            val callExtras = Bundle()
+            callExtras.putBoolean("conferenceCall", dialerState.showCallConferenceButton.value)
+            callExtras.putLong("uap", ua.uap)
+            if (onHoldCallp != 0L)
+                callExtras.putLong("onHoldCallp", onHoldCallp)
+            extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+            try {
+                Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
+                tm.placeCall(uri.toUri(), extras)
+            } catch (e: SecurityException) {
+                error = "placeCall failed: ${e.message}"
+            }
+        }
+        if (error != "") {
+            Log.e(TAG, error)
+            viewModel.dialerState.callButtonsEnabled.value = true
         }
     }
 }
@@ -2392,8 +2381,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
 
     when (ev[0]) {
         "call rejected" -> {
-            if (!BaresipService.telecom)
-                BaresipService.abandonAudioFocus(ctx)
             if (aor == viewModel.selectedAor.value)
                 viewModel.triggerAccountUpdate()
         }

@@ -285,7 +285,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
                 BaresipService.filesPath + "/accounts",
                 accounts.toByteArray(Charsets.UTF_8)
             )
-            Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
+            // Log.d(TAG, "Saved accounts '${accounts}' to '${BaresipService.filesPath}/accounts'")
         }
 
         fun ofAor(aor: String): Account? {

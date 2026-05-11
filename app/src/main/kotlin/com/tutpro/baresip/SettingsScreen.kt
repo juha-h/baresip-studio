@@ -80,6 +80,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import com.tutpro.baresip.Utils.copyInputStreamToFile
@@ -1031,6 +1032,7 @@ private fun SettingsContent(
             ) { result ->
                 Log.d(TAG, "dialerRoleRequest result: $result")
                 viewModel.defaultDialer.value = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+                BaresipService.instance?.addMobileUserAgent()
             }
             Switch(
                 checked = defaultDialer,
@@ -1181,14 +1183,14 @@ private fun SettingsContent(
         UserAgent()
         UniqueContactUri()
         AudioSettings(navController)
+        if (VERSION.SDK_INT >= 29)
+            DefaultDialer()
         BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 31)
             DynamicColors()
         ColorBlind()
         ProximitySensing()
-        if (VERSION.SDK_INT >= 29)
-            DefaultDialer()
         Debug()
         SipTrace()
         Reset(onRestartApp)

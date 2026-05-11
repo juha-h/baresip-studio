@@ -151,15 +151,11 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     }
 
     open fun hangup(code: Int, reason: String) {
-        if (BaresipService.telecom) {
-            val connection = ConnectionService.connections[callp]
-            if (connection != null)
-                connection.onDisconnect()
-            else
-                Api.ua_hangup(ua.uap, callp, code, reason)
-        } else {
+        val connection = ConnectionService.connections[callp]
+        if (connection != null)
+            connection.onDisconnect()
+        else
             Api.ua_hangup(ua.uap, callp, code, reason)
-        }
     }
 
     open fun answer() {

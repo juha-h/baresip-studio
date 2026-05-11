@@ -4,8 +4,10 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.role.RoleManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Context.ROLE_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -1335,15 +1337,16 @@ object Utils {
         return file
     }
 
+    @RequiresApi(29)
     fun pstnAccountHandle(ctx: Context):  PhoneAccountHandle? {
+        val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
         if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
-                PackageManager.PERMISSION_GRANTED) {
+                    PackageManager.PERMISSION_GRANTED &&
+                roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
             val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            if (Build.VERSION.SDK_INT >= 29) {
-                val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
-                if (preferredHandle != null)
-                    return preferredHandle
-            }
+            val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
+            if (preferredHandle != null)
+                return preferredHandle
             val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
             val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
             return if (phoneAccounts.isNotEmpty())

@@ -1677,7 +1677,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
 
     if (viewModel.defaultAccount.value) ua.makeDefault()
 
-    Api.account_debug(acc.accp)
+    // Api.account_debug(acc.accp)
 
     Account.saveAccounts()
 

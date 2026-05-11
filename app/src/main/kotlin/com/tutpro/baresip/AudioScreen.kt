@@ -164,8 +164,6 @@ private var newOpusPacketLoss = oldOpusPacketLoss
 private var newAudioDelay = BaresipService.audioDelay.toString()
 private var newToneCountry = BaresipService.toneCountry
 private var newRingtoneUri = ""
-private var oldTelecom = BaresipService.telecom
-private var newTelecom = oldTelecom
 
 private var save = false
 
@@ -178,8 +176,6 @@ private fun AudioContent(contentPadding: PaddingValues) {
 
     oldSpeakerPhone = Config.variable("speaker_phone") == "yes"
     newSpeakerPhone = oldSpeakerPhone
-    oldTelecom = Config.variable("telecom") == "yes"
-    newTelecom = oldTelecom
     oldAudioModules = Config.variables("module")
     oldOpusBitrate = Config.variable("opus_bitrate")
     oldOpusPacketLoss = Config.variable("opus_packet_loss")
@@ -206,7 +202,6 @@ private fun AudioContent(contentPadding: PaddingValues) {
             .verticalScroll(state = scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Telecom()
         Ringtone()
         ToneCountry()
         SpeakerPhone()
@@ -216,37 +211,6 @@ private fun AudioContent(contentPadding: PaddingValues) {
         OpusBitRate()
         OpusPacketLoss()
         AudioDelay()
-    }
-}
-
-@Composable
-private fun Telecom() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val telecomTitle = stringResource(R.string.telecom)
-        val telecomHelp = stringResource(R.string.telecom_help)
-        Text(text = telecomTitle,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = telecomTitle
-                    alertMessage.value = telecomHelp
-                    showAlert.value = true
-                },
-            fontSize = 18.sp)
-        var telecom by remember { mutableStateOf(oldTelecom) }
-        Switch(
-            checked = telecom,
-            onCheckedChange = {
-                telecom = it
-                newTelecom = telecom
-            }
-        )
     }
 }
 
@@ -628,13 +592,6 @@ private fun AudioDelay() {
 private fun checkOnClick(ctx: Context): Result {
 
     var restart = false
-
-    if (newTelecom != oldTelecom) {
-        Config.replaceVariable("telecom", if (newTelecom) "yes" else "no")
-        BaresipService.telecom = newTelecom
-        restart = true
-        save = true
-    }
 
     if (Preferences(ctx).ringtoneUri != newRingtoneUri) {
         Preferences(ctx).ringtoneUri = newRingtoneUri

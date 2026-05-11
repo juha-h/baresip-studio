@@ -1,6 +1,5 @@
 package com.tutpro.baresip
 
-import android.Manifest
 import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -61,7 +60,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.MessagingStyle
 import androidx.core.app.Person
@@ -491,18 +489,7 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                if (telecom)
-                    registerPhoneAccount()
-                else
-                    if (btAdapter != null) {
-                        Log.i(TAG, "Registering bluetooth receiver")
-                        val filter = IntentFilter()
-                        filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
-                        filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
-                        filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
-                        this.registerReceiver(bluetoothReceiver, filter)
-                        bluetoothReceiverRegistered = true
-                    }
+                registerPhoneAccount()
 
                 Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
@@ -551,8 +538,6 @@ class BaresipService: Service() {
                 setCallVolume()
                 proximitySensing(proximitySensing)
                 call?.answer()
-                if (!telecom)
-                    ensureCommunicationMode()
             }
 
             "Call Reject" -> {
@@ -877,12 +862,10 @@ class BaresipService: Service() {
                         proximitySensing(proximitySensing)
                     }
                     "call ringing" -> {
-                        if (!telecom) ensureCommunicationMode()
                         playRingBack()
                         return
                     }
                     "call progress" -> {
-                        if (!telecom) ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else {
@@ -926,7 +909,6 @@ class BaresipService: Service() {
                                 )
                                 if (resourceId != 0) {
                                     ensureCommunicationMode()
-                                    if (!telecom) playUnInterrupted(resourceId, 1)
                                 } else {
                                     Log.e(TAG, "Callwaiting tone $name.wav not found")
                                 }
@@ -946,23 +928,14 @@ class BaresipService: Service() {
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         if (Call.ofCallp(callp) == null)
                             Call(callp, ua, peerUri, "in", "incoming").add()
-                        if (telecom) {
-                            val extras = android.os.Bundle()
-                            extras.putLong("uap", uap)
-                            extras.putLong("callp", callp)
-                            extras.putString("peerUri", peerUri)
-                            try {
-                                tm.addNewIncomingCall(getPhoneAccountHandle(this), extras)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Telecom addNewIncomingCall failed: ${e.message}")
-                            }
-                        } else {
-                            if (!requestAudioFocus(applicationContext)) {
-                                Log.w(TAG, "Audio focus denied for incoming call")
-                                Api.ua_hangup(uap, callp, 486, "Busy Here")
-                                return
-                            }
-                            handleIncomingCall(Call.ofCallp(callp)!!)
+                        val extras = android.os.Bundle()
+                        extras.putLong("uap", uap)
+                        extras.putLong("callp", callp)
+                        extras.putString("peerUri", peerUri)
+                        try {
+                            tm.addNewIncomingCall(getPhoneAccountHandle(this), extras)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Telecom addNewIncomingCall failed: ${e.message}")
                         }
                         return
                     }
@@ -1023,12 +996,6 @@ class BaresipService: Service() {
                         if (call.state() == Api.CALL_STATE_EARLY) {
                             if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                                 stopMediaPlayer()
-                            else {
-                                if (!telecom) {
-                                    ConnectionService.connections[callp]?.setRinging()
-                                    playRingBack()
-                                }
-                            }
                         }
                         if (call.status.value == "connected" && !call.held && !call.onhold) {
                             if (call.callOnHold.value || call.showOnHoldNotice.value) {
@@ -1160,13 +1127,8 @@ class BaresipService: Service() {
                             val tone = ev[2]
                             if (tone == "busy")
                                 playBusy()
-                            else {
-                                if (!telecom && !Call.inCall())
-                                    abandonAudioFocus(applicationContext)
+                            else
                                 ensureCommunicationMode()
-                            }
-                            if (!telecom && !Call.inCall())
-                                abandonAudioFocus(applicationContext)
                             if (call.dir == "out")
                                 call.rejected = call.startTime == null &&
                                         !reason.startsWith("408") &&
@@ -1500,7 +1462,7 @@ class BaresipService: Service() {
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
         isNativeReady = true
-        if (telecom) addMobileUserAgent()
+        addMobileUserAgent()
         Api.net_debug()
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
@@ -1849,23 +1811,41 @@ class BaresipService: Service() {
         messageUpdate.postValue(System.currentTimeMillis())
     }
 
-    private fun addMobileUserAgent() {
-        if (!telecom || Utils.pstnAccountHandle(this) == null) return
+    fun addMobileUserAgent() {
+        if (VERSION.SDK_INT < 29) return
+
+        val mobileAccountHandle = Utils.pstnAccountHandle(this)
+        val existingMobileUa = uas.value.find { it.account.isMobile }
+
+        // If mobile account should not exist (role lost or no SIM), remove it if it exists
+        if (mobileAccountHandle == null) {
+            if (existingMobileUa != null) {
+                Log.d(TAG, "Removing Mobile account (role lost or SIM missing)")
+                existingMobileUa.remove()
+                Account.saveAccounts()
+            }
+            return
+        }
 
         val userPart = Utils.getLine1Number(this) ?: "mobile"
         val mobileAor = "sip:$userPart@pstn"
 
-        val existingMobileUa = uas.value.find { it.account.isMobile }
         if (existingMobileUa != null) {
-            // Replace previous sip:mobile@pstn with real number if available
+            // Update AOR if it previously was sip:mobile@pstn but now a real number
             if (existingMobileUa.account.aor == "sip:mobile@pstn" && mobileAor != "sip:mobile@pstn") {
-                val updatedUas = uas.value.toMutableList()
-                updatedUas.remove(existingMobileUa)
-                uas.value = updatedUas.toList()
-            } else
-                return
+                Log.d(TAG, "Updating existing Mobile account AOR to $mobileAor")
+                val aorField = Account::class.java.getDeclaredField("aor")
+                aorField.isAccessible = true
+                aorField.set(existingMobileUa.account, mobileAor)
+                val luriField = Account::class.java.getDeclaredField("luri")
+                luriField.isAccessible = true
+                luriField.set(existingMobileUa.account, mobileAor)
+                Account.saveAccounts()
+            }
+            return
         }
 
+        Log.d(TAG, "Injecting new virtual Mobile account: $mobileAor")
         val account = Account(0L, mobileAor)
         account.isMobile = true
         account.nickName = "Mobile"
@@ -2515,7 +2495,6 @@ class BaresipService: Service() {
         var isRecOn = false
         var toneCountry = "us"
         var proximitySensing = true
-        var telecom = true
 
         val uas = mutableStateOf(emptyList<UserAgent>())
         val uasStatus = mutableStateOf(emptyMap<String, Int>())
@@ -2609,47 +2588,12 @@ class BaresipService: Service() {
                 ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             ) {
                 Log.d(TAG, "requestAudioFocus granted")
-                if (!telecom && isBluetoothHeadsetConnected(ctx))
-                    startBluetoothSco(ctx, 250L, 3)
             }
             else {
                 Log.w(TAG, "requestAudioFocus denied")
                 audioFocusRequest = null
             }
             return audioFocusRequest != null
-        }
-
-        fun abandonAudioFocus(ctx: Context) {
-            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-            if (audioFocusRequest != null) {
-                Log.d(TAG, "Abandoning audio focus")
-                if (androidx.media.AudioManagerCompat.abandonAudioFocusRequest(
-                        am,
-                        audioFocusRequest!!
-                    ) ==
-                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-                ) {
-                    audioFocusRequest = null
-                    if (!telecom && isBluetoothHeadsetConnected(ctx))
-                        stopBluetoothSco(ctx)
-                }
-                else
-                    Log.e(TAG, "Failed to abandon audio focus")
-            }
-            am.mode = MODE_NORMAL
-        }
-
-        private fun isBluetoothHeadsetConnected(ctx: Context): Boolean {
-            if (VERSION.SDK_INT >= 31 &&
-                ActivityCompat.checkSelfPermission(
-                    ctx,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) == PackageManager.PERMISSION_DENIED
-            )
-                return false
-            return btAdapter != null && btAdapter!!.isEnabled &&
-                    btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
-                        BluetoothAdapter.STATE_CONNECTED
         }
 
         private fun isBluetoothScoOn(am: AudioManager): Boolean {
