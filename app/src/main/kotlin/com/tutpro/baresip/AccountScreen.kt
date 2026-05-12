@@ -236,7 +236,7 @@ private fun AccountContent(
                 if (ua.account.aor == "sip:mobile@pstn")
                     stringResource(R.string.not_available)
                 else
-                    ua.account.aor
+                    "tel:${Utils.uriUserPart(ua.account.aor)}"
             } else
                 ua.account.luri
 

@@ -1026,12 +1026,29 @@ private fun SettingsContent(
             )
             val defaultDialer by viewModel.defaultDialer.collectAsState()
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+
+            val requestPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted)
+                    Log.d(TAG, "READ_PHONE_NUMBERS permission granted")
+                BaresipService.instance?.addMobileUserAgent()
+            }
+
             val dialerRoleRequest = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
-                Log.d(TAG, "dialerRoleRequest result: $result")
-                viewModel.defaultDialer.value = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-                BaresipService.instance?.addMobileUserAgent()
+            ) { _ ->
+                val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+                viewModel.defaultDialer.value = isHeld
+                if (isHeld) {
+                    if (Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS))) {
+                        BaresipService.instance?.addMobileUserAgent()
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_NUMBERS)
+                    }
+                } else {
+                    BaresipService.instance?.addMobileUserAgent()
+                }
             }
             Switch(
                 checked = defaultDialer,
