@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import java.util.*
 
-class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
+open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
 
     var status: MutableState<String> = mutableStateOf(initialStatus)
 
@@ -55,11 +55,11 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         BaresipService.calls.remove(this)
     }
 
-    fun connect(uri: String): Boolean {
+    open fun connect(uri: String): Boolean {
         return Api.call_connect(callp, uri) == 0
     }
 
-    fun hold(): Boolean {
+    open fun hold(): Boolean {
         if (onhold) return true
         if (Api.call_hold(callp, true)) {
             onhold = true
@@ -71,7 +71,7 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return false
     }
 
-    fun resume(): Boolean {
+    open fun resume(): Boolean {
         if (!onhold && !held) return true
         // 1. Hold other calls first
         for (c in BaresipService.calls) {
@@ -94,13 +94,13 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return false
     }
 
-    fun transfer(uri: String): Boolean {
+    open fun transfer(uri: String): Boolean {
         if (!onhold) hold()
         Log.d(TAG, "Transferring call $callp to $uri")
         return Api.call_transfer(callp, uri) == 0
     }
 
-    fun executeTransfer(): Boolean {
+    open fun executeTransfer(): Boolean {
         return if (onHoldCall != null) {
             if (Api.call_hold(callp, true))
                 Api.call_replace_transfer(onHoldCall!!.callp, callp)
@@ -110,31 +110,31 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             false
     }
 
-    fun sendDigit(digit: Char): Int {
+    open fun sendDigit(digit: Char): Int {
         return Api.call_send_digit(callp, digit)
     }
 
-    fun notifySipfrag(code: Int, reason: String) {
+    open fun notifySipfrag(code: Int, reason: String) {
         Api.call_notify_sipfrag(callp, code, reason)
     }
 
-    fun duration(): Int {
+    open fun duration(): Int {
         return Api.call_duration(callp)
     }
 
-    fun stats(stream: String): String {
+    open fun stats(stream: String): String {
         return Api.call_stats(callp, stream)
     }
 
-    fun state(): Int {
+    open fun state(): Int {
         return Api.call_state(callp)
     }
 
-    fun audioCodecs(): String {
+    open fun audioCodecs(): String {
         return Api.call_audio_codecs(callp)
     }
 
-    fun replaces(): Boolean {
+    open fun replaces(): Boolean {
         return Api.call_replaces(callp)
     }
 
@@ -146,8 +146,79 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         if (ua.account.mediaEnc != "") security = R.color.colorTrafficRed
     }
 
-    fun destroy() {
+    open fun destroy() {
         Api.call_destroy(callp)
+    }
+
+    open fun hangup(code: Int, reason: String) {
+        val connection = ConnectionService.connections[callp]
+        if (connection != null)
+            connection.onDisconnect()
+        else
+            Api.ua_hangup(ua.uap, callp, code, reason)
+    }
+
+    open fun answer() {
+        Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
+    }
+
+    open fun reject() {
+        hangup(486, "Busy Here")
+    }
+
+    class ExternalCall(
+        val telecomCall: android.telecom.Call,
+        ua: UserAgent,
+        peerUri: String,
+        dir: String,
+        initialStatus: String
+    ) : Call(telecomCall.hashCode().toLong(), ua, peerUri, dir, initialStatus) {
+
+        override fun connect(uri: String): Boolean {
+            telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
+            return true
+        }
+
+        override fun answer() {
+            telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
+        }
+
+        override fun hold(): Boolean {
+            telecomCall.hold()
+            onhold = true
+            callOnHold.value = true
+            return true
+        }
+
+        override fun resume(): Boolean {
+            telecomCall.unhold()
+            onhold = false
+            callOnHold.value = false
+            return true
+        }
+
+        override fun hangup(code: Int, reason: String) {
+            telecomCall.disconnect()
+        }
+
+        override fun reject() {
+            telecomCall.disconnect()
+        }
+
+        override fun destroy() {
+            telecomCall.disconnect()
+        }
+
+        override fun sendDigit(digit: Char): Int {
+            telecomCall.playDtmfTone(digit)
+            telecomCall.stopDtmfTone()
+            return 0
+        }
+
+        override fun duration(): Int = 0
+        override fun stats(stream: String): String = ""
+        override fun state(): Int = 0
+        override fun audioCodecs(): String = "PSTN"
     }
 
     companion object {
@@ -170,6 +241,12 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
 
         fun inCall(): Boolean {
             return BaresipService.calls.isNotEmpty()
+        }
+
+        fun hasTelecomCall(): Boolean {
+            return BaresipService.calls.any {
+                it is ExternalCall || ConnectionService.connections.containsKey(it.callp)
+            } || ConnectionService.pendingOutgoingConnection != null
         }
 
         fun isAnyCallActive(ctx: Context): Boolean {

@@ -5,12 +5,13 @@ import com.tutpro.baresip.BaresipService.Companion.colorblind
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
 
-class UserAgent(val uap: Long) {
+class UserAgent(val uap: Long, virtualAccount: Account? = null) {
 
-    val account = Account(Api.ua_account(uap))
-    var status = R.drawable.circle_white
+    val account = virtualAccount ?: Account(Api.ua_account(uap))
+    var status = if (uap != 0L) R.drawable.circle_white else R.drawable.circle_green
 
     fun callAlloc(xCall: Long, videoMode: Int): Long {
+        if (uap == 0L) return 0L
         return Api.ua_call_alloc(uap, xCall, videoMode)
     }
 
@@ -49,6 +50,7 @@ class UserAgent(val uap: Long) {
     }
 
     fun reRegister() {
+        if (uap == 0L) return
         this.status = circleYellow.getValue(colorblind)
         if (this.account.regint == 0)
             Api.ua_unregister(this.uap)

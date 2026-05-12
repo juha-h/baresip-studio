@@ -1,10 +1,13 @@
 package com.tutpro.baresip
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.role.RoleManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Context.ROLE_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -26,6 +29,8 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.telecom.TelecomManager
 import android.telecom.PhoneAccountHandle
 import android.text.format.DateUtils
@@ -128,7 +133,10 @@ object Utils {
         return if (uri.contains("@"))
             uri.substringAfter(":").substringBefore("@")
         else
-            ""
+            if (isTelUri(uri))
+                uri.substringAfter(":").substringBefore(";")
+            else
+                ""
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
@@ -180,14 +188,14 @@ object Utils {
         return u
     }
 
-    private fun e164Uri(uri: String, countryCode: String): String {
+    fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
-                        scheme + userPart.substring(2))
+                        scheme + "+" + userPart.substring(2))
                 userPart.startsWith("0") -> uri.replace("${scheme}0",
                     "$scheme$countryCode")
                 else -> uri.replace(scheme, "$scheme$countryCode")
@@ -1330,6 +1338,57 @@ object Utils {
             file.delete()
         file.createNewFile()
         return file
+    }
+
+    @RequiresApi(29)
+    fun pstnAccountHandle(ctx: Context):  PhoneAccountHandle? {
+        val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+        if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
+                    PackageManager.PERMISSION_GRANTED &&
+                roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
+            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
+            if (preferredHandle != null)
+                return preferredHandle
+            val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
+            val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
+            return if (phoneAccounts.isNotEmpty())
+                phoneAccounts[0]
+            else
+                null
+        }
+        else
+            return null
+    }
+
+    @SuppressLint("HardwareIds")
+    fun getLine1Number(ctx: Context): String? {
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED) {
+                    val sm = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                    val number = sm.getPhoneNumber(SubscriptionManager.DEFAULT_SUBSCRIPTION_ID)
+                    if (number != "") {
+                        Log.i(TAG, "Retrieved SIM number via SubscriptionManager")
+                        return number
+                    }
+                }
+            } else {
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                    val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    @Suppress("DEPRECATION")
+                    val number = tm.line1Number
+                    if (number != null) {
+                        Log.i(TAG, "Retrieved SIM number via TelephonyManager")
+                        return number
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "getLine1Number failed: ${e.message}")
+        }
+        return null
     }
 
     @Suppress("unused")
