@@ -138,7 +138,7 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         return Api.call_replaces(callp)
     }
 
-    fun diverterUri(): String {
+    open fun diverterUri(): String {
         return Api.call_diverter_uri(callp)
     }
 
@@ -214,6 +214,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
             telecomCall.stopDtmfTone()
             return 0
         }
+
+        override fun diverterUri(): String = ""
 
         override fun duration(): Int = 0
         override fun stats(stream: String): String = ""
