@@ -1,41 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_text"><![CDATA[
-        <h1>Baresip library based SIP User Agent</h1>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Version %1$s</p>
-        <h2>Usage Hints</h2>
-        <ul>
-            <li>Check that default values in Settings meet your needs (touch item titles for help).</li>
-            <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
-            <li>Registration status of an account is shown with a colored dot: green (registration
-            succeeded, yellow (registration is in progress), red (registration failed), white (registration
-            has not been activated).</li>
-            <li>Touch on the dot leads directly to account configuration.</li>
-            <li>Swipe down gesture causes re-registration of the currently shown account.</li>
-            <li>Peers of calls and messages can be added to contacts by long touches.</li>
-            <li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>
-            <li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>
-            <li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>
-        </ul>
-        <h2>Known Issues</h2>
-        <ul>
-            <li>Due to limitations in underlying libraries, baresip does not currently support multiple,
-            concurrently active network interfaces. Active network interface preference order is VPN,
-            Internet, other.</li>
-        </ul>
-        <h2>Source code</h2>
-        Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-        where also issues can be reported.
-        <h2>Licenses</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> except the following:</li>
-            <li><b>Apache 2.0</b> AMR codec and TLS security</li>
-            <li><b>LGPL 2.1</b> G.722 and G.726 codecs</li>
-            <li><b>AGPLv4</b> ZRTP media encryption</li>
-            <li><b>GNU GPLv3</b> G.729 codec</li>
-        </ul>
-        ]]></string>
+    <string name="about_text"><![CDATA[\n \u0020 \u0020 \u0020 \u0020<h1>Baresip library based SIP User Agent</h1>\n \u0020 \u0020 \u0020 \u0020<p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n \u0020 \u0020 \u0020 \u0020<p>Version %1$s</p>\n \u0020 \u0020 \u0020 \u0020<h2>Usage Hints</h2>\n \u0020 \u0020 \u0020 \u0020<ul>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Check that default values in Settings meet your needs (touch item titles for help).</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Registration status of an account is shown with a colored dot: green (registration\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020succeeded, yellow (registration is in progress), red (registration failed), white (registration\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020has not been activated).</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Touch on the dot leads directly to account configuration.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Swipe down gesture causes re-registration of the currently shown account.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Peers of calls and messages can be added to contacts by long touches.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Long touches can also be used to remove calls, chats, messages, and contacts.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Touch/long touch of contact icon can be used to install/remove image avatar.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>You can re-reselect the previous call party by touching the call icon when Callee is empty.</li>\n \u0020 \u0020 \u0020 \u0020</ul>\n \u0020 \u0020 \u0020 \u0020<h2>Known Issues</h2>\n \u0020 \u0020 \u0020 \u0020<ul>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Due to limitations in underlying libraries, baresip does not currently support multiple,\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020concurrently active network interfaces. Active network interface preference order is VPN,\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020Internet, other.</li>\n \u0020 \u0020 \u0020 \u0020</ul>\n \u0020 \u0020 \u0020 \u0020<h2>Source code</h2>\n \u0020 \u0020 \u0020 \u0020Source code is available at <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,\n \u0020 \u0020 \u0020 \u0020where also issues can be reported.\n \u0020 \u0020 \u0020 \u0020<h2>Licenses</h2>\n \u0020 \u0020 \u0020 \u0020<ul>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>BSD-3-Clause</b> except the following:</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>Apache 2.0</b> AMR codec and TLS security</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>LGPL 2.1</b> G.722 and G.726 codecs</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>AGPLv4</b> ZRTP media encryption</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>GNU GPLv3</b> G.729 codec</li>\n \u0020 \u0020 \u0020 \u0020</ul>\n \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="about_text_plus"><![CDATA[
         <h1>Baresip library based SIP User Agent with video calls</h1>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
