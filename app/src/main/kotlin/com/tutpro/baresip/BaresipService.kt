@@ -545,6 +545,8 @@ class BaresipService: Service() {
             "Call Reject" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
+                stopRinging()
+                stopMediaPlayer()
                 if (call == null) {
                     Log.w(TAG, "onStartCommand did not find call $callp")
                 } else {
@@ -667,7 +669,6 @@ class BaresipService: Service() {
             else -> {
                 Log.e(TAG, "Unknown start action $action")
             }
-
         }
 
         return START_STICKY
@@ -1795,17 +1796,23 @@ class BaresipService: Service() {
         calls.add(call)
         setCallVolume()
         ensureCommunicationMode()
-        postServiceEvent(ServiceEvent(
-            if (isIncoming) "call incoming" else "call outgoing",
-            arrayListOf(ua.uap, call.callp),
-            System.nanoTime())
-        )
+
+        if (isIncoming)
+            handleIncomingCall(call)
+        else
+            postServiceEvent(ServiceEvent(
+                "call outgoing",
+                arrayListOf(ua.uap, call.callp),
+                System.nanoTime())
+            )
     }
 
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
         val callp = telecomCall.hashCode().toLong()
         val call = calls.find { it.callp == callp }
         if (call != null) {
+            stopRinging()
+            stopMediaPlayer()
             if (call.ua.account.callHistory) {
                 val historyPeerUri = e164Uri(call.peerUri, call.ua.account.countryCode)
                 val history = CallHistoryNew(call.ua.account.aor, historyPeerUri, call.dir)
@@ -1888,7 +1895,7 @@ class BaresipService: Service() {
         val callp = call.callp
 
         val callerNumber = Utils.uriUserPart(peerUri)
-        if (shouldStartRinging(callerNumber))
+        if (call !is Call.ExternalCall && shouldStartRinging(callerNumber))
             startRinging()
 
         if (!Utils.isVisible()) {
