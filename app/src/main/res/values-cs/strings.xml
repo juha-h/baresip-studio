@@ -306,8 +306,7 @@
     <string name="proximity_sensing_help">Při hovorech používat snímač přiblížení (automatické vypnutí displeje).</string>
     <string name="dynamic_colors">Dynamické barvy</string>
     <string name="dynamic_colors_help">Použijí se dynamické barvy, pokud jsou povoleny v nastavení Androidu</string>
-    <string name="about_text">
-        <![CDATA[
+    <string name="about_text"><![CDATA[
         <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
@@ -353,8 +352,7 @@
             <li><b>Free</b> G.722 codec</li>
             <li><b>GNU GPLv3</b> G.729 kodek</li>
         </ul>
-        ]]>
-    </string>
+        ]]></string>
     <string name="check_origin">Ověřovat požadavky na registraci</string>
     <string name="check_origin_help">Pokud je tato volba zapnutá, příchozí požadavky jsou povoleny pouze z IP adres, na které byly odeslány registrační požadavky.</string>
     <string name="block_unknown">Blokovat neznámé kontakty</string>
