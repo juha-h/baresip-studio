@@ -113,6 +113,7 @@
     </string>
     <!-- Account Activity -->
     <string name="account">Account</string>
+    <string name="not_available">Not available</string>
     <string name="account_nickname_help">Nickname (if any) used to identify this account within
         baresip app.</string>
     <string name="nickname">Nickname</string>
@@ -321,7 +322,7 @@
         to reduce likelihood that Android restricts baresip\'s access to network or enters baresip
         to standby state.</string>
     <string name="default_phone_app">Default Phone App</string>
-    <string name="dialer_role_not_available">Dialer role is not available</string>
+    <string name="dialer_role_not_available">Default phone app role is not available</string>
     <string name="default_phone_app_help">If checked, baresip is the default phone app.</string>
     <string name="listen_address">Listen Address</string>
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
@@ -511,7 +512,6 @@
     <string name="call_is_ringing">Call is ringing</string>
     <string name="call_is_on_hold">Call is on hold</string>
     <string name="call_is_connected">Call is connected</string>
-    <string name="not_available">Not available</string>
     <string name="rec_in_call">Recording can be turned on or off only when call is not
         connected</string>
     <string name="call_transfer">Call Transfer</string>
