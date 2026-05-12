@@ -1,8 +1,14 @@
-This is a <a href="https://github.com/baresip/baresip">baresip</a> based SIP User Agent application for Android.
+This is a <a href="https://github.com/baresip/baresip">baresip</a> based
+SIP and mobile calling User Agent application for Android.
 
-Currently baresip app supports voice calling, voice conference calls, text messages, voicemail Message Waiting Indication as well as blind and attended call transfers.  Voice can be coded with Opus, AMR, Codec2, G.729, G.722, G.722.1, or PCMU/PCMA codecs. Security is achieved via TLS or WSS SIP signaling transport and ZRTP or (DTLS) SRTP media encapsulation.
+Currently baresip app supports VoIP and mobile voice calling, SIP based voice
+conference calls and text messages, voicemail Message Waiting Indication
+as well as blind and attended call transfers.  In VoIP calls audio can be coded with Opus, AMR, Codec2, G.729, G.722, G.722.1, or PCMU/PCMA codecs. Security is achieved via TLS or WSS SIP signaling transport and ZRTP or (DTLS) SRTP media encapsulation.
 
-Development of baresip app is motivated by need for a secure, open source SIP based VoIP User Agent for Android that does not depend on proprietary, third party push notification services.
+Development of baresip app is motivated by need for a secure, open
+source SIP based VoIP User Agent for Android that does not depend on
+proprietary, third party push notification services.  Support for mobile
+calling avoids the need for two voice calling apps.
 
 This application can be installed on Android devices running Android version 9 or later.
 
