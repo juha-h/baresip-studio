@@ -20,6 +20,7 @@ import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.telecom.TelecomManager
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -239,6 +240,12 @@ private fun MainScreen(
                     BaresipService.isMainVisible = true
                     viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
                     viewModel.updateCalls(Call.calls().toList())
+
+                    if (Call.inCall())
+                        (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else
+                        (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
                     (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
                         spinToAor(viewModel, it.ua.account.aor)
                     } ?: run {
@@ -2117,7 +2124,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
         viewModel.dialerState.callButtonsEnabled.value = false
         var error = ""
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-        if (ua.account.isMobile) {
+        if (VERSION.SDK_INT >= 29 && ua.account.isMobile) {
             val phoneAccountHandle = Utils.pstnAccountHandle(ctx)
             if (phoneAccountHandle != null) {
                 val extras = Bundle().apply {
@@ -2423,6 +2430,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             showCall(ctx, viewModel, ua)
         }
         "call established" -> {
+            (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
@@ -2521,6 +2529,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
+            if (Call.calls().isEmpty())
+                (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             viewModel.updateCalls(Call.calls().toList())
             val activity = ctx as? Activity
             if (activity != null) {
