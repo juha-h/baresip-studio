@@ -740,6 +740,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     val hasNewVoicemail = remember(aor, accountUpdate) {
         if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
     }
+    val isMobile = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.isMobile ?: false else false
+    }
     val hasUnreadMessages = remember(aor, accountUpdate) {
         if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
     }
@@ -768,19 +771,26 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     val ua = UserAgent.ofAor(aor)!!
                     val acc = ua.account
                     if (acc.vmUri.isNotEmpty()) {
-                        dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                        dialogMessage.value = acc.vmMessages(ctx)
-                        firstText.value = ctx.getString(R.string.cancel)
-                        onFirstClicked.value = {}
-                        secondText.value = ""
-                        lastText.value = ctx.getString(R.string.listen)
-                        onLastClicked.value = {
+                        if (isMobile) {
                             val intent = Intent(ctx, MainActivity::class.java)
                             intent.putExtra("uap", ua.uap)
                             intent.putExtra("peer", acc.vmUri)
                             handleIntent(ctx, viewModel, intent, "call")
+                        } else {
+                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
+                            dialogMessage.value = acc.vmMessages(ctx)
+                            firstText.value = ctx.getString(R.string.cancel)
+                            onFirstClicked.value = {}
+                            secondText.value = ""
+                            lastText.value = ctx.getString(R.string.listen)
+                            onLastClicked.value = {
+                                val intent = Intent(ctx, MainActivity::class.java)
+                                intent.putExtra("uap", ua.uap)
+                                intent.putExtra("peer", acc.vmUri)
+                                handleIntent(ctx, viewModel, intent, "call")
+                            }
+                            showDialog.value = true
                         }
-                        showDialog.value = true
                     }
                 },
                 modifier = Modifier
@@ -809,22 +819,23 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             )
         }
 
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = {
-                navController.navigate("chats/$aor")
-            },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-            )
-        }
+        if (!isMobile)
+            IconButton(
+                enabled = aor.isNotEmpty(),
+                onClick = {
+                    navController.navigate("chats/$aor")
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .size(buttonSize)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Chat,
+                    contentDescription = null,
+                    Modifier.size(buttonSize),
+                    tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+                )
+            }
 
         IconButton(
             enabled = aor.isNotEmpty(),

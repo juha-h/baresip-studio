@@ -1758,7 +1758,7 @@ class BaresipService: Service() {
                     android.telecom.Call.STATE_RINGING -> "incoming"
                     android.telecom.Call.STATE_DIALING, android.telecom.Call.STATE_CONNECTING -> "outgoing"
                     android.telecom.Call.STATE_ACTIVE -> "connected"
-                    android.telecom.Call.STATE_DISCONNECTED -> "closed"
+                    android.telecom.Call.STATE_DISCONNECTED, android.telecom.Call.STATE_DISCONNECTING -> "closed"
                     android.telecom.Call.STATE_HOLDING -> {
                         calls.find { it.callp == call.hashCode().toLong() }?.onhold = true
                         "connected"

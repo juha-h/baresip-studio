@@ -1067,7 +1067,10 @@ private fun AccountContent(
     @Composable
     fun Voicemail() {
         val voicemailUriTitle = stringResource(R.string.voicemail_uri)
-        val voicemailUriHelp = stringResource(R.string.voicemain_uri_help)
+        val voicemailUriHelp = if (ua.account.isMobile)
+            stringResource(R.string.voicemain_tel_uri_help)
+        else
+            stringResource(R.string.voicemain_uri_help)
         val vmUri by viewModel.vmUri.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
