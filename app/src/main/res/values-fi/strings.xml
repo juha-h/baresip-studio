@@ -5,16 +5,20 @@
     <string name="about_title_plus">baresip+ sovelluksesta</string>
     <string name="about_text">
         <![CDATA[
-            <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva äänipuhelut ja
-                pikaviestit mahdollistava SIP-sovellus</h1>
+            <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva
+                SIP-äänipuhelut ja -pikaviestit sekä mobiilipuhelut mahdollistava sovellus</h1>
             <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
             <br>
             <h2>Käyttövihjeitä</h2>
             <ul>
-                <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+                <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi.
+                    Kunkin otsikon kosketus tarjoaa apua.</li>
+                <li>Jos haluat käyttää baresip-sovellusta mobiilipuheluihin, aktivoi Oletus puhelusovellus
+                    -asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
+                <li>Sitten luo yksi tai useampi SIP-tili Tilit-sivulla. Jälleen kunkin otsikon
+                    kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
