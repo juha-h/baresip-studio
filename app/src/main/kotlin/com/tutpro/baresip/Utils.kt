@@ -133,7 +133,10 @@ object Utils {
         return if (uri.contains("@"))
             uri.substringAfter(":").substringBefore("@")
         else
-            ""
+            if (isTelUri(uri))
+                uri.substringAfter(":").substringBefore(";")
+            else
+                ""
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
@@ -185,14 +188,14 @@ object Utils {
         return u
     }
 
-    private fun e164Uri(uri: String, countryCode: String): String {
+    fun e164Uri(uri: String, countryCode: String): String {
         if (countryCode == "") return uri
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
-                        scheme + userPart.substring(2))
+                        scheme + "+" + userPart.substring(2))
                 userPart.startsWith("0") -> uri.replace("${scheme}0",
                     "$scheme$countryCode")
                 else -> uri.replace(scheme, "$scheme$countryCode")

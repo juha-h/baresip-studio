@@ -1291,10 +1291,9 @@ private fun AccountContent(
             Answer()
         }
         Voicemail()
-        if (!ua.account.isMobile) {
-            CountryCode()
+        CountryCode()
+        if (!ua.account.isMobile)
             TelProvider()
-        }
         NumericKeypad()
         DefaultAccount()
         if (!ua.account.isMobile)

@@ -916,6 +916,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
 
     val calls by viewModel.calls.collectAsState()
     val selectedAor by viewModel.selectedAor.collectAsState()
+    val ua = uas.value.find { it.account.aor == selectedAor }
     val aorCalls = calls.filter { it.ua.account.aor == selectedAor }
     val hasActiveCalls = aorCalls.any { !it.callOnHold.value }
     val conferenceCall = aorCalls.any { it.conferenceCall }
@@ -1027,7 +1028,12 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
             }
         }
 
-        if (!hasActiveCalls || conferenceCall)
+        val showEmptyCard = if (ua?.account?.isMobile == true)
+            aorCalls.isEmpty()
+        else
+            !hasActiveCalls || conferenceCall
+
+        if (showEmptyCard)
             CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
 
         Indicator(

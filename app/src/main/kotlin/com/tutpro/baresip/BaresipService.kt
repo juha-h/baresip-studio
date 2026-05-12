@@ -68,6 +68,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
+import com.tutpro.baresip.Utils.e164Uri
 import com.tutpro.baresip.Utils.toCircle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -1703,8 +1704,12 @@ class BaresipService: Service() {
     }
 
     fun handleExternalCall(telecomCall: android.telecom.Call, preferredAor: String? = null) {
-        val uri = telecomCall.details.handle?.schemeSpecificPart ?: "Unknown"
-        Log.d(TAG, "Handling external call from $uri (preferredAor=$preferredAor)")
+        val rawUri = telecomCall.details.handle?.toString() ?: "Unknown"
+        val uri = try {
+            java.net.URLDecoder.decode(rawUri, "UTF-8")
+        } catch (_: Exception) {
+            rawUri
+        }
 
         if (uas.value.isEmpty()) {
             Log.e(TAG, "No User Agents available to handle external call")
@@ -1719,13 +1724,17 @@ class BaresipService: Service() {
             telecomCall.details.state
         else
             @Suppress("DEPRECATION") telecomCall.state
+
+        val isIncoming = telecomState == android.telecom.Call.STATE_RINGING
+        Log.d(TAG, "Handling external call ${if (isIncoming) "from" else "to"} $uri (preferredAor=$preferredAor)")
+
         val initialStatus = when (telecomState) {
             android.telecom.Call.STATE_RINGING -> "incoming"
             android.telecom.Call.STATE_DIALING, android.telecom.Call.STATE_CONNECTING -> "outgoing"
             else -> "connected"
         }
 
-        if (initialStatus == "incoming") {
+        if (isIncoming) {
             if (ua.account.blockUnknown && Contact.contactName(uri) == uri) {
                 Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri")
                 telecomCall.disconnect()
@@ -1786,7 +1795,7 @@ class BaresipService: Service() {
         setCallVolume()
         ensureCommunicationMode()
         postServiceEvent(ServiceEvent(
-            "call incoming",
+            if (isIncoming) "call incoming" else "call outgoing",
             arrayListOf(ua.uap, call.callp),
             System.nanoTime())
         )
@@ -1797,7 +1806,8 @@ class BaresipService: Service() {
         val call = calls.find { it.callp == callp }
         if (call != null) {
             if (call.ua.account.callHistory) {
-                val history = CallHistoryNew(call.ua.account.aor, call.peerUri, call.dir)
+                val historyPeerUri = e164Uri(call.peerUri, call.ua.account.countryCode)
+                val history = CallHistoryNew(call.ua.account.aor, historyPeerUri, call.dir)
                 history.stopTime = GregorianCalendar()
                 history.startTime = call.startTime
                 history.rejected = call.rejected
