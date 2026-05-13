@@ -553,7 +553,6 @@ class BaresipService: Service() {
                     val peerUri = call.peerUri
                     val aor = call.ua.account.aor
                     Log.d(TAG, "Aor $aor rejected incoming call $callp from $peerUri")
-                    call.rejected = true
                     call.reject()
                 }
             }
@@ -1779,8 +1778,11 @@ class BaresipService: Service() {
                 calls.find { it.callp == call.hashCode().toLong() }?.let {
                     if (it.status.value != newStatus) {
                         it.status.value = newStatus
-                        if (newStatus == "connected")
+                        if (newStatus == "connected") {
                             it.startTime = GregorianCalendar()
+                            nm.cancel(CALL_NOTIFICATION_ID)
+                            updateStatusNotification()
+                        }
                         postServiceEvent(ServiceEvent(
                             "call update",
                             arrayListOf(it.ua.uap, it.callp),
@@ -1810,6 +1812,7 @@ class BaresipService: Service() {
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
         val callp = telecomCall.hashCode().toLong()
         val call = calls.find { it.callp == callp }
+        nm.cancel(CALL_NOTIFICATION_ID)
         if (call != null) {
             stopRinging()
             stopMediaPlayer()
