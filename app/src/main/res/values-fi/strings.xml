@@ -229,7 +229,7 @@
     <string name="country_code_help">Tämän tilin E.164-maakoodi. Jos puhelun tai viestin toisen
         osapuolen URI:n käyttäjäosa sisältää puhelinnumeron, joka ei ala \'+\' merkillä, ja jos sitä
         ei löydy yhteystiedoista, niin tämä maakoodi lisätään numeron eteen ja etsintä tehdään
-        uudelleen. Jos puhelinnumero alkaa yhdellä tai kahdella numerolla \'0\', niin ne
+        uudelleen. Jos puhelinnumero alkaa yhdellä numerolla \'0\', niin se
         poistetaan ennen maakoodin lisäämistä.
     </string>
     <string name="invalid_country_code">Virheellinen maakoodi \'%1$s\'</string>
