@@ -48,11 +48,15 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
 
     fun add() {
-        BaresipService.calls.add(this)
+        synchronized(BaresipService.calls) {
+            BaresipService.calls.add(this)
+        }
     }
 
     fun remove() {
-        BaresipService.calls.remove(this)
+        synchronized(BaresipService.calls) {
+            BaresipService.calls.remove(this)
+        }
     }
 
     open fun connect(uri: String): Boolean {

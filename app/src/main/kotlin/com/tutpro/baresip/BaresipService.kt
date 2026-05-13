@@ -1089,6 +1089,7 @@ class BaresipService: Service() {
                             Handler(Looper.getMainLooper()).postDelayed({
                                 connection.destroy()
                                 ConnectionService.connections.remove(callp)
+                                updateStatusNotification()
                             }, 500)
                         }
                         nm.cancel(CALL_NOTIFICATION_ID)
@@ -1565,117 +1566,142 @@ class BaresipService: Service() {
 
     fun updateStatusNotification() {
 
-        val activeCall = Call.calls().find {
-            it.status.value == "connected" || it.status.value == "outgoing" || it.status.value == "answered"
-        }
-
-        val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
-        val intent = Intent(applicationContext, MainActivity::class.java)
-            .setAction(Intent.ACTION_MAIN)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
-
-        val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent, PendingIntent.FLAG_IMMUTABLE)
-        val deleteIntent = Intent(this, BaresipService::class.java).setAction("Notification Dismissed")
-        val dpi = PendingIntent.getService(this, STATUS_REQ_CODE, deleteIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setSmallIcon(R.drawable.ic_notification_b)
-            .setContentIntent(pi)
-            .setDeleteIntent(dpi)
-            .setOngoing(true)
-
-        if (activeCall != null) {
-            val peerUri = activeCall.peerUri
-            val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account)
-            val person = Person.Builder().setName(caller).build()
-
-            val hangupIntent = Intent(this, BaresipService::class.java)
-            hangupIntent.action = "Call Hangup"
-            hangupIntent.putExtra("callp", activeCall.callp)
-            val hpi = PendingIntent.getService(this, REJECT_REQ_CODE, hangupIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-            builder.setStyle(NotificationCompat.CallStyle.forOngoingCall(person, hpi))
-                .setCategory(Notification.CATEGORY_CALL)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
-                .setUsesChronometer(true)
-                .setContentText(
-                    if (activeCall.onhold)
-                        getString(R.string.call_is_on_hold)
-                    else
-                        when (activeCall.status.value) {
-                            "outgoing", "incoming" -> getString(R.string.call_is_ringing)
-                            "connected", "answered" -> getString(R.string.call_is_connected)
-                            else -> getString(R.string.call)
-                        }
-                )
-        } else {
-            builder.setStyle(null)
-            builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setWhen(0)
-                .setShowWhen(false)
-                .setUsesChronometer(false)
-                .setContentTitle("")
-                .setContentText("")
-
-            val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
-            for (i in 0..3) {
-                val resId = when (i) {
-                    0 -> R.id.status0
-                    1 -> R.id.status1
-                    2 -> R.id.status2
-                    else -> R.id.status3
-                }
-                if (i < uas.value.size) {
-                    notificationLayout.setImageViewResource(resId, uas.value[i].status)
-                    notificationLayout.setViewVisibility(resId, View.VISIBLE)
-                } else {
-                    notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+        Handler(Looper.getMainLooper()).post {
+            val activeCall = synchronized(calls) {
+                calls.find {
+                    it.status.value == "connected" || it.status.value == "outgoing" || it.status.value == "answered"
                 }
             }
-            if (uas.value.size > 4)
-                notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
-            else
-                notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
 
-            builder.setCustomContentView(notificationLayout)
-        }
+            val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
+            val intent = Intent(applicationContext, MainActivity::class.java)
+                .setAction(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_LAUNCHER)
 
-        if (VERSION.SDK_INT >= 31)
-            builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+            val pi = PendingIntent.getActivity(
+                applicationContext,
+                STATUS_REQ_CODE,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+            val deleteIntent =
+                Intent(this, BaresipService::class.java).setAction("Notification Dismissed")
+            val dpi = PendingIntent.getService(
+                this,
+                STATUS_REQ_CODE,
+                deleteIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
 
-        builder.setOngoing(true)
-        val notification = builder.build()
-        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
+            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_notification_b)
+                .setContentIntent(pi)
+                .setDeleteIntent(dpi)
+                .setOngoing(true)
 
-        try {
             if (activeCall != null) {
-                if (VERSION.SDK_INT >= 29)
-                    startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType(activeCall))
-                else
-                    startForeground(STATUS_NOTIFICATION_ID, notification)
-                isNotificationInCall = true
+                val peerUri = activeCall.peerUri
+                val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account)
+                val person = Person.Builder().setName(caller).build()
+
+                val hangupIntent = Intent(this, BaresipService::class.java)
+                hangupIntent.action = "Call Hangup"
+                hangupIntent.putExtra("callp", activeCall.callp)
+                val hpi = PendingIntent.getService(
+                    this, REJECT_REQ_CODE, hangupIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                builder.setStyle(NotificationCompat.CallStyle.forOngoingCall(person, hpi))
+                    .setCategory(Notification.CATEGORY_CALL)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
+                    .setUsesChronometer(true)
+                    .setContentText(
+                        if (activeCall.onhold)
+                            getString(R.string.call_is_on_hold)
+                        else
+                            when (activeCall.status.value) {
+                                "outgoing", "incoming" -> getString(R.string.call_is_ringing)
+                                "connected", "answered" -> getString(R.string.call_is_connected)
+                                else -> getString(R.string.call)
+                            }
+                    )
             } else {
-                // If we are currently in a call notification mode, downgrade to standby FGS
-                // but DO NOT call stopForeground as that would drop FGS status.
-                if (isNotificationInCall) {
+                builder.setStyle(null)
+                builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
+                    .setWhen(0)
+                    .setShowWhen(false)
+                    .setUsesChronometer(false)
+                    .setContentTitle("")
+                    .setContentText("")
+
+                val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
+                for (i in 0..3) {
+                    val resId = when (i) {
+                        0 -> R.id.status0
+                        1 -> R.id.status1
+                        2 -> R.id.status2
+                        else -> R.id.status3
+                    }
+                    if (i < uas.value.size) {
+                        notificationLayout.setImageViewResource(resId, uas.value[i].status)
+                        notificationLayout.setViewVisibility(resId, View.VISIBLE)
+                    } else {
+                        notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+                    }
+                }
+                if (uas.value.size > 4)
+                    notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
+                else
+                    notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
+
+                builder.setCustomContentView(notificationLayout)
+            }
+
+            if (VERSION.SDK_INT >= 31)
+                builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+
+            builder.setOngoing(true)
+            val notification = builder.build()
+            notification.flags =
+                notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
+
+            try {
+                if (activeCall != null) {
                     if (VERSION.SDK_INT >= 29)
-                        startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
+                        startForeground(
+                            STATUS_NOTIFICATION_ID,
+                            notification,
+                            foregroundServiceType(activeCall)
+                        )
                     else
                         startForeground(STATUS_NOTIFICATION_ID, notification)
-                    isNotificationInCall = false
+                    isNotificationInCall = true
                 } else {
-                    // Already in standby, just update the notification content
-                    nm.notify(STATUS_NOTIFICATION_ID, notification)
+                    // If we are currently in a call notification mode, downgrade to standby FGS.
+                    // We call stopForeground(REMOVE) to explicitly clear the system's telephony UI context
+                    // that might be persisting the timer/peer info on the lock screen.
+                    if (isNotificationInCall) {
+                        stopForeground(STOP_FOREGROUND_REMOVE)
+                        isNotificationInCall = false
+                    }
+                    if (VERSION.SDK_INT >= 29)
+                        startForeground(
+                            STATUS_NOTIFICATION_ID,
+                            notification,
+                            foregroundServiceType()
+                        )
+                    else
+                        startForeground(STATUS_NOTIFICATION_ID, notification)
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to update foreground notification: ${e.message}")
+                // Fallback to standard notification if promotion/update fails
+                nm.notify(STATUS_NOTIFICATION_ID, notification)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to update foreground notification: ${e.message}")
-            // Fallback to standard notification if promotion/update fails
-            nm.notify(STATUS_NOTIFICATION_ID, notification)
         }
     }
 
@@ -1841,6 +1867,7 @@ class BaresipService: Service() {
             proximitySensing(false)
             stopMediaPlayer()
         }
+        updateStatusNotification()
         messageUpdate.postValue(System.currentTimeMillis())
     }
 

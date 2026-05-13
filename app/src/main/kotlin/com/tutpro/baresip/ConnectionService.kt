@@ -195,6 +195,7 @@ class ConnectionService : ConnectionService() {
             if (call != null)
                 Api.ua_hangup(uap, callp, 0, "")
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
+            connections.remove(callp)
             destroy()
             // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
