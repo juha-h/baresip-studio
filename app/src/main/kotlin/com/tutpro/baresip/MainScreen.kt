@@ -152,7 +152,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
@@ -247,15 +246,12 @@ private fun MainScreen(
                         (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
                     (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
-                        spinToAor(viewModel, it.ua.account.aor)
+                        spinToAor(viewModel, it.ua.account.aor, it)
                     } ?: run {
                         if (uas.value.isNotEmpty() && viewModel.selectedAor.value == "")
                             spinToAor(viewModel, uas.value.first().account.aor)
-                    }
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)
-                    if (ua != null) {
-                        showCall(ctx, viewModel, ua)
-                        viewModel.triggerAccountUpdate()
+                        else
+                            viewModel.triggerAccountUpdate()
                     }
                 }
                 Lifecycle.Event.ON_PAUSE -> {
@@ -476,16 +472,6 @@ private fun MainScreen(
                 // Baresip is started for the first time
                 onRequestPermissions()
             }
-        }
-    }
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    LaunchedEffect(currentRoute, viewModel.selectedAor.collectAsState()) {
-        if (currentRoute == "main") {
-            Log.d(TAG, "Updating icons for AOR: ${viewModel.selectedAor.value}")
-            viewModel.triggerAccountUpdate()
         }
     }
 
@@ -1050,20 +1036,21 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     val selected: String by viewModel.selectedAor.collectAsState()
+    val accountUpdate by viewModel.accountUpdate.collectAsState()
     val uasValue by uas
 
-    LaunchedEffect(uasValue, selected) {
-        if (uasValue.isEmpty()) {
+    LaunchedEffect(uasValue, selected, accountUpdate) {
+        val selected = viewModel.selectedAor.value
+        if (uas.value.isEmpty()) {
             if (selected != "") viewModel.updateSelectedAor("")
         } else {
             if (selected == "" || UserAgent.ofAor(selected) == null) {
-                viewModel.updateSelectedAor(uasValue.first().account.aor)
+                viewModel.updateSelectedAor(uas.value.first().account.aor)
             }
         }
-        val ua = UserAgent.ofAor(selected)
+        val ua = UserAgent.ofAor(viewModel.selectedAor.value)
         if (ua != null) {
-            showCall(ctx, viewModel, ua)
-            viewModel.triggerAccountUpdate()
+            showCall(ctx, viewModel, ua, viewModel.focusedCall.value)
         }
     }
 
@@ -1190,9 +1177,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
-                            viewModel.updateSelectedAor(acc.aor)
-                            showCall(ctx, viewModel, ua)
-                            viewModel.triggerAccountUpdate()
+                            spinToAor(viewModel, acc.aor)
                         },
                         text = { Text(
                             text = acc.text(),
@@ -2049,10 +2034,14 @@ private fun OnHoldNotice() {
     }
 }
 
-private fun spinToAor(viewModel: ViewModel, aor: String) {
-    if (aor != viewModel.selectedAor.value)
-        viewModel.updateSelectedAor(aor)
-    viewModel.triggerAccountUpdate()
+private fun spinToAor(viewModel: ViewModel, aor: String, call: Call? = null) {
+    val aorChanged = aor != viewModel.selectedAor.value
+    val callChanged = call != viewModel.focusedCall.value
+    val statusChanged = call != null && call.status.value != viewModel.focusedCall.value?.status?.value
+    if (aorChanged || callChanged || statusChanged) {
+        if (aorChanged) viewModel.updateSelectedAor(aor)
+        viewModel.triggerAccountUpdate(call)
+    }
 }
 
 private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?) {
@@ -2239,6 +2228,13 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
     if (ua == null)
         return
     val call = showCall ?: ua.currentCall()
+    val aor = ua.account.aor
+    val callp = call?.callp ?: 0L
+    val status = call?.status?.value ?: "idle"
+    val security = call?.security ?: -1
+
+    if (viewModel.isUIRedundant(aor, callp, status, security)) return
+
     if (call == null) {
         pullToRefreshEnabled.value = true
         viewModel.dialerState.callUri.value = ua.account.resumeUri
@@ -2272,10 +2268,10 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             call.focusDtmf.value = true
             viewModel.requestShowKeyboard()
         }
-        Log.d(TAG, "Showing call ${call.callp} from ${call.ua.account.aor} with status ${call.status.value}")
-        when (call.status.value) {
+        Log.d(TAG, "Showing call $callp from $aor with status $status")
+        when (status) {
             "outgoing", "transferring", "answered" -> {
-                call.callUriLabel.value = if (call.status.value == "answered")
+                call.callUriLabel.value = if (status == "answered")
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
@@ -2284,7 +2280,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 call.showCallTimer.value = false
                 call.securityIconTint.value = -1
                 call.showCallButton.value = false
-                call.showCancelButton.value = call.status.value == "outgoing"
+                call.showCancelButton.value = status == "outgoing"
                 call.showHangupButton.value = !call.showCancelButton.value
                 call.showAnswerRejectButtons.value = false
                 call.showOnHoldNotice.value = false
@@ -2344,6 +2340,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             }
         }
     }
+    viewModel.markUIRendered(aor, callp, status, security)
 }
 
 fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params: ArrayList<Any>) {
@@ -2412,15 +2409,13 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val callp = params[1] as Long
             if (!BaresipService.isMainVisible)
                 viewModel.navigateToHome()
-            spinToAor(viewModel, aor)
-            showCall(ctx, viewModel, ua, Call.ofCallp(callp))
+            spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call answered" -> {
+            val callp = params[1] as Long
             if (!BaresipService.isMainVisible)
                 viewModel.navigateToHome()
-            spinToAor(viewModel, aor)
-            val callp = params[1] as Long
-            showCall(ctx, viewModel, ua, Call.ofCallp(callp))
+            spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call redirect" -> {
             val redirectUri = ev[1]
@@ -2444,7 +2439,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 }
                 showDialog.value = true
             }
-            showCall(ctx, viewModel, ua)
+            viewModel.triggerAccountUpdate()
         }
         "call established" -> {
             (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -2457,11 +2452,11 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     if (call.conferenceCall)
                         Api.cmd_exec("conference")
                 }
-                showCall(ctx, viewModel, ua, call)
+                viewModel.triggerAccountUpdate(call)
             }
         }
         "call update" -> {
-            showCall(ctx, viewModel, ua)
+            viewModel.triggerAccountUpdate()
         }
         "call verify" -> {
             val callp = params[1] as Long
@@ -2502,8 +2497,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 handleNextEvent("Call $callp that is verified is not found")
                 return
             }
-            if (aor == viewModel.selectedAor.value)
+            if (aor == viewModel.selectedAor.value) {
                 call.securityIconTint.value = call.security
+                viewModel.triggerAccountUpdate(call)
+            }
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -2560,7 +2557,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true
                 ua.account.resumeUri = ""
-                showCall(ctx, viewModel, ua)
+                viewModel.triggerAccountUpdate()
                 if (acc.missedCalls)
                     viewModel.triggerAccountUpdate()
             }
@@ -2621,7 +2618,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 return
             }
             val ua = call.ua
-            spinToAor(viewModel, ua.account.aor)
+            spinToAor(viewModel, ua.account.aor, call)
             if (ev[0] == "call answer")
                 answer(ctx, call)
             else
