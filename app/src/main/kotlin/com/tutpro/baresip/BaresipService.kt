@@ -1558,6 +1558,8 @@ class BaresipService: Service() {
                 startForeground(STATUS_NOTIFICATION_ID, notification)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start foreground service: ${e.message}")
+            // Fallback to standard notification if background start is denied
+            nm.notify(STATUS_NOTIFICATION_ID, notification)
         }
     }
 
@@ -1652,40 +1654,47 @@ class BaresipService: Service() {
         try {
             if (activeCall != null) {
                 if (VERSION.SDK_INT >= 29)
-                    startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
+                    startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType(activeCall))
                 else
                     startForeground(STATUS_NOTIFICATION_ID, notification)
                 isNotificationInCall = true
             } else {
+                // If we are currently in a call notification mode, downgrade to standby FGS
+                // but DO NOT call stopForeground as that would drop FGS status.
                 if (isNotificationInCall) {
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    isNotificationInCall = false
                     if (VERSION.SDK_INT >= 29)
                         startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
                     else
                         startForeground(STATUS_NOTIFICATION_ID, notification)
+                    isNotificationInCall = false
                 } else {
-                    // Use standard notify for standby updates.
-                    // This is much more stable for background registration.
+                    // Already in standby, just update the notification content
                     nm.notify(STATUS_NOTIFICATION_ID, notification)
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update foreground notification: ${e.message}")
+            // Fallback to standard notification if promotion/update fails
             nm.notify(STATUS_NOTIFICATION_ID, notification)
         }
     }
 
-    private fun foregroundServiceType(): Int {
+    private fun foregroundServiceType(activeCall: Call? = null): Int {
         var type = 0
         if (VERSION.SDK_INT >= 30) {
-            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-            if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-                type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            if (activeCall != null) {
+                type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
+                    type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            }
         }
         if (VERSION.SDK_INT >= 34) {
             type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
         }
+        // Fallback for API 30-33 when no active call (specialUse not available)
+        if (type == 0 && VERSION.SDK_INT >= 30)
+            type = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+
         return type
     }
 
