@@ -260,7 +260,9 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(route)
                             }
                             is NavigationCommand.NavigateToHome -> {
-                                navController.navigate("main")
+                                navController.navigate("main") {
+                                    popUpTo("main") { inclusive = true }
+                                }
                             }
                         }
                     }

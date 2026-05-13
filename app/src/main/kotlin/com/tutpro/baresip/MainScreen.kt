@@ -2603,6 +2603,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                 return
             }
+            viewModel.navigateToHome()
             viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {
@@ -2617,6 +2618,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent '$action' did not find call $callp")
                 return
             }
+            viewModel.navigateToHome()
             val ua = call.ua
             spinToAor(viewModel, ua.account.aor, call)
             if (ev[0] == "call answer")
