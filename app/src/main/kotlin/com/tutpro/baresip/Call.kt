@@ -232,36 +232,48 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     companion object {
 
         fun calls(): ArrayList<Call> {
-            return BaresipService.calls
+            synchronized(BaresipService.calls) {
+                return ArrayList(BaresipService.calls)
+            }
         }
 
         fun ofCallp(callp: Long): Call? {
-            for (c in BaresipService.calls)
-                if (c.callp == callp) return c
-            return null
+            synchronized(BaresipService.calls) {
+                for (c in BaresipService.calls)
+                    if (c.callp == callp) return c
+                return null
+            }
         }
 
         fun call(status: String): Call? {
-            for (c in BaresipService.calls)
-                if (c.status.value == status) return c
-            return null
+            synchronized(BaresipService.calls) {
+                for (c in BaresipService.calls)
+                    if (c.status.value == status) return c
+                return null
+            }
         }
 
         fun inCall(): Boolean {
-            return BaresipService.calls.isNotEmpty()
+            synchronized(BaresipService.calls) {
+                return BaresipService.calls.isNotEmpty()
+            }
         }
 
         fun hasTelecomCall(): Boolean {
-            return BaresipService.calls.any {
-                it is ExternalCall || ConnectionService.connections.containsKey(it.callp)
-            } || ConnectionService.pendingOutgoingConnection != null
+            synchronized(BaresipService.calls) {
+                return BaresipService.calls.any {
+                    it is ExternalCall || ConnectionService.connections.containsKey(it.callp)
+                } || ConnectionService.pendingOutgoingConnection != null
+            }
         }
 
         fun isAnyCallActive(ctx: Context): Boolean {
-            // Check if there exist SIP calls that are not onhold or held
-            if (BaresipService.calls.any { !it.onhold && !it.held }) return true
-            // MODE_IN_CALL indicates a PSTN call is active
-            return Utils.isAudioMode(ctx, AudioManager.MODE_IN_CALL)
+            synchronized(BaresipService.calls) {
+                // Check if there exist SIP calls that are not onhold or held
+                if (BaresipService.calls.any { !it.onhold && !it.held }) return true
+                // MODE_IN_CALL indicates a PSTN call is active
+                return Utils.isAudioMode(ctx, AudioManager.MODE_IN_CALL)
+            }
         }
     }
 }

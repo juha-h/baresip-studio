@@ -1075,7 +1075,6 @@ class BaresipService: Service() {
                             if (!Call.inCall())
                                 proximitySensing(false)
                         }
-                        ConnectionService.lastDisconnectTime = System.currentTimeMillis()
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
                             val cause = when {
@@ -1086,13 +1085,10 @@ class BaresipService: Service() {
                                 else -> DisconnectCause.REMOTE
                             }
                             connection.setDisconnected(DisconnectCause(cause))
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                connection.destroy()
-                                ConnectionService.connections.remove(callp)
-                                updateStatusNotification()
-                            }, 500)
+                            connection.destroy()
+                            ConnectionService.connections.remove(callp)
                         }
-                        nm.cancel(CALL_NOTIFICATION_ID)
+                        updateStatusNotification()
                         if (call != null) {
                             stopRinging()
                             stopMediaPlayer()
@@ -1229,6 +1225,7 @@ class BaresipService: Service() {
                         }
                     }
                 }
+                break
             }
         }
 
@@ -1671,35 +1668,32 @@ class BaresipService: Service() {
 
             try {
                 if (activeCall != null) {
-                    if (VERSION.SDK_INT >= 29)
-                        startForeground(
-                            STATUS_NOTIFICATION_ID,
-                            notification,
-                            foregroundServiceType(activeCall)
-                        )
+                    if (!isNotificationInCall) {
+                        // Only call startForeground when the FIRST call starts.
+                        if (VERSION.SDK_INT >= 29)
+                            startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType(activeCall))
+                        else
+                            startForeground(STATUS_NOTIFICATION_ID, notification)
+                        isNotificationInCall = true
+                    }
                     else
-                        startForeground(STATUS_NOTIFICATION_ID, notification)
-                    isNotificationInCall = true
+                        nm.notify(STATUS_NOTIFICATION_ID, notification)
                 } else {
-                    // If we are currently in a call notification mode, downgrade to standby FGS.
-                    // We call stopForeground(REMOVE) to explicitly clear the system's telephony UI context
-                    // that might be persisting the timer/peer info on the lock screen.
                     if (isNotificationInCall) {
                         stopForeground(STOP_FOREGROUND_REMOVE)
+                        // Only call startForeground to drop the "Call" type when the LAST call ends.
+                        if (VERSION.SDK_INT >= 29)
+                            startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
+                        else
+                            startForeground(STATUS_NOTIFICATION_ID, notification)
                         isNotificationInCall = false
                     }
-                    if (VERSION.SDK_INT >= 29)
-                        startForeground(
-                            STATUS_NOTIFICATION_ID,
-                            notification,
-                            foregroundServiceType()
-                        )
                     else
-                        startForeground(STATUS_NOTIFICATION_ID, notification)
+                        // Already in standby, just keep the notification current.
+                        nm.notify(STATUS_NOTIFICATION_ID, notification)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to update foreground notification: ${e.message}")
-                // Fallback to standard notification if promotion/update fails
+                Log.e(TAG, "Failed to update notification: ${e.message}")
                 nm.notify(STATUS_NOTIFICATION_ID, notification)
             }
         }
@@ -1847,7 +1841,6 @@ class BaresipService: Service() {
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
         val callp = telecomCall.hashCode().toLong()
         val call = calls.find { it.callp == callp }
-        nm.cancel(CALL_NOTIFICATION_ID)
         if (call != null) {
             stopRinging()
             stopMediaPlayer()

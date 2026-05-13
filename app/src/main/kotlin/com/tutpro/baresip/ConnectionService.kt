@@ -176,14 +176,11 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onDisconnect() {
-            if (isDisconnecting) {
-                Log.d(TAG, "onDisconnect already in progress for $callp")
-                return
-            }
+            val now = System.currentTimeMillis()
+            if (now - lastDisconnectTime < 500) return
+            lastDisconnectTime = now
 
             Log.d(TAG, "Telecom Connection onDisconnect $callp")
-            isDisconnecting = true
-            lastDisconnectTime = System.currentTimeMillis()
 
             if (callp == 0L) {
                 pendingOutgoingConnection = null
@@ -191,16 +188,12 @@ class ConnectionService : ConnectionService() {
                 destroy()
                 return
             }
-            val call = Call.ofCallp(callp)
-            if (call != null)
-                Api.ua_hangup(uap, callp, 0, "")
+
+            Api.ua_hangup(uap, callp, 0, "")
+
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
             connections.remove(callp)
             destroy()
-            // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                isDisconnecting = false
-            }, 500)
         }
 
         override fun onAbort() {
