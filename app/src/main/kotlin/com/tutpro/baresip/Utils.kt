@@ -189,13 +189,13 @@ object Utils {
     }
 
     fun e164Uri(uri: String, countryCode: String): String {
-        if (countryCode == "") return uri
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
                         scheme + "+" + userPart.substring(2))
+                countryCode == "" -> uri
                 userPart.startsWith("0") -> uri.replace("${scheme}0",
                     "$scheme$countryCode")
                 else -> uri.replace(scheme, "$scheme$countryCode")
