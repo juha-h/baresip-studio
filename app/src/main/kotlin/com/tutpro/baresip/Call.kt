@@ -163,6 +163,7 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     }
 
     open fun reject() {
+        this.rejected = true
         hangup(486, "Busy Here")
     }
 
@@ -202,6 +203,7 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         }
 
         override fun reject() {
+            this.rejected = true
             telecomCall.disconnect()
         }
 
