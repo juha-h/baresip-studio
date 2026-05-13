@@ -57,7 +57,7 @@
     <string name="voicemail_uri">语音信箱 URI</string>
     <string name="voicemain_uri_help">用于检查语音信箱消息的 SIP URI。如果留空，则不订阅语音信箱消息（消息等待指示）。</string>
     <string name="country_code">国家/地区代码</string>
-    <string name="country_code_help">此账号的 E.164 国家/地区代码。如果来电或消息的 From URI 用户部分包含不以“+”符号开头的电话号码，并且如果联系人查找失败，则该号码将以该国家/地区代码作为前缀，并再次尝试联系人查找。如果电话号码以单数字“0”开头，则在号码前缀之前移除数字“0”。</string>
+    <string name="country_code_help">此账号的 E.164 国家/地区代码。如果呼叫或消息中对等方的 URI 用户部分包含不以“+”符号开头的电话号码，并且如果联系人查找失败，则该号码将以该国家/地区代码作为前缀，并再次尝试联系人查找。如果号码以单个“0”开头，则在号码前缀前将其移除。</string>
     <string name="invalid_country_code">国家/地区代码“%1$s”无效</string>
     <string name="telephony_provider">电话服务提供者</string>
     <string name="telephony_provider_help">用于拨打电话号码的 SIP URI 主机部分。出厂默认为账号的域名。如果未提供，则此账号不能用于拨打电话号码。</string>
@@ -124,8 +124,8 @@
     <string name="battery_optimizations">电池优化</string>
     <string name="battery_optimizations_help">如果您想降低 Android 限制 baresip 访问网络或让 baresip 进入待机状态的概率，请禁用电池优化。</string>
     <string name="default_phone_app">默认电话应用</string>
-    <string name="dialer_role_not_available">拨号器角色不可用</string>
-    <string name="default_phone_app_help">如果选中，则 baresip 是默认电话应用。如果您的设备还需要处理除 SIP 通话或消息之外的其他通话或消息，请勿选中。</string>
+    <string name="dialer_role_not_available">默认电话应用角色不可用</string>
+    <string name="default_phone_app_help">如果选中，则 baresip 是默认电话应用。</string>
     <string name="listen_address">监听地址</string>
     <string name="listen_address_help">baresip 监听传入 SIP 请求的 IP 地址和端口，格式为“地址:端口”。如果 IP 地址是 IPv6 地址，则必须将其写在方括号 [] 内。IPv4 地址 0.0.0.0 或 IPv6 地址 [::] 使 baresip 监听所有可用地址。如果留空（出厂默认），baresip 将在所有可用地址的任意端口上监听。</string>
     <string name="invalid_listen_address">监听地址无效</string>
@@ -194,7 +194,7 @@
     <string name="read_ca_certs_error">无法读取“ca_certs.crt”文件。</string>
     <string name="config_restart">您需要重启 baresip 才能激活新设置。是否立即重启？</string>
     <string name="consent_request">同意请求</string>
-    <string name="contacts_consent">如果选择了 Android 联系人，可将其作为 SIP 和 tel URI 的引用用于通话和消息。baresip 应用不会存储 Android 联系人，也不会与任何人共享。为了使 Android 联系人在 baresip 中可用，Google 要求您接受此处和应用<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">隐私政策</a>中所述的使用。</string>
+    <string name="contacts_consent">如果选择了 Android 联系人，可将其作为 SIP 和 tel URI 的引用用于通话和消息。baresip 应用不会存储 Android 联系人，也不会与任何人共享。为了使 Android 联系人在 baresip 中可用，Google 要求您接受此处和应用 <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">隐私政策</a> 中所述的使用。</string>
     <string name="new_contact">新联系人</string>
     <string name="contact_name">名称</string>
     <string name="sip_or_tel_uri">SIP 或 tel URI</string>
@@ -360,7 +360,7 @@
             <li><b>AOMedia</b> AV1 编解码器</li>
         </ul>
         ]]></string>
-    <string name="about_text"><![CDATA["\n        <h1>基于 <a href=\"https://github.com/baresip/baresip\">baresip</a> 库的 SIP 用户代理</h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>版本 %1$s</p>\n        <br>\n        <h2>使用提示</h2>\n        <ul>\n            <li>检查 baresip 设置中的默认值是否满足您的需求（触摸项目标题获取帮助）。</li>\n            <li>然后在“账号”中，创建一个或多个账号（再次触摸项目标题以获取帮助）。</li>\n            <li>账号的注册状态用彩色圆点显示：绿色（注册成功）、黄色（注册正在进行）、红色（注册失败）、白色（注册尚未激活）。</li>\n            <li>触摸状态点可直接进入账号配置。</li>\n            <li>长按 baresip 栏图标可显示有关图标的信息。</li>\n            <li>向下滑动手势会导致当前显示的账号重新注册。</li>\n            <li>长按当前显示的账号可启用或禁用账号的注册。</li>\n            <li>向左/向右滑动手势可在账号之间切换。</li>\n            <li>当被叫方为空时，可以通过触摸通话图标来重新选择先前的呼叫方。</li>\n            <li>长按即可将通话和消息联系人添加到联系人中。</li>\n            <li>长按也可用于移除通话、聊天、消息和联系人。</li>\n            <li>触摸/长按联系人图标可用于设置/移除头像。</li>\n            <li>长按音频编解码器可以启用/禁用该编解码器。</li>\n            <li>如需更多信息，请参阅 <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a>。</li>\n        </ul>\n        <h2>隐私政策</h2>\n            <p>隐私政策可在<a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">此处</a>获取。</p>\n        <br>\n        <h2>源代码</h2>\n            <p>源代码可在 <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a> 上找到，您也可以在此报告问题。</p>\n        <br>\n        <h2>语言翻译</h2>\n            <p>语言翻译通过 baresip <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a> 项目进行管理。</p>\n        <br>\n        <h2>许可</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b>，但以下内容除外：</li>\n            <li><b>Apache 2.0</b> AMR 编解码器和 TLS 安全</li>\n            <li><b>AGPLv4</b> ZRTP 媒体加密</li>\n            <li><b>GNU LGPL 2.1</b> Codec2 编解码器</li>\n            <li><b>Free</b> G.722 编解码器</li>\n            <li><b>GNU GPLv3</b> G.729 编解码器</li>\n        </ul>\n        "]]></string>
+    <string name="about_text"><![CDATA["\"\n        <h1>基于 <a href=\"https://github.com/baresip/baresip\">baresip</a> 库的 SIP 和移动通话用户代理</h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>版本 %1$s</p>\n        <br>\n        <h2>使用提示</h2>\n        <ul>\n            <li>检查 baresip 设置中的默认值是否满足您的需求（触摸项目标题获取帮助）。</li>\n            <li>如果您想使用 baresip 进行移动通话，请启用默认电话应用设置。它将创建用于移动通话的移动账号。</li>\n            <li>然后在“账号”中，创建一个或多个 SIP 账号（再次触摸项目标题以获取帮助）。</li>\n            <li>账号的注册状态用彩色圆点显示：绿色（注册成功）、黄色（注册正在进行）、红色（注册失败）、白色（注册尚未激活）。</li>\n            <li>触摸状态点可直接进入账号配置。</li>\n            <li>长按 baresip 栏图标可显示有关图标的信息。</li>\n            <li>向下滑动手势会导致当前显示的账号重新注册。</li>\n            <li>长按当前显示的账号可启用或禁用账号的注册。</li>\n            <li>向左/向右滑动手势可在账号之间切换。</li>\n            <li>当被叫方为空时，可以通过触摸通话图标来重新选择先前的呼叫方。</li>\n            <li>长按即可将通话和消息联系人添加到联系人中。</li>\n            <li>长按也可用于移除通话、聊天、消息和联系人。</li>\n            <li>触摸/长按联系人图标可用于设置/移除头像。</li>\n            <li>长按音频编解码器可以启用/禁用该编解码器。</li>\n            <li>如需更多信息，请参阅 <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a>。</li>\n        </ul>\n        <h2>隐私政策</h2>\n            <p>隐私政策可在<a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">此处</a>获取。</p>\n        <br>\n        <h2>源代码</h2>\n            <p>源代码可在 <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a> 上找到，您也可以在此报告问题。</p>\n        <br>\n        <h2>语言翻译</h2>\n            <p>语言翻译通过 baresip <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a> 项目进行管理。</p>\n        <br>\n        <h2>许可</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b>，但以下内容除外：</li>\n            <li><b>Apache 2.0</b> AMR 编解码器和 TLS 安全</li>\n            <li><b>AGPLv4</b> ZRTP 媒体加密</li>\n            <li><b>GNU LGPL 2.1</b> Codec2 编解码器</li>\n            <li><b>Free</b> G.722 编解码器</li>\n            <li><b>GNU GPLv3</b> G.729 编解码器</li>\n        </ul>\n        \""]]></string>
     <string name="dynamic_colors">动态配色</string>
     <string name="dynamic_colors_help">如果在 Android 设置中启用，则使用动态配色</string>
     <string name="is_calling">正在呼叫</string>
@@ -394,4 +394,6 @@
     <string name="telecom">Telecom 框架</string>
     <string name="telecom_help">使用 Android Telecom 框架进行通话。如果遇到音频相关的问题，请尝试关闭 Telecom 框架，看看是否有所帮助。</string>
     <string name="diverted_by">已转接</string>
+    <string name="not_available">不可用</string>
+    <string name="voicemain_tel_uri_help">用于检查语音信箱消息的 TEL URI。</string>
 </resources>
