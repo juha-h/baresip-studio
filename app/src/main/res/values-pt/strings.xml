@@ -136,46 +136,7 @@
 \n • SRTP-MAND significa que RTP/SAVP é oferecido em chamadas efetuadas e requerido em chamadas recebidas.
 \n • SRTP significa que RTP/AVP é oferecido em chamadas efetuadas e que RTP/SAVP ou RTP/SAVPF é usado se oferecido em chamadas recebidas.</string>
     <string name="new_messages">novas mensagens</string>
-    <string name="about_text"><![CDATA[
-        <h1>Biblioteca Baresip baseado em agente de utilizador SIP</h1>
-        <br>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Versão %1$s</p>
-        <br>
-        <h2>Dicas de Uso</h2>
-        <ul>
-            <li>Verifique se os valores padrão nas configurações do baresip atendem
-                 às suas necessidades (toque nos títulos dos elementos para obter ajuda).
-            <li>Em seguida, em Contas, crie uma ou mais contas (toque novamente nos títulos dos elementos para obter ajuda).</li>
-            <li>O estado de registo de uma conta é mostrado com um ponto colorido: verde (registo
-                bem-sucedido), amarelo (registo em andamento), vermelho (falha no registo), branco (registo
-                não foi ativado).</li>
-            <li>O toque no ponto leva diretamente à configuração da conta.</li>
-            <li>O gesto de deslizar para baixo causa o novo registo da conta exibida no momento.</li>
-            <li>Um toque longo na conta exibida no momento ativa ou desativa o registo da conta.</li>
-            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone de chamada quando
-                Callee estiver vazio.</li>
-            <li>É possível adicionar pares de chamadas e mensagens aos contatos por meio de toques longos.</li>
-            <li>Também é possível usar toques longos para remover chamadas, bate-papos, mensagens e contatos.</li>
-            <li>Toque/toque longo no ícone do contato para instalar/remover o avatar.</li>
-            <li>Para mais informações, consulte <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a>.</li>
-        </ul>
-        <h2>Política de privacidade</h2>
-            <p>A política de privacidade está disponível em<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">here</a>.</p>
-        <br>
-        <h2>Código fonte</h2>
-            <p>O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-            onde os problemas encontrados também podem ser reportados.</p>
-        <br>
-        <h2>Licenças</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> exceto os seguintes:</li>
-            <li><b>Apache 2.0</b> codecs AMR e segurança TLS</li>
-            <li><b>AGPLv4</b> criptografia de média ZRTP</li>
-            <li><b>GNU LGPL 2.1</b> G.722, G.726 e codecs Codec2</li>
-            <li><b>GNU GPLv3</b> codec G.729</li>
-        </ul>
-        ]]></string>
+    <string name="about_text"><![CDATA["\n        <h1>Biblioteca Baresip baseado em agente de utilizador SIP</h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>Versão %1$s</p>\n        <br>\n        <h2>Dicas de Uso</h2>\n        <ul>\n            <li>Verifique se os valores padrão nas configurações do baresip atendem\n                 às suas necessidades (toque nos títulos dos elementos para obter ajuda).\n            <li>Em seguida, em Contas, crie uma ou mais contas (toque novamente nos títulos dos elementos para obter ajuda).</li>\n            <li>O estado de registo de uma conta é mostrado com um ponto colorido: verde (registo\n                bem-sucedido), amarelo (registo em andamento), vermelho (falha no registo), branco (registo\n                não foi ativado).</li>\n            <li>O toque no ponto leva diretamente à configuração da conta.</li>\n            <li>O gesto de deslizar para baixo causa o novo registo da conta exibida no momento.</li>\n            <li>Um toque longo na conta exibida no momento ativa ou desativa o registo da conta.</li>\n            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone de chamada quando\n                Callee estiver vazio.</li>\n            <li>É possível adicionar pares de chamadas e mensagens aos contatos por meio de toques longos.</li>\n            <li>Também é possível usar toques longos para remover chamadas, bate-papos, mensagens e contatos.</li>\n            <li>Toque/toque longo no ícone do contato para instalar/remover o avatar.</li>\n            <li>Para mais informações, consulte <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a>.</li>\n        </ul>\n        <h2>Política de privacidade</h2>\n            <p>A política de privacidade está disponível em<a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">here</a>.</p>\n        <br>\n        <h2>Código fonte</h2>\n            <p>O código fonte está disponível no <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\n            onde os problemas encontrados também podem ser reportados.</p>\n        <br>\n        <h2>Licenças</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b> exceto os seguintes:</li>\n            <li><b>Apache 2.0</b> codecs AMR e segurança TLS</li>\n            <li><b>AGPLv4</b> criptografia de média ZRTP</li>\n            <li><b>GNU LGPL 2.1</b> G.722, G.726 e codecs Codec2</li>\n            <li><b>GNU GPLv3</b> codec G.729</li>\n        </ul>\n        "]]></string>
     <string name="video_size">Tamanho do Quadro do Vídeo</string>
     <string name="restore_failed">Falha ao restaurar os dados da aplicação. Verifique se inseriu a palavra-passe correta e que o ficheiro de backup seja deste aplicação, Nas versões do Android 9 e anteriores, verifique também em Apps → baresip → Permissões → Armazenamento e se o ficheiro \'%1$s\' existe na pasta Download.</string>
     <string name="restart">Reiniciar</string>

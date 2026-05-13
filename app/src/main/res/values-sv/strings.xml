@@ -110,52 +110,7 @@
     <string name="account">Konto</string>
     <string name="about_title_plus">Om baresip+</string>
     <string name="about_title">Om baresip</string>
-    <string name="about_text"><![CDATA[
-<h1>SIP-användaragent baserad på <a href="https://github.com/baresip/baresip">baresip</a>-biblioteket</h1>
-<br>
-<p>Juha Heinanen &lt;jh@tutpro.com></p>
-<p>Version %1$s</p>
-<br>
-<h2>Användningstips</h2>
-<ul>
-<li>Kontrollera att standardvärdena i baresips inställningar uppfyller dina behov
-(tryck på objektets titel för hjälp).</li>
-<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>
-<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering
-lyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering
-har inte aktiverats).</li>
-<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.
-<li>Långt tryck på baresip-ikonerna visar information om ikonerna.
-<li>Svep nedåt för att omregistrera det aktuella kontot.
-<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.
-<li>Svep åt vänster/höger för att växla mellan kontona.
-<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.
-<li>Samtal och meddelanden kan läggas till i kontakter genom att trycka länge på dem.
-<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.
-<li>Tryck/långtryck på kontaktikonen kan användas för att installera/ta bort bildavatar.
-<li>Långtryck på en ljudkodek kan användas för att aktivera/inaktivera kodeken.
-<li>Se <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> för mer information.
-</ul>
-<h2>Integritet</h2>
-<p>Integritetspolicyn finns tillgänglig <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">här</a>.</p>
-<br>
-<h2>Källkod</h2>
-<p>Källkoden finns tillgänglig på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-där även problem kan rapporteras.</p>
-<br>
-<h2>Språköversättningar</h2>
-<p>Språköversättningar hanteras via baresip
-<a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>-projektet.</p>
-<br>
-<h2>Licenser</h2>
-<ul>
-<li><b>BSD-3-klausul</b> med undantag för följande:</li>
-<li><b>Apache 2.0</b> AMR-kodekter och TLS-säkerhet</li>
-<li><b>AGPLv4</b> ZRTP-mediekryptering</li>
-<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>
-<li><b>GNU GPLv3</b> G.729-kodeken</li>
-</ul>
-]]></string>
+    <string name="about_text"><![CDATA[\n<h1>SIP-användaragent baserad på <a href=\"https://github.com/baresip/baresip\">baresip</a>-biblioteket</h1>\n<br>\n<p>Juha Heinanen &lt;jh@tutpro.com></p>\n<p>Version %1$s</p>\n<br>\n<h2>Användningstips</h2>\n<ul>\n<li>Kontrollera att standardvärdena i baresips inställningar uppfyller dina behov\n(tryck på objektets titel för hjälp).</li>\n<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>\n<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering\nlyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering\nhar inte aktiverats).</li>\n<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.\n<li>Långt tryck på baresip-ikonerna visar information om ikonerna.\n<li>Svep nedåt för att omregistrera det aktuella kontot.\n<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.\n<li>Svep åt vänster/höger för att växla mellan kontona.\n<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.\n<li>Samtal och meddelanden kan läggas till i kontakter genom att trycka länge på dem.\n<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.\n<li>Tryck/långtryck på kontaktikonen kan användas för att installera/ta bort bildavatar.\n<li>Långtryck på en ljudkodek kan användas för att aktivera/inaktivera kodeken.\n<li>Se <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> för mer information.\n</ul>\n<h2>Integritet</h2>\n<p>Integritetspolicyn finns tillgänglig <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">här</a>.</p>\n<br>\n<h2>Källkod</h2>\n<p>Källkoden finns tillgänglig på <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\ndär även problem kan rapporteras.</p>\n<br>\n<h2>Språköversättningar</h2>\n<p>Språköversättningar hanteras via baresip\n<a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>-projektet.</p>\n<br>\n<h2>Licenser</h2>\n<ul>\n<li><b>BSD-3-klausul</b> med undantag för följande:</li>\n<li><b>Apache 2.0</b> AMR-kodekter och TLS-säkerhet</li>\n<li><b>AGPLv4</b> ZRTP-mediekryptering</li>\n<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>\n<li><b>GNU GPLv3</b> G.729-kodeken</li>\n</ul>\n]]></string>
     <string name="transfer_request_query">Accepterar du att koppla det här samtalet till \'%1$s\'\?</string>
     <string name="audio_modules_title">Ljudmoduler</string>
     <string name="start_failed">Baresip kunde inte starta. Det kan bero på ett ogiltigt värde för en inställning. Kontrollera Adress att lyssna på, TLS certifikat-fil och TLS CA-fil. Starta sedan om baresip.</string>
