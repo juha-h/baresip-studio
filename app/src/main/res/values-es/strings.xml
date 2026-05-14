@@ -382,7 +382,5 @@
     <string name="call_is_ringing">La llamada está sonando</string>
     <string name="custom_parameters">Parámetros personales</string>
     <string name="custom_parameters_help">Listado separador por punto y coma de parámetros de cuenta personal</string>
-    <string name="telecom">Marco de Telecom</string>
-    <string name="telecom_help">Utilice el marco Android Telecom para llamadas. Si experimenta incidencias relacionadas con el sonido, pruebe si se soluciona cuando apague el Marco de Trabajo de Telecomunicaciones.</string>
     <string name="diverted_by">desviado por</string>
 </resources>

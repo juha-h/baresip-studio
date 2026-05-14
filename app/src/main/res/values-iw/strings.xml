@@ -395,8 +395,6 @@
     <string name="unique_contact_uri_help">אם מסומן, URI של איש הקשר מובטח להיות ייחודי. יש לסמן זאת אם קיימים יותר מחשבון אחד עם חלק המשתמש זהה ב־SIP URI, אך גם משפר את ההגנה על החשבונות מפני תקיפות.</string>
     <string name="custom_parameters">פרמטרים מותאמים אישית</string>
     <string name="custom_parameters_help">רשימה מופרדת בנקודה־פסיק של פרמטרי חשבון מותאמים אישית</string>
-    <string name="telecom">מסגרת טלקום</string>
-    <string name="telecom_help">השתמש במסגרת טלקום של אנדרואיד עבור שיחות. אם אתם חווים בעיות הקשורות לאודיו, נסו לבדוק אם כיבוי מסגרת הטלקום עוזר.</string>
     <string name="diverted_by">הועברה ע\"י</string>
     <string name="call_is_ringing">שיחה מצלצלת</string>
     <string name="call_is_connected">שיחה מחוברת</string>
