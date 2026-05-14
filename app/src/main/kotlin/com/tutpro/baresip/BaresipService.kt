@@ -1828,14 +1828,19 @@ class BaresipService: Service() {
         setCallVolume()
         ensureCommunicationMode()
 
-        if (isIncoming)
+        if (isIncoming) {
             handleIncomingCall(call)
-        else
+            if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
+                Log.d(TAG, "Auto-answering external call ${call.callp}")
+                call.answer()
+            }
+        } else {
             postServiceEvent(ServiceEvent(
                 "call outgoing",
                 arrayListOf(ua.uap, call.callp),
                 System.nanoTime())
             )
+        }
     }
 
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {

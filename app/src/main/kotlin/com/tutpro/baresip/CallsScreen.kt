@@ -2,7 +2,6 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

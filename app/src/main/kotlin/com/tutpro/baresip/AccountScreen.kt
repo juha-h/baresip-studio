@@ -1288,8 +1288,8 @@ private fun AccountContent(
             Rel100()
             Dtmf()
             Redirect()
-            Answer()
         }
+        Answer()
         Voicemail()
         CountryCode()
         if (!ua.account.isMobile)
