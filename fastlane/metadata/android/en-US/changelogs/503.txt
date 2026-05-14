@@ -1,0 +1,2 @@
+- baresip app can now be used as the default phone app supporting also mobile calling (see About screen Usage Hints)
+- This is major upgrade and may contain bugs
