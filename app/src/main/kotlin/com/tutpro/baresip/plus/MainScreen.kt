@@ -1529,8 +1529,12 @@ private fun CallRow(
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = if (isDialer || call?.showCancelButton?.value == true || call?.showAnswerRejectButtons?.value == true)
-            Arrangement.Center else Arrangement.SpaceBetween
+        horizontalArrangement = if (isDialer)
+            Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally)
+        else if (call?.showCancelButton?.value == true || call?.showAnswerRejectButtons?.value == true)
+            Arrangement.Center
+        else
+            Arrangement.SpaceBetween
     ) {
         if (isDialer) {
 
@@ -1618,8 +1622,6 @@ private fun CallRow(
         }
         else {
             if (call!!.showCancelButton.value) {
-                if (!call.videoCall)
-                    Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
