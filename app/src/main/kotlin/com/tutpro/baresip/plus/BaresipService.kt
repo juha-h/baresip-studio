@@ -1222,6 +1222,8 @@ class BaresipService: Service() {
                         if (call != null) {
                             stopRinging()
                             stopMediaPlayer()
+                            if (!Call.inCall())
+                                abandonAudioFocus(this)
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -2701,6 +2703,7 @@ class BaresipService: Service() {
             }
             stopRinging()
             stopMediaPlayer()
+            abandonAudioFocus(this)
             uas.value = emptyList()
             uasStatus.value = emptyMap()
             callHistory.clear()
@@ -2856,6 +2859,18 @@ class BaresipService: Service() {
                 audioFocusRequest = null
             }
             return audioFocusRequest != null
+        }
+
+        fun abandonAudioFocus(ctx: Context) {
+            if (audioFocusRequest != null) {
+                Log.d(TAG, "Abandoning audio focus")
+                val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
+                if (am.abandonAudioFocusRequest(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    audioFocusRequest = null
+                } else {
+                    Log.e(TAG, "Failed to abandon audio focus")
+                }
+            }
         }
 
         private fun isBluetoothScoOn(am: AudioManager): Boolean {
