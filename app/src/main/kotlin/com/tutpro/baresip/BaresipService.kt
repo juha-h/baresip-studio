@@ -1835,15 +1835,17 @@ class BaresipService: Service() {
             handleIncomingCall(call)
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering external call ${call.callp}")
-                call.answer()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    call.answer()
+                }, 2000)
             }
-        } else {
+        }
+        else
             postServiceEvent(ServiceEvent(
                 "call outgoing",
                 arrayListOf(ua.uap, call.callp),
                 System.nanoTime())
             )
-        }
     }
 
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
@@ -2168,16 +2170,6 @@ class BaresipService: Service() {
                 Log.e(TAG, "Busy tone $name.wav not found")
             }
         }
-    }
-
-    private fun playUnInterrupted(raw: Int, count: Int) {
-        val player = MediaPlayer.create(this, raw)
-        player.setOnCompletionListener {
-            it.stop()
-            it.release()
-            if (count > 1) playUnInterrupted(raw, count - 1)
-        }
-        player.start()
     }
 
     private fun stopMediaPlayer() {
