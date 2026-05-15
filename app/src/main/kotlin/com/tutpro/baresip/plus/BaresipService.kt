@@ -1,6 +1,5 @@
 package com.tutpro.baresip.plus
 
-import android.Manifest
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
@@ -65,7 +64,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.MessagingStyle
 import androidx.core.app.Person
@@ -74,6 +72,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
+import com.tutpro.baresip.plus.Utils.e164Uri
 import com.tutpro.baresip.plus.Utils.toCircle
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
@@ -130,11 +129,9 @@ class BaresipService: Service() {
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
-
         super.onCreate()
 
         Log.i(TAG, "BaresipService onCreate")
-
         instance = this
 
         intent = Intent("com.tutpro.baresip.EVENT")
@@ -146,7 +143,7 @@ class BaresipService: Service() {
         am = applicationContext.getSystemService(AUDIO_SERVICE) as AudioManager
 
         val ntUri = RingtoneManager.getActualDefaultRingtoneUri(applicationContext,
-                RingtoneManager.TYPE_NOTIFICATION)
+            RingtoneManager.TYPE_NOTIFICATION)
         nt = RingtoneManager.getRingtone(applicationContext, ntUri)
 
         val rtUri = if (Preferences(applicationContext).ringtoneUri == "")
@@ -162,9 +159,11 @@ class BaresipService: Service() {
         pm = getSystemService(POWER_SERVICE) as PowerManager
 
         vibrator = if (VERSION.SDK_INT >= 31) {
-            val vibratorManager = applicationContext.getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            val vibratorManager =
+                applicationContext.getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
             vibratorManager.defaultVibrator
-        } else {
+        }
+        else {
             @Suppress("DEPRECATION")
             applicationContext.getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
@@ -247,7 +246,8 @@ class BaresipService: Service() {
                     if (WifiManager.WIFI_STATE_ENABLED == state % 10) {
                         if (hotSpotIsEnabled) {
                             Log.d(TAG, "HotSpot is still enabled")
-                        } else {
+                        }
+                        else {
                             Log.d(TAG, "HotSpot is enabled")
                             hotSpotIsEnabled = true
                             Timer().schedule(1000) {
@@ -265,15 +265,18 @@ class BaresipService: Service() {
                                         Timer().schedule(2000) {
                                             updateNetwork()
                                         }
-                                } else {
+                                }
+                                else {
                                     Log.w(TAG, "Could not get hotspot addresses")
                                 }
                             }
                         }
-                    } else {
+                    }
+                    else {
                         if (!hotSpotIsEnabled) {
                             Log.d(TAG, "HotSpot is still disabled")
-                        } else {
+                        }
+                        else {
                             Log.d(TAG, "HotSpot is disabled")
                             hotSpotIsEnabled = false
                             if (hotSpotAddresses.isNotEmpty()) {
@@ -307,7 +310,7 @@ class BaresipService: Service() {
                 when (intent.action) {
                     BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
                         val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
-                                BluetoothHeadset.STATE_DISCONNECTED)
+                            BluetoothHeadset.STATE_DISCONNECTED)
                         when (state) {
                             BluetoothHeadset.STATE_CONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset is connected")
@@ -322,9 +325,10 @@ class BaresipService: Service() {
 
                         }
                     }
+
                     BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED -> {
                         val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
-                                BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
+                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
                         when (state) {
                             BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset audio is connected")
@@ -334,9 +338,10 @@ class BaresipService: Service() {
                             }
                         }
                     }
+
                     AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
                         val state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE,
-                                AudioManager.SCO_AUDIO_STATE_DISCONNECTED)
+                            AudioManager.SCO_AUDIO_STATE_DISCONNECTED)
                         when (state) {
                             AudioManager.SCO_AUDIO_STATE_CONNECTING -> {
                                 Log.d(TAG, "Bluetooth headset SCO is connecting")
@@ -357,8 +362,10 @@ class BaresipService: Service() {
             }
         }
 
-        proximityWakeLock = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
-                "com.tutpro.baresip.plus:proximity_wakelock")
+        proximityWakeLock = pm.newWakeLock(
+            PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+            "com.tutpro.baresip.plus:proximity_wakelock"
+        )
 
         wifiLock = if (VERSION.SDK_INT < 29)
             @Suppress("DEPRECATION")
@@ -393,7 +400,8 @@ class BaresipService: Service() {
                     "force" -> {
                         cleanService()
                         isServiceRunning = false
-                        postServiceEvent(ServiceEvent("stopped", arrayListOf(""), System.nanoTime()))
+                        postServiceEvent(
+                            ServiceEvent("stopped", arrayListOf(""), System.nanoTime()))
                         stopSelf()
                         // exitProcess(0)
                     }
@@ -410,7 +418,8 @@ class BaresipService: Service() {
         if (intent == null) {
             action = "Start"
             Log.d(TAG, "Received onStartCommand with null intent")
-        } else {
+        }
+        else {
             // Utils.dumpIntent(intent)
             action = intent.action!!
             Log.d(TAG, "Received onStartCommand action $action")
@@ -445,7 +454,8 @@ class BaresipService: Service() {
                     if (!file.exists() && a != "config") {
                         Log.i(TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
-                    } else {
+                    }
+                    else {
                         Log.i(TAG, "Asset '$a' already copied")
                     }
                     if (a == "config") {
@@ -464,7 +474,8 @@ class BaresipService: Service() {
                 val history = CallHistory.get()
                 if (history.isEmpty()) {
                     CallHistoryNew.restore()
-                } else {
+                }
+                else {
                     for (old in history) {
                         val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
                         new.stopTime = old.stopTime
@@ -502,23 +513,11 @@ class BaresipService: Service() {
                 activeNetwork = cm.activeNetwork
                 Log.i(TAG, "Active network: $activeNetwork")
 
-                if (telecom)
-                    registerPhoneAccount()
-                else
-                    if (btAdapter != null) {
-                        Log.i(TAG, "Registering bluetooth receiver")
-                        val filter = IntentFilter()
-                        filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
-                        filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
-                        filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
-                        this.registerReceiver(bluetoothReceiver, filter)
-                        bluetoothReceiverRegistered = true
-                    }
+                registerPhoneAccount()
 
                 Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
                 val userAgent = Config.variable("user_agent")
-
                 Thread {
                     baresipStart(
                         filesPath,
@@ -528,7 +527,7 @@ class BaresipService: Service() {
                             userAgent
                         else
                             "baresip v${BuildConfig.VERSION_NAME} " +
-                                "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
+                                    "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
                     )
                 }.start()
 
@@ -559,42 +558,36 @@ class BaresipService: Service() {
             }
 
             "Call Answer" -> {
-                val uap = intent!!.getLongExtra("uap", 0L)
-                val callp = intent.getLongExtra("callp", 0L)
+                val callp = intent!!.getLongExtra("callp", 0L)
+                val call = Call.ofCallp(callp)
                 stopRinging()
                 stopMediaPlayer()
                 setCallVolume()
                 proximitySensing(proximitySensing)
-                Api.ua_answer(uap, callp, Api.VIDMODE_ON)
+                call?.answer()
                 updateStatusNotification()
-                if (!telecom)
-                    ensureCommunicationMode()
             }
 
             "Call Reject" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
-                if (call == null) {
+                stopRinging()
+                stopMediaPlayer()
+                if (call == null)
                     Log.w(TAG, "onStartCommand did not find call $callp")
-                } else {
+                else {
                     val peerUri = call.peerUri
                     val aor = call.ua.account.aor
                     Log.d(TAG, "Aor $aor rejected incoming call $callp from $peerUri")
-                    call.rejected = true
-                    Api.ua_hangup(call.ua.uap, callp, 486, "Rejected")
+                    call.reject()
                 }
             }
 
             "Call Hangup" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
                 Log.d(TAG, "onStartCommand Hangup action for $callp")
-                val connection = ConnectionService.connections[callp]
-                if (connection != null) {
-                    connection.onDisconnect() // This calls Api.ua_hangup(..., 0, "")
-                } else {
-                    val call = Call.ofCallp(callp)
-                    if (call != null) Api.ua_hangup(call.ua.uap, callp, 0, "")
-                }
+                val call = Call.ofCallp(callp)
+                call?.hangup(0, "")
             }
 
             "Transfer Deny" -> {
@@ -651,14 +644,24 @@ class BaresipService: Service() {
                             if (ua.account.telProvider == "") {
                                 Log.w(TAG, "No telephony provider for $aor")
                                 peerUri = ""
-                            } else
+                            }
+                            else
                                 peerUri = Utils.telToSip(peerUri, ua.account)
                         }
                         if (peerUri != "") {
                             Log.d(TAG, "Inline Reply from $aor to $peerUri: $replyText")
                             Message.updateAorMessage(aor, timeStamp)
                             val time = System.currentTimeMillis()
-                            val msg = Message(aor, peerUri, replyText, time, MESSAGE_UP_WAIT, 0, "", false)
+                            val msg = Message(
+                                aor,
+                                peerUri,
+                                replyText,
+                                time,
+                                MESSAGE_UP_WAIT,
+                                0,
+                                "",
+                                false
+                            )
                             msg.add()
                             if (Api.message_send(uap, peerUri, replyText, time.toString()) != 0) {
                                 Log.w(TAG, "message_send failed")
@@ -702,7 +705,6 @@ class BaresipService: Service() {
             else -> {
                 Log.e(TAG, "Unknown start action $action")
             }
-
         }
 
         return START_STICKY
@@ -714,7 +716,7 @@ class BaresipService: Service() {
         when (currentNightMode) {
             Configuration.UI_MODE_NIGHT_NO -> {
                 darkTheme.value = Preferences(applicationContext).displayTheme ==
-                    AppCompatDelegate.MODE_NIGHT_YES
+                        AppCompatDelegate.MODE_NIGHT_YES
             }
             Configuration.UI_MODE_NIGHT_YES -> {
                 darkTheme.value = true
@@ -747,7 +749,9 @@ class BaresipService: Service() {
         if (ev[0] == "create") {
 
             val ua = UserAgent(uap)
-            ua.status = if (ua.account.regint == 0)
+            ua.status = if (ua.account.isMobile)
+                R.drawable.circle_green
+            else if (ua.account.regint == 0)
                 R.drawable.circle_white
             else
                 circleYellow.getValue(colorblind)
@@ -759,9 +763,9 @@ class BaresipService: Service() {
                 if (password != null) {
                     Api.account_set_auth_pass(acc.accp, password)
                     acc.authPass = password
-                } else {
-                    Api.account_set_auth_pass(acc.accp, NO_AUTH_PASS)
                 }
+                else
+                    Api.account_set_auth_pass(acc.accp, NO_AUTH_PASS)
             }
 
             Log.d(TAG, "got uaEvent $event/${acc.aor}")
@@ -857,7 +861,8 @@ class BaresipService: Service() {
 
         val call = Call.ofCallp(callp)
         if (call == null && callp != 0L &&
-            !setOf("incoming call", "call incoming", "call closed").contains(ev[0])) {
+            !setOf("incoming call", "call incoming", "call closed").contains(ev[0])
+        ) {
             Log.w(TAG, "uaEvent '$event' did not find call $callp")
             return
         }
@@ -874,6 +879,7 @@ class BaresipService: Service() {
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
+
                     "registered" -> {
                         ua.updateStatus(
                             if (Api.account_regint(ua.account.accp) == 0)
@@ -886,11 +892,13 @@ class BaresipService: Service() {
                             registrationUpdate.postValue(System.currentTimeMillis())
                         return
                     }
+
                     "registering failed" -> {
-                        ua.updateStatus(if (Api.account_regint(ua.account.accp) == 0)
-                            R.drawable.circle_white
-                        else
-                            circleRed.getValue(colorblind)
+                        ua.updateStatus(
+                            if (Api.account_regint(ua.account.accp) == 0)
+                                R.drawable.circle_white
+                            else
+                                circleRed.getValue(colorblind)
                         )
                         updateStatusNotification()
                         if (isMainVisible)
@@ -901,32 +909,30 @@ class BaresipService: Service() {
                                     ": DNS lookup failed"
                                 else
                                     ": ${ev[1]}"
-                            } else
+                            }
+                            else
                                 ""
                             toast(String.format(getString(R.string.registering_failed), aor) + reason)
                         }
                         return
                     }
+
                     "call outgoing" -> {
                         if (call!!.status.value == "transferring")
                             break
                         speakerPhone = speakerPhoneAuto
                         stopMediaPlayer()
-                        val hasTelecom = ConnectionService.connections.containsKey(callp) ||
-                                ConnectionService.pendingOutgoingConnection != null
-                        if (!hasTelecom) {
-                            setCallVolume()
-                            ensureCommunicationMode()
-                        }
+                        setCallVolume()
+                        ensureCommunicationMode()
                         proximitySensing(proximitySensing)
                     }
+
                     "call ringing" -> {
-                        if (!telecom) ensureCommunicationMode()
                         playRingBack()
                         return
                     }
+
                     "call progress" -> {
-                        if (!telecom) ensureCommunicationMode()
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else {
@@ -934,15 +940,20 @@ class BaresipService: Service() {
                         }
                         return
                     }
+
                     "incoming call" -> {
                         speakerPhone = speakerPhoneAuto
                         val peerUri = ev[1]
                         val toastMsg = if (Call.isAnyCallActive(applicationContext))
-                            String.format(getString(R.string.call_auto_rejected),
-                                Utils.friendlyUri(this, peerUri, ua.account))
+                            String.format(
+                                getString(R.string.call_auto_rejected),
+                                Utils.friendlyUri(this, peerUri, ua.account)
+                            )
                         else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri)
-                            String.format(getString(R.string.call_blocked),
-                                Utils.friendlyUri(this, peerUri, ua.account))
+                            String.format(
+                                getString(R.string.call_blocked),
+                                Utils.friendlyUri(this, peerUri, ua.account)
+                            )
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else
@@ -970,10 +981,9 @@ class BaresipService: Service() {
                                 )
                                 if (resourceId != 0) {
                                     ensureCommunicationMode()
-                                    if (!telecom) playUnInterrupted(resourceId, 1)
-                                } else {
-                                    Log.e(TAG, "Callwaiting tone $name.wav not found")
                                 }
+                                else
+                                    Log.e(TAG, "Callwaiting tone $name.wav not found")
                                 if (ua.account.callHistory) {
                                     CallHistoryNew(aor, peerUri, "in").add()
                                     ua.account.missedCalls = true
@@ -985,34 +995,28 @@ class BaresipService: Service() {
                         Api.ua_accept(uap, callp)
                         return
                     }
+
                     "call incoming" -> {
                         val peerUri = ev[1]
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         if (Call.ofCallp(callp) == null)
                             Call(callp, ua, peerUri, "in", "incoming").add()
-                        if (telecom) {
-                            val extras = android.os.Bundle()
-                            extras.putLong("uap", uap)
-                            extras.putLong("callp", callp)
-                            extras.putString("peerUri", peerUri)
-                            try {
-                                tm.addNewIncomingCall(getPhoneAccountHandle(this), extras)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Telecom addNewIncomingCall failed: ${e.message}")
-                            }
-                        } else {
-                            if (!requestAudioFocus(applicationContext)) {
-                                Log.w(TAG, "Audio focus denied for incoming call")
-                                Api.ua_hangup(uap, callp, 486, "Busy Here")
-                                return
-                            }
-                            handleIncomingCall(Call.ofCallp(callp)!!)
+                        val extras = android.os.Bundle()
+                        extras.putLong("uap", uap)
+                        extras.putLong("callp", callp)
+                        extras.putString("peerUri", peerUri)
+                        try {
+                            tm.addNewIncomingCall(getPhoneAccountHandle(this), extras)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Telecom addNewIncomingCall failed: ${e.message}")
                         }
                         return
                     }
+
                     "remote call answered" -> {
                         newEvent = "call update"
                     }
+
                     "remote call offered" -> {
                         val callHasVideo = ev[1] == "1"
                         val remoteHasVideo = ev[2] == "1"
@@ -1029,13 +1033,19 @@ class BaresipService: Service() {
                             return
                         if (!(callHasVideo && remoteHasVideo && ldir == 0) &&
                             (!callHasVideo && remoteHasVideo &&
-                                    (rdir == Api.SDP_SENDRECV) && (ldir != rdir))) {
-                            postServiceEvent(ServiceEvent("call video request",
-                                arrayListOf(uap, callp, rdir), System.nanoTime()))
+                                    (rdir == Api.SDP_SENDRECV) && (ldir != rdir))
+                        ) {
+                            postServiceEvent(
+                                ServiceEvent(
+                                    "call video request",
+                                    arrayListOf(uap, callp, rdir), System.nanoTime()
+                                )
+                            )
                             return
                         }
                         newEvent = "call update"
                     }
+
                     "call answered" -> {
                         stopMediaPlayer()
                         ConnectionService.connections[callp]?.setActive()
@@ -1045,9 +1055,11 @@ class BaresipService: Service() {
                         else
                             return
                     }
-                    "call redirect", "video call redirect"-> {
+
+                    "call redirect", "video call redirect" -> {
                         stopMediaPlayer()
                     }
+
                     "call established" -> {
                         ensureCommunicationMode()
                         stopMediaPlayer()
@@ -1060,6 +1072,7 @@ class BaresipService: Service() {
                         if (!isMainVisible)
                             return
                     }
+
                     "call update" -> {
                         val newHeldState = when (ev[1].toInt()) {
                             Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
@@ -1083,7 +1096,8 @@ class BaresipService: Service() {
                             call.showOnHoldNotice.value = true
                             call.callOnHold.value = true
                             connection?.setOnHold()
-                        } else {
+                        }
+                        else {
                             // Peer un-held us
                             call.showOnHoldNotice.value = false
                             if (!call.onhold) {
@@ -1094,12 +1108,6 @@ class BaresipService: Service() {
                         if (call.state() == Api.CALL_STATE_EARLY) {
                             if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                                 stopMediaPlayer()
-                            else {
-                                if (!telecom) {
-                                    ConnectionService.connections[callp]?.setRinging()
-                                    playRingBack()
-                                }
-                            }
                         }
                         if (call.status.value == "connected" && !call.held && !call.onhold) {
                             if (call.callOnHold.value || call.showOnHoldNotice.value) {
@@ -1112,25 +1120,34 @@ class BaresipService: Service() {
                         if (!isMainVisible || call.status.value != "connected")
                             return
                     }
+
                     "call verified", "call secure" -> {
                         if (ev[0] == "call secure") {
                             call!!.security = R.color.colorTrafficYellow
-                        } else {
+                        }
+                        else {
                             call!!.security = R.color.colorTrafficGreen
                             call.zid = ev[1]
                         }
                         if (!isMainVisible)
                             return
                     }
+
                     "call transfer" -> {
                         if (!Utils.isVisible()) {
-                            val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                            val piFlags =
+                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                             intent.putExtra("action", "transfer show")
                                 .putExtra("callp", callp).putExtra("uri", ev[1])
-                            val pi = PendingIntent.getActivity(applicationContext, TRANSFER_REQ_CODE, intent, piFlags)
+                            val pi = PendingIntent.getActivity(
+                                applicationContext,
+                                TRANSFER_REQ_CODE,
+                                intent,
+                                piFlags
+                            )
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                             val target = Utils.friendlyUri(this, ev[1], ua.account)
                             nb.setSmallIcon(R.drawable.ic_notification_call)
@@ -1145,21 +1162,30 @@ class BaresipService: Service() {
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                             acceptIntent.putExtra("action", "transfer accept")
                                 .putExtra("callp", callp).putExtra("uri", ev[1])
-                            val acceptPendingIntent = PendingIntent.getActivity(applicationContext,
-                                ACCEPT_REQ_CODE, acceptIntent, piFlags)
+                            val acceptPendingIntent = PendingIntent.getActivity(
+                                applicationContext,
+                                ACCEPT_REQ_CODE, acceptIntent, piFlags
+                            )
                             val denyIntent = Intent(this, BaresipService::class.java)
                             denyIntent.action = "Transfer Deny"
                             denyIntent.putExtra("callp", callp)
-                            val denyPendingIntent = PendingIntent.getService(this,
-                                DENY_REQ_CODE, denyIntent, piFlags)
-                            nb.addAction(R.drawable.ic_notification_call,
-                                getString(R.string.accept), acceptPendingIntent)
-                            nb.addAction(R.drawable.ic_notification_call_end,
-                                getString(R.string.deny), denyPendingIntent)
+                            val denyPendingIntent = PendingIntent.getService(
+                                this,
+                                DENY_REQ_CODE, denyIntent, piFlags
+                            )
+                            nb.addAction(
+                                R.drawable.ic_notification_call,
+                                getString(R.string.accept), acceptPendingIntent
+                            )
+                            nb.addAction(
+                                R.drawable.ic_notification_call_end,
+                                getString(R.string.deny), denyPendingIntent
+                            )
                             nm.notify(TRANSFER_NOTIFICATION_ID, nb.build())
                             return
                         }
                     }
+
                     "transfer failed" -> {
                         Log.d(TAG, "AoR $aor call $callp transfer failed: ${ev[1]}")
                         stopMediaPlayer()
@@ -1169,18 +1195,15 @@ class BaresipService: Service() {
                         if (!isMainVisible)
                             return
                     }
+
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
                         if (call != null) {
                             call.terminated.value = true
                             call.remove()
-                            if (!Call.inCall()) {
+                            if (!Call.inCall())
                                 proximitySensing(false)
-                                if (!telecom)
-                                    abandonAudioFocus(applicationContext)
-                            }
                         }
-                        ConnectionService.lastDisconnectTime = System.currentTimeMillis()
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
                             val cause = when {
@@ -1191,12 +1214,10 @@ class BaresipService: Service() {
                                 else -> DisconnectCause.REMOTE
                             }
                             connection.setDisconnected(DisconnectCause(cause))
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                connection.destroy()
-                                ConnectionService.connections.remove(callp)
-                            }, 500)
+                            connection.destroy()
+                            ConnectionService.connections.remove(callp)
                         }
-                        nm.cancel(CALL_NOTIFICATION_ID)
+                        updateStatusNotification()
                         if (call != null) {
                             stopRinging()
                             stopMediaPlayer()
@@ -1237,8 +1258,7 @@ class BaresipService: Service() {
                             if (tone == "busy")
                                 playBusy()
                             else
-                                if (!Call.inCall())
-                                    ensureCommunicationMode()
+                                ensureCommunicationMode()
                             if (call.dir == "out")
                                 call.rejected = call.startTime == null &&
                                         !reason.startsWith("408") &&
@@ -1278,10 +1298,17 @@ class BaresipService: Service() {
                                                 rxFile.delete()
                                                 txFile.delete()
                                             } catch (e: Exception) {
-                                                Log.w(TAG, "Could not delete temporary raw files after merge: ${e.message}")
+                                                Log.w(
+                                                    TAG,
+                                                    "Could not delete temporary raw files after merge: ${e.message}"
+                                                )
                                             }
-                                        } else {
-                                            Log.e(TAG, "Automatic merge failed. Storing raw file paths as fallback.")
+                                        }
+                                        else {
+                                            Log.e(
+                                                TAG,
+                                                "Automatic merge failed. Storing raw file paths as fallback."
+                                            )
                                             history.recording = call.dumpfiles
                                         }
                                     }
@@ -1295,15 +1322,17 @@ class BaresipService: Service() {
                                 intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                                 intent.putExtra("action", "call missed")
-                                        .putExtra("uap", uap)
-                                val pi = PendingIntent.getActivity(applicationContext, CALL_REQ_CODE,
-                                    intent, piFlags)
+                                    .putExtra("uap", uap)
+                                val pi = PendingIntent.getActivity(
+                                    applicationContext, CALL_REQ_CODE,
+                                    intent, piFlags
+                                )
                                 val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                                 nb.setSmallIcon(R.drawable.ic_notification_call_missed)
-                                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                                        .setContentIntent(pi)
-                                        .setCategory(Notification.CATEGORY_CALL)
-                                        .setAutoCancel(true)
+                                    .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                                    .setContentIntent(pi)
+                                    .setCategory(Notification.CATEGORY_CALL)
+                                    .setAutoCancel(true)
                                 var missedCalls = 0
                                 for (notification in nm.activeNotifications)
                                     if (notification.id == CALL_MISSED_NOTIFICATION_ID)
@@ -1315,8 +1344,11 @@ class BaresipService: Service() {
                                 else {
                                     nb.setContentTitle(getString(R.string.missed_calls))
                                     nb.setContentText(
-                                            String.format(getString(R.string.missed_calls_count),
-                                                    missedCalls + 1))
+                                        String.format(
+                                            getString(R.string.missed_calls_count),
+                                            missedCalls + 1
+                                        )
+                                    )
                                 }
                                 nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
                             }
@@ -1334,10 +1366,12 @@ class BaresipService: Service() {
                         }
                     }
                 }
+                break
             }
         }
 
-        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), System.nanoTime()))
+        postServiceEvent(ServiceEvent(newEvent ?: event, arrayListOf(uap, callp), System.nanoTime())
+        )
 
     }
 
@@ -1360,7 +1394,8 @@ class BaresipService: Service() {
                 "message",
                 GregorianCalendar().timeInMillis
             ).add()
-            toast(String.format(
+            toast(
+                String.format(
                     getString(R.string.message_blocked),
                     Utils.friendlyUri(this, peerUri, ua.account)
                 )
@@ -1387,7 +1422,16 @@ class BaresipService: Service() {
         val timeStamp = System.currentTimeMillis()
         val timeStampString = timeStamp.toString()
         Log.d(TAG, "Message event for $uap from $peerUri at $timeStampString")
-        Message(ua.account.aor, peerUri, text, timeStamp, MESSAGE_DOWN, 0, "", true).add()
+        Message(
+            ua.account.aor,
+            peerUri,
+            text,
+            timeStamp,
+            MESSAGE_DOWN,
+            0,
+            "",
+            true
+        ).add()
         ua.account.unreadMessages = true
 
         if (!Utils.isVisible()) {
@@ -1396,7 +1440,9 @@ class BaresipService: Service() {
             val intent = Intent(applicationContext, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("action", "message show").putExtra("uap", uap).putExtra("peer", peerUri)
+            intent.putExtra("action", "message show")
+                .putExtra("uap", uap)
+                .putExtra("peer", peerUri)
             val pi = PendingIntent.getActivity(applicationContext, MESSAGE_REQ_CODE, intent, piFlags)
 
             val sender = createPerson(this, peerUri, ua.account)
@@ -1439,13 +1485,14 @@ class BaresipService: Service() {
                 directReplyPendingIntent
             ).addRemoteInput(remoteInput)
                 .setAllowGeneratedReplies(true)
-                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).
-                build()
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                .build()
 
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
             saveIntent.putExtra("uap", uap).putExtra("time", timeStampString)
-            val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
+            val savePendingIntent =
+                PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
             val saveAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_notification_save,
                 getString(R.string.save),
@@ -1455,7 +1502,8 @@ class BaresipService: Service() {
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
             deleteIntent.putExtra("uap", uap).putExtra("time", timeStampString)
-            val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
+            val deletePendingIntent =
+                PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
             val deleteAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_notification_delete,
                 getString(R.string.delete),
@@ -1483,14 +1531,16 @@ class BaresipService: Service() {
             if (m.timeStamp == timeStamp) {
                 if (responseCode < 300) {
                     m.direction = MESSAGE_UP
-                } else {
+                }
+                else {
                     m.direction = MESSAGE_UP_FAIL
                     m.responseCode = responseCode
                     m.responseReason = responseReason
                 }
                 messageUpdate.postValue(System.currentTimeMillis())
                 break
-            } else {
+            }
+            else {
                 if (m.timeStamp < timeStamp - 60000)
                     break
             }
@@ -1498,8 +1548,13 @@ class BaresipService: Service() {
 
     private var audioModeChangedListener: AudioManager.OnModeChangedListener? = null
 
-    fun runCall(uap: Long, uri: String, conferenceCall: Boolean,  videoCall: Boolean, onHoldCallp: Long) {
-
+    fun runCall(
+        uap: Long,
+        uri: String,
+        conferenceCall: Boolean,
+        videoCall: Boolean,
+        onHoldCallp: Long
+    ) {
         val executeCall = {
             val handler = Handler(Looper.getMainLooper())
             handler.postDelayed({
@@ -1535,20 +1590,18 @@ class BaresipService: Service() {
                             call.destroy()
                             updateStatusNotification()
                         }
-                    } else {
+                    }
+                    else
                         ConnectionService.pendingOutgoingConnection?.let {
                             it.setDisconnected(DisconnectCause(DisconnectCause.ERROR))
                             it.destroy()
                             ConnectionService.pendingOutgoingConnection = null
                         }
-                    }
                 }
             }, audioDelay)
         }
 
-        val isTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) } ||
-                ConnectionService.pendingOutgoingConnection != null
-        if (isTelecom)
+        if (Call.hasTelecomCall())
             executeCall()
         else if (VERSION.SDK_INT < 31) {
             Log.d(TAG, "Setting audio mode to MODE_IN_COMMUNICATION")
@@ -1584,6 +1637,7 @@ class BaresipService: Service() {
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
         isNativeReady = true
+        addMobileUserAgent()
         Api.net_debug()
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
@@ -1607,8 +1661,10 @@ class BaresipService: Service() {
     }
 
     private fun createNotificationChannels() {
-        val lowChannel = NotificationChannel(LOW_CHANNEL_ID, "No sound, no vibrate",
-            NotificationManager.IMPORTANCE_LOW)
+        val lowChannel = NotificationChannel(
+            LOW_CHANNEL_ID, "No sound, no vibrate",
+            NotificationManager.IMPORTANCE_LOW
+        )
         lowChannel.description = "Background status notifications"
         lowChannel.enableVibration(false)
         lowChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -1617,15 +1673,19 @@ class BaresipService: Service() {
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
             .build()
-        val highChannel = NotificationChannel(HIGH_CHANNEL_ID, "Sound, vibrate, and peek",
-            NotificationManager.IMPORTANCE_HIGH)
+        val highChannel = NotificationChannel(
+            HIGH_CHANNEL_ID, "Sound, vibrate, and peek",
+            NotificationManager.IMPORTANCE_HIGH
+        )
         highChannel.description = "Incoming calls and important alerts"
         highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         highChannel.enableVibration(true)
         highChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI, ringAttributes)
         nm.createNotificationChannel(highChannel)
-        val mediumChannel = NotificationChannel(MEDIUM_CHANNEL_ID, "Sound only",
-            NotificationManager.IMPORTANCE_DEFAULT)
+        val mediumChannel = NotificationChannel(
+            MEDIUM_CHANNEL_ID, "Sound only",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
         mediumChannel.description = "Incoming messages"
         mediumChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         mediumChannel.enableVibration(false)
@@ -1648,8 +1708,10 @@ class BaresipService: Service() {
         val intent = Intent(applicationContext, MainActivity::class.java)
             .setAction(Intent.ACTION_MAIN)
             .addCategory(Intent.CATEGORY_LAUNCHER)
-        val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent,
-            PendingIntent.FLAG_IMMUTABLE)
+        val pi = PendingIntent.getActivity(
+            applicationContext, STATUS_REQ_CODE, intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val deleteIntent = Intent(this, BaresipService::class.java)
             .setAction("Notification Dismissed")
         val dpi = PendingIntent.getService(
@@ -1675,138 +1737,190 @@ class BaresipService: Service() {
                 startForeground(STATUS_NOTIFICATION_ID, notification)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start foreground service: ${e.message}")
+            // Fallback to standard notification if background start is denied
+            nm.notify(STATUS_NOTIFICATION_ID, notification)
         }
     }
 
     fun updateStatusNotification() {
 
-        val activeCall = Call.calls().find {
-            it.status.value == "connected" || it.status.value == "outgoing" || it.status.value == "answered"
-        }
-
-        val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
-        val intent = Intent(applicationContext, MainActivity::class.java)
-            .setAction(Intent.ACTION_MAIN)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
-
-        val pi = PendingIntent.getActivity(applicationContext, STATUS_REQ_CODE, intent, PendingIntent.FLAG_IMMUTABLE)
-        val deleteIntent = Intent(this, BaresipService::class.java).setAction("Notification Dismissed")
-        val dpi = PendingIntent.getService(this, STATUS_REQ_CODE, deleteIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setSmallIcon(R.drawable.ic_notification_b)
-            .setContentIntent(pi)
-            .setDeleteIntent(dpi)
-            .setOngoing(true)
-
-        if (activeCall != null) {
-            val peerUri = activeCall.peerUri
-            val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account)
-            val person = Person.Builder().setName(caller).build()
-
-            val hangupIntent = Intent(this, BaresipService::class.java)
-            hangupIntent.action = "Call Hangup"
-            hangupIntent.putExtra("callp", activeCall.callp)
-            val hpi = PendingIntent.getService(this, REJECT_REQ_CODE, hangupIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-            builder.setStyle(NotificationCompat.CallStyle.forOngoingCall(person, hpi))
-                .setCategory(Notification.CATEGORY_CALL)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
-                .setUsesChronometer(true)
-                .setContentText(
-                    if (activeCall.onhold)
-                        getString(R.string.call_is_on_hold)
-                    else
-                        when (activeCall.status.value) {
-                            "outgoing", "incoming" -> getString(R.string.call_is_ringing)
-                            "connected", "answered" -> getString(R.string.call_is_connected)
-                            else -> getString(R.string.call)
-                        }
-                )
-        } else {
-            builder.setStyle(null)
-            builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setWhen(0)
-                .setShowWhen(false)
-                .setUsesChronometer(false)
-                .setContentTitle("")
-                .setContentText("")
-            val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
-            for (i in 0..3) {
-                val resId = when (i) {
-                    0 -> R.id.status0
-                    1 -> R.id.status1
-                    2 -> R.id.status2
-                    else -> R.id.status3
-                }
-                if (i < uas.value.size) {
-                    notificationLayout.setImageViewResource(resId, uas.value[i].status)
-                    notificationLayout.setViewVisibility(resId, View.VISIBLE)
-                } else {
-                    notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+        Handler(Looper.getMainLooper()).post {
+            val activeCall = synchronized(calls) {
+                calls.find {
+                    it.status.value == "connected" || it.status.value == "outgoing" || it.status.value == "answered"
                 }
             }
-            if (uas.value.size > 4)
-                notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
-            else
-                notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
 
-            builder.setCustomContentView(notificationLayout)
-        }
+            val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
+            val intent = Intent(applicationContext, MainActivity::class.java)
+                .setAction(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_LAUNCHER)
 
-        if (VERSION.SDK_INT >= 31)
-            builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+            val pi = PendingIntent.getActivity(
+                applicationContext,
+                STATUS_REQ_CODE,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+            val deleteIntent =
+                Intent(this, BaresipService::class.java).setAction("Notification Dismissed")
+            val dpi = PendingIntent.getService(
+                this,
+                STATUS_REQ_CODE,
+                deleteIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
 
-        builder.setOngoing(true)
-        val notification = builder.build()
-        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
+            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_notification_b)
+                .setContentIntent(pi)
+                .setDeleteIntent(dpi)
+                .setOngoing(true)
 
-        try {
             if (activeCall != null) {
-                if (VERSION.SDK_INT >= 29)
-                    startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
-                else
-                    startForeground(STATUS_NOTIFICATION_ID, notification)
-                isNotificationInCall = true
-            } else {
-                if (isNotificationInCall) {
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    isNotificationInCall = false
-                    if (VERSION.SDK_INT >= 29)
-                        startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
-                    else
-                        startForeground(STATUS_NOTIFICATION_ID, notification)
-                }
-                else
-                    nm.notify(STATUS_NOTIFICATION_ID, notification)
+                val peerUri = activeCall.peerUri
+                val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account)
+                val person = Person.Builder().setName(caller).build()
+
+                val hangupIntent = Intent(this, BaresipService::class.java)
+                hangupIntent.action = "Call Hangup"
+                hangupIntent.putExtra("callp", activeCall.callp)
+                val hpi = PendingIntent.getService(
+                    this, REJECT_REQ_CODE, hangupIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                builder.setStyle(NotificationCompat.CallStyle.forOngoingCall(person, hpi))
+                    .setCategory(Notification.CATEGORY_CALL)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
+                    .setUsesChronometer(true)
+                    .setContentText(
+                        if (activeCall.onhold)
+                            getString(R.string.call_is_on_hold)
+                        else
+                            when (activeCall.status.value) {
+                                "outgoing", "incoming" -> getString(R.string.call_is_ringing)
+                                "connected", "answered" -> getString(R.string.call_is_connected)
+                                else -> getString(R.string.call)
+                            }
+                    )
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to update foreground notification: ${e.message}")
-            nm.notify(STATUS_NOTIFICATION_ID, notification)
+            else {
+                builder.setStyle(null)
+                builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
+                    .setWhen(0)
+                    .setShowWhen(false)
+                    .setUsesChronometer(false)
+                    .setContentTitle("")
+                    .setContentText("")
+
+                val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
+                for (i in 0..3) {
+                    val resId = when (i) {
+                        0 -> R.id.status0
+                        1 -> R.id.status1
+                        2 -> R.id.status2
+                        else -> R.id.status3
+                    }
+                    if (i < uas.value.size) {
+                        notificationLayout.setImageViewResource(resId, uas.value[i].status)
+                        notificationLayout.setViewVisibility(resId, View.VISIBLE)
+                    }
+                    else
+                        notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+                }
+                if (uas.value.size > 4)
+                    notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
+                else
+                    notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
+
+                builder.setCustomContentView(notificationLayout)
+            }
+
+            if (VERSION.SDK_INT >= 31)
+                builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+
+            builder.setOngoing(true)
+            val notification = builder.build()
+            notification.flags =
+                notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
+
+            try {
+                if (activeCall != null) {
+                    if (!isNotificationInCall) {
+                        // Only call startForeground when the FIRST call starts.
+                        if (VERSION.SDK_INT >= 29)
+                            startForeground(
+                                STATUS_NOTIFICATION_ID,
+                                notification,
+                                foregroundServiceType(activeCall)
+                            )
+                        else
+                            startForeground(STATUS_NOTIFICATION_ID, notification)
+                        isNotificationInCall = true
+                    }
+                    else
+                        nm.notify(STATUS_NOTIFICATION_ID, notification)
+                }
+                else {
+                    if (isNotificationInCall) {
+                        stopForeground(STOP_FOREGROUND_REMOVE)
+                        // Only call startForeground to drop the "Call" type when the LAST call ends.
+                        if (VERSION.SDK_INT >= 29)
+                            startForeground(
+                                STATUS_NOTIFICATION_ID,
+                                notification,
+                                foregroundServiceType()
+                            )
+                        else
+                            startForeground(STATUS_NOTIFICATION_ID, notification)
+                        isNotificationInCall = false
+                    }
+                    else
+                        // Already in standby, just keep the notification current.
+                        nm.notify(STATUS_NOTIFICATION_ID, notification)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to update notification: ${e.message}")
+                nm.notify(STATUS_NOTIFICATION_ID, notification)
+            }
         }
     }
 
-    private fun foregroundServiceType(): Int {
+    private fun foregroundServiceType(activeCall: Call? = null): Int {
         var type = 0
-        if (VERSION.SDK_INT >= 30) {
-            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    RECORD_AUDIO
-            ) == PackageManager.PERMISSION_GRANTED)
-                type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    CAMERA
-            ) == PackageManager.PERMISSION_GRANTED)
+
+        // API 29+ supports the 3-argument startForeground and the phoneCall type
+        if (VERSION.SDK_INT >= 29) {
+            if (activeCall != null) {
+                type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                // Microphone and Camera types were added in API 30
+                if (VERSION.SDK_INT >= 30) {
+                    if (ContextCompat.checkSelfPermission(this, RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
+                        type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                    if (ContextCompat.checkSelfPermission(this, CAMERA) == PackageManager.PERMISSION_GRANTED)
+                        type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                }
+            }
+        }
+
+        // API 34+ introduces specialUse for background SIP registration
+        if (VERSION.SDK_INT >= 34) {
+            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        }
+
+        // Fallback for API 29-33 when in "Standby" (no active call)
+        // We must return a type to match the manifest and keep the service alive.
+        if (type == 0 && VERSION.SDK_INT >= 29) {
+            type = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            // On API 30-33, we can also include CAMERA as a fallback if expected by manifest
+            if (VERSION.SDK_INT >= 30)
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
         }
-        if (VERSION.SDK_INT >= 34)
-            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+
         return type
     }
 
@@ -1824,6 +1938,193 @@ class BaresipService: Service() {
         }
     }
 
+    fun handleExternalCall(telecomCall: android.telecom.Call, preferredAor: String? = null) {
+        val rawUri = telecomCall.details.handle?.toString() ?: "Unknown"
+        val uri = try {
+            java.net.URLDecoder.decode(rawUri, "UTF-8")
+        } catch (_: Exception) {
+            rawUri
+        }
+
+        if (uas.value.isEmpty()) {
+            Log.e(TAG, "No User Agents available to handle external call")
+            return
+        }
+
+        val ua = preferredAor?.let { UserAgent.ofAor(it) }
+            ?: uas.value.find { it.account.isMobile }
+            ?: uas.value[0]
+
+        val telecomState = if (VERSION.SDK_INT >= 31)
+            telecomCall.details.state
+        else
+            @Suppress("DEPRECATION") telecomCall.state
+
+        val isIncoming = telecomState == android.telecom.Call.STATE_RINGING
+        Log.d(TAG, "Handling external call ${if (isIncoming) "from" else "to"} $uri (preferredAor=$preferredAor)")
+
+        val initialStatus = when (telecomState) {
+            android.telecom.Call.STATE_RINGING -> "incoming"
+            android.telecom.Call.STATE_DIALING, android.telecom.Call.STATE_CONNECTING -> "outgoing"
+            else -> "connected"
+        }
+
+        if (isIncoming) {
+            val e164Uri = e164Uri(uri, ua.account.countryCode)
+            if (ua.account.blockUnknown && Contact.contactName(e164Uri) == e164Uri) {
+                Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri")
+                telecomCall.disconnect()
+                toast(String.format(getString(R.string.call_blocked),
+                    Utils.friendlyUri(this, uri, ua.account)))
+                if (ua.account.callHistory) {
+                    Blocked(
+                        ua.account.aor,
+                        uri,
+                        "invite",
+                        GregorianCalendar().timeInMillis
+                    ).add()
+                }
+                return
+            }
+        }
+
+        val call = Call.ExternalCall(
+            telecomCall,
+            ua,
+            uri,
+            if (telecomState == android.telecom.Call.STATE_RINGING) "in" else "out",
+            initialStatus
+        )
+
+        telecomCall.registerCallback(object : android.telecom.Call.Callback() {
+            override fun onStateChanged(call: android.telecom.Call, state: Int) {
+                super.onStateChanged(call, state)
+                val newStatus = when (state) {
+                    android.telecom.Call.STATE_RINGING -> "incoming"
+                    android.telecom.Call.STATE_DIALING, android.telecom.Call.STATE_CONNECTING -> "outgoing"
+                    android.telecom.Call.STATE_ACTIVE -> "connected"
+                    android.telecom.Call.STATE_DISCONNECTED, android.telecom.Call.STATE_DISCONNECTING -> "closed"
+                    android.telecom.Call.STATE_HOLDING -> {
+                        calls.find { it.callp == call.hashCode().toLong() }?.onhold = true
+                        "connected"
+                    }
+                    else -> "connected"
+                }
+                calls.find { it.callp == call.hashCode().toLong() }?.let {
+                    if (it.status.value != newStatus) {
+                        it.status.value = newStatus
+                        if (newStatus == "connected") {
+                            it.startTime = GregorianCalendar()
+                            nm.cancel(CALL_NOTIFICATION_ID)
+                            updateStatusNotification()
+                        }
+                        postServiceEvent(ServiceEvent(
+                            "call update",
+                            arrayListOf(it.ua.uap, it.callp),
+                            System.nanoTime())
+                        )
+                        if (newStatus == "closed")
+                            handleExternalCallRemoved(call)
+                    }
+                }
+            }
+        })
+
+        calls.add(call)
+        setCallVolume()
+        ensureCommunicationMode()
+
+        if (isIncoming) {
+            handleIncomingCall(call)
+            if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
+                Log.d(TAG, "Auto-answering external call ${call.callp}")
+                call.answer()
+            }
+        } else {
+            postServiceEvent(ServiceEvent(
+                "call outgoing",
+                arrayListOf(ua.uap, call.callp),
+                System.nanoTime())
+            )
+        }
+    }
+
+    fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
+        val callp = telecomCall.hashCode().toLong()
+        val call = calls.find { it.callp == callp }
+        if (call != null) {
+            stopRinging()
+            stopMediaPlayer()
+            if (call.ua.account.callHistory) {
+                val historyPeerUri = e164Uri(call.peerUri, call.ua.account.countryCode)
+                val history = CallHistoryNew(call.ua.account.aor, historyPeerUri, call.dir)
+                history.stopTime = GregorianCalendar()
+                history.startTime = call.startTime
+                history.rejected = call.rejected
+                history.add()
+                if (call.dir == "in" && call.startTime == null && !call.rejected)
+                    call.ua.account.missedCalls = true
+            }
+            calls.remove(call)
+        }
+        if (!Call.inCall()) {
+            proximitySensing(false)
+            stopMediaPlayer()
+        }
+        updateStatusNotification()
+        messageUpdate.postValue(System.currentTimeMillis())
+    }
+
+    fun addMobileUserAgent() {
+        if (VERSION.SDK_INT < 29) return
+
+        val mobileAccountHandle = Utils.pstnAccountHandle(this)
+        val existingMobileUa = uas.value.find { it.account.isMobile }
+
+        // If mobile account should not exist (role lost or no SIM), remove it if it exists
+        if (mobileAccountHandle == null) {
+            if (existingMobileUa != null) {
+                Log.d(TAG, "Removing Mobile account (role lost or SIM missing)")
+                existingMobileUa.remove()
+                Account.saveAccounts()
+            }
+            return
+        }
+
+        val userPart = Utils.getLine1Number(this) ?: "mobile"
+        val mobileAor = "sip:$userPart@pstn"
+
+        if (existingMobileUa != null) {
+            // Update AOR if it previously was sip:mobile@pstn but now a real number
+            if (existingMobileUa.account.aor == "sip:mobile@pstn" && mobileAor != "sip:mobile@pstn") {
+                Log.d(TAG, "Updating existing Mobile account AOR to $mobileAor")
+                val aorField = Account::class.java.getDeclaredField("aor")
+                aorField.isAccessible = true
+                aorField.set(existingMobileUa.account, mobileAor)
+                val luriField = Account::class.java.getDeclaredField("luri")
+                luriField.isAccessible = true
+                luriField.set(existingMobileUa.account, mobileAor)
+                Account.saveAccounts()
+            }
+            return
+        }
+
+        Log.d(TAG, "Injecting new virtual Mobile account: $mobileAor")
+        val account = Account(0L, mobileAor)
+        account.isMobile = true
+        account.nickName = "Mobile"
+        account.regint = 0
+        account.telProvider = ""
+        val mobileUa = UserAgent(0L, account)
+
+        val updatedUas = uas.value.toMutableList()
+        updatedUas.add(mobileUa)
+        uas.value = updatedUas.toList()
+        uasStatus.value = UserAgent.statusMap()
+
+        Account.saveAccounts()
+    }
+
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(this@BaresipService.applicationContext, message, length).show()
@@ -1837,7 +2138,7 @@ class BaresipService: Service() {
         val callp = call.callp
 
         val callerNumber = Utils.uriUserPart(peerUri)
-        if (shouldStartRinging(callerNumber))
+        if (call !is Call.ExternalCall && shouldStartRinging(callerNumber))
             startRinging()
 
         if (!Utils.isVisible()) {
@@ -2124,8 +2425,7 @@ class BaresipService: Service() {
                 cleanupRunnable = null
             }
             if (isSpeakerphoneOn == speakerPhone) {
-                val hasTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) }
-                if (hasTelecom || currentMode == MODE_IN_COMMUNICATION) {
+                if (Call.hasTelecomCall() || currentMode == MODE_IN_COMMUNICATION) {
                     Log.d(TAG, "Already in valid call mode ($currentMode) with correct speaker state.")
                     return
                 }
@@ -2152,13 +2452,17 @@ class BaresipService: Service() {
         val runnable = Runnable {
             cleanupRunnable = null
             if (Call.inCall()) {
-                val hasTelecom = Call.calls().any { ConnectionService.connections.containsKey(it.callp) }
+                val hasTelecom = Call.hasTelecomCall()
                 if (!hasTelecom && am.mode != MODE_IN_COMMUNICATION && am.mode != AudioManager.MODE_IN_CALL) {
                     am.mode = MODE_IN_COMMUNICATION
                     Log.d(TAG, "Manual Mode Guard: Setting MODE_IN_COMMUNICATON from ${am.mode}")
                 }
                 Log.d(TAG, "Applying speakerphone state: $speakerPhone")
-                if (!hasTelecom) {
+                if (InCallService.instance != null) {
+                    Log.d(TAG, "Using InCallService for audio route: $speakerPhone")
+                    @Suppress("DEPRECATION")
+                    InCallService.instance!!.setAudioRoute(if (speakerPhone) android.telecom.CallAudioState.ROUTE_SPEAKER else android.telecom.CallAudioState.ROUTE_EARPIECE)
+                } else if (!hasTelecom) {
                     Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
                     Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
                 } else {
@@ -2193,7 +2497,7 @@ class BaresipService: Service() {
                         )
                     )
                 }
-                if (!Call.calls().any { ConnectionService.connections.containsKey(it.callp) })
+                if (!Call.hasTelecomCall())
                     resetCallVolume()
             }
         }
@@ -2455,7 +2759,6 @@ class BaresipService: Service() {
         var isRecOn = false
         var toneCountry = "us"
         var proximitySensing = true
-        var telecom = true
         var videoSize = Size(0, 0)
 
         val uas = mutableStateOf(emptyList<UserAgent>())
@@ -2550,47 +2853,12 @@ class BaresipService: Service() {
                 ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             ) {
                 Log.d(TAG, "requestAudioFocus granted")
-                if (!telecom && isBluetoothHeadsetConnected(ctx))
-                    startBluetoothSco(ctx, 250L, 3)
             }
             else {
                 Log.w(TAG, "requestAudioFocus denied")
                 audioFocusRequest = null
             }
             return audioFocusRequest != null
-        }
-
-        fun abandonAudioFocus(ctx: Context) {
-            val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-            if (audioFocusRequest != null) {
-                Log.d(TAG, "Abandoning audio focus")
-                if (androidx.media.AudioManagerCompat.abandonAudioFocusRequest(
-                        am,
-                        audioFocusRequest!!
-                    ) ==
-                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-                ) {
-                    audioFocusRequest = null
-                    if (!telecom && isBluetoothHeadsetConnected(ctx))
-                        stopBluetoothSco(ctx)
-                }
-                else
-                    Log.e(TAG, "Failed to abandon audio focus")
-            }
-            am.mode = MODE_NORMAL
-        }
-
-        private fun isBluetoothHeadsetConnected(ctx: Context): Boolean {
-            if (VERSION.SDK_INT >= 31 &&
-                ActivityCompat.checkSelfPermission(
-                    ctx,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) == PackageManager.PERMISSION_DENIED
-            )
-                return false
-            return btAdapter != null && btAdapter!!.isEnabled &&
-                    btAdapter!!.getProfileConnectionState(BluetoothHeadset.HEADSET) ==
-                        BluetoothAdapter.STATE_CONNECTED
         }
 
         private fun isBluetoothScoOn(am: AudioManager): Boolean {
