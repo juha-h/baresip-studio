@@ -2119,7 +2119,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     }
     else if (ua.account.isMobile && !Utils.isTelUri(uri)) {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = "Telephone call can only be made to telephone number"
+            alertMessage.value = ctx.getString(R.string.no_telephone_number)
             showAlert.value = true
             return
     }

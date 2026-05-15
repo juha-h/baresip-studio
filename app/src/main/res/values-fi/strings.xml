@@ -526,6 +526,7 @@
     <string name="diverted_by">siirtäjä</string>
     <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
         tarjoajaa</string>
+    <string name="no_telephone_number">Mobiilipuhelu voidaan tehdä vain puhelinnumeroon</string>
     <string name="video_call">Videopuhelu</string>
     <string name="video_request">Videopyyntö</string>
     <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'\?</string>

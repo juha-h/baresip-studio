@@ -508,6 +508,7 @@
     <string name="diverted_by_dots">Diverted by …</string>
     <string name="diverted_by">diverted by</string>
     <string name="no_telephony_provider">Account \'%1$s\' has no Telephony Provider</string>
+    <string name="no_telephone_number">Mobile call only be made to telephone number</string>
     <string name="video_call">Video call</string>
     <string name="video_request">Video Request</string>
     <string name="allow_video">Accept sending and receiving video with \'%1$s\'\?</string>
