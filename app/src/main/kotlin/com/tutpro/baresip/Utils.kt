@@ -1191,14 +1191,14 @@ object Utils {
         try {
             bgPaint.color = colorHex.toColorInt()
         } catch (_: Exception) {
-            bgPaint.color = android.graphics.Color.GRAY // Fallback color
+            bgPaint.color = Color.GRAY // Fallback color
         }
         canvas.drawCircle(size / 2f, size / 2f, size / 2f, bgPaint)
 
         // Draw the text (Initial)
         val textPaint = android.graphics.Paint()
         textPaint.isAntiAlias = true
-        textPaint.color = android.graphics.Color.WHITE
+        textPaint.color = Color.WHITE
         textPaint.textSize = size / 2f // Text size is half the circle size
         textPaint.textAlign = android.graphics.Paint.Align.CENTER
 
