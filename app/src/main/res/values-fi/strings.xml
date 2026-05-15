@@ -525,7 +525,7 @@
     <string name="diverted_by_dots">Siirtäjä …</string>
     <string name="diverted_by">siirtäjä</string>
     <string name="no_telephony_provider">Tilille \'%1$s\' ei ole konfiguroitu puhelinpalvelun
-        tarjoajaa</string>
+        tarjoajaa</string>log
     <string name="no_telephone_number">Mobiilipuhelu voidaan tehdä vain puhelinnumeroon</string>
     <string name="video_call">Videopuhelu</string>
     <string name="video_request">Videopyyntö</string>

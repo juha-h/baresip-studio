@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.media.AudioAttributes
@@ -852,9 +853,12 @@ object Utils {
     }
 
     fun randomColor(): Int {
-        val rnd = Random()
-        return android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256),
-                rnd.nextInt(256))
+        return Color.argb(
+            255,
+            kotlin.random.Random.nextInt(256),
+            kotlin.random.Random.nextInt(256),
+            kotlin.random.Random.nextInt(256)
+        )
     }
 
     fun requestDismissKeyguard(activity: Activity) {

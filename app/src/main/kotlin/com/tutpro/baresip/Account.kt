@@ -54,9 +54,9 @@ class Account(val accp: Long, virtualAor: String? = null) {
                 if (ob != "") {
                     outbound.add(ob)
                     i++
-                } else {
-                    break
                 }
+		else
+                    break
             }
 
             i = 0
