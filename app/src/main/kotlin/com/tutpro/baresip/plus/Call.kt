@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import java.util.*
 
-class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
+open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
 
     var status: MutableState<String> = mutableStateOf(initialStatus)
 
@@ -26,10 +26,6 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     var referTo = ""
     var videoRequest = 0
     var dumpfiles = arrayOf("", "")
-
-    fun diverterUri(): String {
-        return Api.call_diverter_uri(callp)
-    }
 
     // UI state properties
     val callUri: MutableState<String> = mutableStateOf("")
@@ -56,30 +52,22 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
     val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
 
     fun add() {
-        BaresipService.calls.add(this)
+        synchronized(BaresipService.calls) {
+            BaresipService.calls.add(this)
+        }
     }
 
     fun remove() {
-        BaresipService.calls.remove(this)
+        synchronized(BaresipService.calls) {
+            BaresipService.calls.remove(this)
+        }
     }
 
-    fun connect(uri: String): Boolean {
+    open fun connect(uri: String): Boolean {
         return Api.call_connect(callp, uri) == 0
     }
 
-    fun startVideoDisplay(): Int {
-        return Api.call_start_video_display(callp)
-    }
-
-    fun stopVideoDisplay() {
-        Api.call_stop_video_display(callp)
-    }
-
-    fun setVideoSource(front: Boolean): Int {
-        return Api.call_set_video_source(callp, front)
-    }
-
-    fun hold(): Boolean {
+    open fun hold(): Boolean {
         if (onhold) return true
         if (Api.call_hold(callp, true)) {
             onhold = true
@@ -91,7 +79,19 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return false
     }
 
-    fun resume(): Boolean {
+    open fun startVideoDisplay(): Int {
+        return Api.call_start_video_display(callp)
+    }
+
+    open fun stopVideoDisplay() {
+        Api.call_stop_video_display(callp)
+    }
+
+    open fun setVideoSource(front: Boolean): Int {
+        return Api.call_set_video_source(callp, front)
+    }
+
+    open fun resume(): Boolean {
         if (!onhold && !held) return true
         // 1. Hold other calls first
         for (c in BaresipService.calls) {
@@ -114,13 +114,13 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
         return false
     }
 
-    fun transfer(uri: String): Boolean {
+    open fun transfer(uri: String): Boolean {
         if (!onhold) hold()
         Log.d(TAG, "Transferring call $callp to $uri")
         return Api.call_transfer(callp, uri) == 0
     }
 
-    fun executeTransfer(): Boolean {
+    open fun executeTransfer(): Boolean {
         return if (onHoldCall != null) {
             if (Api.call_hold(callp, true))
                 Api.call_replace_transfer(onHoldCall!!.callp, callp)
@@ -130,93 +130,190 @@ class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: Str
             false
     }
 
-    fun sendDigit(digit: Char): Int {
+    open fun sendDigit(digit: Char): Int {
         return Api.call_send_digit(callp, digit)
     }
 
-    fun notifySipfrag(code: Int, reason: String) {
+    open fun notifySipfrag(code: Int, reason: String) {
         Api.call_notify_sipfrag(callp, code, reason)
     }
 
-    fun hasVideo(): Boolean {
-        return Api.call_has_video(callp)
-    }
-
-    fun videoEnabled(): Boolean {
-        return Api.call_video_enabled(callp)
-    }
-
-    fun disableVideoStream(disable: Boolean) {
-        Api.call_disable_video_stream(callp, disable)
-    }
-
-    fun setVideoDirection(vdir: Int) {
-        Api.call_set_video_direction(callp, vdir)
-    }
-
-    fun setMediaDirection(adir: Int, vdir: Int) {
-        Api.call_set_media_direction(callp, adir, vdir)
-    }
-
-    fun duration(): Int {
+    open fun duration(): Int {
         return Api.call_duration(callp)
     }
 
-    fun stats(stream: String): String {
+    open fun stats(stream: String): String {
         return Api.call_stats(callp, stream)
     }
 
-    fun state(): Int {
+    open fun state(): Int {
         return Api.call_state(callp)
     }
 
-    fun audioCodecs(): String {
+    open fun audioCodecs(): String {
         return Api.call_audio_codecs(callp)
     }
 
-    fun videoCodecs(): String {
+    open fun videoCodecs(): String {
         return Api.call_video_codecs(callp)
     }
 
-    fun replaces(): Boolean {
+    open fun replaces(): Boolean {
         return Api.call_replaces(callp)
+    }
+
+    open fun diverterUri(): String {
+        return Api.call_diverter_uri(callp)
+    }
+
+    open fun hasVideo(): Boolean {
+        return Api.call_has_video(callp)
+    }
+
+    open fun videoEnabled(): Boolean {
+        return Api.call_video_enabled(callp)
+    }
+
+    open fun disableVideoStream(disable: Boolean) {
+        Api.call_disable_video_stream(callp, disable)
+    }
+
+    open fun setVideoDirection(vdir: Int) {
+        Api.call_set_video_direction(callp, vdir)
+    }
+
+    open fun setMediaDirection(adir: Int, vdir: Int) {
+        Api.call_set_media_direction(callp, adir, vdir)
     }
 
     init {
         if (ua.account.mediaEnc != "") security = R.color.colorTrafficRed
     }
 
-    fun destroy() {
+    open fun destroy() {
         Api.call_destroy(callp)
+    }
+
+    open fun hangup(code: Int, reason: String) {
+        val connection = ConnectionService.connections[callp]
+        if (connection != null)
+            connection.onDisconnect()
+        else
+            Api.ua_hangup(ua.uap, callp, code, reason)
+    }
+
+    open fun answer() {
+        Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
+    }
+
+    open fun reject() {
+        this.rejected = true
+        hangup(486, "Busy Here")
+    }
+
+    class ExternalCall(
+        val telecomCall: android.telecom.Call,
+        ua: UserAgent,
+        peerUri: String,
+        dir: String,
+        initialStatus: String
+    ) : Call(telecomCall.hashCode().toLong(), ua, peerUri, dir, initialStatus) {
+
+        override fun connect(uri: String): Boolean {
+            telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
+            return true
+        }
+
+        override fun answer() {
+            telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
+        }
+
+        override fun hold(): Boolean {
+            telecomCall.hold()
+            onhold = true
+            callOnHold.value = true
+            return true
+        }
+
+        override fun resume(): Boolean {
+            telecomCall.unhold()
+            onhold = false
+            callOnHold.value = false
+            return true
+        }
+
+        override fun hangup(code: Int, reason: String) {
+            telecomCall.disconnect()
+        }
+
+        override fun reject() {
+            this.rejected = true
+            telecomCall.disconnect()
+        }
+
+        override fun destroy() {
+            telecomCall.disconnect()
+        }
+
+        override fun sendDigit(digit: Char): Int {
+            telecomCall.playDtmfTone(digit)
+            telecomCall.stopDtmfTone()
+            return 0
+        }
+
+        override fun diverterUri(): String = ""
+
+        override fun duration(): Int = 0
+        override fun stats(stream: String): String = ""
+        override fun state(): Int = 0
+        override fun audioCodecs(): String = "PSTN"
     }
 
     companion object {
 
         fun calls(): ArrayList<Call> {
-            return BaresipService.calls
+            synchronized(BaresipService.calls) {
+                return ArrayList(BaresipService.calls)
+            }
         }
 
         fun ofCallp(callp: Long): Call? {
-            for (c in BaresipService.calls)
-                if (c.callp == callp) return c
-            return null
+            synchronized(BaresipService.calls) {
+                for (c in BaresipService.calls)
+                    if (c.callp == callp) return c
+                return null
+            }
         }
 
         fun call(status: String): Call? {
-            for (c in BaresipService.calls)
-                if (c.status.value == status) return c
-            return null
+            synchronized(BaresipService.calls) {
+                for (c in BaresipService.calls)
+                    if (c.status.value == status) return c
+                return null
+            }
         }
 
         fun inCall(): Boolean {
-            return BaresipService.calls.isNotEmpty()
+            synchronized(BaresipService.calls) {
+                return BaresipService.calls.isNotEmpty()
+            }
+        }
+
+        fun hasTelecomCall(): Boolean {
+            synchronized(BaresipService.calls) {
+                return BaresipService.calls.any {
+                    it is ExternalCall || ConnectionService.connections.containsKey(it.callp)
+                } || ConnectionService.pendingOutgoingConnection != null
+            }
         }
 
         fun isAnyCallActive(ctx: Context): Boolean {
-            // Check if there exist SIP calls that are not onhold or held
-            if (BaresipService.calls.any { !it.onhold && !it.held }) return true
-            // MODE_IN_CALL indicates a PSTN call is active
-            return Utils.isAudioMode(ctx, AudioManager.MODE_IN_CALL)
+            synchronized(BaresipService.calls) {
+                // Check if there exist SIP calls that are not onhold or held
+                if (BaresipService.calls.any { !it.onhold && !it.held }) return true
+                // MODE_IN_CALL indicates a PSTN call is active
+                return Utils.isAudioMode(ctx, AudioManager.MODE_IN_CALL)
+            }
         }
     }
 }

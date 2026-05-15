@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                 val first = BaresipService.serviceEvents.removeAt(0)
                 if (taskId != -1) {
                     if (first.event == "started" && !initialized)
-                    // Android has restarted baresip when permission has been denied in app settings
+                        // Android has restarted baresip when permission has been denied in app settings
                         recreate()
                     else {
                         if (first.event == "stopped") {
@@ -229,7 +229,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 else {
-                    if (shouldShow.isNotEmpty()) {
+                    if (shouldShow.isNotEmpty())
                         handleDialog(
                             ctx = applicationContext,
                             title = getString(R.string.permissions_rationale),
@@ -239,15 +239,13 @@ class MainActivity : ComponentActivity() {
                                 getString(R.string.audio_permissions),
                             action = { requestPermissionsLauncher.launch(permissions) }
                         )
-                    }
-                    else {
+                    else
                         if (!BaresipService.isStartReceived) {
                             baresipService.action = "Start"
                             ContextCompat.startForegroundService(this, baresipService)
                             if (atStartup)
                                 moveTaskToBack(true)
                         }
-                    }
                 }
             }
 
@@ -270,7 +268,9 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(route)
                             }
                             is NavigationCommand.NavigateToHome -> {
-                                navController.navigate("main")
+                                navController.navigate("main") {
+                                    popUpTo("main") { inclusive = true }
+                                }
                             }
                         }
                     }
@@ -304,6 +304,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     } // OnCreate
 
     override fun onStart() {

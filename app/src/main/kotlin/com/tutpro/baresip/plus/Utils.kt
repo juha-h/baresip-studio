@@ -1,12 +1,14 @@
 package com.tutpro.baresip.plus
 
-import android.annotation.SuppressLint
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.role.RoleManager
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
+import android.content.Context.ROLE_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -32,6 +34,8 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.telecom.TelecomManager
 import android.telecom.PhoneAccountHandle
 import android.text.format.DateUtils
@@ -130,7 +134,10 @@ object Utils {
         return if (uri.contains("@"))
             uri.substringAfter(":").substringBefore("@")
         else
-            ""
+            if (isTelUri(uri))
+                uri.substringAfter(":").substringBefore(";")
+            else
+                ""
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
@@ -183,13 +190,13 @@ object Utils {
     }
 
     fun e164Uri(uri: String, countryCode: String): String {
-        if (countryCode == "") return uri
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
         return if (userPart.isDigitsOnly()) {
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
-                        scheme + userPart.substring(2))
+                    scheme + "+" + userPart.substring(2))
+                countryCode == "" -> uri
                 userPart.startsWith("0") -> uri.replace("${scheme}0",
                     "$scheme$countryCode")
                 else -> uri.replace(scheme, "$scheme$countryCode")
@@ -838,11 +845,6 @@ object Utils {
         return true
     }
 
-    fun requestDismissKeyguard(activity: Activity) {
-        val keyguardManager = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        keyguardManager.requestDismissKeyguard(activity, null)
-    }
-
     @Suppress("unused")
     fun dumpIntent(intent: Intent) {
         val bundle: Bundle = intent.extras ?: return
@@ -857,9 +859,17 @@ object Utils {
     }
 
     fun randomColor(): Int {
-        val rnd = Random()
-        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256),
-                rnd.nextInt(256))
+        return Color.argb(
+            255,
+            kotlin.random.Random.nextInt(256),
+            kotlin.random.Random.nextInt(256),
+            kotlin.random.Random.nextInt(256)
+        )
+    }
+
+    fun requestDismissKeyguard(activity: Activity) {
+        val keyguardManager = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        keyguardManager.requestDismissKeyguard(activity, null)
     }
 
     fun supportedCameras(ctx: Context): Map<String, Int> {
@@ -1181,6 +1191,66 @@ object Utils {
         return file
     }
 
+    @RequiresApi(29)
+    fun pstnAccountHandle(ctx: Context):  PhoneAccountHandle? {
+        val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+        if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
+                    PackageManager.PERMISSION_GRANTED &&
+                roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
+            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
+            if (preferredHandle != null)
+                return preferredHandle
+            val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
+            val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
+            return if (phoneAccounts.isNotEmpty())
+                phoneAccounts[0]
+            else
+                null
+        }
+        else {
+            Log.d(TAG, "READ_PHONE_STATE permission not granted")
+            return null
+        }
+    }
+
+    @SuppressLint("HardwareIds")
+    fun getLine1Number(ctx: Context): String? {
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_NUMBERS) ==
+                        PackageManager.PERMISSION_GRANTED) {
+                    val sm = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                    val number = sm.getPhoneNumber(SubscriptionManager.DEFAULT_SUBSCRIPTION_ID)
+                    if (number != "") {
+                        Log.d(TAG, "Retrieved SIM number $number via SubscriptionManager")
+                        return number
+                    }
+                    else
+                        Log.d(TAG, "Did not get SIM number via SubscriptionManager")
+                }
+                else
+                    Log.d(TAG, "No READ_PHONE_NUMBERS permission")
+            } else {
+                if (checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS,
+                        Manifest.permission.READ_PHONE_STATE))) {
+                    val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    @Suppress("DEPRECATION")
+                    val number = tm.line1Number
+                    if (number != null) {
+                        Log.d(TAG, "Retrieved SIM number $number via TelephonyManager")
+                        return number
+                    }
+                }
+                else
+                    Log.d(TAG, "No READ_PHONE_NUMBERS and/or READ_PHONE_STATE permissions")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "getLine1Number failed: ${e.message}")
+        }
+        return null
+    }
+
     @Suppress("unused")
     fun playFile(ctx: Context, path: String) {
         Log.d(TAG, "Playing file $path")
@@ -1361,8 +1431,7 @@ object Utils {
     }
 
     fun createTextAvatar(letter: String, colorHex: String): Bitmap {
-        // Standard notification large icon size is usually 64dp or 48dp.
-        // We use a decent resolution (e.g. 128x128) and let Android scale it down.
+        // Use decent resolution 128x128 and let Android scale it down.
         val size = 128
 
         // Use KTX createBitmap to match toCircle style

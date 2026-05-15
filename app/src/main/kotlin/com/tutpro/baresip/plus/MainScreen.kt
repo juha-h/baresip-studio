@@ -14,12 +14,15 @@ import android.media.AudioManager
 import android.media.MediaActionSound
 import android.net.Uri
 import android.os.Build.VERSION
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import android.os.SystemClock
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.telecom.TelecomManager
+import android.view.WindowManager
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,7 +44,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,14 +51,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -167,7 +166,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tutpro.baresip.plus.BaresipService.Companion.contactNames
 import com.tutpro.baresip.plus.BaresipService.Companion.uas
 import com.tutpro.baresip.plus.BaresipService.Companion.uasStatus
@@ -253,16 +251,19 @@ private fun MainScreen(
                     BaresipService.isMainVisible = true
                     viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
                     viewModel.updateCalls(Call.calls().toList())
+
+                    if (Call.inCall())
+                        (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else
+                        (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
                     (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
-                        spinToAor(viewModel, it.ua.account.aor)
+                        spinToAor(viewModel, it.ua.account.aor, it)
                     } ?: run {
                         if (uas.value.isNotEmpty() && viewModel.selectedAor.value == "")
                             spinToAor(viewModel, uas.value.first().account.aor)
-                    }
-                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)
-                    if (ua != null) {
-                        showCall(ctx, viewModel, ua)
-                        viewModel.triggerAccountUpdate()
+                        else
+                            viewModel.triggerAccountUpdate()
                     }
                 }
 
@@ -376,16 +377,6 @@ private fun MainScreen(
         }
     }
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    LaunchedEffect(currentRoute, viewModel.selectedAor.collectAsState()) {
-        if (currentRoute == "main") {
-            Log.d(TAG, "Updating icons for AOR: ${viewModel.selectedAor.value}")
-            viewModel.triggerAccountUpdate()
-        }
-    }
-
     if (showVideoLayout.value)
         VideoLayout(ctx = ctx, viewModel= viewModel,
             onCloseVideo = {
@@ -454,13 +445,15 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
                 alertTitle.value = noticeTitle
                 alertMessage.value = noBackupMessage
                 showAlert.value = true
-            } else {
+            }
+            else {
                 val path = Utils.downloadsPath("baresip+.bs")
                 downloadsOutputUri = File(path).toUri()
                 passwordTitle.value = encryptPasswordTitle
                 showPasswordDialog.value = true
             }
-        } else {
+        }
+        else {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/octet-stream"
@@ -500,13 +493,15 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
                 alertTitle.value = noticeTitle
                 alertMessage.value = noRestoreMessage
                 showAlert.value = true
-            } else {
+            }
+            else {
                 val path = Utils.downloadsPath("baresip+.bs")
                 downloadsInputUri = File(path).toUri()
                 passwordTitle.value = decryptPasswordTitle
                 showPasswordDialog.value = true
             }
-        } else {
+        }
+        else {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/octet-stream"
@@ -571,11 +566,8 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(
-                        WindowInsets.statusBars
-                            .union(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
-                            .asPaddingValues()
+                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                     )
-                    //.padding(WindowInsets.systemBars.asPaddingValues())
             ) {
                 TopAppBar(
                     viewModel = viewModel,
@@ -589,8 +581,8 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
             }
         },
         bottomBar = { BottomBar(ctx, viewModel, navController) },
-        content = { innerPadding ->
-            MainContent(navController, viewModel, innerPadding)
+        content = { contentPadding ->
+            MainContent(navController, viewModel, contentPadding)
         }
     )
 }
@@ -814,6 +806,9 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     val hasNewVoicemail = remember(aor, accountUpdate) {
         if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
     }
+    val isMobile = remember(aor, accountUpdate) {
+        if (aor.isNotEmpty()) Account.ofAor(aor)?.isMobile ?: false else false
+    }
     val hasUnreadMessages = remember(aor, accountUpdate) {
         if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
     }
@@ -842,19 +837,26 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     val ua = UserAgent.ofAor(aor)!!
                     val acc = ua.account
                     if (acc.vmUri.isNotEmpty()) {
-                        dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                        dialogMessage.value = acc.vmMessages(ctx)
-                        firstText.value = ctx.getString(R.string.cancel)
-                        onFirstClicked.value = {}
-                        secondText.value = ""
-                        lastText.value = ctx.getString(R.string.listen)
-                        onLastClicked.value = {
+                        if (isMobile) {
                             val intent = Intent(ctx, MainActivity::class.java)
                             intent.putExtra("uap", ua.uap)
                             intent.putExtra("peer", acc.vmUri)
                             handleIntent(ctx, viewModel, intent, "call")
+                        } else {
+                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
+                            dialogMessage.value = acc.vmMessages(ctx)
+                            firstText.value = ctx.getString(R.string.cancel)
+                            onFirstClicked.value = {}
+                            secondText.value = ""
+                            lastText.value = ctx.getString(R.string.listen)
+                            onLastClicked.value = {
+                                val intent = Intent(ctx, MainActivity::class.java)
+                                intent.putExtra("uap", ua.uap)
+                                intent.putExtra("peer", acc.vmUri)
+                                handleIntent(ctx, viewModel, intent, "call")
+                            }
+                            showDialog.value = true
                         }
-                        showDialog.value = true
                     }
                 },
                 modifier = Modifier
@@ -883,22 +885,23 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             )
         }
 
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = {
-                navController.navigate("chats/$aor")
-            },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-            )
-        }
+        if (!isMobile)
+            IconButton(
+                enabled = aor.isNotEmpty(),
+                onClick = {
+                    navController.navigate("chats/$aor")
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .size(buttonSize)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Chat,
+                    contentDescription = null,
+                    Modifier.size(buttonSize),
+                    tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+                )
+            }
 
         IconButton(
             enabled = aor.isNotEmpty(),
@@ -956,7 +959,7 @@ private fun CallCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MainContent(navController: NavController, viewModel: ViewModel, innerPadding: PaddingValues) {
+private fun MainContent(navController: NavController, viewModel: ViewModel, contentPadding: PaddingValues) {
 
     var isRefreshing by remember { mutableStateOf(false) }
     val refreshState = rememberPullToRefreshState()
@@ -966,6 +969,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
 
     val calls by viewModel.calls.collectAsState()
     val selectedAor by viewModel.selectedAor.collectAsState()
+    val ua = uas.value.find { it.account.aor == selectedAor }
     val aorCalls = calls.filter { it.ua.account.aor == selectedAor }
     val hasActiveCalls = aorCalls.any { !it.callOnHold.value }
     val conferenceCall = aorCalls.any { it.conferenceCall }
@@ -989,7 +993,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(innerPadding)
+            .padding(contentPadding)
             .padding(top = 18.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
             .fillMaxSize()
             .pullToRefresh(
@@ -1056,7 +1060,12 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, inne
             }
         }
 
-        if (!hasActiveCalls || conferenceCall)
+        val showEmptyCard = if (ua?.account?.isMobile == true)
+            aorCalls.isEmpty()
+        else
+            !hasActiveCalls || conferenceCall
+
+        if (showEmptyCard)
             CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
 
         Indicator(
@@ -1073,20 +1082,21 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     val selected: String by viewModel.selectedAor.collectAsState()
+    val accountUpdate by viewModel.accountUpdate.collectAsState()
     val uasValue by uas
 
-    LaunchedEffect(uasValue, selected) {
-        if (uasValue.isEmpty()) {
+    LaunchedEffect(uasValue, selected, accountUpdate) {
+        val selected = viewModel.selectedAor.value
+        if (uas.value.isEmpty()) {
             if (selected != "") viewModel.updateSelectedAor("")
         } else {
             if (selected == "" || UserAgent.ofAor(selected) == null) {
-                viewModel.updateSelectedAor(uasValue.first().account.aor)
+                viewModel.updateSelectedAor(uas.value.first().account.aor)
             }
         }
-        val ua = UserAgent.ofAor(selected)
+        val ua = UserAgent.ofAor(viewModel.selectedAor.value)
         if (ua != null) {
-            showCall(ctx, viewModel, ua)
-            viewModel.triggerAccountUpdate()
+            showCall(ctx, viewModel, ua, viewModel.focusedCall.value)
         }
     }
 
@@ -1214,9 +1224,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
-                            viewModel.updateSelectedAor(acc.aor)
-                            showCall(ctx, viewModel, ua)
-                            viewModel.triggerAccountUpdate()
+                            spinToAor(viewModel, acc.aor)
                         },
                         text = { Text(
                             text = acc.text(),
@@ -1231,8 +1239,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             )
                         }
                     )
-                    if (index < uas.value.size - 1) {
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant) }
+                    if (index < uas.value.size - 1)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }
@@ -1521,7 +1529,8 @@ private fun CallRow(
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        horizontalArrangement = if (isDialer || call?.showCancelButton?.value == true || call?.showAnswerRejectButtons?.value == true)
+            Arrangement.Center else Arrangement.SpaceBetween
     ) {
         if (isDialer) {
 
@@ -1617,18 +1626,8 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        if (BaresipService.telecom) {
-                            val connection = ConnectionService.connections[call.callp]
-                            if (connection != null)
-                                connection.onDisconnect()
-                            else {
-                                Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
-                                Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                            }
-                        } else {
-                            Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
-                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                        }
+                        Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
+                        call.hangup(487, "Request Terminated")
                     },
                 ) {
                     Icon(
@@ -1648,18 +1647,8 @@ private fun CallRow(
                     onClick = {
                         if (call.terminated.value) return@IconButton
                         call.terminated.value = true
-                        if (BaresipService.telecom) {
-                            val connection = ConnectionService.connections[call.callp]
-                            if (connection != null)
-                                connection.onDisconnect()
-                            else {
-                                Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
-                                Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                            }
-                        } else {
-                            Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
-                            Api.ua_hangup(call.ua.uap, call.callp, 487, "Request Terminated")
-                        }
+                        Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
+                        call.hangup(487, "Request Terminated")
                     }
                 ) {
                     Icon(
@@ -1691,310 +1680,315 @@ private fun CallRow(
                             contentDescription = null,
                         )
                     }
+            }
 
-                if (!call.conferenceCall)
-                    IconButton(    modifier = Modifier.size(48.dp),
-                        onClick = {
-                            if (call.callOnHold.value) {
-                                Log.d(TAG, "User requested resume for ${call.callp}")
-                                call.resume() // This now automatically holds other calls
-                            } else {
-                                Log.d(TAG, "User requested hold for ${call.callp}")
-                                call.hold()
+            if (call.showHangupButton.value && !call.conferenceCall)
+                IconButton(    modifier = Modifier.size(48.dp),
+                    onClick = {
+                        if (call.callOnHold.value) {
+                            Log.d(TAG, "User requested resume for ${call.callp}")
+                            call.resume() // This automatically holds other calls
+                        }
+                        else {
+                            Log.d(TAG, "User requested hold for ${call.callp}")
+                            call.hold()
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.PauseCircle,
+                        modifier = Modifier.size(42.dp),
+                        tint = if (call.callOnHold.value)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
+
+            var showTransferDialog by remember { mutableStateOf(false) }
+
+            if (call.showHangupButton.value && !call.conferenceCall && !call.ua.account.isMobile)
+                IconButton(
+                    modifier = Modifier.size(48.dp),
+                    enabled = call.transferButtonEnabled.value,
+                    onClick = {
+                        if (call.onHoldCall != null) {
+                            if (!Api.call_supported(call.callp, Api.REPLACES)) {
+                                alertTitle.value = ctx.getString(R.string.notice)
+                                alertMessage.value = ctx.getString(R.string.replaces_not_supported)
+                                showAlert.value = true
                             }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.PauseCircle,
-                            modifier = Modifier.size(42.dp),
-                            tint = if (call.callOnHold.value)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.secondary,
-                            contentDescription = null,
-                        )
-                    }
-
-                var showTransferDialog by remember { mutableStateOf(false) }
-
-                if (!call.conferenceCall)
-                    IconButton(
-                        modifier = Modifier.size(48.dp),
-                        enabled = call.transferButtonEnabled.value,
-                        onClick = {
-                            if (call.onHoldCall != null) {
-                                if (!Api.call_supported(call.callp, Api.REPLACES)) {
-                                   alertTitle.value = ctx.getString(R.string.notice)
-                                    alertMessage.value = ctx.getString(R.string.replaces_not_supported)
+                            else {
+                                call.hold()
+                                if (!call.executeTransfer()) {
+                                    alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.transfer_failed)
                                     showAlert.value = true
                                 }
-                                else {
-                                    val connection = ConnectionService.connections[call.callp]
-                                    connection?.onHold()
-                                    if (!call.executeTransfer()) {
-                                        alertTitle.value = ctx.getString(R.string.notice)
-                                        alertMessage.value = ctx.getString(R.string.transfer_failed)
-                                        showAlert.value = true
+                            }
+                        }
+                        else
+                            showTransferDialog = true
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ArrowCircleRight,
+                        modifier = Modifier.size(42.dp),
+                        tint = if (call.callTransfer.value)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
+
+            if (showTransferDialog) {
+
+                val showDialog = remember { mutableStateOf(true) }
+                val blindChecked = remember { mutableStateOf(true) }
+
+                if (showDialog.value)
+                    BasicAlertDialog(
+                        onDismissRequest = {
+                            viewModel.requestHideKeyboard()
+                            showDialog.value = false
+                            showTransferDialog = false
+                        }
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = stringResource(R.string.call_transfer),
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                var transferUri by remember { mutableStateOf("") }
+                                val suggestions by remember { contactNames }
+                                var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
+                                val focusRequester = remember { FocusRequester() }
+                                val lazyListState = rememberLazyListState()
+                                OutlinedTextField(
+                                    value = transferUri,
+                                    singleLine = true,
+                                    onValueChange = {
+                                        if (it != transferUri) {
+                                            transferUri = it
+                                            if (it.length > 1) {
+                                                val normalizedInput = Utils.unaccent(it)
+                                                filteredSuggestions =
+                                                    suggestions.filter { suggestion ->
+                                                        Utils.unaccent(suggestion)
+                                                            .contains(normalizedInput, ignoreCase = true)
+                                                    }
+                                                        .map { suggestion ->
+                                                            Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                                                        }
+                                            }
+                                            call.showSuggestions.value = transferUri.length > 1
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        if (transferUri.isNotEmpty())
+                                            Icon(
+                                                Icons.Outlined.Clear,
+                                                contentDescription = null,
+                                                modifier = Modifier.clickable {
+                                                    if (call.showSuggestions.value)
+                                                        call.showSuggestions.value = false
+                                                    else
+                                                        transferUri = ""
+                                                },
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = 4.dp,
+                                            end = 4.dp,
+                                            top = 12.dp,
+                                            bottom = 2.dp
+                                        )
+                                        .focusRequester(focusRequester),
+                                    label = { Text(stringResource(R.string.transfer_destination)) },
+                                    textStyle = TextStyle(fontSize = 18.sp),
+                                    keyboardOptions = if (isDialpadVisible)
+                                        KeyboardOptions(keyboardType = KeyboardType.Phone)
+                                    else
+                                        KeyboardOptions(keyboardType = KeyboardType.Text)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .shadow(8.dp, RoundedCornerShape(8.dp))
+                                        .background(
+                                            color = MaterialTheme.colorScheme.surfaceVariant,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .animateContentSize()
+                                ) {
+                                    if (call.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
+                                        Box(modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(max = 150.dp)) {
+                                            LazyColumn(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .verticalScrollbar(
+                                                        state = lazyListState,
+                                                        width = 6.dp,
+                                                    ),
+                                                horizontalAlignment = Alignment.Start,
+                                                state = lazyListState,
+                                            ) {
+                                                items(
+                                                    items = filteredSuggestions,
+                                                    key = { suggestion -> suggestion.toString() }
+                                                ) { suggestion ->
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .clickable {
+                                                                transferUri =
+                                                                    suggestion.toString()
+                                                                call.showSuggestions.value =
+                                                                    false
+                                                            }
+                                                            .padding(12.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = suggestion,
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                            fontSize = 18.sp
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            else
-                                showTransferDialog = true
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowCircleRight,
-                            modifier = Modifier.size(42.dp),
-                            tint = if (call.callTransfer.value)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.secondary,
-                            contentDescription = null,
-                        )
-                    }
-
-                if (showTransferDialog) {
-
-                    val showDialog = remember { mutableStateOf(true) }
-                    val blindChecked = remember { mutableStateOf(true) }
-
-                    if (showDialog.value)
-                        BasicAlertDialog(
-                            onDismissRequest = {
-                                viewModel.requestHideKeyboard()
-                                showDialog.value = false
-                                showTransferDialog = false
-                            }
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                                )
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = stringResource(R.string.call_transfer),
-                                        fontSize = 20.sp,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                    )
-                                    var transferUri by remember { mutableStateOf("") }
-                                    val suggestions by remember { contactNames }
-                                    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
-                                    val focusRequester = remember { FocusRequester() }
-                                    val lazyListState = rememberLazyListState()
-                                    OutlinedTextField(
-                                        value = transferUri,
-                                        singleLine = true,
-                                        onValueChange = {
-                                            if (it != transferUri) {
-                                                transferUri = it
-                                                if (it.length > 1) {
-                                                    val normalizedInput = Utils.unaccent(it)
-                                                    filteredSuggestions =
-                                                        suggestions.filter { suggestion ->
-                                                            Utils.unaccent(suggestion)
-                                                                .contains(normalizedInput, ignoreCase = true)
-                                                        }
-                                                            .map { suggestion ->
-                                                                Utils.buildAnnotatedStringWithHighlight(suggestion, it)
-                                                            }
-                                                }
-                                                call.showSuggestions.value = transferUri.length > 1
-                                            }
-                                        },
-                                        trailingIcon = {
-                                            if (transferUri.isNotEmpty())
-                                                Icon(
-                                                    Icons.Outlined.Clear,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.clickable {
-                                                        if (call.showSuggestions.value)
-                                                            call.showSuggestions.value = false
-                                                        else
-                                                            transferUri = ""
-                                                    },
-                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                start = 4.dp,
-                                                end = 4.dp,
-                                                top = 12.dp,
-                                                bottom = 2.dp
-                                            )
-                                            .focusRequester(focusRequester),
-                                        label = { Text(stringResource(R.string.transfer_destination)) },
-                                        textStyle = TextStyle(fontSize = 18.sp),
-                                        keyboardOptions = if (isDialpadVisible)
-                                            KeyboardOptions(keyboardType = KeyboardType.Phone)
-                                        else
-                                            KeyboardOptions(keyboardType = KeyboardType.Text)
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .shadow(8.dp, RoundedCornerShape(8.dp))
-                                            .background(
-                                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                                shape = RoundedCornerShape(8.dp)
-                                            )
-                                            .animateContentSize()
-                                    ) {
-                                        if (call.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
-                                            Box(modifier = Modifier
-                                                .fillMaxWidth()
-                                                .heightIn(max = 150.dp)) {
-                                                LazyColumn(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .verticalScrollbar(
-                                                            state = lazyListState,
-                                                            width = 6.dp,
-                                                        ),
-                                                    horizontalAlignment = Alignment.Start,
-                                                    state = lazyListState,
-                                                ) {
-                                                    items(
-                                                        items = filteredSuggestions,
-                                                        key = { suggestion -> suggestion.toString() }
-                                                    ) { suggestion ->
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .clickable {
-                                                                    transferUri = suggestion.toString()
-                                                                    call.showSuggestions.value = false
-                                                                }
-                                                                .padding(12.dp)
-                                                        ) {
-                                                            Text(
-                                                                text = suggestion,
-                                                                modifier = Modifier.fillMaxWidth(),
-                                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                                fontSize = 18.sp
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (call.replaces())
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Start,
-                                        ) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = stringResource(R.string.blind),
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.padding(8.dp),
-                                                )
-                                                Switch(
-                                                    checked = blindChecked.value,
-                                                    onCheckedChange = {
-                                                        blindChecked.value = true
-                                                    }
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = stringResource(R.string.attended),
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.padding(8.dp),
-                                                )
-                                                Switch(
-                                                    checked = !blindChecked.value,
-                                                    onCheckedChange = {
-                                                        blindChecked.value = false
-                                                    }
-                                                )
-                                            }
-                                        }
+                                if (call.replaces())
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        horizontalArrangement = Arrangement.Start,
                                     ) {
-                                        TextButton(
-                                            onClick = {
-                                                viewModel.requestHideKeyboard()
-                                                showDialog.value = false
-                                                showTransferDialog = false
-                                            },
-                                            modifier = Modifier.padding(end = 32.dp),
-                                        ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
-                                                text = stringResource(R.string.cancel),
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                text = stringResource(R.string.blind),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(8.dp),
+                                            )
+                                            Switch(
+                                                checked = blindChecked.value,
+                                                onCheckedChange = {
+                                                    blindChecked.value = true
+                                                }
                                             )
                                         }
-                                        TextButton(
-                                            onClick = {
-                                                call.showSuggestions.value = false
-                                                var uriText = transferUri.trim()
-                                                if (uriText.isNotEmpty()) {
-                                                    val uris = Contact.contactUris(uriText)
-                                                    if (uris.size > 1) {
-                                                        selectItems.value = uris
-                                                        selectItemAction.value = { index ->
-                                                            val uri = uris[index]
-                                                            transfer(
-                                                                ctx,
-                                                                viewModel,
-                                                                call.ua,
-                                                                if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
-                                                                !blindChecked.value
-                                                            )
-                                                            showSelectItemDialog.value = false
-                                                        }
-                                                        showSelectItemDialog.value = true
-                                                    }
-                                                    else {
-                                                        if (uris.size == 1) uriText = uris[0]
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = stringResource(R.string.attended),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(8.dp),
+                                            )
+                                            Switch(
+                                                checked = !blindChecked.value,
+                                                onCheckedChange = {
+                                                    blindChecked.value = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TextButton(
+                                        onClick = {
+                                            viewModel.requestHideKeyboard()
+                                            showDialog.value = false
+                                            showTransferDialog = false
+                                        },
+                                        modifier = Modifier.padding(end = 32.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.cancel),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = {
+                                            call.showSuggestions.value = false
+                                            var uriText = transferUri.trim()
+                                            if (uriText.isNotEmpty()) {
+                                                val uris = Contact.contactUris(uriText)
+                                                if (uris.size > 1) {
+                                                    selectItems.value = uris
+                                                    selectItemAction.value = { index ->
+                                                        val uri = uris[index]
                                                         transfer(
                                                             ctx,
                                                             viewModel,
                                                             call.ua,
-                                                            if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                            if (Utils.isTelNumber(uri)) "tel:$uri" else uri,
                                                             !blindChecked.value
                                                         )
+                                                        showSelectItemDialog.value = false
                                                     }
-                                                    viewModel.requestHideKeyboard()
-                                                    showDialog.value = false
-                                                    showTransferDialog = false
+                                                    showSelectItemDialog.value = true
                                                 }
-                                            },
-                                            modifier = Modifier.padding(end = 16.dp),
-                                        ) {
-                                            Text(
-                                                text = stringResource(
-                                                    if (blindChecked.value)
-                                                        R.string.transfer
-                                                    else
-                                                        R.string.call
-                                                ).uppercase(),
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
+                                                else {
+                                                    if (uris.size == 1) uriText = uris[0]
+                                                    transfer(
+                                                        ctx,
+                                                        viewModel,
+                                                        call.ua,
+                                                        if (Utils.isTelNumber(uriText)) "tel:$uriText" else uriText,
+                                                        !blindChecked.value
+                                                    )
+                                                }
+                                                viewModel.requestHideKeyboard()
+                                                showDialog.value = false
+                                                showTransferDialog = false
+                                            }
+                                        },
+                                        modifier = Modifier.padding(end = 16.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(
+                                                if (blindChecked.value)
+                                                    R.string.transfer
+                                                else
+                                                    R.string.call
+                                            ).uppercase(),
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
                                     }
                                 }
                             }
                         }
+                    }
 
-                }
+            }
 
-                val focusRequester = remember { FocusRequester() }
-                val shouldRequestFocus by call.focusDtmf
-                val interactionSource = remember { MutableInteractionSource() }
+            val focusRequester = remember { FocusRequester() }
+            val shouldRequestFocus by call.focusDtmf
+            val interactionSource = remember { MutableInteractionSource() }
+
+            if (call.showHangupButton.value)
                 BasicTextField(
                     value = call.dtmfText.value,
                     onValueChange = { newText ->
@@ -2049,6 +2043,8 @@ private fun CallRow(
                         )
                     }
                 )
+
+            if (call.showHangupButton.value)
                 LaunchedEffect(shouldRequestFocus) {
                     if (shouldRequestFocus) {
                         focusRequester.requestFocus()
@@ -2056,6 +2052,7 @@ private fun CallRow(
                     }
                 }
 
+            if (call.showHangupButton.value && !call.ua.account.isMobile)
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     onClick = {
@@ -2095,7 +2092,6 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
-            }
 
             if (call.showAnswerRejectButtons.value) {
 
@@ -2128,6 +2124,8 @@ private fun CallRow(
                         )
                     }
                 }
+
+                Spacer(Modifier.weight(1f))
 
                 IconButton(
                     modifier = Modifier.size(48.dp),
@@ -2489,10 +2487,14 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
     }
 }
 
-private fun spinToAor(viewModel: ViewModel, aor: String) {
-    if (aor != viewModel.selectedAor.value)
-        viewModel.updateSelectedAor(aor)
-    viewModel.triggerAccountUpdate()
+private fun spinToAor(viewModel: ViewModel, aor: String, call: Call? = null) {
+    val aorChanged = aor != viewModel.selectedAor.value
+    val callChanged = call != viewModel.focusedCall.value
+    val statusChanged = call != null && call.status.value != viewModel.focusedCall.value?.status?.value
+    if (aorChanged || callChanged || statusChanged) {
+        if (aorChanged) viewModel.updateSelectedAor(aor)
+        viewModel.triggerAccountUpdate(call)
+    }
 }
 
 private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?, video: Boolean) {
@@ -2506,7 +2508,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         ctx,
                         viewModel,
                         uriText,
-                        dialerState.showCallConferenceButton.value,
+                        dialerState,
                         video
                     )
                 else if (uris.size == 1)
@@ -2514,7 +2516,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         ctx,
                         viewModel,
                         uris[0],
-                        dialerState.showCallConferenceButton.value,
+                        dialerState,
                         video
                     )
                 else {
@@ -2524,7 +2526,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                             ctx,
                             viewModel,
                             uris[index],
-                            dialerState.showCallConferenceButton.value,
+                            dialerState,
                             video
                         )
                     }
@@ -2559,14 +2561,8 @@ fun videoClick(ctx: Context, call: Call) {
     showVideoLayout.value = true
 }
 
-private fun makeCall(
-    ctx: Context,
-    viewModel: ViewModel,
-    uriText: String,
-    conferenceCall: Boolean,
-    videoCall: Boolean,
-    onHoldCallp: Long = 0L
-) {
+private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
+                     dialerState: ViewModel.DialerState, videoCall: Boolean, onHoldCallp: Long = 0L) {
     val aor = viewModel.selectedAor.value
     val ua = UserAgent.ofAor(aor)!!
     val peerUri = if (Utils.isTelNumber(uriText))
@@ -2574,13 +2570,16 @@ private fun makeCall(
     else
         uriText
     val uri = if (Utils.isTelUri(peerUri)) {
-        if (ua.account.telProvider == "") {
+        if (ua.account.isMobile)
+            peerUri
+        else if (ua.account.telProvider == "") {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = String.format(ctx.getString(R.string.no_telephony_provider), aor)
             showAlert.value = true
             return
         }
-        Utils.telToSip(peerUri, ua.account)
+        else
+            Utils.telToSip(peerUri, ua.account)
     }
     else
         Utils.uriComplete(peerUri, aor)
@@ -2588,41 +2587,64 @@ private fun makeCall(
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
         showAlert.value = true
+        return
+    }
+    else if (ua.account.isMobile && !Utils.isTelUri(uri)) {
+        alertTitle.value = ctx.getString(R.string.notice)
+        alertMessage.value = ctx.getString(R.string.no_telephone_number)
+        showAlert.value = true
+        return
     }
     else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
-        if (BaresipService.telecom) {
-            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
-            val extras = android.os.Bundle()
-            extras.putParcelable(android.telecom.TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
-                BaresipService.getPhoneAccountHandle(ctx))
-            val callExtras = android.os.Bundle()
-            callExtras.putBoolean("conferenceCall", conferenceCall)
+        var error = ""
+        val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+        if (VERSION.SDK_INT >= 29 && ua.account.isMobile) {
+            val phoneAccountHandle = Utils.pstnAccountHandle(ctx)
+            if (phoneAccountHandle != null) {
+                val extras = Bundle().apply {
+                    putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
+                }
+                val callExtras = Bundle()
+                callExtras.putBoolean("pstnCall", true)
+                callExtras.putString("aor", aor)
+                extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+                try {
+                    Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
+                    tm.placeCall(uri.toUri(), extras)
+                } catch (e: SecurityException) {
+                    error = "placeCall failed: ${e.message}"
+                }
+            }
+            else
+                error = "no phone account"
+        }
+        else {
+            val extras = Bundle()
+            extras.putParcelable(
+                TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
+                BaresipService.getPhoneAccountHandle(ctx)
+            )
+            val callExtras = Bundle()
+            callExtras.putBoolean("conferenceCall", dialerState.showCallConferenceButton.value)
             callExtras.putBoolean("videoCall", videoCall)
             callExtras.putLong("uap", ua.uap)
             if (onHoldCallp != 0L)
                 callExtras.putLong("onHoldCallp", onHoldCallp)
-            extras.putBundle(android.telecom.TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
+            extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
             try {
-                Log.d(TAG, "Placing Telecom call to $uri with uap=${ua.uap}")
+                Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
                 tm.placeCall(uri.toUri(), extras)
             } catch (e: SecurityException) {
-                Log.e(TAG, "placeCall failed: ${e.message}")
-                viewModel.dialerState.callButtonsEnabled.value = true
+                error = "placeCall failed: ${e.message}"
             }
         }
-        else {
-            val intent = Intent(ctx, BaresipService::class.java)
-            intent.action = "Start Call"
-            intent.putExtra("uap", ua.uap)
-            intent.putExtra("uri", uri)
-            intent.putExtra("conferenceCall", conferenceCall)
-            intent.putExtra("videoCall", videoCall)
-            intent.putExtra("onHoldCallp", onHoldCallp)
-            ctx.startService(intent)
+        if (error != "") {
+            Log.e(TAG, error)
+            viewModel.dialerState.callButtonsEnabled.value = true
         }
     }
 }
@@ -2644,8 +2666,6 @@ private fun answer(ctx: Context, call: Call, videoCall: Boolean) {
         call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
         call.disableVideoStream(true)
     }
-    if (BaresipService.telecom)
-        ConnectionService.connections[call.callp]?.setActive()
     val intent = Intent(ctx, BaresipService::class.java)
     intent.action = "Call Answer"
     intent.putExtra("uap", call.ua.uap)
@@ -2655,19 +2675,7 @@ private fun answer(ctx: Context, call: Call, videoCall: Boolean) {
 
 private fun reject(call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp} from ${call.callUri.value}")
-    if (BaresipService.telecom) {
-        val connection = ConnectionService.connections[call.callp]
-        if (connection != null)
-            connection.onReject()
-        else {
-            call.rejected = true
-            Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
-        }
-    }
-    else {
-        call.rejected = true
-        Api.ua_hangup(call.ua.uap, call.callp, 486, "Busy Here")
-    }
+    call.reject()
 }
 
 private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText: String, attended: Boolean) {
@@ -2684,27 +2692,15 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
         val call = ua.currentCall()
         if (call != null) {
             if (attended) {
-                val connection = ConnectionService.connections[call.callp]
-                val success = if (connection != null) {
-                    connection.onHold()
-                    true
-                } else {
-                    call.hold()
-                }
-                if (success) {
+                if (call.hold()) {
                     call.onhold = true
                     call.referTo = uri
-                    makeCall(ctx, viewModel, uri,
-                        conferenceCall = false,
-                        videoCall = false,
-                        onHoldCallp = call.callp
-                    )
+                    makeCall(ctx, viewModel, uri, viewModel.dialerState, false, call.callp)
                     showCall(ctx, viewModel, ua, call)
                 }
             }
             else {
-                val connection = ConnectionService.connections[call.callp]
-                connection?.onHold()
+                call.hold()
                 if (!call.transfer(uri)) {
                     alertTitle.value = ctx.getString(R.string.notice)
                     alertMessage.value = ctx.getString(R.string.transfer_failed)
@@ -2720,6 +2716,13 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
     if (ua == null)
         return
     val call = showCall ?: ua.currentCall()
+    val aor = ua.account.aor
+    val callp = call?.callp ?: 0L
+    val status = call?.status?.value ?: "idle"
+    val security = call?.security ?: -1
+
+    if (viewModel.isUIRedundant(aor, callp, status, security)) return
+
     if (call == null) {
         pullToRefreshEnabled.value = true
         showVideoLayout.value = false
@@ -2729,11 +2732,10 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             viewModel.dialerState.callUriEnabled.value = true
         }, 100)
         viewModel.dialerState.showCallButton.value = true
-        viewModel.dialerState.showCallConferenceButton.value = true
-        viewModel.dialerState.showCallVideoButton.value = true
+        viewModel.dialerState.showCallConferenceButton.value = !ua.account.isMobile
+        viewModel.dialerState.showCallVideoButton.value = !ua.account.isMobile
         viewModel.dialerState.callButtonsEnabled.value = true
         viewModel.dialerState.showSuggestions.value = false
-        dialpadButtonEnabled.value = true
         dialpadButtonEnabled.value = true
         if (BaresipService.isMicMuted) {
             BaresipService.isMicMuted = false
@@ -2756,10 +2758,10 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             call.focusDtmf.value = true
             viewModel.requestShowKeyboard()
         }
-        Log.d(TAG, "Showing call ${call.callp} from ${call.ua.account.aor} with status ${call.status.value}")
-        when (call.status.value) {
+        Log.d(TAG, "Showing call $callp from $aor with status $status")
+        when (status) {
             "outgoing", "transferring", "answered" -> {
-                call.callUriLabel.value = if (call.status.value == "answered")
+                call.callUriLabel.value = if (status == "answered")
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
@@ -2770,7 +2772,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 call.showCallButton.value = false
                 call.showCallVideoButton.value = false
                 call.videoIcon.value = Video.NONE
-                call.showCancelButton.value = call.status.value == "outgoing"
+                call.showCancelButton.value = status == "outgoing"
                 call.showHangupButton.value = !call.showCancelButton.value
                 call.showAnswerRejectButtons.value = false
                 call.showOnHoldNotice.value = false
@@ -2802,14 +2804,14 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 if (call.referTo != "") {
                     call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
                     call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
-                    call.transferButtonEnabled.value = false
-                } else {
+                }
+                else {
                     if (call.dir == "out")
                         call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
                     else
                         call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
                     call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                    call.transferButtonEnabled.value = true
+                    call.transferButtonEnabled.value = !ua.account.isMobile
                 }
                 call.callUri2.value = ""
                 call.callTransfer.value = call.onHoldCall != null
@@ -2833,6 +2835,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             }
         }
     }
+    viewModel.markUIRendered(aor, callp, status, security)
 }
 
 fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params: ArrayList<Any>) {
@@ -2894,20 +2897,20 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
 
     when (ev[0]) {
         "call rejected" -> {
-            if (!BaresipService.telecom)
-                BaresipService.abandonAudioFocus(ctx)
             if (aor == viewModel.selectedAor.value)
                 viewModel.triggerAccountUpdate()
         }
         "call incoming", "call outgoing" -> {
+            val callp = params[1] as Long
             if (!BaresipService.isMainVisible)
                 viewModel.navigateToHome()
-            spinToAor(viewModel, aor)
-            val callp = params[1] as Long
-            showCall(ctx, viewModel, ua, Call.ofCallp(callp))
+            spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call answered" -> {
-            showCall(ctx, viewModel, ua)
+            val callp = params[1] as Long
+            if (!BaresipService.isMainVisible)
+                viewModel.navigateToHome()
+            spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call redirect", "video call redirect" -> {
             val redirectUri = ev[1]
@@ -2931,9 +2934,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 }
                 showDialog.value = true
             }
-            showCall(ctx, viewModel, ua)
+            viewModel.triggerAccountUpdate()
         }
         "call established" -> {
+            (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
@@ -2943,7 +2947,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     if (call.conferenceCall)
                         Api.cmd_exec("conference")
                 }
-                showCall(ctx, viewModel, ua, call)
+                viewModel.triggerAccountUpdate(call)
             }
         }
         "call update" -> {
@@ -2953,7 +2957,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 Log.d(TAG, "Enabling video layout at call update")
                 showVideoLayout.value = true
             }
-            showCall(ctx, viewModel, ua)
+            viewModel.triggerAccountUpdate()
         }
         "call video request" -> {
             val callp = params[1] as Long
@@ -3021,8 +3025,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 handleNextEvent("Call $callp that is verified is not found")
                 return
             }
-            if (aor == viewModel.selectedAor.value)
+            if (aor == viewModel.selectedAor.value) {
                 call.securityIconTint.value = call.security
+                viewModel.triggerAccountUpdate(call)
+            }
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -3049,7 +3055,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 if (call in Call.calls())
                     acceptTransfer(ctx, viewModel, ua, call!!, ev[1])
                 else
-                    makeCall(ctx, viewModel, ev[1], conferenceCall = false, videoCall = false)
+                    makeCall(ctx, viewModel, ev[1], viewModel.dialerState, false)
             }
             showDialog.value = true
         }
@@ -3057,14 +3063,16 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             val callp = params[1] as Long
             val call = Call.ofCallp(callp)
             if (call in Call.calls())
-                Api.ua_hangup(uap, callp, 487, "Request Terminated")
-            makeCall(ctx, viewModel, ev[1], conferenceCall = false, videoCall = false)
+                call!!.hangup(487, "Request Terminated")
+            makeCall(ctx, viewModel, ev[1], viewModel.dialerState, false)
             showCall(ctx, viewModel, ua)
         }
         "transfer failed" -> {
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
+            if (Call.calls().isEmpty())
+                (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             viewModel.updateCalls(Call.calls().toList())
             val activity = ctx as? Activity
             if (activity != null) {
@@ -3077,7 +3085,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true
                 ua.account.resumeUri = ""
-                showCall(ctx, viewModel, ua)
+                viewModel.triggerAccountUpdate()
                 if (acc.missedCalls)
                     viewModel.triggerAccountUpdate()
             }
@@ -3123,6 +3131,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                 return
             }
+            viewModel.navigateToHome()
             viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {
@@ -3143,8 +3152,9 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent '$action' did not find call $callp")
                 return
             }
+            viewModel.navigateToHome()
             val ua = call.ua
-            spinToAor(viewModel, ua.account.aor)
+            spinToAor(viewModel, ua.account.aor, call)
             if (ev[0] == "call answer")
                 answer(ctx, call, false)
             else

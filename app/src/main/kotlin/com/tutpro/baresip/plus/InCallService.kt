@@ -1,24 +1,53 @@
 package com.tutpro.baresip.plus
 
-import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-
-// This is needed in order to allow choosing baresip as default Phone app
-class InCallService : Service() {
-    override fun onBind(intent: Intent): IBinder? {
-        Log.d(TAG, "InCallService onBind with intent: ${intent.action}")
-        return null
-    }
-}
-
-/*import android.telecom.InCallService
 import android.telecom.Call
+import android.telecom.InCallService
+import java.lang.ref.WeakReference
 
 class InCallService : InCallService() {
+
+    override fun onBind(intent: Intent): IBinder? {
+        instance = this
+        return super.onBind(intent)
+    }
+
     override fun onCallAdded(call: Call) {
         super.onCallAdded(call)
-        // This is triggered when the system wants YOU to show the call UI
-        Log.d("Baresip", "InCallService: Call added")
+        Log.d(TAG, "InCallService: Call added")
+
+        val handle = call.details.accountHandle
+        val baresipHandle = BaresipService.getPhoneAccountHandle(this)
+
+        if (handle == baresipHandle) {
+            Log.d(TAG, "InCallService: Identified as SIP call")
+            // SIP call is already managed by ConnectionService/BaresipService
+        } else {
+            Log.d(TAG, "InCallService: Identified as PSTN call from $handle")
+            val aor = call.details.intentExtras?.getString("aor")
+            BaresipService.instance?.handleExternalCall(call, aor)
+        }
     }
-}*/
+
+    override fun onCallRemoved(call: Call) {
+        super.onCallRemoved(call)
+        Log.d(TAG, "InCallService: Call removed")
+        BaresipService.instance?.handleExternalCallRemoved(call)
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        instance = null
+        return super.onUnbind(intent)
+    }
+
+    companion object {
+        private const val TAG = "Baresip"
+        private var _instance = WeakReference<InCallService>(null)
+        var instance: InCallService?
+            get() = _instance.get()
+            set(value) {
+                _instance = WeakReference(value)
+            }
+    }
+}

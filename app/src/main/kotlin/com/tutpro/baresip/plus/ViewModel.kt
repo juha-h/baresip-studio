@@ -63,6 +63,9 @@ class ViewModel: ViewModel() {
     private val _accountUpdate = MutableStateFlow(0)
     val accountUpdate = _accountUpdate.asStateFlow()
 
+    private val _focusedCall = MutableStateFlow<Call?>(null)
+    val focusedCall = _focusedCall.asStateFlow()
+
     private val _micIcon = MutableStateFlow(Icons.Filled.Mic)
     val micIcon = _micIcon.asStateFlow()
 
@@ -80,6 +83,23 @@ class ViewModel: ViewModel() {
 
     private val _navigationCommand = MutableSharedFlow<NavigationCommand>()
     val navigationCommand = _navigationCommand.asSharedFlow()
+
+    private var lastRenderedAor = ""
+    private var lastRenderedCallp = 0L
+    private var lastRenderedStatus = ""
+    private var lastRenderedSecurity = -1
+
+    fun isUIRedundant(aor: String, callp: Long, status: String, security: Int): Boolean {
+        return aor == lastRenderedAor && callp == lastRenderedCallp &&
+                status == lastRenderedStatus && security == lastRenderedSecurity
+    }
+
+    fun markUIRendered(aor: String, callp: Long, status: String, security: Int) {
+        lastRenderedAor = aor
+        lastRenderedCallp = callp
+        lastRenderedStatus = status
+        lastRenderedSecurity = security
+    }
 
     private var _selectedCallRow: CallRow? = null
 
@@ -107,7 +127,8 @@ class ViewModel: ViewModel() {
         _selectedAor.value = aor
     }
 
-    fun triggerAccountUpdate() {
+    fun triggerAccountUpdate(call: Call? = null) {
+        _focusedCall.value = call
         _accountUpdate.value += 1
     }
 

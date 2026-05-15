@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.content.Intent
+import android.net.Uri
 import android.telecom.CallAudioState
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
@@ -8,7 +9,6 @@ import android.telecom.ConnectionService
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.net.Uri
 import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
@@ -16,7 +16,6 @@ class ConnectionService : ConnectionService() {
     companion object {
 
         private const val TAG = "BaresipConnection"
-
         val connections = ConcurrentHashMap<Long, BaresipConnection>()
         var pendingOutgoingConnection: BaresipConnection? = null
         var lastDisconnectTime = 0L
@@ -65,7 +64,8 @@ class ConnectionService : ConnectionService() {
 
         val connection = BaresipConnection(uap, callp)
         connections[callp] = connection
-        connection.setAddress(Uri.fromParts("sip", peerUri, null), TelecomManager.PRESENTATION_ALLOWED)
+        connection.setAddress(Uri.fromParts("sip", peerUri, null),
+            TelecomManager.PRESENTATION_ALLOWED)
         connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
@@ -109,6 +109,9 @@ class ConnectionService : ConnectionService() {
         val conferenceCall = rootExtras?.getBoolean("conferenceCall", false) ?:
             nestedExtras?.getBoolean("conferenceCall") ?: false
 
+        val pstnCall = rootExtras?.getBoolean("pstnCall", false) ?:
+        nestedExtras?.getBoolean("pstnCall") ?: false
+
         val videoCall = rootExtras?.getBoolean("videoCall", false) ?:
             nestedExtras?.getBoolean("videoCall") ?: false
 
@@ -127,17 +130,11 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
-        connection.audioModeIsVoip = true
 
-        // Start the SIP connection logic
-        if (uap != 0L) {
+        if (!pstnCall) {
+            connection.audioModeIsVoip = true
             val sipUri = if (destination.startsWith("sip:")) destination else "sip:$destination"
             BaresipService.instance?.runCall(uap, sipUri, conferenceCall, videoCall, onHoldCallp)
-        } else {
-            Log.e(TAG, "Cannot start outgoing call: uap is 0")
-            connection.setDisconnected(DisconnectCause(DisconnectCause.ERROR, "No Account"))
-            connection.destroy()
-            pendingOutgoingConnection = null
         }
 
         connection.setDialing()
@@ -181,14 +178,11 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onDisconnect() {
-            if (isDisconnecting) {
-                Log.d(TAG, "onDisconnect already in progress for $callp")
-                return
-            }
+            val now = System.currentTimeMillis()
+            if (now - lastDisconnectTime < 500) return
+            lastDisconnectTime = now
 
             Log.d(TAG, "Telecom Connection onDisconnect $callp")
-            isDisconnecting = true
-            lastDisconnectTime = System.currentTimeMillis()
 
             if (callp == 0L) {
                 pendingOutgoingConnection = null
@@ -196,15 +190,12 @@ class ConnectionService : ConnectionService() {
                 destroy()
                 return
             }
-            val call = Call.ofCallp(callp)
-            if (call != null)
-                Api.ua_hangup(uap, callp, 0, "")
+
+            Api.ua_hangup(uap, callp, 0, "")
+
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
+            connections.remove(callp)
             destroy()
-            // Allow other disconnects after a short period to prevent the "Telecom Cascade" effect
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                isDisconnecting = false
-            }, 500)
         }
 
         override fun onAbort() {
@@ -222,9 +213,10 @@ class ConnectionService : ConnectionService() {
         @Deprecated("Deprecated in Java")
         @Suppress("DEPRECATION")
         override fun onCallAudioStateChanged(state: CallAudioState?) {
+            if (state == null || isDisconnecting || getState() == STATE_DISCONNECTED) return
             super.onCallAudioStateChanged(state)
             Log.d(TAG, "onCallAudioStateChanged: $state")
-            state?.let {
+            state.let {
                 if (BaresipService.isMicMuted != it.isMuted) {
                     BaresipService.isMicMuted = it.isMuted
                     Api.calls_mute(it.isMuted)

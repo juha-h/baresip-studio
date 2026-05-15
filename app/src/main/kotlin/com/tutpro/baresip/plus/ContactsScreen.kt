@@ -411,6 +411,17 @@ private fun ContactsContent(
             onLastClicked = lastAction.value,
         )
 
+    val alertTitle = remember { mutableStateOf("") }
+    val alertMessage = remember { mutableStateOf("") }
+    val showAlert = remember { mutableStateOf(false) }
+
+    AlertDialog(
+        showDialog = showAlert,
+        title = alertTitle.value,
+        message = alertMessage.value,
+        lastButtonText = stringResource(R.string.ok),
+    )
+
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(searchQuery) {
@@ -532,8 +543,15 @@ private fun ContactsContent(
                                         lastText.value = ctx.getString(R.string.send_message)
                                         lastAction.value = {
                                             if (ua != null) {
-                                                handleIntent(ctx, viewModel, intent, "message")
-                                                navController.navigateUp()
+                                                if (ua.account.isMobile) {
+                                                    alertTitle.value  = ctx.getString(R.string.notice)
+                                                    alertMessage.value = ctx.getString(R.string.no_sms_messaging)
+                                                    showAlert.value = true
+                                                }
+                                                else {
+                                                    handleIntent(ctx, viewModel, intent, "message")
+                                                    navController.navigateUp()
+                                                }
                                             }
                                         }
                                         showDialog.value = true

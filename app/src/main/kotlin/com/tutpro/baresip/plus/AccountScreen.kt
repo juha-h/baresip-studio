@@ -232,21 +232,32 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
+            val aorText = if (ua.account.isMobile) {
+                if (ua.account.aor == "sip:mobile@pstn")
+                    stringResource(R.string.not_available)
+                else
+                    "tel:${Utils.uriUserPart(ua.account.aor)}"
+            } else
+                ua.account.luri
+
             OutlinedTextField(
-                value = ua.account.luri,
+                value = aorText,
                 enabled = false,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(fontSize = 18.sp),
                 label = {
-                    Text(text = stringResource(R.string.sip_uri), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(if (ua.account.isMobile) R.string.tel_uri else R.string.sip_uri),
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
                     disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             )
         }
@@ -1076,7 +1087,10 @@ private fun AccountContent(
     @Composable
     fun Voicemail() {
         val voicemailUriTitle = stringResource(R.string.voicemail_uri)
-        val voicemailUriHelp = stringResource(R.string.voicemain_uri_help)
+        val voicemailUriHelp = if (ua.account.isMobile)
+            stringResource(R.string.voicemain_tel_uri_help)
+        else
+            stringResource(R.string.voicemain_uri_help)
         val vmUri by viewModel.vmUri.collectAsState()
         Row(
             Modifier.fillMaxWidth().padding(end = 10.dp),
@@ -1267,38 +1281,44 @@ private fun AccountContent(
     ) {
         AoR()
         Nickname()
-        DisplayName()
-        AuthUser()
-        AuthPass()
-        if (showPasswordDialog.value)
-            AskPassword(ctx, navController, ua)
-        Outbound()
-        Register()
-        if (viewModel.register.collectAsState().value) {
-            RegInt()
-            CheckOrigin()
+        if (!ua.account.isMobile) {
+            DisplayName()
+            AuthUser()
+            AuthPass()
+            if (showPasswordDialog.value)
+                AskPassword(ctx, navController, ua)
+            Outbound()
+            Register()
+            if (viewModel.register.collectAsState().value) {
+                RegInt()
+                CheckOrigin()
+            }
         }
         BlockUnknown()
-        AudioCodecs(navController, aor)
-        VideoCodecs(navController, aor)
-        MediaEnc()
-        MediaNat()
-        if (showStun) {
-            StunServer()
-            StunUser()
-            StunPass()
+        if (!ua.account.isMobile) {
+            AudioCodecs(navController, aor)
+            VideoCodecs(navController, aor)
+            MediaEnc()
+            MediaNat()
+            if (showStun) {
+                StunServer()
+                StunUser()
+                StunPass()
+            }
+            RtcpMux()
+            Rel100()
+            Dtmf()
+            Redirect()
         }
-        RtcpMux()
-        Rel100()
-        Dtmf()
         Answer()
-        Redirect()
         Voicemail()
         CountryCode()
-        TelProvider()
+        if (!ua.account.isMobile)
+            TelProvider()
         NumericKeypad()
         DefaultAccount()
-        CustomParams()
+        if (!ua.account.isMobile)
+            CustomParams()
     }
 }
 
@@ -1619,8 +1639,13 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     var newVmUri = viewModel.vmUri.value.trim()
     if (newVmUri != acc.vmUri) {
         if (newVmUri != "") {
-            if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
-            if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+            if (acc.isMobile) {
+                if (!newVmUri.startsWith("tel:")) newVmUri = "tel:$newVmUri"
+            }
+            else {
+                if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
+                if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+            }
             if (!Utils.checkUri(newVmUri)) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri),
@@ -1675,7 +1700,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
 
     if (viewModel.defaultAccount.value) ua.makeDefault()
 
-    Api.account_debug(acc.accp)
+    // Api.account_debug(acc.accp)
 
     Account.saveAccounts()
 

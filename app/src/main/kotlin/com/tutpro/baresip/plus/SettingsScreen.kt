@@ -159,7 +159,8 @@ private fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -685,7 +686,8 @@ private fun SettingsContent(
         ) {
             val ctx = LocalContext.current
             Text(text = tlsCaFileTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = tlsCaFileTitle
                         alertMessage.value = tlsCaFileHelp
@@ -809,7 +811,8 @@ private fun SettingsContent(
         ) {
             Text(
                 text = stringResource(R.string.audio_settings),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable { navController.navigate("audio") },
                 fontSize = 18.sp,
                 fontWeight = FontWeight. Bold
@@ -989,7 +992,8 @@ private fun SettingsContent(
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = dynamicColorsTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = dynamicColorsTitle
                         alertMessage.value = dynamicColorsHelp
@@ -1083,11 +1087,29 @@ private fun SettingsContent(
             )
             val defaultDialer by viewModel.defaultDialer.collectAsState()
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+
+            val requestPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted)
+                    Log.d(TAG, "READ_PHONE_NUMBERS permission granted")
+                BaresipService.instance?.addMobileUserAgent()
+            }
+
             val dialerRoleRequest = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
-                Log.d(TAG, "dialerRoleRequest result: $result")
-                viewModel.defaultDialer.value = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            ) { _ ->
+                val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+                viewModel.defaultDialer.value = isHeld
+                if (isHeld) {
+                    if (Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS))) {
+                        BaresipService.instance?.addMobileUserAgent()
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_NUMBERS)
+                    }
+                } else {
+                    BaresipService.instance?.addMobileUserAgent()
+                }
             }
             Switch(
                 checked = defaultDialer,
@@ -1124,7 +1146,8 @@ private fun SettingsContent(
             horizontalArrangement = Arrangement.Start
         ) {
             Text(text = debugTitle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .clickable {
                         alertTitle.value = debugTitle
                         alertMessage.value = debugHelp
@@ -1233,14 +1256,14 @@ private fun SettingsContent(
         AudioSettings(navController)
         VideoSize()
         VideoFps()
+        if (VERSION.SDK_INT >= 29)
+            DefaultDialer()
         BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 31)
             DynamicColors()
         ColorBlind()
         ProximitySensing()
-        if (VERSION.SDK_INT >= 29)
-            DefaultDialer()
         Debug()
         SipTrace()
         Reset(onRestartApp)
@@ -1248,6 +1271,8 @@ private fun SettingsContent(
 }
 
 private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
+
+    val noticeTitle = ctx.getString(R.string.notice)
 
     if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
         Config.replaceVariable(
@@ -1280,7 +1305,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         .lowercase(Locale.ROOT).replace(" ", "")
     if (transportProtocols != Config.variable("sip_transports")) {
         if (!checkTransportProtocols(transportProtocols)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_transport_protocols)}: " +
                     transportProtocols
             showAlert.value = true
@@ -1297,7 +1322,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         .lowercase(Locale.ROOT).replace(" ", ""))
     if (dnsServers != Config.dnsServers()) {
         if (!checkDnsServers(dnsServers)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_dns_servers)}: $dnsServers"
             showAlert.value = true
             return false
@@ -1308,7 +1333,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
                 Config.addVariable("dns_server", server)
             Config.replaceVariable("dyn_dns", "no")
             if (Api.net_use_nameserver(dnsServers) != 0) {
-                alertTitle.value = ctx.getString(R.string.notice)
+                alertTitle.value = noticeTitle
                 alertMessage.value = "${ctx.getString(R.string.failed_to_set_dns_servers)}: $dnsServers"
                 showAlert.value = true
                 return false
@@ -1331,7 +1356,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     val userAgent = viewModel.userAgent.value.trim()
     if (userAgent != Config.variable("user_agent")) {
         if (userAgent != "" && !Utils.checkServerVal(userAgent)) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = "${ctx.getString(R.string.invalid_user_agent)}: " +
                     userAgent
             showAlert.value = true
@@ -1357,7 +1382,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     if (videoFps != Config.variable("video_fps")) {
         val fps = videoFps.toIntOrNull()
         if (fps == null || fps < 10 || fps > 30) {
-            alertTitle.value = ctx.getString(R.string.notice)
+            alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_fps), fps ?: 0)
             showAlert.value = true
             return false
