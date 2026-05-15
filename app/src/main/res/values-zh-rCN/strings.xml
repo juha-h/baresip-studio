@@ -394,4 +394,6 @@
     <string name="diverted_by">已转接</string>
     <string name="not_available">不可用</string>
     <string name="voicemain_tel_uri_help">用于检查语音信箱消息的 TEL URI。</string>
+    <string name="no_sms_messaging">抱歉，尚不支持短信。</string>
+    <string name="no_telephone_number">移动通话只能拨打电话号码</string>
 </resources>
