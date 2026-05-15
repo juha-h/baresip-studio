@@ -18,7 +18,6 @@ lifecycleProcess = "2.10.0"
 lifecycleRuntimeCompose = "2.10.0"
 lifecycleViewmodelKtx = "2.10.0"
 material = "1.13.0"
-media = "1.8.0"
 navigationCompose = "2.9.8"
 navigationRuntimeAndroid = "2.9.8"
 preferenceKtx = "1.2.1"
@@ -43,7 +42,6 @@ androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", vers
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-androidx-media = { module = "androidx.media:media", version.ref = "media" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }

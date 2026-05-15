@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.database.ContentObserver
 import android.graphics.ImageDecoder
 import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.graphics.BitmapFactory
 import android.hardware.camera2.CameraManager
 import android.media.AudioDeviceInfo
@@ -2795,7 +2796,7 @@ class BaresipService: Service() {
         private var ns: NoiseSuppressor? = null
         private var recorderSessionId = 0
         private var btAdapter: BluetoothAdapter? = null
-        private var audioFocusRequest: androidx.media.AudioFocusRequestCompat? = null
+        private var audioFocusRequest: AudioFocusRequest? = null
 
         var rt: Ringtone? = null
 
@@ -2838,20 +2839,16 @@ class BaresipService: Service() {
                 return true
             }
             val am = ctx.getSystemService(AUDIO_SERVICE) as AudioManager
-            val attributes = androidx.media.AudioAttributesCompat.Builder()
-                .setUsage(androidx.media.AudioAttributesCompat.USAGE_VOICE_COMMUNICATION)
-                .setContentType(androidx.media.AudioAttributesCompat.CONTENT_TYPE_SPEECH)
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                 .build()
             audioFocusRequest =
-                androidx.media.AudioFocusRequestCompat.Builder(androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+                AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
                     .setAudioAttributes(attributes)
                     .setOnAudioFocusChangeListener { }
                     .build()
-            if (androidx.media.AudioManagerCompat.requestAudioFocus(
-                    am,
-                    audioFocusRequest!!
-                ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-            ) {
+            if (am.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(TAG, "requestAudioFocus granted")
             }
             else {
