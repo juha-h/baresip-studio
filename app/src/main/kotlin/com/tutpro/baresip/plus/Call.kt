@@ -202,8 +202,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
             Api.ua_hangup(ua.uap, callp, code, reason)
     }
 
-    open fun answer() {
-        Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
+    open fun answer(video: Boolean = false) {
+        Api.ua_answer(ua.uap, callp, if (video) Api.VIDMODE_ON else Api.VIDMODE_OFF)
     }
 
     open fun reject() {
@@ -224,8 +224,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
             return true
         }
 
-        override fun answer() {
-            telecomCall.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
+        override fun answer(video: Boolean) {
+            telecomCall.answer(if (video) android.telecom.VideoProfile.STATE_BIDIRECTIONAL else android.telecom.VideoProfile.STATE_AUDIO_ONLY)
         }
 
         override fun hold(): Boolean {

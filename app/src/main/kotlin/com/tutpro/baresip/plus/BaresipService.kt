@@ -560,12 +560,13 @@ class BaresipService: Service() {
 
             "Call Answer" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
+                val video = intent.getBooleanExtra("video", false)
                 val call = Call.ofCallp(callp)
                 stopRinging()
                 stopMediaPlayer()
                 setCallVolume()
                 proximitySensing(proximitySensing)
-                call?.answer()
+                call?.answer(video)
                 updateStatusNotification()
             }
 
