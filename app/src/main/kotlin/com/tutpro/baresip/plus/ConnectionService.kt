@@ -2,6 +2,8 @@ package com.tutpro.baresip.plus
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.telecom.CallAudioState
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
@@ -78,11 +80,12 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
+            connection.setRinging()
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering call $callp")
-                connection.onAnswer()
-            } else {
-                connection.setRinging()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    connection.onAnswer()
+                }, 2000)
             }
         }
 
