@@ -131,7 +131,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
@@ -2952,7 +2951,11 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "call update" -> {
             val callp = params[1] as Long
-            val call = Call.ofCallp(callp)!!
+            val call = Call.ofCallp(callp)
+            if (call == null) {
+                handleNextEvent("handleServiceEvent 'call update' did not find call $callp")
+                return
+            }
             if (call.hasVideo()) {
                 Log.d(TAG, "Enabling video layout at call update")
                 showVideoLayout.value = true
