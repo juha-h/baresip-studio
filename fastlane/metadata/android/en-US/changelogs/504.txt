@@ -1,0 +1,4 @@
+- When answer mode is auto, play ringing sound for 2 seconds before answering
+- Call button alignment improvements
+- Abandon audio focus when call is closed
+- New translations (Chinese)
