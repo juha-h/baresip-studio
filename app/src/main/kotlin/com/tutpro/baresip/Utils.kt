@@ -1440,4 +1440,20 @@ object Utils {
         Log.e(TAG, "--------------------------------------")
     }
 
+    fun sendSms(ctx: Context, destination: String, message: String): Boolean {
+        return try {
+            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ctx.getSystemService(android.telephony.SmsManager::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                android.telephony.SmsManager.getDefault()
+            }
+            smsManager.sendTextMessage(destination, null, message, null, null)
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send SMS: ${e.message}")
+            false
+        }
+    }
+
 }

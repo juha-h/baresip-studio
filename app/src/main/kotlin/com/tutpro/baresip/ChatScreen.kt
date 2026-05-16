@@ -552,25 +552,14 @@ private fun NewMessage(
                     msg.add()
                     var msgUri = ""
                     addMessage(msg)
-                    if (Utils.isTelUri(peerUri))
-                        if (ua.account.telProvider == "") {
-                            dialogMessage.value = String.format(
-                                ctx.getString(R.string.no_telephony_provider),
-                                Utils.plainAor(aor)
-                            )
-                            showDialog.value = true
-                        }
-                        else {
-                            msgUri = Utils.telToSip(peerUri, ua.account)
-                        }
-                    else
-                        msgUri = peerUri
-                    if (msgUri != "")
-                        if (Api.message_send(ua.uap,
-                                msgUri,
-                                msgText,
-                                time.toString()
-                        ) != 0) {
+                    if (ua.account.isMobile) {
+                        val destination = Utils.uriUserPart(peerUri)
+                        if (Utils.sendSms(ctx, destination, msgText)) {
+                            msg.direction = MESSAGE_UP
+                            newMessage.value = TextFieldValue("")
+                            viewModel.updateAorPeerMessage(aor, peerUri, "")
+                            keyboardController?.hide()
+                        } else {
                             Toast.makeText(
                                 ctx, "${ctx.getString(R.string.message_failed)}!",
                                 Toast.LENGTH_SHORT
@@ -578,11 +567,39 @@ private fun NewMessage(
                             msg.direction = MESSAGE_UP_FAIL
                             msg.responseReason = ctx.getString(R.string.message_failed)
                         }
-                        else {
-                            newMessage.value = TextFieldValue("")
-                            viewModel.updateAorPeerMessage(aor, peerUri, "")
-                            keyboardController?.hide()
-                        }
+                    } else {
+                        if (Utils.isTelUri(peerUri))
+                            if (ua.account.telProvider == "") {
+                                dialogMessage.value = String.format(
+                                    ctx.getString(R.string.no_telephony_provider),
+                                    Utils.plainAor(aor)
+                                )
+                                showDialog.value = true
+                            } else {
+                                msgUri = Utils.telToSip(peerUri, ua.account)
+                            }
+                        else
+                            msgUri = peerUri
+                        if (msgUri != "")
+                            if (Api.message_send(
+                                    ua.uap,
+                                    msgUri,
+                                    msgText,
+                                    time.toString()
+                                ) != 0
+                            ) {
+                                Toast.makeText(
+                                    ctx, "${ctx.getString(R.string.message_failed)}!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                msg.direction = MESSAGE_UP_FAIL
+                                msg.responseReason = ctx.getString(R.string.message_failed)
+                            } else {
+                                newMessage.value = TextFieldValue("")
+                                viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                keyboardController?.hide()
+                            }
+                    }
                 }
             },
             containerColor = MaterialTheme.colorScheme.secondary,

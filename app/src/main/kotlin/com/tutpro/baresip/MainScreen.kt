@@ -805,23 +805,22 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             )
         }
 
-        if (!isMobile)
-            IconButton(
-                enabled = aor.isNotEmpty(),
-                onClick = {
-                    navController.navigate("chats/$aor")
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .size(buttonSize)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = null,
-                    Modifier.size(buttonSize),
-                    tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-                )
-            }
+        IconButton(
+            enabled = aor.isNotEmpty(),
+            onClick = {
+                navController.navigate("chats/$aor")
+            },
+            modifier = Modifier
+                .weight(1f)
+                .size(buttonSize)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Chat,
+                contentDescription = null,
+                Modifier.size(buttonSize),
+                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+            )
+        }
 
         IconButton(
             enabled = aor.isNotEmpty(),
