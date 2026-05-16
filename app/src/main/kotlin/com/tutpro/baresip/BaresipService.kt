@@ -1852,6 +1852,7 @@ class BaresipService: Service() {
         val callp = telecomCall.hashCode().toLong()
         val call = calls.find { it.callp == callp }
         if (call != null) {
+            val uap = call.ua.uap
             stopRinging()
             stopMediaPlayer()
             if (call.ua.account.callHistory) {
@@ -1865,6 +1866,11 @@ class BaresipService: Service() {
                     call.ua.account.missedCalls = true
             }
             calls.remove(call)
+            postServiceEvent(
+                ServiceEvent(
+                    "call closed", arrayListOf(uap, callp), System.nanoTime()
+                )
+            )
         }
         if (!Call.inCall()) {
             proximitySensing(false)
