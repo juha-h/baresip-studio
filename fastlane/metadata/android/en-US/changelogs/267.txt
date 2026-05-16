@@ -1,0 +1,6 @@
+- baresip+ app can now be used as the default phone app supporting also mobile calling (see About screen Usage Hints)
+- This is major upgrade and may contain bugs
+- When answer mode is auto, play ringing sound for 2 seconds before answering
+- Call button alignment improvements
+- Abandon audio focus when call is closed
+- New translations (several languages)
