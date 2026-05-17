@@ -125,7 +125,7 @@
     <string name="battery_optimizations_help">如果您想降低 Android 限制 baresip 访问网络或让 baresip 进入待机状态的概率，请禁用电池优化。</string>
     <string name="default_phone_app">默认电话应用</string>
     <string name="dialer_role_not_available">默认电话应用角色不可用</string>
-    <string name="default_phone_app_help">如果选中，则 baresip 是默认电话应用。</string>
+    <string name="default_phone_app_help">如果选中，baresip 将成为默认电话应用。</string>
     <string name="listen_address">监听地址</string>
     <string name="listen_address_help">baresip 监听传入 SIP 请求的 IP 地址和端口，格式为“地址:端口”。如果 IP 地址是 IPv6 地址，则必须将其写在方括号 [] 内。IPv4 地址 0.0.0.0 或 IPv6 地址 [::] 使 baresip 监听所有可用地址。如果留空（出厂默认），baresip 将在所有可用地址的任意端口上监听。</string>
     <string name="invalid_listen_address">监听地址无效</string>
@@ -437,4 +437,8 @@
     <string name="not_available">不可用</string>
     <string name="voicemain_tel_uri_help">用于检查语音信箱消息的 TEL URI。</string>
     <string name="no_telephone_number">移动通话只能拨打电话号码</string>
+    <string name="default_messaging_app">默认短信应用</string>
+    <string name="default_messaging_app_help">如果选中，baresip 将成为短信/彩信的默认应用。</string>
+    <string name="messaging_role_not_available">默认短信应用角色不可用</string>
+    <string name="enable_default_messaging">请在设置中启用默认短信应用</string>
 </resources>
