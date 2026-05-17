@@ -1,1 +1,1 @@
-基于 baresip 库的 Android SIP 和移动通话用户代理
+基于 baresip 库的适用于 Android 的 SIP 和移动通话用户代理
