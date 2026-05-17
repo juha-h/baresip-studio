@@ -1279,10 +1279,29 @@ class BaresipService: Service() {
             error
         }
 
-        val timeStamp = System.currentTimeMillis()
-        val timeStampString = timeStamp.toString()
-        Log.d(TAG, "Message event for $uap from $peerUri at $timeStampString")
-        Message(ua.account.aor, peerUri, text, timeStamp, MESSAGE_DOWN, 0, "", true).add()
+        handleIncomingMessage(uap, peerUri, text, System.currentTimeMillis())
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    fun handleIncomingMessage(uap: Long, peerUri: String, text: String, timeStamp: Long) {
+
+        val ua = UserAgent.ofUap(uap)
+        if (ua == null) {
+            Log.w(TAG, "handleIncomingMessage did not find ua $uap")
+            return
+        }
+
+        val aor = ua.account.aor
+
+        // Check for duplicates
+        val lastMsg = messages.lastOrNull { m -> m.aor == aor }
+        if (lastMsg != null && lastMsg.timeStamp == timeStamp && lastMsg.peerUri == peerUri && lastMsg.message == text) {
+            Log.d(TAG, "Omit duplicate message from $peerUri")
+            return
+        }
+
+        Log.d(TAG, "Message event for $uap from $peerUri at $timeStamp")
+        Message(aor, peerUri, text, timeStamp, MESSAGE_DOWN, 0, "", true).add()
         ua.account.unreadMessages = true
 
         if (!Utils.isVisible()) {
@@ -1339,7 +1358,7 @@ class BaresipService: Service() {
 
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
-            saveIntent.putExtra("uap", uap).putExtra("time", timeStampString)
+            saveIntent.putExtra("uap", uap).putExtra("time", timeStamp.toString())
             val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
             val saveAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_notification_save,
@@ -1349,7 +1368,7 @@ class BaresipService: Service() {
 
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
-            deleteIntent.putExtra("uap", uap).putExtra("time", timeStampString)
+            deleteIntent.putExtra("uap", uap).putExtra("time", timeStamp.toString())
             val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
             val deleteAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_notification_delete,

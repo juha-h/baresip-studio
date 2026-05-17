@@ -30,6 +30,7 @@ class SettingsViewModel: ViewModel() {
     val colorblind = MutableStateFlow(false)
     val proximitySensing = MutableStateFlow(false)
     val defaultDialer = MutableStateFlow(false)
+    val defaultMessaging = MutableStateFlow(false)
     val debug = MutableStateFlow(false)
     val sipTrace = MutableStateFlow(false)
 
@@ -76,6 +77,7 @@ class SettingsViewModel: ViewModel() {
         if (Build.VERSION.SDK_INT >= 29) {
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
             defaultDialer.value = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            defaultMessaging.value = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
         }
 
         debug.value = Config.variable("log_level") == "0"

@@ -280,7 +280,6 @@
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history\?</string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history\?</string>
-    <string name="no_sms_messaging">Sorry, no SMS messaging yet.</string>
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
     <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'\?</string>
@@ -328,6 +327,10 @@
     <string name="default_phone_app">Default Phone App</string>
     <string name="dialer_role_not_available">Default phone app role is not available</string>
     <string name="default_phone_app_help">If checked, baresip is the default phone app.</string>
+    <string name="default_messaging_app">Default Messaging App</string>
+    <string name="default_messaging_app_help">If checked, baresip is the default messaging app for SMS/MMS.</string>
+    <string name="messaging_role_not_available">Default messaging app role is not available</string>
+    <string name="enable_default_messaging">Please enable Default Messaging App in Settings</string>
     <string name="listen_address">Listen Address</string>
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside

@@ -6,6 +6,7 @@ import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.KeyguardManager
+import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -808,17 +809,26 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
         IconButton(
             enabled = aor.isNotEmpty(),
             onClick = {
+                if (isMobile) {
+                    if (!Utils.isDefaultSmsApp(ctx)) {
+                        alertTitle.value = ctx.getString(R.string.notice)
+                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                        showAlert.value = true
+                        return@IconButton
+                    }
+                }
                 navController.navigate("chats/$aor")
             },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize)
+            modifier = Modifier.weight(1f).size(buttonSize)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Chat,
                 contentDescription = null,
                 Modifier.size(buttonSize),
-                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+                tint = if (hasUnreadMessages)
+                    MaterialTheme.colorScheme.error
+                else
+                    MaterialTheme.colorScheme.secondary
             )
         }
 

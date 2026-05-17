@@ -1404,6 +1404,32 @@ object Utils {
         return null
     }
 
+    fun sendSms(ctx: Context, destination: String, message: String): Boolean {
+        return try {
+            val smsManager = if (Build.VERSION.SDK_INT >= 31) {
+                ctx.getSystemService(android.telephony.SmsManager::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                android.telephony.SmsManager.getDefault()
+            }
+            smsManager.sendTextMessage(destination, null, message, null, null)
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send SMS: ${e.message}")
+            false
+        }
+    }
+
+    fun isDefaultSmsApp(ctx: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= 29) {
+            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+            roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+        } else {
+            @Suppress("DEPRECATION")
+            android.provider.Telephony.Sms.getDefaultSmsPackage(ctx) == ctx.packageName
+        }
+    }
+
     @Suppress("unused")
     fun listFilesInDirectory(directoryPath: String): List<File> {
         val directory = File(directoryPath)
@@ -1439,21 +1465,4 @@ object Utils {
         }
         Log.e(TAG, "--------------------------------------")
     }
-
-    fun sendSms(ctx: Context, destination: String, message: String): Boolean {
-        return try {
-            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ctx.getSystemService(android.telephony.SmsManager::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                android.telephony.SmsManager.getDefault()
-            }
-            smsManager.sendTextMessage(destination, null, message, null, null)
-            true
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to send SMS: ${e.message}")
-            false
-        }
-    }
-
 }

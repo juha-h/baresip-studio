@@ -294,7 +294,6 @@
         %2$s puheluhistoriasta\?
     </string>
     <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta\?</string>
-    <string name="no_sms_messaging">SMS-tekstiviestitystä ei ole vielä toteutettu.</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
@@ -343,7 +342,14 @@
         ja pääsyä verkkoon.</string>
     <string name="default_phone_app">Oletus puhelusovellus</string>
     <string name="dialer_role_not_available">Oletus puhelusovellusrooli ei ole saatavana</string>
-    <string name="default_phone_app_help">Jos merkitty, baresip on oletus puhelusovellus.</string>
+    <string name="default_phone_app_help">Jos merkitty, baresip on oletus puhelusovellus</string>
+    <string name="default_messaging_app">Oletus tekstiviestisovellus</string>
+    <string name="default_messaging_app_help">Jos merkitty, baresip on tekstiviestien
+        oletussovellus</string>
+    <string name="messaging_role_not_available">Oletus tekstiviestisovellusrooli ei ole
+        saatavana</string>
+    <string name="enable_default_messaging">Ole hyvä ja merkitse \'Oletus tekstiviestisovellus\'
+        baresip asetuksissa</string>
     <string name="listen_address">Kuunteluosoite</string>
     <string name="listen_address_help">IP-osoite ja portti muotoa
     \'osoite:portti\', missä baresip kuuntelee sisään tulevia

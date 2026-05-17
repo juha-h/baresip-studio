@@ -36,6 +36,12 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SEND_SMS"
         tools:ignore="SmsAndCallLogPolicy" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS"
+        tools:ignore="SmsAndCallLogPolicy" />
+    <uses-permission android:name="android.permission.READ_SMS"
+        tools:ignore="SmsAndCallLogPolicy" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS"
+        tools:ignore="SmsAndCallLogPolicy" />
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -78,10 +84,28 @@
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.DIAL" />
                 <action android:name="android.intent.action.CALL" />
+                <action android:name="android.intent.action.SENDTO" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="tel" />
                 <data android:scheme="sip" />
+                <data android:scheme="smsto" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ComposeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
             </intent-filter>
         </activity>
 
@@ -120,6 +144,42 @@
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".HeadlessSmsSendService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE" >
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".SmsReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS" >
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".MmsReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_WAP_PUSH" >
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".BootCompletedReceiver"

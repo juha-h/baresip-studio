@@ -349,9 +349,16 @@ private fun Calls(
                                 lastButtonText.value = ctx.getString(R.string.send_message)
                                 lastAction.value = {
                                     if (account.isMobile) {
-                                        alertTitle.value  = ctx.getString(R.string.notice)
-                                        alertMessage.value = ctx.getString(R.string.no_sms_messaging)
-                                        showAlert.value = true
+                                        if (!Utils.isDefaultSmsApp(ctx)) {
+                                            alertTitle.value = ctx.getString(R.string.notice)
+                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                            showAlert.value = true
+                                        } else {
+                                            if (ua != null) {
+                                                handleIntent(ctx, viewModel, intent, "message")
+                                                navController.navigateUp()
+                                            }
+                                        }
                                     }
                                     else
                                         if (ua != null) {
