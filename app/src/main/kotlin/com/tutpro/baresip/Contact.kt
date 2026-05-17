@@ -13,7 +13,7 @@ import java.util.ArrayList
 
 sealed class Contact {
 
-    class BaresipContact(var name: String, var uri: String, var color: Int, var id: Long,
+    class BaresipContact(var name: String, val uris: ArrayList<String>, var color: Int, var id: Long,
                          var favorite: Boolean): Contact() {
         var avatarImage: Bitmap? = null
     }
@@ -57,7 +57,7 @@ sealed class Contact {
     fun copy(): Contact {
         val copy = when (this) {
             is BaresipContact ->
-                BaresipContact(name, uri, color, id, favorite)
+                BaresipContact(name, ArrayList(uris), color, id, favorite)
             is AndroidContact ->
                 AndroidContact(name, color, thumbnailUri, id, favorite)
         }
@@ -107,9 +107,10 @@ sealed class Contact {
                 when (c) {
                     is BaresipContact -> {
                         if (c.name.equals(name, ignoreCase = true)) {
-                            uris.add(c.uri.removePrefix("<")
-                                .replaceAfter(">", "")
-                                .replace(">", ""))
+                            for (u in c.uris)
+                                uris.add(u.removePrefix("<")
+                                    .replaceAfter(">", "")
+                                    .replace(">", ""))
                             return uris
                         }
                     }
@@ -128,8 +129,9 @@ sealed class Contact {
             for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact -> {
-                        if (Utils.uriMatch(c.uri, uri))
-                            return c
+                        for (u in c.uris)
+                            if (Utils.uriMatch(u, uri))
+                                return c
                     }
                     is AndroidContact -> {
                         val cleanUri = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
@@ -153,7 +155,7 @@ sealed class Contact {
             val avatarFiles = avatarFileNames()
             var contents = ""
             for (c in BaresipService.baresipContacts.value) {
-                contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}" +
+                contents += "\"${c.name}\" <${c.uris.joinToString(",")}>;id=${c.id};color=${c.color}" +
                         ";favorite=${if (c.favorite) "yes" else "no"}\n"
                 avatarFiles.remove(c.id.toString() + ".png")
             }
@@ -236,7 +238,8 @@ sealed class Contact {
                     contactNo++
                     val name = parts[1]
                     val uriParams = parts[2].trim()
-                    val uri = uriParams.substringAfter("<").substringBefore(">")
+                    val urisPart = uriParams.substringAfter("<").substringBefore(">")
+                    val uris = ArrayList(urisPart.split(","))
                     val params = uriParams.substringAfter(">;")
                     val colorValue = Utils.paramValue(params, "color" )
                     val color: Int = if (colorValue != "")
@@ -249,8 +252,8 @@ sealed class Contact {
                     else
                         baseId + contactNo
                     val favorite = Utils.paramValue(params, "favorite" ) == "yes"
-                    Log.d(TAG, "Restoring contact $name, $uri, $color, $id")
-                    val contact = BaresipContact(name, uri, color, id, favorite)
+                    Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
+                    val contact = BaresipContact(name, uris, color, id, favorite)
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {

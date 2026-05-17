@@ -72,6 +72,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.tutpro.baresip.CustomElements.AlertDialog
+import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: ViewModel) {
@@ -303,6 +304,15 @@ private fun Calls(
         lastButtonText = stringResource(R.string.ok),
     )
 
+    SelectableAlertDialog(
+        openDialog = CustomElements.showSelectItemDialog,
+        title = stringResource(R.string.choose_destination_uri),
+        items = CustomElements.selectItems.value,
+        onItemClicked = CustomElements.selectItemAction.value,
+        neutralButtonText = stringResource(R.string.cancel),
+        onNeutralClicked = {}
+    )
+
     val lazyListState = rememberLazyListState()
     LazyColumn(
         modifier = Modifier
@@ -339,32 +349,88 @@ private fun Calls(
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
                                     if (ua != null) {
-                                        handleIntent(ctx, viewModel, intent, "call")
-                                        navController.navigate("main") {
-                                            popUpTo("main")
-                                            launchSingleTop = true
+                                        val contact = Contact.findContact(peerUri)
+                                        val uris = if (contact is Contact.BaresipContact) {
+                                            if (ua.account.isMobile)
+                                                contact.uris.filter { it.startsWith("tel:") }
+                                            else
+                                                contact.uris
+                                        } else {
+                                            listOf(peerUri)
+                                        }
+
+                                        if (uris.size > 1) {
+                                            CustomElements.selectItems.value = uris
+                                            CustomElements.selectItemAction.value = { index ->
+                                                intent.putExtra("peer", uris[index])
+                                                handleIntent(ctx, viewModel, intent, "call")
+                                                navController.navigate("main") {
+                                                    popUpTo("main")
+                                                    launchSingleTop = true
+                                                }
+                                                CustomElements.showSelectItemDialog.value = false
+                                            }
+                                            CustomElements.showSelectItemDialog.value = true
+                                        } else if (uris.size == 1) {
+                                            intent.putExtra("peer", uris[0])
+                                            handleIntent(ctx, viewModel, intent, "call")
+                                            navController.navigate("main") {
+                                                popUpTo("main")
+                                                launchSingleTop = true
+                                            }
                                         }
                                     }
                                 }
                                 lastButtonText.value = ctx.getString(R.string.send_message)
                                 lastAction.value = {
-                                    if (account.isMobile) {
-                                        if (!Utils.isDefaultSmsApp(ctx)) {
-                                            alertTitle.value = ctx.getString(R.string.notice)
-                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                            showAlert.value = true
+                                    if (ua != null) {
+                                        val contact = Contact.findContact(peerUri)
+                                        val uris = if (contact is Contact.BaresipContact) {
+                                            if (ua.account.isMobile)
+                                                contact.uris.filter { it.startsWith("tel:") }
+                                            else
+                                                contact.uris
                                         } else {
-                                            if (ua != null) {
+                                            listOf(peerUri)
+                                        }
+
+                                        if (uris.size > 1) {
+                                            CustomElements.selectItems.value = uris
+                                            CustomElements.selectItemAction.value = { index ->
+                                                intent.putExtra("peer", uris[index])
+                                                if (ua.account.isMobile) {
+                                                    if (!Utils.isDefaultSmsApp(ctx)) {
+                                                        alertTitle.value = ctx.getString(R.string.notice)
+                                                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                                        showAlert.value = true
+                                                    } else {
+                                                        handleIntent(ctx, viewModel, intent, "message")
+                                                        navController.navigateUp()
+                                                    }
+                                                } else {
+                                                    handleIntent(ctx, viewModel, intent, "message")
+                                                    navController.navigateUp()
+                                                }
+                                                CustomElements.showSelectItemDialog.value = false
+                                            }
+                                            CustomElements.showSelectItemDialog.value = true
+                                        } else if (uris.size == 1) {
+                                            intent.putExtra("peer", uris[0])
+                                            if (ua.account.isMobile) {
+                                                if (!Utils.isDefaultSmsApp(ctx)) {
+                                                    alertTitle.value = ctx.getString(R.string.notice)
+                                                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                                    showAlert.value = true
+                                                } else {
+                                                    handleIntent(ctx, viewModel, intent, "message")
+                                                    navController.navigateUp()
+                                                }
+                                            } else {
                                                 handleIntent(ctx, viewModel, intent, "message")
                                                 navController.navigateUp()
                                             }
                                         }
                                     }
-                                    else
-                                        if (ua != null) {
-                                            handleIntent(ctx, viewModel, intent, "message")
-                                            navController.navigateUp()
-                                        }
                                 }
                                 showDialog.value = true
                             },

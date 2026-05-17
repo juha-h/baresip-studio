@@ -82,6 +82,10 @@ import androidx.compose.ui.window.DialogProperties
 
 object CustomElements {
 
+    val selectItems = mutableStateOf(listOf<String>())
+    val selectItemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
+    val showSelectItemDialog = mutableStateOf(false)
+
     @Composable
     fun Button(
         onClick: () -> Unit,
@@ -424,7 +428,7 @@ object CustomElements {
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -449,8 +453,8 @@ object CustomElements {
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Text(
-                                            text = item,
-                                            color = MaterialTheme.colorScheme.onSurface,
+                                            text = stringResource(R.string.bullet_item, item),
+                                            color = MaterialTheme.colorScheme.primary,
                                             modifier = Modifier.fillMaxWidth(),
                                             textAlign = TextAlign.Start
                                         )

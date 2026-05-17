@@ -37,7 +37,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -108,7 +110,7 @@ private data class ScreenState(
     val id: Long = 0,
     val newId: Long = 0,
     val name: String = "",
-    val uri: String = "",
+    val uris: List<String> = emptyList(),
     val color: Int = 0,
     val avatarImageUri: String? = null,
     val tmpAvatarFile: File? = null,
@@ -138,7 +140,7 @@ private fun ContactScreen(
             screenState = ScreenState(
                 new = true,
                 name = "",
-                uri = uriOrNameArg,
+                uris = if (uriOrNameArg == "") emptyList() else listOf(uriOrNameArg),
                 favorite = false,
                 android = BaresipService.contactsMode == "android",
                 color = Utils.randomColor(),
@@ -153,7 +155,7 @@ private fun ContactScreen(
             screenState = ScreenState(
                 new = false,
                 name = uriOrNameArg,
-                uri = contact.uri,
+                uris = contact.uris,
                 favorite = contact.favorite,
                 android = false,
                 color = contact.color,
@@ -320,9 +322,9 @@ private fun ContactContent(
             new = screenState.new,
             onNameChange = { newName -> onStateChange(screenState.copy(name = newName)) }
         )
-        ContactUri(
-            uri = screenState.uri,
-            onUriChange = { newUri -> onStateChange(screenState.copy(uri = newUri)) }
+        ContactUris(
+            uris = screenState.uris,
+            onUrisChange = { newUris -> onStateChange(screenState.copy(uris = newUris)) }
         )
         Favorite(
             ctx = ctx,
@@ -456,16 +458,62 @@ private fun ContactName(name: String, new: Boolean, onNameChange: (String) -> Un
 }
 
 @Composable
-private fun ContactUri(uri: String, onUriChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = uri,
-        placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
-        onValueChange = onUriChange,
+private fun ContactUris(uris: List<String>, onUrisChange: (List<String>) -> Unit) {
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-        label = { Text(stringResource(R.string.sip_or_tel_uri)) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-    )
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        uris.forEachIndexed { index, uri ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = uri,
+                    placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
+                    onValueChange = { newUri ->
+                        val newList = uris.toMutableList()
+                        newList[index] = newUri
+                        onUrisChange(newList.toList())
+                    },
+                    modifier = Modifier.weight(1f),
+                    textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                    label = { Text("${stringResource(R.string.sip_or_tel_uri)} ${index + 1}") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+                if (uris.size > 1) {
+                    IconButton(
+                        onClick = {
+                            val newList = uris.toMutableList()
+                            newList.removeAt(index)
+                            onUrisChange(newList.toList())
+                        },
+                        modifier = Modifier.padding(start = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Delete",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+        }
+        IconButton(
+            onClick = {
+                val newList = uris.toMutableList()
+                newList.add("")
+                onUrisChange(newList.toList())
+            },
+            modifier = Modifier.align(Alignment.Start)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Add",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
 }
 
 @Composable
@@ -520,22 +568,34 @@ private fun checkOnClick(
     uriOrNameArg: String
 ): Boolean {
 
-    var newUri = currentState.uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
-    if (!newUri.startsWith("sip:") && !newUri.startsWith("tel:"))
-        newUri = if (Utils.isTelNumber(newUri))
-            "tel:$newUri"
-        else
-            "sip:$newUri"
+    val newUris = ArrayList<String>()
+    for (uri in currentState.uris) {
+        var u = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
+        if (u == "") continue
+        if (!u.startsWith("sip:") && !u.startsWith("tel:"))
+            u = if (Utils.isTelNumber(u))
+                "tel:$u"
+            else
+                "sip:$u"
 
-    if (!Utils.checkUri(newUri)) {
+        if (!Utils.checkUri(u)) {
+            alertTitle.value = ctx.getString(R.string.notice)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), u)
+            showAlert.value = true
+            return false
+        }
+        newUris.add(u)
+    }
+
+    if (newUris.isEmpty()) {
         alertTitle.value = ctx.getString(R.string.notice)
-        alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), newUri)
+        alertMessage.value = ctx.getString(R.string.sip_or_tel_uri)
         showAlert.value = true
         return false
     }
 
     var newName = currentState.name.trim()
-    if (newName == "") newName = newUri.substringAfter(":")
+    if (newName == "") newName = newUris[0].substringAfter(":")
     if (!Utils.checkName(newName)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_contact), newName)
@@ -572,7 +632,7 @@ private fun checkOnClick(
     val contact: Contact.BaresipContact =
         Contact.BaresipContact(
             newName,
-            newUri,
+            newUris,
             currentState.color,
             idToUse,
             currentState.favorite
@@ -683,17 +743,19 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
             .withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
             .withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, contact.name)
             .build())
-    val mimeType = if (contact.uri.startsWith("sip:"))
-        CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
-    else
-        CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-    ops.add(
-        ContentProviderOperation
-            .newInsert(ContactsContract.Data.CONTENT_URI)
-            .withValueBackReference(Data.RAW_CONTACT_ID, 0)
-            .withValue(Data.MIMETYPE, mimeType)
-            .withValue(Data.DATA1, contact.uri.substringAfter(":"))
-            .build())
+    for (uri in contact.uris) {
+        val mimeType = if (uri.startsWith("sip:"))
+            CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+        else
+            CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+        ops.add(
+            ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                .withValue(Data.MIMETYPE, mimeType)
+                .withValue(Data.DATA1, uri.substringAfter(":"))
+                .build())
+    }
 
     if (contact.avatarImage != null) {
         val photoData: ByteArray? = bitmapToPNGByteArray(contact.avatarImage!!)
@@ -717,8 +779,9 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
 }
 
 private fun updateAndroidContact(ctx: Context, rawContactId: Long, contact: Contact.BaresipContact) {
-    if (updateAndroidUri(ctx, rawContactId, contact.uri) == 0)
-        addAndroidUri(ctx, rawContactId, contact.uri)
+    for (uri in contact.uris)
+        if (updateAndroidUri(ctx, rawContactId, uri) == 0)
+            addAndroidUri(ctx, rawContactId, uri)
     if (updateAndroidPhoto(ctx, rawContactId, contact.avatarImage) == 0)
         if (contact.avatarImage != null)
             addAndroidPhoto(ctx, rawContactId, contact.avatarImage!!)

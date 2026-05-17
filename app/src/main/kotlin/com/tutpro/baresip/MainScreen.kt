@@ -6,7 +6,6 @@ import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.KeyguardManager
-import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -180,9 +179,9 @@ private val showPasswordsDialog = mutableStateOf(false)
 private var passwordAccounts = mutableListOf<String>()
 private var password = mutableStateOf("")
 
-private val selectItems = mutableStateOf(listOf<String>())
-private val selectItemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
-private val showSelectItemDialog = mutableStateOf(false)
+private val selectItems = CustomElements.selectItems
+private val selectItemAction = CustomElements.selectItemAction
+private val showSelectItemDialog = CustomElements.showSelectItemDialog
 
 fun NavGraphBuilder.mainScreenRoute(
     navController: NavController,

@@ -77,6 +77,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.tutpro.baresip.CustomElements.AlertDialog
+import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
@@ -207,6 +208,15 @@ private fun ContactsScreen(
                 )
             )
         }
+    )
+
+    SelectableAlertDialog(
+        openDialog = CustomElements.showSelectItemDialog,
+        title = stringResource(R.string.choose_destination_uri),
+        items = CustomElements.selectItems.value,
+        onItemClicked = CustomElements.selectItemAction.value,
+        neutralButtonText = stringResource(R.string.cancel),
+        onNeutralClicked = {}
     )
 
     Scaffold(
@@ -508,7 +518,6 @@ private fun ContactsContent(
                                         val intent = Intent(ctx, MainActivity::class.java)
                                         if (ua != null) {
                                             intent.putExtra("uap", ua.uap)
-                                            intent.putExtra("peer", contact.uri)
                                         }
                                         else
                                             Log.w(TAG, "onClickListener did not find UA for $aor")
@@ -519,29 +528,78 @@ private fun ContactsContent(
                                         secondText.value = ctx.getString(R.string.call)
                                         secondAction.value = {
                                             if (ua != null) {
-                                                handleIntent(ctx, viewModel, intent, "call")
-                                                navController.navigate("main") {
-                                                    popUpTo("main")
-                                                    launchSingleTop = true
+                                                val uris = if (ua.account.isMobile)
+                                                    contact.uris.filter { it.startsWith("tel:") }
+                                                else
+                                                    contact.uris
+
+                                                if (uris.size > 1) {
+                                                    CustomElements.selectItems.value = uris
+                                                    CustomElements.selectItemAction.value = { index: Int ->
+                                                        intent.putExtra("peer", uris[index])
+                                                        handleIntent(ctx, viewModel, intent, "call")
+                                                        navController.navigate("main") {
+                                                            popUpTo("main")
+                                                            launchSingleTop = true
+                                                        }
+                                                        CustomElements.showSelectItemDialog.value = false
+                                                    }
+                                                    CustomElements.showSelectItemDialog.value = true
+                                                } else if (uris.size == 1) {
+                                                    intent.putExtra("peer", uris[0])
+                                                    handleIntent(ctx, viewModel, intent, "call")
+                                                    navController.navigate("main") {
+                                                        popUpTo("main")
+                                                        launchSingleTop = true
+                                                    }
                                                 }
                                             }
                                         }
                                         lastText.value = ctx.getString(R.string.send_message)
                                         lastAction.value = {
                                             if (ua != null) {
-                                                if (ua.account.isMobile) {
-                                                    if (!Utils.isDefaultSmsApp(ctx)) {
-                                                        alertTitle.value = ctx.getString(R.string.notice)
-                                                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                                        showAlert.value = true
-                                                    } else {
+                                                val uris = if (ua.account.isMobile)
+                                                    contact.uris.filter { it.startsWith("tel:") }
+                                                else
+                                                    contact.uris
+
+                                                if (uris.size > 1) {
+                                                    CustomElements.selectItems.value = uris
+                                                    CustomElements.selectItemAction.value = { index: Int ->
+                                                        intent.putExtra("peer", uris[index])
+                                                        if (ua.account.isMobile) {
+                                                            if (!Utils.isDefaultSmsApp(ctx)) {
+                                                                alertTitle.value = ctx.getString(R.string.notice)
+                                                                alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                                                showAlert.value = true
+                                                            } else {
+                                                                handleIntent(ctx, viewModel, intent, "message")
+                                                                navController.navigateUp()
+                                                            }
+                                                        }
+                                                        else {
+                                                            handleIntent(ctx, viewModel, intent, "message")
+                                                            navController.navigateUp()
+                                                        }
+                                                        CustomElements.showSelectItemDialog.value = false
+                                                    }
+                                                    CustomElements.showSelectItemDialog.value = true
+                                                } else if (uris.size == 1) {
+                                                    intent.putExtra("peer", uris[0])
+                                                    if (ua.account.isMobile) {
+                                                        if (!Utils.isDefaultSmsApp(ctx)) {
+                                                            alertTitle.value = ctx.getString(R.string.notice)
+                                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                                            showAlert.value = true
+                                                        } else {
+                                                            handleIntent(ctx, viewModel, intent, "message")
+                                                            navController.navigateUp()
+                                                        }
+                                                    }
+                                                    else {
                                                         handleIntent(ctx, viewModel, intent, "message")
                                                         navController.navigateUp()
                                                     }
-                                                }
-                                                else {
-                                                    handleIntent(ctx, viewModel, intent, "message")
-                                                    navController.navigateUp()
                                                 }
                                             }
                                         }
