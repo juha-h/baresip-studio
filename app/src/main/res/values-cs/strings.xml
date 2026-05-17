@@ -452,7 +452,6 @@
     <string name="voicemain_tel_uri_help">TEL URI pro kontrolu hlasových zpráv.</string>
     <string name="custom_parameters">Vlastní parametry</string>
     <string name="custom_parameters_help">Seznam vlastních parametrů účtu oddělený středníky</string>
-    <string name="no_sms_messaging">Služba SMS zatím není k dispozici.</string>
     <string name="diverted_by">přesměroval</string>
     <string name="no_telephone_number">Volání na mobil lze uskutečnit pouze na telefonní čísla</string>
     <string name="call_is_ringing">Hovor vyzvání</string>
