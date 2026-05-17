@@ -69,7 +69,7 @@
     <string name="listen_address">Naslouchací adresa</string>
     <string name="start_automatically">Spustit automaticky</string>
     <string name="start_automatically_help">Pokud je zaškrtnuto, baresip se spustí automaticky po (opětovném) spuštění zařízení nebo po instalaci nové verze baresip. Ke spuštění dojde po odemčení zařízení.</string>
-    <string name="battery_optimizations_help">Pokud chcete snížit pravděpodobnost, že systém Android omezí přístup zařízení baresip k síti nebo jej přepne do pohotovostního režimu, zakažte optimalizace baterie (doporučeno).</string>
+    <string name="battery_optimizations_help">Pokud chcete snížit pravděpodobnost, že systém Android omezí přístup zařízení baresip k síti nebo jej přepne do pohotovostního režimu, zakažte optimalizace baterie.</string>
     <string name="listen_address_help">IP adresa a port ve tvaru \"address:port\", na kterém baresip naslouchá příchozím požadavkům SIP. Pokud je IP adresa IPv6, musí být zapsána v závorce []. IPv4 adresa 0.0.0.0 nebo IPv6 adresa [::] způsobí, že baresip bude naslouchat na všech dostupných adresách. Pokud zůstane prázdné (výchozí nastavení), bude baresip naslouchat na libovolném portu na všech dostupných adresách.</string>
     <string name="dns_servers">Servery DNS</string>
     <string name="dns_servers_help">Seznam adres serverů DNS oddělených čárkou. Pokud nejsou zadány, adresy serverů DNS jsou získávány dynamicky ze systému. Každá adresa DNS má tvar \'ip:port\' nebo \'ip\'. Pokud je port vynechán, je výchozí hodnota 53. Pokud je ip adresa IPv6 a je zadán i port, musí být ip zapsáno v závorkách []. Příklad: seznam \'8.8.8.8:53,[2001:4860:4860::8888]:53\' ukazuje na adresy IPv4 a IPv6 veřejných serverů Google DNS.</string>
@@ -93,7 +93,7 @@
     <string name="auto">Automaticky</string>
     <string name="country_code">Kód země</string>
     <string name="voicemain_uri_help">SIP URI pro kontrolu zpráv hlasové pošty. Pokud je ponecháno prázdné, zprávy hlasové pošty (indikace čekající zprávy) nejsou přihlášeny k odběru.</string>
-    <string name="country_code_help">Kód země E.164 tohoto účtu. Pokud uživatelská část \"Od\" v URI příchozího hovoru nebo zprávy obsahuje telefonní číslo, které nezačíná znakem \"+\", a pokud se vyhledání kontaktu nezdaří, je číslo předřazeno tomuto kódu země a vyhledání kontaktu je zopakováno. Pokud telefonní číslo začíná jedinou číslicí \"0\", číslice \"0\" se před prefixací čísla odstraní.</string>
+    <string name="country_code_help">Kód země E.164 tohoto účtu. Pokud část URI uživatele v rámci hovoru nebo zprávy obsahuje telefonní číslo, které nezačíná znakem „+“, a pokud vyhledání kontaktu selže, před číslo se připojí tento kód země a vyhledání kontaktu se zkusí znovu. Pokud číslo začíná číslicí „0“, je tato číslice před připojením kódu země odstraněna.</string>
     <string name="default_account">Výchozí účet</string>
     <string name="invalid_country_code">Neplatný kód země \'%1$s\'</string>
     <string name="telephony_provider_help">Hostitelská část SIP URI používaná při volání na telefonní čísla. Výchozí tovární nastavení je doména účtu. Pokud není zadána, nelze tento účet použít pro volání na telefonní čísla.</string>
@@ -252,8 +252,8 @@
     <string name="audio_delay">Zpoždění zvuku</string>
     <string name="call_auto_rejected">Automaticky odmítat volání od %1$s</string>
     <string name="default_phone_app">Výchozí aplikace telefonu</string>
-    <string name="dialer_role_not_available">Role číselníku není k dispozici</string>
-    <string name="default_phone_app_help">Pokud je zaškrtnuto, je výchozí aplikací telefonu baresip. Nezaškrtávejte, pokud vaše zařízení může potřebovat zpracovávat i jiné než SIP hovory nebo zprávy.</string>
+    <string name="dialer_role_not_available">Role výchozí aplikace pro telefonování není k dispozici</string>
+    <string name="default_phone_app_help">Pokud je zaškrtnuto, je výchozí aplikací pro telefonování baresip.</string>
     <string name="redirect_notice">Automatické přesměrování na \'%1$s\'\\</string>
     <string name="favorite">Oblíbené</string>
     <string name="appear_on_top_permission">Automatické spuštění vyžaduje oprávnění Zobrazení přes ostatní aplikace.</string>
@@ -448,4 +448,13 @@
         ]]></string>
     <string name="unique_contact_uri">Jedinečné URI kontaktu</string>
     <string name="unique_contact_uri_help">Pokud je zaškrtnuto, URI kontaktu je zaručeně jedinečné. Je nutné tuto volbu zapnout, pokud existuje více účtů se stejnou uživatelskou částí SIP URI, a zároveň zlepšuje ochranu účtů proti útokům.</string>
+    <string name="not_available">Nedostupné</string>
+    <string name="voicemain_tel_uri_help">TEL URI pro kontrolu hlasových zpráv.</string>
+    <string name="custom_parameters">Vlastní parametry</string>
+    <string name="custom_parameters_help">Seznam vlastních parametrů účtu oddělený středníky</string>
+    <string name="diverted_by">přesměroval</string>
+    <string name="no_telephone_number">Volání na mobil lze uskutečnit pouze na telefonní čísla</string>
+    <string name="call_is_ringing">Hovor vyzvání</string>
+    <string name="call_is_connected">Hovor je spojen</string>
+    <string name="replaces_not_supported">Protistrana nepodporuje funkci REPLACES</string>
 </resources>
