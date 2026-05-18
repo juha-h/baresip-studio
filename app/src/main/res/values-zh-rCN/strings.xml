@@ -206,7 +206,7 @@
     <string name="android_contact_help">如果选中，此联系人将添加到 Android 联系人中。</string>
     <string name="avatar_image">头像</string>
     <string name="contacts">联系人</string>
-    <string name="contact_action_question">您要呼叫还是发送消息至“%1$s”？</string>
+    <string name="contact_action_question">您要给“%1$s”打电话还是发送消息？</string>
     <string name="send_message">发送消息</string>
     <string name="contact_delete_question">是否要删除联系人“%1$s”？</string>
     <string name="alert">提醒</string>
@@ -441,4 +441,10 @@
     <string name="default_messaging_app_help">如果选中，baresip 将成为短信/彩信的默认应用。</string>
     <string name="messaging_role_not_available">默认短信应用角色不可用</string>
     <string name="enable_default_messaging">请在设置中启用默认短信应用</string>
+    <string name="email">电子邮件</string>
+    <string name="contact_email_action_question">您要给“%1$s”打电话、发送消息还是发送电子邮件？</string>
+    <string name="send_email">发送电子邮件</string>
+    <string name="import_contacts">导入</string>
+    <string name="contact_import_success">联系人已成功导入</string>
+    <string name="contact_import_failure">无法导入联系人</string>
 </resources>
