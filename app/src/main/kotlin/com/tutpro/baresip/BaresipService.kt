@@ -2434,6 +2434,20 @@ class BaresipService: Service() {
         handler.postDelayed(runnable, 500)
     }
 
+    fun toggleSpeakerphone() {
+        speakerPhone = !speakerPhone
+        // Notify the UI to update the icon color
+        postServiceEvent(
+            ServiceEvent(
+                "speaker update,$speakerPhone",
+                arrayListOf(0L, 0L),
+                System.nanoTime()
+            )
+        )
+        // Apply the new audio route
+        ensureCommunicationMode()
+    }
+
     @SuppressLint("WakelockTimeout", "Wakelock")
     private fun proximitySensing(enable: Boolean) {
         if (enable) {

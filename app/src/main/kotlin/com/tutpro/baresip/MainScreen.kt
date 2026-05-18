@@ -643,23 +643,8 @@ private fun TopAppBar(
                     .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
-                            val aor = viewModel.selectedAor.value
-                            val ua = uas.value.find { it.account.aor == aor }
-                            val call = ua?.currentCall()
-                            val connection =
-                                if (call != null) ConnectionService.connections[call.callp] else null
-                            if (connection != null) {
-                                @Suppress("DEPRECATION")
-                                connection.setAudioRoute(
-                                    if (isSpeakerOn)
-                                        android.telecom.CallAudioState.ROUTE_EARPIECE
-                                    else
-                                        android.telecom.CallAudioState.ROUTE_SPEAKER
-                                )
-                            } else {
-                                BaresipService.speakerPhone = !isSpeakerOn
-                                viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
-                            }
+                            // Unified toggle via BaresipService
+                            BaresipService.instance?.toggleSpeakerphone()
                         },
                         onLongClick = {
                             alertTitle.value = speakerPhoneTitle
