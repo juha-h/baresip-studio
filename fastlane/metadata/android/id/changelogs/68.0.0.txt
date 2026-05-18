@@ -1,0 +1,4 @@
+- Menargetkan Android 16 API level 36
+- Penambahan pengaturan Sensor Kedekatan
+- Perbaikan nilai Both pada pengaturan Kontak
+- Terjemahan baru (Ceko)
