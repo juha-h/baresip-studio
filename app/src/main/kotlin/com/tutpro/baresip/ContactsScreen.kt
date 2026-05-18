@@ -677,13 +677,19 @@ private fun ContactsContent(
                                                         CustomElements.showSelectItemDialog.value = false
                                                     }
                                                     CustomElements.showSelectItemDialog.value = true
-                                                } else if (uris.size == 1) {
+                                                }
+                                                else if (uris.size == 1) {
                                                     intent.putExtra("peer", uris[0])
                                                     handleIntent(ctx, viewModel, intent, "call")
                                                     navController.navigate("main") {
                                                         popUpTo("main")
                                                         launchSingleTop = true
                                                     }
+                                                }
+                                                else {
+                                                    alertTitle.value = ctx.getString(R.string.notice)
+                                                    alertMessage.value = ctx.getString(R.string.no_telephone_number)
+                                                    showAlert.value = true
                                                 }
                                             }
                                         }
