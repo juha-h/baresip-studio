@@ -664,7 +664,6 @@ private fun ContactsContent(
                                                     contact.uris.filter { it.startsWith("tel:") }
                                                 else
                                                     contact.uris
-
                                                 if (uris.size > 1) {
                                                     CustomElements.selectItems.value = uris
                                                     CustomElements.selectItemAction.value = { index: Int ->

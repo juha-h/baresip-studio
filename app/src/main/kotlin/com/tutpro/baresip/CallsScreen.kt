@@ -90,7 +90,7 @@ fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: Vi
 @Composable
 private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
-    val account = Account.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)!!
 
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
     var isHistoryLoaded by remember { mutableStateOf(false) }
@@ -115,7 +115,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     BackHandler(enabled = true) {
-        account.missedCalls = false
+        ua.account.missedCalls = false
         navController.navigateUp()
     }
 
@@ -129,7 +129,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
                     .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
-                TopAppBar(navController, account, callHistory)
+                TopAppBar(navController, ua, callHistory)
             }
         },
         content = { contentPadding ->
@@ -139,7 +139,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
                     navController,
                     viewModel,
                     contentPadding,
-                    account,
+                    ua,
                     callHistory
                 )
         },
@@ -148,7 +148,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(navController: NavController, account: Account, callHistory: MutableState<List<CallRow>>) {
+private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: MutableState<List<CallRow>>) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -159,6 +159,8 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
 
     val showDialog = remember { mutableStateOf(false) }
     val lastAction = remember { mutableStateOf({}) }
+
+    val account = ua.account
 
     AlertDialog(
         showDialog = showDialog,
@@ -240,7 +242,7 @@ private fun CallsContent(
     navController: NavController,
     viewModel: ViewModel,
     contentPadding: PaddingValues,
-    account: Account,
+    ua: UserAgent,
     callHistory: MutableState<List<CallRow>>
 ) {
     Column(
@@ -250,8 +252,8 @@ private fun CallsContent(
             .padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Account(account)
-        Calls(ctx, navController, viewModel, account, callHistory)
+        Account(ua.account)
+        Calls(ctx, navController, viewModel, ua, callHistory)
     }
 }
 
@@ -272,7 +274,7 @@ private fun Calls(
     ctx: Context,
     navController: NavController,
     viewModel: ViewModel,
-    account: Account,
+    ua: UserAgent,
     callHistory: MutableState<List<CallRow>>
 ) {
 
@@ -340,16 +342,10 @@ private fun Calls(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.combinedClickable(
                             onClick = {
-                                val aor = account.aor
-                                val ua = UserAgent.ofAor(aor)
                                 val intent = Intent(ctx, MainActivity::class.java)
-                                if (ua != null) {
-                                    intent.putExtra("uap", ua.uap)
-                                    intent.putExtra("peer", peerUri)
-                                }
-                                else
-                                    Log.w(TAG, "onClickListener did not find UA for $aor")
-                                val peerName = Utils.friendlyUri(ctx, peerUri, account)
+                                intent.putExtra("uap", ua.uap)
+                                intent.putExtra("peer", peerUri)
+                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account)
                                 val contact = Contact.findContact(peerUri)
                                 if (contact is Contact.BaresipContact && contact.email.isNotEmpty())
                                     message.value = String.format(
@@ -363,86 +359,28 @@ private fun Calls(
                                     )
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
-                                    if (ua != null) {
-                                        val uris = if (contact is Contact.BaresipContact) {
-                                            if (ua.account.isMobile)
-                                                contact.uris.filter { it.startsWith("tel:") }
-                                            else
-                                                contact.uris
-                                        } else {
-                                            listOf(peerUri)
-                                        }
-
-                                        if (uris.size > 1) {
-                                            CustomElements.selectItems.value = uris
-                                            CustomElements.selectItemAction.value = { index ->
-                                                intent.putExtra("peer", uris[index])
-                                                handleIntent(ctx, viewModel, intent, "call")
-                                                navController.navigate("main") {
-                                                    popUpTo("main")
-                                                    launchSingleTop = true
-                                                }
-                                                CustomElements.showSelectItemDialog.value = false
-                                            }
-                                            CustomElements.showSelectItemDialog.value = true
-                                        } else if (uris.size == 1) {
-                                            intent.putExtra("peer", uris[0])
-                                            handleIntent(ctx, viewModel, intent, "call")
-                                            navController.navigate("main") {
-                                                popUpTo("main")
-                                                launchSingleTop = true
-                                            }
-                                        }
+                                    handleIntent(ctx, viewModel, intent, "call")
+                                    navController.navigate("main") {
+                                        popUpTo("main")
+                                        launchSingleTop = true
                                     }
                                 }
                                 thirdButtonText.value = ctx.getString(R.string.send_message)
                                 thirdAction.value = {
-                                    if (ua != null) {
-                                        val uris = if (contact is Contact.BaresipContact) {
-                                            if (ua.account.isMobile)
-                                                contact.uris.filter { it.startsWith("tel:") }
-                                            else
-                                                contact.uris
-                                        } else {
-                                            listOf(peerUri)
+                                    if (ua.account.isMobile) {
+                                        if (!Utils.isDefaultSmsApp(ctx)) {
+                                            alertTitle.value = ctx.getString(R.string.notice)
+                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                            showAlert.value = true
                                         }
-
-                                        if (uris.size > 1) {
-                                            CustomElements.selectItems.value = uris
-                                            CustomElements.selectItemAction.value = { index ->
-                                                intent.putExtra("peer", uris[index])
-                                                if (ua.account.isMobile) {
-                                                    if (!Utils.isDefaultSmsApp(ctx)) {
-                                                        alertTitle.value = ctx.getString(R.string.notice)
-                                                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                                        showAlert.value = true
-                                                    } else {
-                                                        handleIntent(ctx, viewModel, intent, "message")
-                                                        navController.navigateUp()
-                                                    }
-                                                } else {
-                                                    handleIntent(ctx, viewModel, intent, "message")
-                                                    navController.navigateUp()
-                                                }
-                                                CustomElements.showSelectItemDialog.value = false
-                                            }
-                                            CustomElements.showSelectItemDialog.value = true
-                                        } else if (uris.size == 1) {
-                                            intent.putExtra("peer", uris[0])
-                                            if (ua.account.isMobile) {
-                                                if (!Utils.isDefaultSmsApp(ctx)) {
-                                                    alertTitle.value = ctx.getString(R.string.notice)
-                                                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                                    showAlert.value = true
-                                                } else {
-                                                    handleIntent(ctx, viewModel, intent, "message")
-                                                    navController.navigateUp()
-                                                }
-                                            } else {
-                                                handleIntent(ctx, viewModel, intent, "message")
-                                                navController.navigateUp()
-                                            }
+                                        else {
+                                            handleIntent(ctx, viewModel, intent, "message")
+                                            navController.navigateUp()
                                         }
+                                    }
+                                    else {
+                                        handleIntent(ctx, viewModel, intent, "message")
+                                        navController.navigateUp()
                                     }
                                 }
                                 if (contact is Contact.BaresipContact && contact.email.isNotEmpty()) {
@@ -457,13 +395,13 @@ private fun Calls(
                                             Log.e(TAG, "Failed to start email activity: ${e.message}")
                                         }
                                     }
-                                } else {
-                                    lastButtonText.value = ""
                                 }
+                                else
+                                    lastButtonText.value = ""
                                 showDialog.value = true
                             },
                             onLongClick = {
-                                val peerName = Utils.friendlyUri(ctx, peerUri, account)
+                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account)
                                 val callText: String = if (callRow.details.size > 1)
                                     ctx.getString(R.string.calls_calls)
                                 else
@@ -550,7 +488,7 @@ private fun Calls(
                         }
                         if (count > 3)
                             Text("...", color = MaterialTheme.colorScheme.onBackground)
-                        Text(text = Utils.friendlyUri(ctx, peerUri, account),
+                        Text(text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,
