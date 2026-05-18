@@ -33,13 +33,15 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -111,6 +113,7 @@ private data class ScreenState(
     val newId: Long = 0,
     val name: String = "",
     val uris: List<String> = emptyList(),
+    val email: String = "",
     val color: Int = 0,
     val avatarImageUri: String? = null,
     val tmpAvatarFile: File? = null,
@@ -141,6 +144,7 @@ private fun ContactScreen(
                 new = true,
                 name = "",
                 uris = if (uriOrNameArg == "") emptyList() else listOf(uriOrNameArg),
+                email = "",
                 favorite = false,
                 android = BaresipService.contactsMode == "android",
                 color = Utils.randomColor(),
@@ -156,6 +160,7 @@ private fun ContactScreen(
                 new = false,
                 name = uriOrNameArg,
                 uris = contact.uris,
+                email = contact.email,
                 favorite = contact.favorite,
                 android = false,
                 color = contact.color,
@@ -186,8 +191,10 @@ private fun ContactScreen(
             currentState = screenState,
             uriOrNameArg = uriOrNameArg,
         )
-        if (result)
+        if (result) {
+            navController.previousBackStackEntry?.savedStateHandle?.set("scrollToContact", screenState.name)
             navController.navigateUp()
+        }
     }
 
     BackHandler(enabled = true) {
@@ -279,12 +286,14 @@ private fun ContactContent(
         )
     }
 
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Avatar(
@@ -325,6 +334,10 @@ private fun ContactContent(
         ContactUris(
             uris = screenState.uris,
             onUrisChange = { newUris -> onStateChange(screenState.copy(uris = newUris)) }
+        )
+        ContactEmail(
+            email = screenState.email,
+            onEmailChange = { newEmail -> onStateChange(screenState.copy(email = newEmail)) }
         )
         Favorite(
             ctx = ctx,
@@ -491,8 +504,8 @@ private fun ContactUris(uris: List<String>, onUrisChange: (List<String>) -> Unit
                         modifier = Modifier.padding(start = 4.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete",
+                            imageVector = Icons.Filled.Remove,
+                            contentDescription = "Remove",
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -514,6 +527,19 @@ private fun ContactUris(uris: List<String>, onUrisChange: (List<String>) -> Unit
             )
         }
     }
+}
+
+@Composable
+private fun ContactEmail(email: String, onEmailChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = email,
+        placeholder = { Text(stringResource(R.string.email)) },
+        onValueChange = onEmailChange,
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+        label = { Text(stringResource(R.string.email)) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+    )
 }
 
 @Composable
@@ -633,6 +659,7 @@ private fun checkOnClick(
         Contact.BaresipContact(
             newName,
             newUris,
+            currentState.email.trim(),
             currentState.color,
             idToUse,
             currentState.favorite
@@ -743,6 +770,16 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
             .withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
             .withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, contact.name)
             .build())
+    if (contact.email.isNotEmpty()) {
+        ops.add(
+            ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                .withValue(Data.MIMETYPE, CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                .withValue(CommonDataKinds.Email.ADDRESS, contact.email)
+                .withValue(CommonDataKinds.Email.TYPE, CommonDataKinds.Email.TYPE_HOME)
+                .build())
+    }
     for (uri in contact.uris) {
         val mimeType = if (uri.startsWith("sip:"))
             CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
@@ -779,6 +816,10 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
 }
 
 private fun updateAndroidContact(ctx: Context, rawContactId: Long, contact: Contact.BaresipContact) {
+    if (contact.email.isNotEmpty()) {
+        if (updateAndroidEmail(ctx, rawContactId, contact.email) == 0)
+            addAndroidEmail(ctx, rawContactId, contact.email)
+    }
     for (uri in contact.uris)
         if (updateAndroidUri(ctx, rawContactId, uri) == 0)
             addAndroidUri(ctx, rawContactId, uri)
@@ -840,6 +881,36 @@ private fun addAndroidPhoto(ctx: Context, rawContactId: Long, photoBits: Bitmap)
         } catch (e: Exception) {
             Log.e(TAG, "Adding of Android photo failed: ${e.message}")
         }
+    }
+}
+
+private fun addAndroidEmail(ctx: Context, rawContactId: Long, email: String) {
+    val ops = ArrayList<ContentProviderOperation>()
+    ops.add(
+        ContentProviderOperation
+            .newInsert(ContactsContract.Data.CONTENT_URI)
+            .withValue(Data.RAW_CONTACT_ID, rawContactId)
+            .withValue(Data.MIMETYPE, CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+            .withValue(CommonDataKinds.Email.ADDRESS, email)
+            .withValue(CommonDataKinds.Email.TYPE, CommonDataKinds.Email.TYPE_HOME)
+            .build())
+    try {
+        ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+    } catch (e: Exception) {
+        Log.e(TAG, "Adding of Android email failed: ${e.message}")
+    }
+}
+
+private fun updateAndroidEmail(ctx: Context, rawContactId: Long, email: String): Int {
+    val contentValues = ContentValues()
+    contentValues.put(CommonDataKinds.Email.ADDRESS, email)
+    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+            "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Email.CONTENT_ITEM_TYPE}'"
+    return try {
+        ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
+    }  catch (e: Exception) {
+        Log.e(TAG, "updateAndroidEmail failed: ${e.message}")
+        0
     }
 }
 

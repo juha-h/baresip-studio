@@ -71,6 +71,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import androidx.core.net.toUri
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -279,6 +280,8 @@ private fun Calls(
     val message = remember { mutableStateOf("") }
     val secondButtonText = remember { mutableStateOf("") }
     val secondAction = remember { mutableStateOf({}) }
+    val thirdButtonText = remember { mutableStateOf("") }
+    val thirdAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
@@ -289,6 +292,8 @@ private fun Calls(
         firstButtonText = stringResource(R.string.cancel),
         secondButtonText = secondButtonText.value,
         onSecondClicked = secondAction.value,
+        thirdButtonText = thirdButtonText.value,
+        onThirdClicked = thirdAction.value,
         lastButtonText = lastButtonText.value,
         onLastClicked = lastAction.value,
     )
@@ -345,11 +350,20 @@ private fun Calls(
                                 else
                                     Log.w(TAG, "onClickListener did not find UA for $aor")
                                 val peerName = Utils.friendlyUri(ctx, peerUri, account)
-                                message.value = String.format(ctx.getString(R.string.contact_action_question), peerName)
+                                val contact = Contact.findContact(peerUri)
+                                if (contact is Contact.BaresipContact && contact.email.isNotEmpty())
+                                    message.value = String.format(
+                                        ctx.getString(R.string.contact_email_action_question),
+                                        peerName
+                                    )
+                                else
+                                    message.value = String.format(
+                                        ctx.getString(R.string.contact_action_question),
+                                        peerName
+                                    )
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
                                     if (ua != null) {
-                                        val contact = Contact.findContact(peerUri)
                                         val uris = if (contact is Contact.BaresipContact) {
                                             if (ua.account.isMobile)
                                                 contact.uris.filter { it.startsWith("tel:") }
@@ -381,10 +395,9 @@ private fun Calls(
                                         }
                                     }
                                 }
-                                lastButtonText.value = ctx.getString(R.string.send_message)
-                                lastAction.value = {
+                                thirdButtonText.value = ctx.getString(R.string.send_message)
+                                thirdAction.value = {
                                     if (ua != null) {
-                                        val contact = Contact.findContact(peerUri)
                                         val uris = if (contact is Contact.BaresipContact) {
                                             if (ua.account.isMobile)
                                                 contact.uris.filter { it.startsWith("tel:") }
@@ -431,6 +444,21 @@ private fun Calls(
                                             }
                                         }
                                     }
+                                }
+                                if (contact is Contact.BaresipContact && contact.email.isNotEmpty()) {
+                                    lastButtonText.value = ctx.getString(R.string.send_email)
+                                    lastAction.value = {
+                                        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                            data = "mailto:${contact.email}".toUri()
+                                        }
+                                        try {
+                                            ctx.startActivity(emailIntent)
+                                        } catch (e: Exception) {
+                                            Log.e(TAG, "Failed to start email activity: ${e.message}")
+                                        }
+                                    }
+                                } else {
+                                    lastButtonText.value = ""
                                 }
                                 showDialog.value = true
                             },

@@ -37,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -74,6 +75,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Observer
@@ -216,7 +218,6 @@ private fun TopAppBar(
     peerUri: String
 ) {
     val aor = account.aor
-
     TopAppBar(
         title = {
             Text(
@@ -245,10 +246,10 @@ private fun TopAppBar(
                 onClick = {
                     val ua = UserAgent.ofAor(account.aor)
                     if (ua != null) {
-                        val intent = Intent(ctx, MainActivity::class.java)
-                        intent.putExtra("uap", ua.uap)
-                        intent.putExtra("peer", peerUri)
-                        handleIntent(ctx, viewModel, intent, "call")
+                        val callIntent = Intent(ctx, MainActivity::class.java)
+                            .putExtra("uap", ua.uap)
+                            .putExtra("peer", peerUri)
+                        handleIntent(ctx, viewModel, callIntent, "call")
                         navController.navigate("main") {
                             popUpTo("main")
                             launchSingleTop = true
@@ -263,6 +264,34 @@ private fun TopAppBar(
                     contentDescription = "Call",
                 )
             }
+            val contact = Contact.findContact(peerUri)
+            if (contact != null && contact is Contact.BaresipContact && contact.email.isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val ua = UserAgent.ofAor(account.aor)
+                        if (ua != null) {
+                            val contact = Contact.findContact(peerUri)
+                            if (contact != null && contact is Contact.BaresipContact &&
+                                    contact.email.isNotEmpty()) {
+                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = "mailto:${contact.email}".toUri()
+                                }
+                                try {
+                                    ctx.startActivity(emailIntent)
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to start email activity: ${e.message}")
+                                }
+                            }
+                        }
+                        else
+                            Log.w(TAG, "Call button onClick listener did not find UA for $aor")
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Email,
+                        contentDescription = "Email",
+                    )
+                }
         }
     )
 }

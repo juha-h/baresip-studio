@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.ContactsContract
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,6 +52,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -82,6 +84,7 @@ import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
+import androidx.core.net.toUri
 
 const val avatarSize: Int = 96
 
@@ -115,6 +118,103 @@ private fun ContactsScreen(
 
     var expanded by remember { mutableStateOf(false) }
     val both = stringResource(R.string.both)
+    val import = stringResource(R.string.import_contacts)
+
+    val vcfImportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: android.net.Uri? ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val reader = inputStream.bufferedReader()
+                    var name = ""
+                    var email = ""
+                    val uris = mutableListOf<String>()
+                    reader.forEachLine { line ->
+                        when {
+                            line.startsWith("BEGIN:VCARD", ignoreCase = true) -> {
+                                name = ""
+                                email = ""
+                                uris.clear()
+                            }
+                            line.startsWith("FN:", ignoreCase = true) -> {
+                                name = line.substring(3).trim()
+                            }
+                            line.startsWith("N:", ignoreCase = true) && name.isEmpty() -> {
+                                name = line.substring(2).trim().replace(";", " ").trim()
+                            }
+                            line.startsWith("EMAIL", ignoreCase = true) -> {
+                                if (email.isEmpty())
+                                    email = line.substringAfter(":").trim()
+                            }
+                            line.startsWith("TEL", ignoreCase = true) -> {
+                                val value = line.substringAfter(":").trim()
+                                val cleanValue = value.filterNot { setOf('-', ' ', '(', ')').contains(it) }
+                                if (cleanValue.isNotEmpty()) {
+                                    val telUri = if (cleanValue.startsWith("tel:")) cleanValue else "tel:$cleanValue"
+                                    if (telUri !in uris) uris.add(telUri)
+                                }
+                            }
+                            line.startsWith("X-SIP:", ignoreCase = true) -> {
+                                val sipUri = line.substring(6).trim()
+                                if (sipUri.isNotEmpty()) {
+                                    val fullSipUri = if (sipUri.startsWith("sip:")) sipUri else "sip:$sipUri"
+                                    if (fullSipUri !in uris) uris.add(fullSipUri)
+                                }
+                            }
+                            line.startsWith("END:VCARD", ignoreCase = true) -> {
+                                if (name.isNotEmpty() && uris.isNotEmpty()) {
+                                    val existingContact = Contact.baresipContact(name)
+                                    if (existingContact != null) {
+                                        var updated = false
+                                        for (u in uris) {
+                                            if (u !in existingContact.uris) {
+                                                existingContact.uris.add(u)
+                                                updated = true
+                                            }
+                                        }
+                                        if (existingContact.email.isEmpty() && email.isNotEmpty()) {
+                                            existingContact.email = email
+                                            updated = true
+                                        }
+                                        if (updated) {
+                                            Contact.updateBaresipContact(existingContact.id, existingContact)
+                                        }
+                                    } else {
+                                        Contact.addBaresipContact(
+                                            Contact.BaresipContact(
+                                                name,
+                                                ArrayList(uris),
+                                                email,
+                                                Utils.randomColor(),
+                                                System.currentTimeMillis(),
+                                                false
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Contact.saveBaresipContacts()
+                    Contact.contactsUpdate()
+                    Toast.makeText(
+                        ctx,
+                        R.string.contact_import_success,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to import VCF: ${e.message}")
+                Toast.makeText(
+                    ctx,
+                    R.string.contact_import_failure,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     val contactNames = remember(BaresipService.contactsMode) {
         val names = mutableListOf("baresip", "Android", both)
         val values = listOf("baresip", "android", "both")
@@ -264,9 +364,13 @@ private fun ContactsScreen(
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames,
+                            items = contactNames + import,
                             onItemClick = { name ->
                                 expanded = false
+                                if (name == import) {
+                                    vcfImportLauncher.launch(arrayOf("text/vcard", "text/x-vcard"))
+                                    return@DropdownMenu
+                                }
                                 val mode = contactValues[contactNames.indexOf(name)]
                                 val contactsPermissions = arrayOf(
                                     Manifest.permission.READ_CONTACTS,
@@ -404,6 +508,8 @@ private fun ContactsContent(
     val secondAction = remember { mutableStateOf({}) }
     val lastText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
+    val thirdText = remember { mutableStateOf("") }
+    val thirdAction = remember { mutableStateOf({}) }
 
     if (showDialog.value)
         AlertDialog(
@@ -413,6 +519,8 @@ private fun ContactsContent(
             firstButtonText = stringResource(R.string.cancel),
             secondButtonText = secondText.value,
             onSecondClicked = secondAction.value,
+            thirdButtonText = thirdText.value,
+            onThirdClicked = thirdAction.value,
             lastButtonText = lastText.value,
             onLastClicked = lastAction.value,
         )
@@ -430,10 +538,17 @@ private fun ContactsContent(
 
     val lazyListState = rememberLazyListState()
 
+    val scrollToContact = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<String>("scrollToContact")
+        ?.observeAsState()
+
+    var lastSearchQuery by remember { mutableStateOf("") }
     LaunchedEffect(searchQuery) {
-        if (searchQuery.isBlank()) {
+        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank()) {
             lazyListState.scrollToItem(0)
         }
+        lastSearchQuery = searchQuery
     }
 
     val filteredContacts = remember(BaresipService.contacts, searchQuery) {
@@ -450,6 +565,16 @@ private fun ContactsContent(
                 .map { contact ->
                     Pair(contact, Utils.buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
                 }
+        }
+    }
+
+    LaunchedEffect(scrollToContact?.value, filteredContacts) {
+        scrollToContact?.value?.let { name ->
+            val index = filteredContacts.indexOfFirst { it.first.name() == name }
+            if (index != -1) {
+                lazyListState.scrollToItem(index)
+            }
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scrollToContact")
         }
     }
 
@@ -521,10 +646,17 @@ private fun ContactsContent(
                                         }
                                         else
                                             Log.w(TAG, "onClickListener did not find UA for $aor")
-                                        dialogMessage.value = String.format(
-                                            ctx.getString(R.string.contact_action_question),
-                                            contact.name()
-                                        )
+                                        val peerName = contact.name()
+                                        if (contact.email.isNotEmpty())
+                                            dialogMessage.value = String.format(
+                                                ctx.getString(R.string.contact_email_action_question),
+                                                peerName
+                                            )
+                                        else
+                                            dialogMessage.value = String.format(
+                                                ctx.getString(R.string.contact_action_question),
+                                                peerName
+                                            )
                                         secondText.value = ctx.getString(R.string.call)
                                         secondAction.value = {
                                             if (ua != null) {
@@ -555,8 +687,8 @@ private fun ContactsContent(
                                                 }
                                             }
                                         }
-                                        lastText.value = ctx.getString(R.string.send_message)
-                                        lastAction.value = {
+                                        thirdText.value = ctx.getString(R.string.send_message)
+                                        thirdAction.value = {
                                             if (ua != null) {
                                                 val uris = if (ua.account.isMobile)
                                                     contact.uris.filter { it.startsWith("tel:") }
@@ -602,6 +734,21 @@ private fun ContactsContent(
                                                     }
                                                 }
                                             }
+                                        }
+                                        if (contact.email.isNotEmpty()) {
+                                            lastText.value = ctx.getString(R.string.send_email)
+                                            lastAction.value = {
+                                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                                    data = "mailto:${contact.email}".toUri()
+                                                }
+                                                try {
+                                                    ctx.startActivity(emailIntent)
+                                                } catch (e: Exception) {
+                                                    Log.e(TAG, "Failed to start email activity: ${e.message}")
+                                                }
+                                            }
+                                        } else {
+                                            lastText.value = ""
                                         }
                                         showDialog.value = true
                                     },

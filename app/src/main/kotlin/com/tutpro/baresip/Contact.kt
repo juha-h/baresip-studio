@@ -13,8 +13,8 @@ import java.util.ArrayList
 
 sealed class Contact {
 
-    class BaresipContact(var name: String, val uris: ArrayList<String>, var color: Int, var id: Long,
-                         var favorite: Boolean): Contact() {
+    class BaresipContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
+                         var id: Long, var favorite: Boolean): Contact() {
         var avatarImage: Bitmap? = null
     }
 
@@ -57,7 +57,7 @@ sealed class Contact {
     fun copy(): Contact {
         val copy = when (this) {
             is BaresipContact ->
-                BaresipContact(name, ArrayList(uris), color, id, favorite)
+                BaresipContact(name, ArrayList(uris), email, color, id, favorite)
             is AndroidContact ->
                 AndroidContact(name, color, thumbnailUri, id, favorite)
         }
@@ -101,16 +101,17 @@ sealed class Contact {
         }
 
         // Return URIs of contact name
-        fun contactUris(name: String): ArrayList<String> {
+        fun contactUris(name: String, tel: Boolean = false): ArrayList<String> {
             val uris = ArrayList<String>()
             for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact -> {
                         if (c.name.equals(name, ignoreCase = true)) {
-                            for (u in c.uris)
-                                uris.add(u.removePrefix("<")
-                                    .replaceAfter(">", "")
-                                    .replace(">", ""))
+                            for (u in c.uris) {
+                                if (tel && !u.startsWith("tel:"))
+                                    continue
+                                uris.add(u)
+                            }
                             return uris
                         }
                     }
@@ -155,8 +156,8 @@ sealed class Contact {
             val avatarFiles = avatarFileNames()
             var contents = ""
             for (c in BaresipService.baresipContacts.value) {
-                contents += "\"${c.name}\" <${c.uris.joinToString(",")}>;id=${c.id};color=${c.color}" +
-                        ";favorite=${if (c.favorite) "yes" else "no"}\n"
+                contents += "\"${c.name}\" <${c.uris.joinToString(",")}>;email=${c.email};id=${c.id}" +
+                        ";color=${c.color};favorite=${if (c.favorite) "yes" else "no"}\n"
                 avatarFiles.remove(c.id.toString() + ".png")
             }
             Utils.putFileContents(BaresipService.filesPath + "/contacts",
@@ -166,8 +167,8 @@ sealed class Contact {
         }
 
         fun loadAndroidContacts(ctx: Context) {
-            // If phone type is needed, add DATA2 to projection. Then phone type can be get from
-            // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE
+            // If phone type is needed, add DATA2 to projection. Then phone type can be got from
+            // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                 ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
                 /* ContactsContract.Data.DATA2 ,*/ ContactsContract.Data.PHOTO_THUMBNAIL_URI,
@@ -241,6 +242,7 @@ sealed class Contact {
                     val urisPart = uriParams.substringAfter("<").substringBefore(">")
                     val uris = ArrayList(urisPart.split(","))
                     val params = uriParams.substringAfter(">;")
+                    val email = Utils.paramValue(params, "email")
                     val colorValue = Utils.paramValue(params, "color" )
                     val color: Int = if (colorValue != "")
                         colorValue.toInt()
@@ -253,7 +255,7 @@ sealed class Contact {
                         baseId + contactNo
                     val favorite = Utils.paramValue(params, "favorite" ) == "yes"
                     Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
-                    val contact = BaresipContact(name, uris, color, id, favorite)
+                    val contact = BaresipContact(name, uris, email, color, id, favorite)
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {

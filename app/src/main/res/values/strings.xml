@@ -456,6 +456,7 @@
     <!-- Contact Activity -->
     <string name="new_contact">New Contact</string>
     <string name="contact_name">Name</string>
+    <string name="email">Email</string>
     <string name="sip_or_tel_uri">SIP or tel URI</string>
     <string name="user_domain_or_number">user@domain or telephone number</string>
     <string name="favorite">Favorite</string>
@@ -468,9 +469,14 @@
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'\?</string>
+    <string name="contact_email_action_question">Do you want to call, send message, or email to \'%1$s\'\?</string>
     <string name="send_message">Send Message</string>
+    <string name="send_email">Send Email</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'\?</string>
     <string name="search">Search</string>
+    <string name="import_contacts">Import</string>
+    <string name="contact_import_success">Contacts imported successfully</string>
+    <string name="contact_import_failure">Failed to import contacts</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>

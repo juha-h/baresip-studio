@@ -433,15 +433,19 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
         else
             chatPeer
         val uri = if (Utils.isTelUri(peerUri)) {
-            if (account.telProvider == "") {
-                alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value =
-                    String.format(ctx.getString(R.string.no_telephony_provider), account.aor)
-                showAlert.value = true
-                ""
-            } else
-                Utils.telToSip(peerUri, account)
-        } else
+            if (account.isMobile)
+                peerUri
+            else
+                if (account.telProvider == "") {
+                    alertTitle.value = ctx.getString(R.string.notice)
+                    alertMessage.value =
+                        String.format(ctx.getString(R.string.no_telephony_provider), account.aor)
+                    showAlert.value = true
+                    ""
+                } else
+                    Utils.telToSip(peerUri, account)
+        }
+        else
             Utils.uriComplete(peerUri, account.aor)
         if (alertMessage.value.isEmpty()) {
             if (!Utils.checkUri(uri)) {
@@ -589,7 +593,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 showSuggestions = false
                 val peerText = newPeer.trim()
                 if (peerText.isNotEmpty()) {
-                    val uris = Contact.contactUris(peerText)
+                    val uris = Contact.contactUris(peerText, account.isMobile)
                     if (uris.isEmpty())
                         makeChat(ctx, navController, account, peerText)
                     else if (uris.size == 1)

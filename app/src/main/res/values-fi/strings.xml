@@ -483,21 +483,30 @@
     <!-- Contact Activity -->
     <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
+    <string name="email">Sähköposti</string>
     <string name="sip_or_tel_uri">SIP tai tel URI</string>
     <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>
     <string name="favorite">Suosikki</string>
-    <string name="favorite_help">Jos ruksattu, kontakti näytetään muiden suosikkien kanssa yhteystietolistan alussa.</string>
+    <string name="favorite_help">Jos ruksattu, kontakti näytetään muiden suosikkien kanssa
+        yhteystietolistan alussa.</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
     <string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
     <string name="avatar_image">Profiilikuva</string>
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
-    <string name="contact_action_question">Haluatko soittaa tai lähettää
-    viestin ositteeseen \'%1$s\'\?</string>
+    <string name="contact_action_question">Haluatko soittaa tai lähettää viestin
+        osoitteeseen \'%1$s\'\?</string>
+    <string name="contact_email_action_question">Haluatko soittaa tai lähettää viestin tai sähköpostin
+        osoitteeseen \'%1$s\'\?</string>
     <string name="send_message">Lähetä viesti</string>
+    <string name="send_email">Lähetä sähköposti</string>
     <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'\?</string>
     <string name="search">Etsi</string>
+    <string name="import_contacts">Tuo</string>
+    <string name="contact_import_success">Yhteystietojen tuonti onnistui</string>
+    <string name="contact_import_failure">Yhteystietojen tuonti epäonnistui</string>
+
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
