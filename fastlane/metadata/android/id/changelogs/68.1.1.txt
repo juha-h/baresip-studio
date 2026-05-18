@@ -1,0 +1,4 @@
+- Peningkatan tampilan waktu riwayat panggilan
+- Perubahan warna latar belakang ikon status buta warna
+- Perbaikan kemungkinan crash terkait pengaturan akun Interval Registrasi
+- Perbaikan pembaruan notifikasi status
