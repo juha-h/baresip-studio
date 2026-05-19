@@ -84,25 +84,18 @@ import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.File
 import java.io.IOException
-import androidx.core.net.toUri
 
 const val avatarSize: Int = 96
 
-fun NavGraphBuilder.contactsScreenRoute(
-    navController: NavController,
-    viewModel: ViewModel
-) {
+fun NavGraphBuilder.contactsScreenRoute(navController: NavController) {
     composable("contacts") { _ ->
-        ContactsScreen(navController = navController, viewModel = viewModel)
+        ContactsScreen(navController = navController)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ContactsScreen(
-    navController: NavController,
-    viewModel: ViewModel
-) {
+private fun ContactsScreen(navController: NavController) {
 
     val ctx = LocalContext.current
     val activity = LocalActivity.current!!
@@ -429,7 +422,7 @@ private fun ContactsScreen(
             )
         },
         content = { contentPadding ->
-            ContactsContent(ctx, viewModel, navController, contentPadding, searchContactName)
+            ContactsContent(ctx, navController, contentPadding, searchContactName)
         }
     )
 }
@@ -497,31 +490,21 @@ private fun BottomBar(
 @Composable
 private fun ContactsContent(
     ctx: Context,
-    viewModel: ViewModel,
     navController: NavController,
     contentPadding: PaddingValues,
     searchQuery: String
 ) {
-    val showDialog = remember { mutableStateOf(false) }
-    val dialogMessage = remember { mutableStateOf("") }
-    val secondText = remember { mutableStateOf("") }
-    val secondAction = remember { mutableStateOf({}) }
-    val lastText = remember { mutableStateOf("") }
+    val showConfirmationDialog = remember { mutableStateOf(false) }
+    val confirmationDialogMessage = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
-    val thirdText = remember { mutableStateOf("") }
-    val thirdAction = remember { mutableStateOf({}) }
 
-    if (showDialog.value)
+    if (showConfirmationDialog.value)
         AlertDialog(
-            showDialog = showDialog,
+            showDialog = showConfirmationDialog,
             title = stringResource(R.string.confirmation),
-            message = dialogMessage.value,
+            message = confirmationDialogMessage.value,
             firstButtonText = stringResource(R.string.cancel),
-            secondButtonText = secondText.value,
-            onSecondClicked = secondAction.value,
-            thirdButtonText = thirdText.value,
-            onThirdClicked = thirdAction.value,
-            lastButtonText = lastText.value,
+            lastButtonText = stringResource(R.string.delete),
             onLastClicked = lastAction.value,
         )
 
@@ -638,132 +621,13 @@ private fun ContactsContent(
                                 .padding(start = 10.dp)
                                 .combinedClickable(
                                     onClick = {
-                                        val aor = viewModel.selectedAor.value
-                                        val ua = UserAgent.ofAor(aor)
-                                        val intent = Intent(ctx, MainActivity::class.java)
-                                        if (ua != null) {
-                                            intent.putExtra("uap", ua.uap)
-                                        }
-                                        else
-                                            Log.w(TAG, "onClickListener did not find UA for $aor")
-                                        val peerName = contact.name()
-                                        if (contact.email.isNotEmpty())
-                                            dialogMessage.value = String.format(
-                                                ctx.getString(R.string.contact_email_action_question),
-                                                peerName
-                                            )
-                                        else
-                                            dialogMessage.value = String.format(
-                                                ctx.getString(R.string.contact_action_question),
-                                                peerName
-                                            )
-                                        secondText.value = ctx.getString(R.string.call)
-                                        secondAction.value = {
-                                            if (ua != null) {
-                                                val uris = if (ua.account.isMobile)
-                                                    contact.uris.filter { it.startsWith("tel:") }
-                                                else
-                                                    contact.uris
-                                                if (uris.size > 1) {
-                                                    CustomElements.selectItems.value = uris
-                                                    CustomElements.selectItemAction.value = { index: Int ->
-                                                        intent.putExtra("peer", uris[index])
-                                                        handleIntent(ctx, viewModel, intent, "call")
-                                                        navController.navigate("main") {
-                                                            popUpTo("main")
-                                                            launchSingleTop = true
-                                                        }
-                                                        CustomElements.showSelectItemDialog.value = false
-                                                    }
-                                                    CustomElements.showSelectItemDialog.value = true
-                                                }
-                                                else if (uris.size == 1) {
-                                                    intent.putExtra("peer", uris[0])
-                                                    handleIntent(ctx, viewModel, intent, "call")
-                                                    navController.navigate("main") {
-                                                        popUpTo("main")
-                                                        launchSingleTop = true
-                                                    }
-                                                }
-                                                else {
-                                                    alertTitle.value = ctx.getString(R.string.notice)
-                                                    alertMessage.value = ctx.getString(R.string.no_telephone_number)
-                                                    showAlert.value = true
-                                                }
-                                            }
-                                        }
-                                        thirdText.value = ctx.getString(R.string.send_message)
-                                        thirdAction.value = {
-                                            if (ua != null) {
-                                                val uris = if (ua.account.isMobile)
-                                                    contact.uris.filter { it.startsWith("tel:") }
-                                                else
-                                                    contact.uris
-
-                                                if (uris.size > 1) {
-                                                    CustomElements.selectItems.value = uris
-                                                    CustomElements.selectItemAction.value = { index: Int ->
-                                                        intent.putExtra("peer", uris[index])
-                                                        if (ua.account.isMobile) {
-                                                            if (!Utils.isDefaultSmsApp(ctx)) {
-                                                                alertTitle.value = ctx.getString(R.string.notice)
-                                                                alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                                                showAlert.value = true
-                                                            } else {
-                                                                handleIntent(ctx, viewModel, intent, "message")
-                                                                navController.navigateUp()
-                                                            }
-                                                        }
-                                                        else {
-                                                            handleIntent(ctx, viewModel, intent, "message")
-                                                            navController.navigateUp()
-                                                        }
-                                                        CustomElements.showSelectItemDialog.value = false
-                                                    }
-                                                    CustomElements.showSelectItemDialog.value = true
-                                                } else if (uris.size == 1) {
-                                                    intent.putExtra("peer", uris[0])
-                                                    if (ua.account.isMobile) {
-                                                        if (!Utils.isDefaultSmsApp(ctx)) {
-                                                            alertTitle.value = ctx.getString(R.string.notice)
-                                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                                            showAlert.value = true
-                                                        } else {
-                                                            handleIntent(ctx, viewModel, intent, "message")
-                                                            navController.navigateUp()
-                                                        }
-                                                    }
-                                                    else {
-                                                        handleIntent(ctx, viewModel, intent, "message")
-                                                        navController.navigateUp()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (contact.email.isNotEmpty()) {
-                                            lastText.value = ctx.getString(R.string.send_email)
-                                            lastAction.value = {
-                                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                                                    data = "mailto:${contact.email}".toUri()
-                                                }
-                                                try {
-                                                    ctx.startActivity(emailIntent)
-                                                } catch (e: Exception) {
-                                                    Log.e(TAG, "Failed to start email activity: ${e.message}")
-                                                }
-                                            }
-                                        } else {
-                                            lastText.value = ""
-                                        }
-                                        showDialog.value = true
+                                        navController.navigate("contact/${contact.name()}")
                                     },
                                     onLongClick = {
-                                        dialogMessage.value = String.format(
+                                        confirmationDialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_delete_question),
                                             contact.name()
                                         )
-                                        secondText.value = ""
-                                        lastText.value = ctx.getString(R.string.delete)
                                         lastAction.value = {
                                             val id = contact.id
                                             val avatarFile = File(
@@ -782,7 +646,7 @@ private fun ContactsContent(
                                             }
                                             Contact.removeBaresipContact(contact)
                                         }
-                                        showDialog.value = true
+                                        showConfirmationDialog.value = true
                                     }
                                 )
                         )
@@ -808,14 +672,14 @@ private fun ContactsContent(
                                 .weight(1f)
                                 .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
                                 .combinedClickable(
-                                    onClick = { navController.navigate("android_contact/${contact.name()}") },
+                                    onClick = {
+                                        navController.navigate("contact/${contact.name()}")
+                                    },
                                     onLongClick = {
-                                        dialogMessage.value = String.format(
+                                        confirmationDialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_delete_question),
                                             contact.name()
                                         )
-                                        secondText.value = ""
-                                        lastText.value = ctx.getString(R.string.delete)
                                         lastAction.value = {
                                             ctx.contentResolver.delete(
                                                 ContactsContract.RawContacts.CONTENT_URI,
@@ -823,7 +687,7 @@ private fun ContactsContent(
                                                 null
                                             )
                                         }
-                                        showDialog.value = true
+                                        showConfirmationDialog.value = true
                                     }
                                 )
                         )

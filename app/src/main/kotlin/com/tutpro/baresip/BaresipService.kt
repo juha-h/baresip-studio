@@ -104,6 +104,7 @@ class BaresipService: Service() {
     private lateinit var wifiLock: WifiManager.WifiLock
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
+    private lateinit var airplaneModeReceiver: BroadcastReceiver
     private lateinit var androidContactsObserver: ContentObserver
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var stopState: String
@@ -120,6 +121,7 @@ class BaresipService: Service() {
     private var androidContactsObserverRegistered = false
     private var hotSpotReceiverRegistered = false
     private var bluetoothReceiverRegistered = false
+    private var airplaneModeReceiverRegistered = false
     private var isNotificationInCall = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
@@ -287,6 +289,23 @@ class BaresipService: Service() {
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
         hotSpotReceiverRegistered = true
+
+        airplaneModeReceiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                if (intent.action == Intent.ACTION_AIRPLANE_MODE_CHANGED) {
+                    val isAirplaneModeOn = intent.getBooleanExtra("state", false)
+                    Log.d(TAG, "Airplane mode changed: $isAirplaneModeOn")
+                    updateMobileStatus(isAirplaneModeOn)
+                }
+            }
+        }
+        ContextCompat.registerReceiver(
+            this,
+            airplaneModeReceiver,
+            IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED),
+            ContextCompat.RECEIVER_EXPORTED
+        )
+        airplaneModeReceiverRegistered = true
 
         tm = getSystemService(TELECOM_SERVICE) as TelecomManager
 
@@ -2027,6 +2046,8 @@ class BaresipService: Service() {
         account.regint = 0
         account.telProvider = ""
         val mobileUa = UserAgent(0L, account)
+        val isAirplaneModeOn = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
+        mobileUa.status = if (isAirplaneModeOn) R.drawable.circle_white else circleGreen.getValue(colorblind)
 
         val updatedUas = uas.value.toMutableList()
         updatedUas.add(mobileUa)
@@ -2039,6 +2060,19 @@ class BaresipService: Service() {
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(this, message, length).show()
+        }
+    }
+
+    private fun updateMobileStatus(isAirplaneModeOn: Boolean) {
+        uas.value.find { it.account.isMobile }?.let { ua ->
+            val status = if (isAirplaneModeOn)
+                R.drawable.circle_white
+            else
+                circleGreen.getValue(colorblind)
+            ua.updateStatus(status)
+            updateStatusNotification()
+            if (isMainVisible)
+                registrationUpdate.postValue(System.currentTimeMillis())
         }
     }
 
@@ -2633,6 +2667,12 @@ class BaresipService: Service() {
                 try {
                     unregisterReceiver(bluetoothReceiver)
                     bluetoothReceiverRegistered = false
+                } catch (_: IllegalArgumentException) {}
+            }
+            if (airplaneModeReceiverRegistered) {
+                try {
+                    unregisterReceiver(airplaneModeReceiver)
+                    airplaneModeReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
             }
             val callps = ConnectionService.connections.keys.toList()

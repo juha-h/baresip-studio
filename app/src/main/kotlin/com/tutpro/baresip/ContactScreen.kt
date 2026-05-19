@@ -2,8 +2,10 @@ package com.tutpro.baresip
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,14 +20,14 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,10 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,10 +56,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import androidx.core.net.toUri
 
-fun NavGraphBuilder.androidContactScreenRoute(navController: NavController, viewModel: ViewModel) {
+fun NavGraphBuilder.contactScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable(
-        route = "android_contact/{name}",
+        route = "contact/{name}",
         arguments = listOf(navArgument("name") { type = NavType.StringType })
     ) { backStackEntry ->
         val ctx = LocalContext.current
@@ -71,10 +76,11 @@ fun NavGraphBuilder.androidContactScreenRoute(navController: NavController, view
 
 @Composable
 private fun ContactScreen(ctx: Context, viewModel: ViewModel, navController: NavController, name: String) {
-    val contact = Contact.androidContact(name)
+    val contact = Contact.baresipContact(name) ?: Contact.androidContact(name)
     if (contact == null) {
-        Log.e(TAG, "No Android contact found with name $name")
+        Log.e(TAG, "No contact found with name $name")
         navController.navigateUp()
+        return
     }
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -90,7 +96,7 @@ private fun ContactScreen(ctx: Context, viewModel: ViewModel, navController: Nav
             }
         },
         content = { contentPadding ->
-            ContactContent(ctx, viewModel, navController, contentPadding, contact!!)
+            ContactContent(ctx, viewModel, navController, contentPadding, contact)
         }
     )
 }
@@ -123,19 +129,23 @@ private fun ContactContent(
     viewModel: ViewModel,
     navController: NavController,
     contentPadding: PaddingValues,
-    contact: Contact.AndroidContact
+    contact: Contact
 ) {
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 52.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Avatar(contact)
-        ContactName(contact.name)
+        ContactName(contact.name())
         Uris(ctx, viewModel, navController, contact)
+        if (contact.email().isNotEmpty())
+            Email(ctx, contact.email())
     }
 }
 
@@ -153,7 +163,19 @@ private fun TextAvatar(text: String, color: Int) {
 }
 
 @Composable
-private fun ImageAvatar(uri: Uri) {
+private fun ImageAvatar(bitmap: Bitmap) {
+    Image(
+        bitmap = bitmap.asImageBitmap(),
+        contentDescription = "Avatar",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(avatarSize.dp)
+            .clip(CircleShape)
+    )
+}
+
+@Composable
+private fun AsyncImageAvatar(uri: Uri) {
     AsyncImage(
         model = uri,
         contentDescription = stringResource(R.string.avatar_image),
@@ -163,19 +185,28 @@ private fun ImageAvatar(uri: Uri) {
 }
 
 @Composable
-private fun Avatar(contact: Contact.AndroidContact) {
+private fun Avatar(contact: Contact) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        val color = contact.color
-        val name = contact.name
-        val thumbnailUri = contact.thumbnailUri
-        if (thumbnailUri != null)
-            ImageAvatar(thumbnailUri)
-        else
-            TextAvatar(if (name == "") "" else name[0].toString(), color)
+        val color = contact.colorInt()
+        val name = contact.name()
+        when (contact) {
+            is Contact.BaresipContact -> {
+                if (contact.avatarImage != null)
+                    ImageAvatar(contact.avatarImage!!)
+                else
+                    TextAvatar(if (name == "") "" else name[0].toString(), color)
+            }
+            is Contact.AndroidContact -> {
+                if (contact.thumbnailUri != null)
+                    AsyncImageAvatar(contact.thumbnailUri!!)
+                else
+                    TextAvatar(if (name == "") "" else name[0].toString(), color)
+            }
+        }
     }
 }
 
@@ -184,9 +215,48 @@ private fun ContactName(name: String) {
     Row(
         Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = name,
+            fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun Email(ctx: Context, email: String) {
+    Row(
+        Modifier.fillMaxWidth().padding(bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        Text(name, fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text(
+            text = stringResource(R.string.bullet_item, email),
+            modifier = Modifier.weight(1f),
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        IconButton(
+            onClick = {
+                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = "mailto:$email".toUri()
+                }
+                try {
+                    ctx.startActivity(emailIntent)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to start email activity: ${e.message}")
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Email,
+                contentDescription = "Send Email",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+        }
     }
 }
 
@@ -195,23 +265,18 @@ private fun Uris(
     ctx: Context,
     viewModel: ViewModel,
     navController: NavController,
-    contact: Contact.AndroidContact
+    contact: Contact
 ) {
-    val lazyListState = rememberLazyListState()
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 4.dp)
-            .background(MaterialTheme.colorScheme.background),
-        state = lazyListState,
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(contact.uris) { uri ->
+        for (uri in contact.uris()) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = uri.substringAfter(":"),
+                    text = stringResource(R.string.bullet_item, uri.substringAfter(":")),
                     modifier = Modifier.weight(1f),
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -225,13 +290,18 @@ private fun Uris(
                         if (ua == null)
                             Log.w(TAG, "Message clickable did not find AoR $aor")
                         else {
-                            val intent = Intent(ctx, MainActivity::class.java)
-                            intent.putExtra("uap", ua.uap)
-                            intent.putExtra("peer", uri)
-                            handleIntent(ctx, viewModel, intent, "message")
-                            navController.navigate("main") {
-                                popUpTo("main") { inclusive = false }
-                                launchSingleTop = true
+                            if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                                handleDialog(ctx, ctx.getString(R.string.notice),
+                                    ctx.getString(R.string.enable_default_messaging))
+                            } else {
+                                val intent = Intent(ctx, MainActivity::class.java)
+                                intent.putExtra("uap", ua.uap)
+                                intent.putExtra("peer", uri)
+                                handleIntent(ctx, viewModel, intent, "message")
+                                navController.navigate("main") {
+                                    popUpTo("main") { inclusive = false }
+                                    launchSingleTop = true
+                                }
                             }
                         }
                     }
@@ -272,5 +342,3 @@ private fun Uris(
         }
     }
 }
-
-

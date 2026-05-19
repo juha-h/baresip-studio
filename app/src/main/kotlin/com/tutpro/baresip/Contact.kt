@@ -13,45 +13,38 @@ import java.util.ArrayList
 
 sealed class Contact {
 
+    abstract fun name(): String
+    abstract fun id(): Long
+    abstract fun favorite(): Boolean
+    abstract fun colorInt(): Int
+    abstract fun uris(): List<String>
+    abstract fun email(): String
+
     class BaresipContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
                          var id: Long, var favorite: Boolean): Contact() {
         var avatarImage: Bitmap? = null
+        override fun name() = name
+        override fun id() = id
+        override fun favorite() = favorite
+        override fun colorInt() = color
+        override fun uris() = uris
+        override fun email() = email
     }
 
-    class AndroidContact(var name: String, var color: Int, var thumbnailUri: Uri?,
-                         var id: Long, var favorite: Boolean): Contact() {
-        val uris = ArrayList<String>()
-    }
-
-    fun name(): String {
-        return when (this) {
-            is AndroidContact -> name
-            is BaresipContact -> name
-        }
-    }
-
-    fun id(): Long {
-        return when (this) {
-            is AndroidContact -> id
-            is BaresipContact -> id
-        }
-    }
-
-    fun favorite(): Boolean {
-        return when (this) {
-            is AndroidContact -> favorite
-            is BaresipContact -> favorite
-        }
+    class AndroidContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
+                         var thumbnailUri: Uri?, var id: Long, var favorite: Boolean): Contact() {
+        override fun name() = name
+        override fun id() = id
+        override fun favorite() = favorite
+        override fun colorInt() = color
+        override fun uris() = uris
+        override fun email() = email
     }
 
     fun color(): String {
-        val intColor = when (this) {
-            is AndroidContact -> color
-            is BaresipContact -> color
-        }
         // Mask with 0xFFFFFF to ensure we get the standard 6-character hex code (RRGGBB)
         // ignoring the alpha channel for compatibility with simple string parsers.
-        return String.format("#%06X", 0xFFFFFF and intColor)
+        return String.format("#%06X", 0xFFFFFF and colorInt())
     }
 
     fun copy(): Contact {
@@ -59,14 +52,10 @@ sealed class Contact {
             is BaresipContact ->
                 BaresipContact(name, ArrayList(uris), email, color, id, favorite)
             is AndroidContact ->
-                AndroidContact(name, color, thumbnailUri, id, favorite)
+                AndroidContact(name, ArrayList(uris), email, color, thumbnailUri, id, favorite)
         }
-        when (this) {
-            is BaresipContact ->
-                (copy as BaresipContact).avatarImage = this.avatarImage
-            is AndroidContact ->
-                (copy as AndroidContact).uris.addAll(this.uris)
-        }
+        if (this is BaresipContact)
+            (copy as BaresipContact).avatarImage = this.avatarImage
         return copy
     }
 
@@ -175,7 +164,8 @@ sealed class Contact {
                 ContactsContract.Contacts.STARRED)
             val selection =
                 ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
-                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
+                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "' OR " +
+                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE + "'"
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                     selection, null, null)
             BaresipService.androidContacts.value = listOf()
@@ -184,27 +174,33 @@ sealed class Contact {
                 val id = cur.getLong(0)
                 val name = cur.getString(1) ?: ""
                 val mime = cur.getString(2)
-                val data = cur.getString(3)
+                val data = cur.getString(3) ?: continue
                 val thumb = cur.getString(4)?.toUri()
                 val starred = cur.getInt(5)
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
-                    AndroidContact(name, Utils.randomColor(), thumb, id, starred == 1)
+                    AndroidContact(name, ArrayList<String>(), "", Utils.randomColor(), thumb, id, starred == 1)
                 if (contact.name == "" && name != "")
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)
                     contact.thumbnailUri = thumb
-                if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
-                    val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
-                    if (uri !in contact.uris)
-                        contact.uris.add(uri)
-                    // contact.types.add(typeToString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)))
+                when (mime) {
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
+                        val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
+                        if (uri !in contact.uris)
+                            contact.uris.add(uri)
+                    }
+                    ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> {
+                        val uri = "sip:$data"
+                        if (uri !in contact.uris)
+                            contact.uris.add(uri)
+                    }
+                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> {
+                        if (contact.email == "")
+                            contact.email = data
+                    }
                 }
-                else if (mime == ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
-                    contact.uris.add("sip:$data")
-                else
-                    continue
                 if (!contacts.containsKey(id))
                     contacts[id] = contact
             }
