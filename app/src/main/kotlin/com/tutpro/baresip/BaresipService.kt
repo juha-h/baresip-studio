@@ -457,6 +457,7 @@ class BaresipService: Service() {
                     if (!file.exists() && a != "config") {
                         Log.i(TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(this, a, "$filesPath/$a")
+                    }
                     else
                         Log.i(TAG, "Asset '$a' already copied")
                     if (a == "config")
@@ -915,7 +916,7 @@ class BaresipService: Service() {
                             )
                         else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri)
                             String.format(
-			        getString(R.string.call_blocked),
+			                    getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account)
                             )
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
@@ -1223,6 +1224,7 @@ class BaresipService: Service() {
                                                     "Could not delete temporary raw files after merge: ${e.message}"
                                                 )
                                             }
+                                        }
                                         else {
                                             Log.e(
                                                 TAG,
