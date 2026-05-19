@@ -597,7 +597,7 @@
     </string>
     <string name="no_notifications">You are not able to use this application without \"Notifications\"
         permission.</string>
-    <string name="no_airplane_mode">Airplane mode is ON. Turn it OFF to use mobile account.</string>
+    <string name="airplane_mode">Airplane mode is ON. Turn it OFF to use mobile account.</string>
     <string name="no_calls">baresip needs \"Microphone\" permission for voice calls.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
     <string name="no_backup">You are not able create backup without \"Storage\" permission.</string>

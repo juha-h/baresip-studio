@@ -690,7 +690,7 @@ private fun UrisSection(
                             else {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
                                     handleDialog(ctx, ctx.getString(R.string.notice),
-                                        ctx.getString(R.string.no_airplane_mode))
+                                        ctx.getString(R.string.airplane_mode))
                                 } else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.enable_default_messaging))
@@ -724,7 +724,7 @@ private fun UrisSection(
                             else {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
                                     handleDialog(ctx, ctx.getString(R.string.notice),
-                                        ctx.getString(R.string.no_airplane_mode))
+                                        ctx.getString(R.string.airplane_mode))
                                 } else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)

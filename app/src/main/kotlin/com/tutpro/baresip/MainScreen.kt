@@ -2134,7 +2134,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     }
     else if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
         alertTitle.value = ctx.getString(R.string.notice)
-        alertMessage.value = ctx.getString(R.string.no_airplane_mode)
+        alertMessage.value = ctx.getString(R.string.airplane_mode)
         showAlert.value = true
         return
     }

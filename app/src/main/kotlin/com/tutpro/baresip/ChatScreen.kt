@@ -583,7 +583,7 @@ private fun NewMessage(
                     addMessage(msg)
                     if (ua.account.isMobile) {
                         if (Utils.isAirplaneModeOn(ctx)) {
-                            dialogMessage.value = ctx.getString(R.string.no_airplane_mode)
+                            dialogMessage.value = ctx.getString(R.string.airplane_mode)
                             showDialog.value = true
                         } else {
                             val destination = Utils.uriUserPart(peerUri)
