@@ -294,7 +294,6 @@
         %2$s puheluhistoriasta\?
     </string>
     <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta\?</string>
-    <string name="no_sms_messaging">SMS-tekstiviestitystä ei ole vielä toteutettu.</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
@@ -343,7 +342,14 @@
         ja pääsyä verkkoon.</string>
     <string name="default_phone_app">Oletus puhelusovellus</string>
     <string name="dialer_role_not_available">Oletus puhelusovellusrooli ei ole saatavana</string>
-    <string name="default_phone_app_help">Jos merkitty, baresip on oletus puhelusovellus.</string>
+    <string name="default_phone_app_help">Jos merkitty, baresip on oletus puhelusovellus</string>
+    <string name="default_messaging_app">Oletus tekstiviestisovellus</string>
+    <string name="default_messaging_app_help">Jos merkitty, baresip on tekstiviestien
+        oletussovellus</string>
+    <string name="messaging_role_not_available">Oletus tekstiviestisovellusrooli ei ole
+        saatavana</string>
+    <string name="enable_default_messaging">Ole hyvä ja merkitse \'Oletus tekstiviestisovellus\'
+        baresip asetuksissa</string>
     <string name="listen_address">Kuunteluosoite</string>
     <string name="listen_address_help">IP-osoite ja portti muotoa
     \'osoite:portti\', missä baresip kuuntelee sisään tulevia
@@ -477,21 +483,32 @@
     <!-- Contact Activity -->
     <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
-    <string name="sip_or_tel_uri">SIP tai tel URI</string>
+    <string name="email">Sähköposti</string>
+    <string name="sip_or_tel_uri">SIP tai TEL URI</string>
     <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>
     <string name="favorite">Suosikki</string>
-    <string name="favorite_help">Jos ruksattu, kontakti näytetään muiden suosikkien kanssa yhteystietolistan alussa.</string>
+    <string name="favorite_help">Jos ruksattu, kontakti näytetään muiden suosikkien kanssa
+        yhteystietolistan alussa.</string>
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
-    <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa.</string>
-    <string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
+    <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa</string>
+    <string name="contact_no_sip_or_tel_uri">Yhteystiedolla \'%1$s\' ei ole SIP eikä TEL URI:a</string>
+    <string name="contact_no_tel_uri">Yhteystiedolla \'%1$s\' ei ole TEL URI:a</string><string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
     <string name="avatar_image">Profiilikuva</string>
+
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
-    <string name="contact_action_question">Haluatko soittaa tai lähettää
-    viestin ositteeseen \'%1$s\'\?</string>
+    <string name="contact_action_question">Haluatko soittaa tai lähettää viestin
+        osoitteeseen \'%1$s\'\?</string>
+    <string name="contact_email_action_question">Haluatko soittaa tai lähettää viestin tai sähköpostin
+        osoitteeseen \'%1$s\'\?</string>
     <string name="send_message">Lähetä viesti</string>
+    <string name="send_email">Lähetä sähköposti</string>
     <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'\?</string>
     <string name="search">Etsi</string>
+    <string name="import_contacts">Tuo</string>
+    <string name="contact_import_success">Yhteystietojen tuonti onnistui</string>
+    <string name="contact_import_failure">Yhteystietojen tuonti epäonnistui</string>
+
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
@@ -603,6 +620,8 @@
         versiosta 14 alkaen ei salli tietojen palauttamista, jos ne on tallettu ennen %1$s versioa
         %2$s.</string>
     <string name="no_notifications">Et voi käyttää tätä sovellusta ilman Ilmoitukset-lupaa.</string>
+    <string name="airplane_mode">Laite on lentotilassa. Poista lentotila, jos haluat käyttää
+        mobiilitiliä.</string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-lupaa.</string>
     <string name="no_video_calls">Salli Kamera-lupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
     <string name="no_backup">Et voi tallentaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>

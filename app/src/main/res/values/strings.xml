@@ -280,7 +280,6 @@
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete
         %2$s from call history\?</string>
     <string name="calls_delete_question">Do you want to delete \'%1$s\' %2$s from call history\?</string>
-    <string name="no_sms_messaging">Sorry, no SMS messaging yet.</string>
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
     <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'\?</string>
@@ -328,6 +327,10 @@
     <string name="default_phone_app">Default Phone App</string>
     <string name="dialer_role_not_available">Default phone app role is not available</string>
     <string name="default_phone_app_help">If checked, baresip is the default phone app.</string>
+    <string name="default_messaging_app">Default Messaging App</string>
+    <string name="default_messaging_app_help">If checked, baresip is the default messaging app for SMS/MMS.</string>
+    <string name="messaging_role_not_available">Default messaging app role is not available</string>
+    <string name="enable_default_messaging">Please enable Default Messaging App in Settings</string>
     <string name="listen_address">Listen Address</string>
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests.  If IP address is an IPv6 address, it must be written inside
@@ -453,6 +456,7 @@
     <!-- Contact Activity -->
     <string name="new_contact">New Contact</string>
     <string name="contact_name">Name</string>
+    <string name="email">Email</string>
     <string name="sip_or_tel_uri">SIP or tel URI</string>
     <string name="user_domain_or_number">user@domain or telephone number</string>
     <string name="favorite">Favorite</string>
@@ -460,14 +464,21 @@
         on top of contacts list.</string>
     <string name="invalid_contact">Invalid contact name \'%1$s\'</string>
     <string name="contact_already_exists">Contact \'%1$s\' already exists.</string>
+    <string name="contact_no_sip_or_tel_uri">Contact \'%1$s\' has no SIP or TEL URI</string>
+    <string name="contact_no_tel_uri">Contact \'%1$s\' has no TEL URI</string>
     <string name="android_contact_help">If checked, this contact is added to Android contacts.</string>
     <string name="avatar_image">Profile image</string>
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'\?</string>
+    <string name="contact_email_action_question">Do you want to call, send message, or email to \'%1$s\'\?</string>
     <string name="send_message">Send Message</string>
+    <string name="send_email">Send Email</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'\?</string>
     <string name="search">Search</string>
+    <string name="import_contacts">Import</string>
+    <string name="contact_import_success">Contacts imported successfully</string>
+    <string name="contact_import_failure">Failed to import contacts</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
@@ -586,6 +597,7 @@
     </string>
     <string name="no_notifications">You are not able to use this application without \"Notifications\"
         permission.</string>
+    <string name="airplane_mode">Airplane mode is ON. Turn it OFF to use mobile account.</string>
     <string name="no_calls">baresip needs \"Microphone\" permission for voice calls.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
     <string name="no_backup">You are not able create backup without \"Storage\" permission.</string>
