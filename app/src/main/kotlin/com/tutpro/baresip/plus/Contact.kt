@@ -13,60 +13,49 @@ import java.util.ArrayList
 
 sealed class Contact {
 
-    class BaresipContact(var name: String, var uri: String, var color: Int, var id: Long,
-                         var favorite: Boolean): Contact() {
-        var avatarImage: Bitmap? = null
-    }
+    abstract fun name(): String
+    abstract fun id(): Long
+    abstract fun favorite(): Boolean
+    abstract fun colorInt(): Int
+    abstract fun uris(): List<String>
+    abstract fun email(): String
 
-    class AndroidContact(var name: String, var color: Int, var thumbnailUri: Uri?,
+    class BaresipContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
                          var id: Long, var favorite: Boolean): Contact() {
-        val uris = ArrayList<String>()
+        var avatarImage: Bitmap? = null
+        override fun name() = name
+        override fun id() = id
+        override fun favorite() = favorite
+        override fun colorInt() = color
+        override fun uris() = uris
+        override fun email() = email
     }
 
-    fun name(): String {
-        return when (this) {
-            is AndroidContact -> name
-            is BaresipContact -> name
-        }
-    }
-
-    fun id(): Long {
-        return when (this) {
-            is AndroidContact -> id
-            is BaresipContact -> id
-        }
-    }
-
-    fun favorite(): Boolean {
-        return when (this) {
-            is AndroidContact -> favorite
-            is BaresipContact -> favorite
-        }
+    class AndroidContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
+                         var thumbnailUri: Uri?, var id: Long, var favorite: Boolean): Contact() {
+        override fun name() = name
+        override fun id() = id
+        override fun favorite() = favorite
+        override fun colorInt() = color
+        override fun uris() = uris
+        override fun email() = email
     }
 
     fun color(): String {
-        val intColor = when (this) {
-            is AndroidContact -> color
-            is BaresipContact -> color
-        }
         // Mask with 0xFFFFFF to ensure we get the standard 6-character hex code (RRGGBB)
         // ignoring the alpha channel for compatibility with simple string parsers.
-        return String.format("#%06X", 0xFFFFFF and intColor)
+        return String.format("#%06X", 0xFFFFFF and colorInt())
     }
 
     fun copy(): Contact {
         val copy = when (this) {
             is BaresipContact ->
-                BaresipContact(name, uri, color, id, favorite)
+                BaresipContact(name, ArrayList(uris), email, color, id, favorite)
             is AndroidContact ->
-                AndroidContact(name, color, thumbnailUri, id, favorite)
+                AndroidContact(name, ArrayList(uris), email, color, thumbnailUri, id, favorite)
         }
-        when (this) {
-            is BaresipContact ->
-                (copy as BaresipContact).avatarImage = this.avatarImage
-            is AndroidContact ->
-                (copy as AndroidContact).uris.addAll(this.uris)
-        }
+        if (this is BaresipContact)
+            (copy as BaresipContact).avatarImage = this.avatarImage
         return copy
     }
 
@@ -100,22 +89,27 @@ sealed class Contact {
         }
 
         // Return URIs of contact name
-        fun contactUris(name: String): ArrayList<String> {
+        fun contactUris(name: String, tel: Boolean = false): ArrayList<String> {
             val uris = ArrayList<String>()
             for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact -> {
                         if (c.name.equals(name, ignoreCase = true)) {
-                            uris.add(c.uri.removePrefix("<")
-                                .replaceAfter(">", "")
-                                .replace(">", ""))
+                            for (u in c.uris) {
+                                if (tel && !u.startsWith("tel:"))
+                                    continue
+                                uris.add(u)
+                            }
                             return uris
                         }
                     }
                     is AndroidContact -> {
                         if (c.name == name) {
-                            for (u in c.uris)
+                            for (u in c.uris) {
+                                if (tel && !u.startsWith("tel:"))
+                                    continue
                                 uris.add(u)
+                            }
                             return uris
                         }
                     }
@@ -127,8 +121,9 @@ sealed class Contact {
             for (c in BaresipService.contacts)
                 when (c) {
                     is BaresipContact -> {
-                        if (Utils.uriMatch(c.uri, uri))
-                            return c
+                        for (u in c.uris)
+                            if (Utils.uriMatch(u, uri))
+                                return c
                     }
                     is AndroidContact -> {
                         val cleanUri = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
@@ -152,8 +147,8 @@ sealed class Contact {
             val avatarFiles = avatarFileNames()
             var contents = ""
             for (c in BaresipService.baresipContacts.value) {
-                contents += "\"${c.name}\" <${c.uri}>;id=${c.id};color=${c.color}" +
-                        ";favorite=${if (c.favorite) "yes" else "no"}\n"
+                contents += "\"${c.name}\" <${c.uris.joinToString(",")}>;email=${c.email};id=${c.id}" +
+                        ";color=${c.color};favorite=${if (c.favorite) "yes" else "no"}\n"
                 avatarFiles.remove(c.id.toString() + ".png")
             }
             Utils.putFileContents(BaresipService.filesPath + "/contacts",
@@ -163,15 +158,16 @@ sealed class Contact {
         }
 
         fun loadAndroidContacts(ctx: Context) {
-            // If phone type is needed, add DATA2 to projection. Then phone type can be get from
-            // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE
+            // If phone type is needed, add DATA2 to projection. Then phone type can be got from
+            // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                 ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
                 /* ContactsContract.Data.DATA2 ,*/ ContactsContract.Data.PHOTO_THUMBNAIL_URI,
                 ContactsContract.Contacts.STARRED)
             val selection =
                 ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
-                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
+                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "' OR " +
+                        ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE + "'"
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
                     selection, null, null)
             BaresipService.androidContacts.value = listOf()
@@ -180,34 +176,40 @@ sealed class Contact {
                 val id = cur.getLong(0)
                 val name = cur.getString(1) ?: ""
                 val mime = cur.getString(2)
-                val data = cur.getString(3)
+                val data = cur.getString(3) ?: continue
                 val thumb = cur.getString(4)?.toUri()
                 val starred = cur.getInt(5)
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
-                    AndroidContact(name, Utils.randomColor(), thumb, id, starred == 1)
+                    AndroidContact(name, ArrayList<String>(), "", Utils.randomColor(), thumb, id, starred == 1)
                 if (contact.name == "" && name != "")
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)
                     contact.thumbnailUri = thumb
-                if (mime == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
-                    val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
-                    if (uri !in contact.uris)
-                        contact.uris.add(uri)
-                    // contact.types.add(typeToString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)))
+                when (mime) {
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
+                        val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
+                        if (uri !in contact.uris)
+                            contact.uris.add(uri)
+                    }
+                    ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> {
+                        val uri = "sip:$data"
+                        if (uri !in contact.uris)
+                            contact.uris.add(uri)
+                    }
+                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> {
+                        if (contact.email == "")
+                            contact.email = data
+                    }
                 }
-                else if (mime == ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE)
-                    contact.uris.add("sip:$data")
-                else
-                    continue
                 if (!contacts.containsKey(id))
                     contacts[id] = contact
             }
             cur?.close()
             val newList = mutableListOf<AndroidContact>()
             for ((_, value) in contacts)
-                if (value.name != "" && value.uris.isNotEmpty())
+                if (value.name != "" && (value.uris.isNotEmpty() || value.email != ""))
                     newList.add(value)
             BaresipService.androidContacts.value = newList.toList()
         }
@@ -235,8 +237,10 @@ sealed class Contact {
                     contactNo++
                     val name = parts[1]
                     val uriParams = parts[2].trim()
-                    val uri = uriParams.substringAfter("<").substringBefore(">")
+                    val urisPart = uriParams.substringAfter("<").substringBefore(">")
+                    val uris = ArrayList(urisPart.split(","))
                     val params = uriParams.substringAfter(">;")
+                    val email = Utils.paramValue(params, "email")
                     val colorValue = Utils.paramValue(params, "color" )
                     val color: Int = if (colorValue != "")
                         colorValue.toInt()
@@ -248,8 +252,8 @@ sealed class Contact {
                     else
                         baseId + contactNo
                     val favorite = Utils.paramValue(params, "favorite" ) == "yes"
-                    Log.d(TAG, "Restoring contact $name, $uri, $color, $id")
-                    val contact = BaresipContact(name, uri, color, id, favorite)
+                    Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
+                    val contact = BaresipContact(name, uris, email, color, id, favorite)
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {

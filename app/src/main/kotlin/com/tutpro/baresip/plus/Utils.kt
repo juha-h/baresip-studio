@@ -924,6 +924,13 @@ object Utils {
         }
     }
 
+    fun isAirplaneModeOn(ctx: Context): Boolean {
+        return android.provider.Settings.Global.getInt(
+            ctx.contentResolver,
+            android.provider.Settings.Global.AIRPLANE_MODE_ON, 0
+        ) != 0
+    }
+
     @Suppress("unused")
     fun isPSTNCallActive(ctx: Context): Boolean {
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
@@ -1249,6 +1256,38 @@ object Utils {
             Log.w(TAG, "getLine1Number failed: ${e.message}")
         }
         return null
+    }
+
+    fun sendSms(ctx: Context, destination: String, message: String): Boolean {
+        return try {
+            val smsManager = if (Build.VERSION.SDK_INT >= 31)
+                ctx.getSystemService(android.telephony.SmsManager::class.java)
+            else
+                @Suppress("DEPRECATION")
+                android.telephony.SmsManager.getDefault()
+            smsManager.sendTextMessage(
+                destination,
+                null,
+                message,
+                null,
+                null
+            )
+            Log.d(TAG, "Sent SMS message to $destination")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send SMS: ${e.message}")
+            false
+        }
+    }
+
+    fun isDefaultSmsApp(ctx: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= 29) {
+            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+            roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+        } else {
+            @Suppress("DEPRECATION")
+            android.provider.Telephony.Sms.getDefaultSmsPackage(ctx) == ctx.packageName
+        }
     }
 
     @Suppress("unused")

@@ -38,6 +38,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Videocam
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -75,6 +76,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Observer
@@ -217,7 +219,6 @@ private fun TopAppBar(
     peerUri: String
 ) {
     val aor = account.aor
-
     TopAppBar(
         title = {
             Text(
@@ -269,10 +270,10 @@ private fun TopAppBar(
                 onClick = {
                     val ua = UserAgent.ofAor(account.aor)
                     if (ua != null) {
-                        val intent = Intent(ctx, MainActivity::class.java)
-                        intent.putExtra("uap", ua.uap)
-                        intent.putExtra("peer", peerUri)
-                        handleIntent(ctx, viewModel, intent, "call")
+                        val callIntent = Intent(ctx, MainActivity::class.java)
+                            .putExtra("uap", ua.uap)
+                            .putExtra("peer", peerUri)
+                        handleIntent(ctx, viewModel, callIntent, "call")
                         navController.navigate("main") {
                             popUpTo("main")
                             launchSingleTop = true
@@ -287,6 +288,34 @@ private fun TopAppBar(
                     contentDescription = "Call",
                 )
             }
+            val contact = Contact.findContact(peerUri)
+            if (contact != null && contact is Contact.BaresipContact && contact.email.isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val ua = UserAgent.ofAor(account.aor)
+                        if (ua != null) {
+                            val contact = Contact.findContact(peerUri)
+                            if (contact != null && contact is Contact.BaresipContact &&
+                                    contact.email.isNotEmpty()) {
+                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = "mailto:${contact.email}".toUri()
+                                }
+                                try {
+                                    ctx.startActivity(emailIntent)
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to start email activity: ${e.message}")
+                                }
+                            }
+                        }
+                        else
+                            Log.w(TAG, "Call button onClick listener did not find UA for $aor")
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Email,
+                        contentDescription = "Email",
+                    )
+                }
         }
     )
 }
@@ -413,7 +442,7 @@ private fun Messages(
                             )
                             secondButtonText.value = ctx.getString(R.string.add_contact)
                             secondAction.value = {
-                                navController.navigate("baresip_contact/$peerUri/new")
+                                navController.navigate("contact/$peerUri/new")
                             }
                             lastButtonText.value = ctx.getString(R.string.delete)
                             lastAction.value = {
@@ -576,37 +605,59 @@ private fun NewMessage(
                     msg.add()
                     var msgUri = ""
                     addMessage(msg)
-                    if (Utils.isTelUri(peerUri))
-                        if (ua.account.telProvider == "") {
-                            dialogMessage.value = String.format(
-                                ctx.getString(R.string.no_telephony_provider),
-                                Utils.plainAor(aor)
-                            )
+                    if (ua.account.isMobile) {
+                        if (Utils.isAirplaneModeOn(ctx)) {
+                            dialogMessage.value = ctx.getString(R.string.airplane_mode)
                             showDialog.value = true
+                        } else {
+                            val destination = Utils.uriUserPart(peerUri)
+                            if (Utils.sendSms(ctx, destination, msgText)) {
+                                msg.direction = MESSAGE_UP
+                                newMessage.value = TextFieldValue("")
+                                viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                keyboardController?.hide()
+                            } else {
+                                Toast.makeText(
+                                    ctx, "${ctx.getString(R.string.message_failed)}!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                msg.direction = MESSAGE_UP_FAIL
+                                msg.responseReason = ctx.getString(R.string.message_failed)
+                            }
                         }
-                        else {
-                            msgUri = Utils.telToSip(peerUri, ua.account)
-                        }
-                    else
-                        msgUri = peerUri
-                    if (msgUri != "")
-                        if (Api.message_send(ua.uap,
-                                msgUri,
-                                msgText,
-                                time.toString()
-                        ) != 0) {
-                            Toast.makeText(
-                                ctx, "${ctx.getString(R.string.message_failed)}!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            msg.direction = MESSAGE_UP_FAIL
-                            msg.responseReason = ctx.getString(R.string.message_failed)
-                        }
-                        else {
-                            newMessage.value = TextFieldValue("")
-                            viewModel.updateAorPeerMessage(aor, peerUri, "")
-                            keyboardController?.hide()
-                        }
+                    } else {
+                        if (Utils.isTelUri(peerUri))
+                            if (ua.account.telProvider == "") {
+                                dialogMessage.value = String.format(
+                                    ctx.getString(R.string.no_telephony_provider),
+                                    Utils.plainAor(aor)
+                                )
+                                showDialog.value = true
+                            } else {
+                                msgUri = Utils.telToSip(peerUri, ua.account)
+                            }
+                        else
+                            msgUri = peerUri
+                        if (msgUri != "")
+                            if (Api.message_send(
+                                    ua.uap,
+                                    msgUri,
+                                    msgText,
+                                    time.toString()
+                                ) != 0
+                            ) {
+                                Toast.makeText(
+                                    ctx, "${ctx.getString(R.string.message_failed)}!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                msg.direction = MESSAGE_UP_FAIL
+                                msg.responseReason = ctx.getString(R.string.message_failed)
+                            } else {
+                                newMessage.value = TextFieldValue("")
+                                viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                keyboardController?.hide()
+                            }
+                    }
                 }
             },
             containerColor = MaterialTheme.colorScheme.secondary,

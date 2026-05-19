@@ -208,9 +208,9 @@ private val showPasswordsDialog = mutableStateOf(false)
 private var passwordAccounts = mutableListOf<String>()
 private var password = mutableStateOf("")
 
-private val selectItems = mutableStateOf(listOf<String>())
-private val selectItemAction = mutableStateOf<(Int) -> Unit>({ _ -> run {} })
-private val showSelectItemDialog = mutableStateOf(false)
+private val selectItems = CustomElements.selectItems
+private val selectItemAction = CustomElements.selectItemAction
+private val showSelectItemDialog = CustomElements.showSelectItemDialog
 
 fun NavGraphBuilder.mainScreenRoute(
     navController: NavController,
@@ -722,23 +722,8 @@ private fun TopAppBar(
                     .clip(CircleShape)
                     .combinedClickable(
                         onClick = {
-                            val aor = viewModel.selectedAor.value
-                            val ua = uas.value.find { it.account.aor == aor }
-                            val call = ua?.currentCall()
-                            val connection =
-                                if (call != null) ConnectionService.connections[call.callp] else null
-                            if (connection != null) {
-                                @Suppress("DEPRECATION")
-                                connection.setAudioRoute(
-                                    if (isSpeakerOn)
-                                        android.telecom.CallAudioState.ROUTE_EARPIECE
-                                    else
-                                        android.telecom.CallAudioState.ROUTE_SPEAKER
-                                )
-                            } else {
-                                BaresipService.speakerPhone = !isSpeakerOn
-                                viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
-                            }
+                            // Unified toggle via BaresipService
+                            BaresipService.instance?.toggleSpeakerphone()
                         },
                         onLongClick = {
                             alertTitle.value = speakerPhoneTitle
@@ -884,23 +869,31 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             )
         }
 
-        if (!isMobile)
-            IconButton(
-                enabled = aor.isNotEmpty(),
-                onClick = {
-                    navController.navigate("chats/$aor")
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .size(buttonSize)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = null,
-                    Modifier.size(buttonSize),
-                    tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-                )
-            }
+        IconButton(
+            enabled = aor.isNotEmpty(),
+            onClick = {
+                if (isMobile) {
+                    if (!Utils.isDefaultSmsApp(ctx)) {
+                        alertTitle.value = ctx.getString(R.string.notice)
+                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                        showAlert.value = true
+                        return@IconButton
+                    }
+                }
+                navController.navigate("chats/$aor")
+            },
+            modifier = Modifier.weight(1f).size(buttonSize)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Chat,
+                contentDescription = null,
+                Modifier.size(buttonSize),
+                tint = if (hasUnreadMessages)
+                    MaterialTheme.colorScheme.error
+                else
+                    MaterialTheme.colorScheme.secondary
+            )
+        }
 
         IconButton(
             enabled = aor.isNotEmpty(),
@@ -2500,15 +2493,27 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
         val uriText = dialerState.callUri.value.trim()
         if (uriText.isNotEmpty()) {
             if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
-                val uris = Contact.contactUris(uriText)
-                if (uris.isEmpty())
-                    makeCall(
-                        ctx,
-                        viewModel,
-                        uriText,
-                        dialerState,
-                        video
-                    )
+                val aor = viewModel.selectedAor.value
+                val ua = UserAgent.ofAor(aor)
+                val uris = Contact.contactUris(uriText, ua?.account?.isMobile ?: false)
+                if (uris.isEmpty()) {
+                    if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
+                        alertTitle.value = ctx.getString(R.string.notice)
+                        alertMessage.value = if (ua?.account?.isMobile == true)
+                            String.format(ctx.getString(R.string.contact_no_tel_uri), uriText)
+                        else
+                            String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), uriText)
+                        showAlert.value = true
+                    }
+                    else
+                        makeCall(
+                            ctx,
+                            viewModel,
+                            uriText,
+                            dialerState,
+                            video
+                        )
+                }
                 else if (uris.size == 1)
                     makeCall(
                         ctx,
@@ -2590,6 +2595,12 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     else if (ua.account.isMobile && !Utils.isTelUri(uri)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = ctx.getString(R.string.no_telephone_number)
+        showAlert.value = true
+        return
+    }
+    else if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+        alertTitle.value = ctx.getString(R.string.notice)
+        alertMessage.value = ctx.getString(R.string.airplane_mode)
         showAlert.value = true
         return
     }

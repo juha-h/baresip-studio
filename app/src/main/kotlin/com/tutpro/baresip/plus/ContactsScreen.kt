@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.ContactsContract
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,7 +36,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +51,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -77,6 +78,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
+import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.plus.CustomElements.TextAvatar
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import java.io.File
@@ -84,21 +86,15 @@ import java.io.IOException
 
 const val avatarSize: Int = 96
 
-fun NavGraphBuilder.contactsScreenRoute(
-    navController: NavController,
-    viewModel: ViewModel
-) {
+fun NavGraphBuilder.contactsScreenRoute(navController: NavController) {
     composable("contacts") { _ ->
-        ContactsScreen(navController = navController, viewModel = viewModel)
+        ContactsScreen(navController = navController)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ContactsScreen(
-    navController: NavController,
-    viewModel: ViewModel
-) {
+private fun ContactsScreen(navController: NavController) {
 
     val ctx = LocalContext.current
     val activity = LocalActivity.current!!
@@ -114,6 +110,103 @@ private fun ContactsScreen(
 
     var expanded by remember { mutableStateOf(false) }
     val both = stringResource(R.string.both)
+    val import = stringResource(R.string.import_contacts)
+
+    val vcfImportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: android.net.Uri? ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val reader = inputStream.bufferedReader()
+                    var name = ""
+                    var email = ""
+                    val uris = mutableListOf<String>()
+                    reader.forEachLine { line ->
+                        when {
+                            line.startsWith("BEGIN:VCARD", ignoreCase = true) -> {
+                                name = ""
+                                email = ""
+                                uris.clear()
+                            }
+                            line.startsWith("FN:", ignoreCase = true) -> {
+                                name = line.substring(3).trim()
+                            }
+                            line.startsWith("N:", ignoreCase = true) && name.isEmpty() -> {
+                                name = line.substring(2).trim().replace(";", " ").trim()
+                            }
+                            line.startsWith("EMAIL", ignoreCase = true) -> {
+                                if (email.isEmpty())
+                                    email = line.substringAfter(":").trim()
+                            }
+                            line.startsWith("TEL", ignoreCase = true) -> {
+                                val value = line.substringAfter(":").trim()
+                                val cleanValue = value.filterNot { setOf('-', ' ', '(', ')').contains(it) }
+                                if (cleanValue.isNotEmpty()) {
+                                    val telUri = if (cleanValue.startsWith("tel:")) cleanValue else "tel:$cleanValue"
+                                    if (telUri !in uris) uris.add(telUri)
+                                }
+                            }
+                            line.startsWith("X-SIP:", ignoreCase = true) -> {
+                                val sipUri = line.substring(6).trim()
+                                if (sipUri.isNotEmpty()) {
+                                    val fullSipUri = if (sipUri.startsWith("sip:")) sipUri else "sip:$sipUri"
+                                    if (fullSipUri !in uris) uris.add(fullSipUri)
+                                }
+                            }
+                            line.startsWith("END:VCARD", ignoreCase = true) -> {
+                                if (name.isNotEmpty() && (uris.isNotEmpty() || email.isNotEmpty())) {
+                                    val existingContact = Contact.baresipContact(name)
+                                    if (existingContact != null) {
+                                        var updated = false
+                                        for (u in uris) {
+                                            if (u !in existingContact.uris) {
+                                                existingContact.uris.add(u)
+                                                updated = true
+                                            }
+                                        }
+                                        if (existingContact.email.isEmpty() && email.isNotEmpty()) {
+                                            existingContact.email = email
+                                            updated = true
+                                        }
+                                        if (updated) {
+                                            Contact.updateBaresipContact(existingContact.id, existingContact)
+                                        }
+                                    } else {
+                                        Contact.addBaresipContact(
+                                            Contact.BaresipContact(
+                                                name,
+                                                ArrayList(uris),
+                                                email,
+                                                Utils.randomColor(),
+                                                System.currentTimeMillis(),
+                                                false
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Contact.saveBaresipContacts()
+                    Contact.contactsUpdate()
+                    Toast.makeText(
+                        ctx,
+                        R.string.contact_import_success,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to import VCF: ${e.message}")
+                Toast.makeText(
+                    ctx,
+                    R.string.contact_import_failure,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     val contactNames = remember(BaresipService.contactsMode) {
         val names = mutableListOf("baresip", "Android", both)
         val values = listOf("baresip", "android", "both")
@@ -209,6 +302,15 @@ private fun ContactsScreen(
         }
     )
 
+    SelectableAlertDialog(
+        openDialog = CustomElements.showSelectItemDialog,
+        title = stringResource(R.string.choose_destination_uri),
+        items = CustomElements.selectItems.value,
+        onItemClicked = CustomElements.selectItemAction.value,
+        neutralButtonText = stringResource(R.string.cancel),
+        onNeutralClicked = {}
+    )
+
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -254,9 +356,13 @@ private fun ContactsScreen(
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames,
+                            items = contactNames + import,
                             onItemClick = { name ->
                                 expanded = false
+                                if (name == import) {
+                                    vcfImportLauncher.launch(arrayOf("text/vcard", "text/x-vcard"))
+                                    return@DropdownMenu
+                                }
                                 val mode = contactValues[contactNames.indexOf(name)]
                                 val contactsPermissions = arrayOf(
                                     Manifest.permission.READ_CONTACTS,
@@ -315,7 +421,7 @@ private fun ContactsScreen(
             )
         },
         content = { contentPadding ->
-            ContactsContent(ctx, viewModel, navController, contentPadding, searchContactName)
+            ContactsContent(ctx, navController, contentPadding, searchContactName)
         }
     )
 }
@@ -366,7 +472,7 @@ private fun BottomBar(
             )
         )
         SmallFloatingActionButton(
-            onClick = { navController.navigate("baresip_contact//new") },
+            onClick = { navController.navigate("contact//new") },
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
@@ -383,31 +489,21 @@ private fun BottomBar(
 @Composable
 private fun ContactsContent(
     ctx: Context,
-    viewModel: ViewModel,
     navController: NavController,
     contentPadding: PaddingValues,
     searchQuery: String
 ) {
-    val showDialog = remember { mutableStateOf(false) }
-    val dialogMessage = remember { mutableStateOf("") }
-    val secondText = remember { mutableStateOf("") }
-    val secondAction = remember { mutableStateOf({}) }
-    val thirdText = remember { mutableStateOf("") }
-    val thirdAction = remember { mutableStateOf({}) }
-    val lastText = remember { mutableStateOf("") }
+    val showConfirmationDialog = remember { mutableStateOf(false) }
+    val confirmationDialogMessage = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
-    if (showDialog.value)
+    if (showConfirmationDialog.value)
         AlertDialog(
-            showDialog = showDialog,
+            showDialog = showConfirmationDialog,
             title = stringResource(R.string.confirmation),
-            message = dialogMessage.value,
+            message = confirmationDialogMessage.value,
             firstButtonText = stringResource(R.string.cancel),
-            secondButtonText = secondText.value,
-            onSecondClicked = secondAction.value,
-            thirdButtonText = thirdText.value,
-            onThirdClicked = thirdAction.value,
-            lastButtonText = lastText.value,
+            lastButtonText = stringResource(R.string.delete),
             onLastClicked = lastAction.value,
         )
 
@@ -424,10 +520,17 @@ private fun ContactsContent(
 
     val lazyListState = rememberLazyListState()
 
+    val scrollToContact = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<String>("scrollToContact")
+        ?.observeAsState()
+
+    var lastSearchQuery by remember { mutableStateOf("") }
     LaunchedEffect(searchQuery) {
-        if (searchQuery.isBlank()) {
+        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank()) {
             lazyListState.scrollToItem(0)
         }
+        lastSearchQuery = searchQuery
     }
 
     val filteredContacts = remember(BaresipService.contacts, searchQuery) {
@@ -444,6 +547,16 @@ private fun ContactsContent(
                 .map { contact ->
                     Pair(contact, Utils.buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
                 }
+        }
+    }
+
+    LaunchedEffect(scrollToContact?.value, filteredContacts) {
+        scrollToContact?.value?.let { name ->
+            val index = filteredContacts.indexOfFirst { it.first.name() == name }
+            if (index != -1) {
+                lazyListState.scrollToItem(index)
+            }
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scrollToContact")
         }
     }
 
@@ -507,63 +620,13 @@ private fun ContactsContent(
                                 .padding(start = 10.dp)
                                 .combinedClickable(
                                     onClick = {
-                                        val aor = viewModel.selectedAor.value
-                                        val ua = UserAgent.ofAor(aor)
-                                        val intent = Intent(ctx, MainActivity::class.java)
-                                        if (ua != null) {
-                                            intent.putExtra("uap", ua.uap)
-                                            intent.putExtra("peer", contact.uri)
-                                        }
-                                        else
-                                            Log.w(TAG, "onClickListener did not find UA for $aor")
-                                        dialogMessage.value = String.format(
-                                            ctx.getString(R.string.contact_action_question),
-                                            contact.name()
-                                        )
-                                        secondText.value = ctx.getString(R.string.call)
-                                        secondAction.value = {
-                                            if (ua != null) {
-                                                handleIntent(ctx, viewModel, intent, "call")
-                                                navController.navigate("main") {
-                                                    popUpTo("main")
-                                                    launchSingleTop = true
-                                                }
-                                            }
-                                        }
-                                        thirdText.value = ctx.getString(R.string.video_call)
-                                        thirdAction.value = {
-                                            if (ua != null) {
-                                                handleIntent(ctx, viewModel, intent, "video call")
-                                                navController.navigate("main") {
-                                                    popUpTo("main")
-                                                    launchSingleTop = true
-                                                }
-                                            }
-                                        }
-                                        lastText.value = ctx.getString(R.string.send_message)
-                                        lastAction.value = {
-                                            if (ua != null) {
-                                                if (ua.account.isMobile) {
-                                                    alertTitle.value  = ctx.getString(R.string.notice)
-                                                    alertMessage.value = ctx.getString(R.string.no_sms_messaging)
-                                                    showAlert.value = true
-                                                }
-                                                else {
-                                                    handleIntent(ctx, viewModel, intent, "message")
-                                                    navController.navigateUp()
-                                                }
-                                            }
-                                        }
-                                        showDialog.value = true
+                                        navController.navigate("contact/${contact.name()}/old")
                                     },
                                     onLongClick = {
-                                        dialogMessage.value = String.format(
+                                        confirmationDialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_delete_question),
                                             contact.name()
                                         )
-                                        secondText.value = ""
-                                        thirdText.value = ""
-                                        lastText.value = ctx.getString(R.string.delete)
                                         lastAction.value = {
                                             val id = contact.id
                                             val avatarFile = File(
@@ -582,22 +645,10 @@ private fun ContactsContent(
                                             }
                                             Contact.removeBaresipContact(contact)
                                         }
-                                        showDialog.value = true
+                                        showConfirmationDialog.value = true
                                     }
                                 )
                         )
-                        SmallFloatingActionButton(
-                            modifier = Modifier.padding(end = 10.dp),
-                            onClick = { navController.navigate("baresip_contact/${contact.name()}/old") },
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = stringResource(R.string.edit)
-                            )
-                        }
                     }
 
                     is Contact.AndroidContact -> {
@@ -608,15 +659,14 @@ private fun ContactsContent(
                                 .weight(1f)
                                 .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
                                 .combinedClickable(
-                                    onClick = { navController.navigate("android_contact/${contact.name()}") },
+                                    onClick = {
+                                        navController.navigate("contact/${contact.name()}/old")
+                                    },
                                     onLongClick = {
-                                        dialogMessage.value = String.format(
+                                        confirmationDialogMessage.value = String.format(
                                             ctx.getString(R.string.contact_delete_question),
                                             contact.name()
                                         )
-                                        secondText.value = ""
-                                        thirdText.value = ""
-                                        lastText.value = ctx.getString(R.string.delete)
                                         lastAction.value = {
                                             ctx.contentResolver.delete(
                                                 ContactsContract.RawContacts.CONTENT_URI,
@@ -624,7 +674,7 @@ private fun ContactsContent(
                                                 null
                                             )
                                         }
-                                        showDialog.value = true
+                                        showConfirmationDialog.value = true
                                     }
                                 )
                         )

@@ -369,7 +369,7 @@ private fun Chats(
                             }
                             lastButtonText.value = ctx.getString(R.string.add_contact)
                             lastAction.value = {
-                                navController.navigate("baresip_contact/${message.peerUri}/new")
+                                navController.navigate("contact/${message.peerUri}/new")
                             }
                         }
                         showDialog.value = true
@@ -433,15 +433,19 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
         else
             chatPeer
         val uri = if (Utils.isTelUri(peerUri)) {
-            if (account.telProvider == "") {
-                alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value =
-                    String.format(ctx.getString(R.string.no_telephony_provider), account.aor)
-                showAlert.value = true
-                ""
-            } else
-                Utils.telToSip(peerUri, account)
-        } else
+            if (account.isMobile)
+                peerUri
+            else
+                if (account.telProvider == "") {
+                    alertTitle.value = ctx.getString(R.string.notice)
+                    alertMessage.value =
+                        String.format(ctx.getString(R.string.no_telephony_provider), account.aor)
+                    showAlert.value = true
+                    ""
+                } else
+                    Utils.telToSip(peerUri, account)
+        }
+        else
             Utils.uriComplete(peerUri, account.aor)
         if (alertMessage.value.isEmpty()) {
             if (!Utils.checkUri(uri)) {
@@ -589,10 +593,19 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 showSuggestions = false
                 val peerText = newPeer.trim()
                 if (peerText.isNotEmpty()) {
-                    val uris = Contact.contactUris(peerText)
-                    if (uris.isEmpty())
-                        makeChat(ctx, navController, account, peerText)
-                    else if (uris.size == 1)
+                    val uris = Contact.contactUris(peerText, account.isMobile)
+                    if (uris.isEmpty()) {
+                        if (Contact.nameExists(peerText, BaresipService.contacts, true)) {
+                            alertTitle.value = ctx.getString(R.string.notice)
+                            alertMessage.value = if (account.isMobile)
+                                String.format(ctx.getString(R.string.contact_no_tel_uri), peerText)
+                            else
+                                String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), peerText)
+                            showAlert.value = true
+                        } else {
+                            makeChat(ctx, navController, account, peerText)
+                        }
+                    } else if (uris.size == 1)
                         makeChat(ctx, navController, account, uris[0])
                     else {
                         items.value = uris

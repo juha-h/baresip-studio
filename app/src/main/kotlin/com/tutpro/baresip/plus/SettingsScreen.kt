@@ -1125,8 +1125,67 @@ private fun SettingsContent(
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
                                 dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
                     } else {
+                        viewModel.defaultMessaging.value = false
                         try {
                             dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
+                        } catch (e: ActivityNotFoundException) {
+                            Log.e(TAG, "ActivityNotFound exception: ${e.message}")
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    @RequiresApi(29)
+    @Composable
+    fun DefaultMessaging() {
+        val defaultMessagingAppTitle = stringResource(R.string.default_messaging_app)
+        val defaultMessagingAppHelp = stringResource(R.string.default_messaging_app_help)
+        val messagingRoleNotAvailableMessage = stringResource(R.string.messaging_role_not_available)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val ctx = LocalContext.current
+            Text(text = defaultMessagingAppTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = defaultMessagingAppTitle
+                        alertMessage.value = defaultMessagingAppHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            val defaultMessaging by viewModel.defaultMessaging.collectAsState()
+            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+
+            val messagingRoleRequest = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { _ ->
+                val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+                viewModel.defaultMessaging.value = isHeld
+            }
+            Switch(
+                checked = defaultMessaging,
+                onCheckedChange = {
+                    viewModel.defaultMessaging.value = it
+                    if (it) {
+                        if (!roleManager.isRoleAvailable(RoleManager.ROLE_SMS)) {
+                            alertTitle.value = alertTitleText
+                            alertMessage.value = messagingRoleNotAvailableMessage
+                            showAlert.value = true
+                        }
+                        else
+                            if (!roleManager.isRoleHeld(RoleManager.ROLE_SMS))
+                                messagingRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS))
+                    } else {
+                        try {
+                            messagingRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                         } catch (e: ActivityNotFoundException) {
                             Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
@@ -1256,8 +1315,12 @@ private fun SettingsContent(
         AudioSettings(navController)
         VideoSize()
         VideoFps()
-        if (VERSION.SDK_INT >= 29)
+        if (VERSION.SDK_INT >= 29) {
             DefaultDialer()
+            val defaultDialer by viewModel.defaultDialer.collectAsState()
+            if (defaultDialer)
+                DefaultMessaging()
+        }
         BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 31)

@@ -2,7 +2,6 @@ package com.tutpro.baresip.plus
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -63,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -73,6 +73,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
+import com.tutpro.baresip.plus.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: ViewModel) {
@@ -89,7 +90,7 @@ fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: Vi
 @Composable
 private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
-    val account = Account.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)!!
 
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
     var isHistoryLoaded by remember { mutableStateOf(false) }
@@ -114,7 +115,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     BackHandler(enabled = true) {
-        account.missedCalls = false
+        ua.account.missedCalls = false
         navController.navigateUp()
     }
 
@@ -128,7 +129,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
                     .background(MaterialTheme.colorScheme.background)
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
-                TopAppBar(navController, account, callHistory)
+                TopAppBar(navController, ua, callHistory)
             }
         },
         content = { contentPadding ->
@@ -138,7 +139,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
                     navController,
                     viewModel,
                     contentPadding,
-                    account,
+                    ua,
                     callHistory
                 )
         },
@@ -147,7 +148,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopAppBar(navController: NavController, account: Account, callHistory: MutableState<List<CallRow>>) {
+private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: MutableState<List<CallRow>>) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -158,6 +159,8 @@ private fun TopAppBar(navController: NavController, account: Account, callHistor
 
     val showDialog = remember { mutableStateOf(false) }
     val lastAction = remember { mutableStateOf({}) }
+
+    val account = ua.account
 
     AlertDialog(
         showDialog = showDialog,
@@ -241,7 +244,7 @@ private fun CallsContent(
     navController: NavController,
     viewModel: ViewModel,
     contentPadding: PaddingValues,
-    account: Account,
+    ua: UserAgent,
     callHistory: MutableState<List<CallRow>>
 ) {
     Column(
@@ -251,8 +254,8 @@ private fun CallsContent(
             .padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Account(account)
-        Calls(ctx, navController, viewModel, account, callHistory)
+        Account(ua.account)
+        Calls(ctx, navController, viewModel, ua, callHistory)
     }
 }
 
@@ -273,7 +276,7 @@ private fun Calls(
     ctx: Context,
     navController: NavController,
     viewModel: ViewModel,
-    account: Account,
+    ua: UserAgent,
     callHistory: MutableState<List<CallRow>>
 ) {
 
@@ -310,6 +313,15 @@ private fun Calls(
         lastButtonText = stringResource(R.string.ok),
     )
 
+    SelectableAlertDialog(
+        openDialog = CustomElements.showSelectItemDialog,
+        title = stringResource(R.string.choose_destination_uri),
+        items = CustomElements.selectItems.value,
+        onItemClicked = CustomElements.selectItemAction.value,
+        neutralButtonText = stringResource(R.string.cancel),
+        onNeutralClicked = {}
+    )
+
     val lazyListState = rememberLazyListState()
     LazyColumn(
         modifier = Modifier
@@ -332,20 +344,28 @@ private fun Calls(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.combinedClickable(
                             onClick = {
-                                val aor = account.aor
-                                val ua = UserAgent.ofAor(aor)
                                 val intent = Intent(ctx, MainActivity::class.java)
-                                if (ua != null) {
-                                    intent.putExtra("uap", ua.uap)
-                                    intent.putExtra("peer", peerUri)
-                                }
+                                intent.putExtra("uap", ua.uap)
+                                intent.putExtra("peer", peerUri)
+                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account)
+                                val contact = Contact.findContact(peerUri)
+                                if (contact is Contact.BaresipContact && contact.email.isNotEmpty())
+                                    message.value = String.format(
+                                        ctx.getString(R.string.contact_email_action_question),
+                                        peerName
+                                    )
                                 else
-                                    Log.w(TAG, "onClickListener did not find UA for $aor")
-                                val peerName = Utils.friendlyUri(ctx, peerUri, account)
-                                message.value = String.format(ctx.getString(R.string.contact_action_question), peerName)
+                                    message.value = String.format(
+                                        ctx.getString(R.string.contact_action_question),
+                                        peerName
+                                    )
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
-                                    if (ua != null) {
+                                    if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                        alertTitle.value = ctx.getString(R.string.notice)
+                                        alertMessage.value = ctx.getString(R.string.airplane_mode)
+                                        showAlert.value = true
+                                    } else {
                                         handleIntent(ctx, viewModel, intent, "call")
                                         navController.navigate("main") {
                                             popUpTo("main")
@@ -355,31 +375,53 @@ private fun Calls(
                                 }
                                 thirdButtonText.value = ctx.getString(R.string.video_call)
                                 thirdAction.value = {
-                                    if (ua != null) {
-                                        handleIntent(ctx, viewModel, intent, "video call")
-                                        navController.navigate("main") {
-                                            popUpTo("main")
-                                            launchSingleTop = true
+                                    handleIntent(ctx, viewModel, intent, "video call")
+                                    navController.navigate("main") {
+                                        popUpTo("main")
+                                        launchSingleTop = true
                                         }
-                                    }
                                 }
-                                lastButtonText.value = ctx.getString(R.string.send_message)
-                                lastAction.value = {
-                                    if (account.isMobile) {
-                                        alertTitle.value  = ctx.getString(R.string.notice)
-                                        alertMessage.value = ctx.getString(R.string.no_sms_messaging)
-                                        showAlert.value = true
-                                    }
-                                    else
-                                        if (ua != null) {
+                                thirdButtonText.value = ctx.getString(R.string.send_message)
+                                thirdAction.value = {
+                                    if (ua.account.isMobile) {
+                                        if (Utils.isAirplaneModeOn(ctx)) {
+                                            alertTitle.value = ctx.getString(R.string.notice)
+                                            alertMessage.value = ctx.getString(R.string.airplane_mode)
+                                            showAlert.value = true
+                                        } else if (!Utils.isDefaultSmsApp(ctx)) {
+                                            alertTitle.value = ctx.getString(R.string.notice)
+                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                            showAlert.value = true
+                                        }
+                                        else {
                                             handleIntent(ctx, viewModel, intent, "message")
                                             navController.navigateUp()
                                         }
+                                    }
+                                    else {
+                                        handleIntent(ctx, viewModel, intent, "message")
+                                        navController.navigateUp()
+                                    }
                                 }
+                                if (contact is Contact.BaresipContact && contact.email.isNotEmpty()) {
+                                    lastButtonText.value = ctx.getString(R.string.send_email)
+                                    lastAction.value = {
+                                        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                            data = "mailto:${contact.email}".toUri()
+                                        }
+                                        try {
+                                            ctx.startActivity(emailIntent)
+                                        } catch (e: Exception) {
+                                            Log.e(TAG, "Failed to start email activity: ${e.message}")
+                                        }
+                                    }
+                                }
+                                else
+                                    lastButtonText.value = ""
                                 showDialog.value = true
                             },
                             onLongClick = {
-                                val peerName = Utils.friendlyUri(ctx, peerUri, account)
+                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account)
                                 val callText: String = if (callRow.details.size > 1)
                                     ctx.getString(R.string.calls_calls)
                                 else
@@ -405,7 +447,7 @@ private fun Calls(
                                     secondButtonText.value = ctx.getString(R.string.add_contact)
                                     secondAction.value = {
                                         val uri = Utils.sipToTel(peerUri)
-                                        navController.navigate("baresip_contact/$uri/new")
+                                        navController.navigate("contact/$uri/new")
                                     }
                                     thirdButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
@@ -468,7 +510,7 @@ private fun Calls(
                         }
                         if (count > 3)
                             Text("...", color = MaterialTheme.colorScheme.onBackground)
-                        Text(text = Utils.friendlyUri(ctx, peerUri, account),
+                        Text(text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,
