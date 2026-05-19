@@ -667,7 +667,8 @@ private fun UrisSection(
                 )
             }
         }
-    } else {
+    }
+    else {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -687,13 +688,13 @@ private fun UrisSection(
                     if (ua != null)
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
-                                } else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                                else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.enable_default_messaging))
-                                } else {
+                                else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
@@ -717,10 +718,10 @@ private fun UrisSection(
                     if (ua != null)
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
-                                } else {
+                                else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
@@ -744,10 +745,10 @@ private fun UrisSection(
                     if (ua != null && !ua.account.isMobile)
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
-                                } else {
+                                else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
