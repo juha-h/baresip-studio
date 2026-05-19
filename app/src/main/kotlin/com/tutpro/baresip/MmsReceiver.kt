@@ -16,13 +16,6 @@ class MmsReceiver : BroadcastReceiver() {
             val contentType = intent.type
             if (contentType == "application/vnd.wap.mms-message") {
                 Log.d(TAG, "Received MMS WAP Push Deliver")
-                
-                // For a robust implementation, we'd need to parse the PDU.
-                // However, since we are the default SMS app, the OS will also
-                // save the MMS to the system provider. We can query it.
-                // Note: WAP_PUSH_DELIVER usually triggers before or during the save.
-                // We might need a small delay or use a ContentObserver if the query fails.
-                
                 extractTextFromProvider(context)
             }
         }

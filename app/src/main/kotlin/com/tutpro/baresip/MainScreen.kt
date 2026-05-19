@@ -2057,14 +2057,14 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         else
                             String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), uriText)
                         showAlert.value = true
-                    } else {
+                    }
+		    else
                         makeCall(
                             ctx,
                             viewModel,
                             uriText,
                             dialerState
                         )
-                    }
                 }
                 else if (uris.size == 1)
                     makeCall(

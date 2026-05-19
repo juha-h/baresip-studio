@@ -404,11 +404,7 @@ class BaresipService: Service() {
                         cleanService()
                         isServiceRunning = false
                         postServiceEvent(
-                            ServiceEvent(
-                                "stopped",
-                                arrayListOf(""),
-                                System.nanoTime()
-                            )
+                            ServiceEvent("stopped", arrayListOf(""), System.nanoTime())
                         )
                         stopSelf()
                         // exitProcess(0)
@@ -461,12 +457,10 @@ class BaresipService: Service() {
                     if (!file.exists() && a != "config") {
                         Log.i(TAG, "Copying asset '$a'")
                         Utils.copyAssetToFile(this, a, "$filesPath/$a")
-                    } else {
+                    else
                         Log.i(TAG, "Asset '$a' already copied")
-                    }
-                    if (a == "config") {
+                    if (a == "config")
                         Config.initialize(this)
-                    }
                 }
 
                 if (contactsMode != "android")
@@ -920,8 +914,10 @@ class BaresipService: Service() {
                                 Utils.friendlyUri(this, peerUri, ua.account)
                             )
                         else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri)
-                            String.format(getString(R.string.call_blocked),
-                                Utils.friendlyUri(this, peerUri, ua.account))
+                            String.format(
+			        getString(R.string.call_blocked),
+                                Utils.friendlyUri(this, peerUri, ua.account)
+                            )
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else
@@ -1222,12 +1218,16 @@ class BaresipService: Service() {
                                                 rxFile.delete()
                                                 txFile.delete()
                                             } catch (e: Exception) {
-                                                Log.w(TAG, "Could not delete temporary raw files " +
-                                                        "after merge: ${e.message}")
+                                                Log.w(
+                                                    TAG,
+                                                    "Could not delete temporary raw files after merge: ${e.message}"
+                                                )
                                             }
-                                        } else {
-                                            Log.e(TAG, "Automatic merge failed. " +
-                                                    "Storing raw file paths as fallback.")
+                                        else {
+                                            Log.e(
+                                                TAG,
+                                                "Automatic merge failed. Storing raw file paths as fallback."
+                                            )
                                             history.recording = call.dumpfiles
                                         }
                                     }

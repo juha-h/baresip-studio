@@ -46,6 +46,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
@@ -680,21 +681,19 @@ private fun UrisSection(
                         color = MaterialTheme.colorScheme.onBackground,
                     )
 
+                    val ua = UserAgent.ofAor(selectedAor)
+
                     // Chat Button
-                    IconButton(
-                        onClick = {
-                            val aor = viewModel.selectedAor.value
-                            val ua = UserAgent.ofAor(aor)
-                            if (ua == null)
-                                Log.w(TAG, "Message clickable did not find AoR $aor")
-                            else {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                    if (ua != null)
+                        IconButton(
+                            onClick = {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
-                                } else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                                else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.enable_default_messaging))
-                                } else {
+                                else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
@@ -705,27 +704,23 @@ private fun UrisSection(
                                     }
                                 }
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Chat,
+                                contentDescription = "Send Message",
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Chat,
-                            contentDescription = "Send Message",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
 
                     // Call Button
-                    IconButton(
-                        onClick = {
-                            val aor = viewModel.selectedAor.value
-                            val ua = UserAgent.ofAor(aor)
-                            if (ua == null)
-                                Log.w(TAG, "Call clickable did not find AoR $aor")
-                            else {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                    if (ua != null)
+                        IconButton(
+                            onClick = {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
-                                } else {
+                                else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
@@ -736,14 +731,14 @@ private fun UrisSection(
                                     }
                                 }
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Call,
+                                contentDescription = "Call",
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Call,
-                            contentDescription = "Call",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
                 }
             }
         }
