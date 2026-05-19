@@ -42,10 +42,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,6 +63,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -604,6 +606,8 @@ private fun UrisSection(
     isEditing: Boolean,
     onUrisChange: (List<String>) -> Unit
 ) {
+    val selectedAor by viewModel.selectedAor.collectAsState()
+
     if (isEditing) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -677,14 +681,12 @@ private fun UrisSection(
                         color = MaterialTheme.colorScheme.onBackground,
                     )
 
+                    val ua = UserAgent.ofAor(selectedAor)
+
                     // Chat Button
-                    IconButton(
-                        onClick = {
-                            val aor = viewModel.selectedAor.value
-                            val ua = UserAgent.ofAor(aor)
-                            if (ua == null)
-                                Log.w(TAG, "Message clickable did not find AoR $aor")
-                            else {
+                    if (ua != null)
+                        IconButton(
+                            onClick = {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
@@ -702,23 +704,19 @@ private fun UrisSection(
                                     }
                                 }
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Chat,
+                                contentDescription = "Send Message",
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Chat,
-                            contentDescription = "Send Message",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
 
                     // Call Button
-                    IconButton(
-                        onClick = {
-                            val aor = viewModel.selectedAor.value
-                            val ua = UserAgent.ofAor(aor)
-                            if (ua == null)
-                                Log.w(TAG, "Call clickable did not find AoR $aor")
-                            else {
+                    if (ua != null)
+                        IconButton(
+                            onClick = {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
                                     handleDialog(ctx, ctx.getString(R.string.notice),
                                         ctx.getString(R.string.airplane_mode))
@@ -733,11 +731,38 @@ private fun UrisSection(
                                     }
                                 }
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Call,
+                                contentDescription = "Call",
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
                         }
-                    ) {
+
+                    // Video Call Button
+                    if (ua != null && !ua.account.isMobile)
+                        IconButton(
+                            onClick = {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                    handleDialog(ctx, ctx.getString(R.string.notice),
+                                        ctx.getString(R.string.airplane_mode))
+                                } else {
+                                    val intent = Intent(ctx, MainActivity::class.java)
+                                    intent.putExtra("uap", ua.uap)
+                                    intent.putExtra("peer", uri)
+                                    handleIntent(ctx, viewModel, intent, "video call")
+                                    navController.navigate("main") {
+                                        popUpTo("main") { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        ) {
                         Icon(
-                            imageVector = Icons.Outlined.Call,
-                            contentDescription = "Call",
+                            imageVector = Icons.Filled.Videocam,
+                            contentDescription = "Video call",
+                            modifier = Modifier.size(28.dp),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
