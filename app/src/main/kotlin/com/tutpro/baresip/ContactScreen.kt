@@ -1,11 +1,9 @@
 package com.tutpro.baresip
 
-import android.Manifest
 import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,7 +12,6 @@ import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds
 import android.provider.ContactsContract.Contacts.Data
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,7 +26,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +46,6 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,6 +62,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,7 +74,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -88,7 +83,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
@@ -97,7 +91,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.tutpro.baresip.CustomElements.AlertDialog
 import java.io.ByteArrayOutputStream
@@ -197,12 +190,15 @@ private fun ContactScreen(
                 color = contact.colorInt(),
                 id = contact.id(),
                 newId = contact.id(),
-                avatarImageUri = if (contact is Contact.BaresipContact && contact.avatarImage != null && avatarFile.exists())
-                    Uri.fromFile(avatarFile).toString()
-                else if (contact is Contact.AndroidContact && contact.thumbnailUri != null)
-                    contact.thumbnailUri.toString()
-                else
-                    null,
+                avatarImageUri = when (contact) {
+                    is Contact.BaresipContact if contact.avatarImage != null && avatarFile.exists() ->
+                        Uri.fromFile(
+                            avatarFile
+                        ).toString()
+                    is Contact.AndroidContact if contact.thumbnailUri != null ->
+                        contact.thumbnailUri.toString()
+                    else -> null
+                },
                 isLoading = false,
                 isBaresipContact = contact is Contact.BaresipContact
             )
@@ -608,6 +604,8 @@ private fun UrisSection(
     isEditing: Boolean,
     onUrisChange: (List<String>) -> Unit
 ) {
+    val selectedAor by viewModel.selectedAor.collectAsState()
+
     if (isEditing) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -1098,7 +1096,7 @@ private fun updateAndroidEmail(ctx: Context, rawContactId: Long, email: String):
     val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and ${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Email.CONTENT_ITEM_TYPE}'"
     return try {
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         0
     }
 }
@@ -1110,7 +1108,7 @@ private fun updateAndroidPhoto(ctx: Context, rawContactId: Long, photoBits: Bitm
     val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and ${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Photo.CONTENT_ITEM_TYPE}'"
     return try {
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         0
     }
 }
@@ -1123,7 +1121,7 @@ private fun bitmapToPNGByteArray(bitmap: Bitmap): ByteArray? {
         out.flush()
         out.close()
         out.toByteArray()
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }
