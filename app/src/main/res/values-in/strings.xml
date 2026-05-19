@@ -1,3 +1,464 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="about_title">Tentang baresip</string>
+    <string name="about_title_plus">Tentang baresip+</string>
+    <string name="about_text"><![CDATA[
+        <h1>Agen Pengguna panggilan SIP dan seluler berbasis
+            <a href="https://github.com/baresip/baresip">pustaka baresip</a></h1>
+ <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Versi %1$s</p>
+        <br>
+        <h2>Petunjuk Penggunaan</h2>
+        <ul>
+            <li>Periksa apakah nilai default di Pengaturan baresip sudah sesuai kebutuhan Anda
+            (sentuh judul item untuk bantuan).</li>
+            <li>Jika ingin menggunakan baresip untuk panggilan seluler, aktifkan pengaturan Aplikasi Telepon Default. Pengaturan ini akan
+                 membuat akun Seluler untuk panggilan seluler.</li>
+            <li>Kemudian di Akun, buat satu atau lebih akun SIP (sekali lagi sentuh judul item untuk bantuan).</li>
+            <li>Status registrasi akun ditampilkan dengan titik berwarna: hijau (registrasi
+ berhasil), kuning (registrasi sedang berlangsung), merah (registrasi gagal),
+                putih (registrasi belum diaktifkan).</li>
+   <li>Menyentuh titik status akan langsung menuju konfigurasi akun.</li>
+            <li>Sentuhan lama pada ikon bilah baresip menampilkan informasi tentang ikon tersebut.</li>
+            <li>Gestur geser ke bawah menyebabkan registrasi ulang akun yang sedang ditampilkan.</li>
+            <li>Sentuhan lama pada akun yang sedang ditampilkan mengaktifkan atau menonaktifkan registrasi akun.</li>
+            <li>Gestur geser kiri/kanan beralih antar akun.</li>
+            <li>Pihak panggilan sebelumnya dapat dipilih kembali dengan menyentuh ikon panggilan saat Callee kosong.</li>
+     <li>Rekan panggilan dan pesan dapat ditambahkan ke kontak dengan sentuhan lama.</li>
+            <li>Sentuhan lama juga dapat digunakan untuk menghapus panggilan, obrolan, pesan, dan kontak.</li>
+            <li>Sentuh/sentuh lama pada ikon kontak dapat digunakan untuk memasang/menghapus avatar gambar.</li>
+         <li>Sentuhan lama pada kodek audio dapat digunakan untuk mengaktifkan/menonaktifkan kodek tersebut.</li>
+            <li>Lihat <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> untuk informasi lebih lanjut.</li>
+        </ul>
+        <h2>Kebijakan Privasi</h2>
+            <p>Kebijakan privasi tersedia <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">di sini</a>.</p>
+        <br>
+        <h2>Kode Sumber</h2>
+            <p>Kode sumber tersedia di <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        di mana masalah juga dapat dilaporkan.</p>
+        <br>
+        <h2>Terjemahan Bahasa</h2>
+            <p>Terjemahan bahasa dikelola melalui proyek
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> baresip.</p>
+        <br>
+        <h2>Lisensi</h2>
+        <ul>
+   <li><b>BSD-3-Clause</b> kecuali yang berikut ini:</li>
+            <li><b>Apache 2.0</b> kodek AMR dan keamanan TLS</li>
+            <li><b>AGPLv4</b> enkripsi media ZRTP</li>
+            <li><b>GNU LGPL 2.1</b> kodek Codec2</li>
+            <li><b>Gratis</b> kodek G.722</li>
+            <li><b>GNU GPLv3</b> kodek G.729</li>
+        </ul>
+        ]]></string>
+    <string name="about_text_plus"><![CDATA[
+        <h1>Agen Pengguna SIP dengan panggilan video berbasis <a href="https://github.com/baresip/baresip">pustaka baresip</a></h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>Versi %1$s</p>
+        <br>
+   <h2>Petunjuk Penggunaan</h2>
+        <ul>
+            <li>Periksa apakah nilai default di Pengaturan baresip+ sudah sesuai kebutuhan Anda
+                (sentuh judul item untuk bantuan).</li>
+        <li>Kemudian di Akun, buat satu atau lebih akun (sekali lagi sentuh judul item untuk bantuan).</li>
+            <li>Status registrasi akun ditampilkan dengan titik berwarna: hijau (registrasi
+            berhasil), kuning (registrasi sedang berlangsung), merah (registrasi gagal), putih (registrasi
+                belum diaktifkan).</li>
+   <li>Menyentuh titik status akan langsung menuju konfigurasi akun.</li>
+            <li>Sentuhan lama pada ikon bilah baresip menampilkan informasi tentang ikon tersebut.</li>
+            <li>Gestur geser ke bawah menyebabkan registrasi ulang akun yang sedang ditampilkan.</li>
+            <li>Sentuhan lama pada akun yang sedang ditampilkan mengaktifkan atau menonaktifkan registrasi akun.</li>
+            <li>Gestur geser kiri/kanan beralih antar akun.</li>
+            <li>Pihak panggilan sebelumnya dapat dipilih kembali dengan menyentuh ikon panggilan saat Callee kosong.</li>
+     <li>Rekan panggilan dan pesan dapat ditambahkan ke kontak dengan sentuhan lama.</li>
+            <li>Sentuhan lama juga dapat digunakan untuk menghapus panggilan, obrolan, pesan, dan kontak.</li>
+            <li>Sentuh/sentuh lama pada ikon kontak dapat digunakan untuk memasang/menghapus avatar gambar.</li>
+         <li>Sentuhan lama pada kodek audio atau video dapat digunakan untuk mengaktifkan/menonaktifkan kodek tersebut.</li>
+            <li>Lihat <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> untuk
+                informasi lebih lanjut.</li>
+        </ul>
+   <h2>Masalah yang Diketahui</h2>
+        <ul>
+            <li>Tampilan diri tidak ditampilkan dengan benar saat aliran video bersifat sendonly.</li>
+        </ul>
+        <h2>Kebijakan Privasi</h2>
+        <p>Kebijakan privasi tersedia
+            <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">di sini</a>.</p>
+        <br>
+        <h2>Kode Sumber</h2>
+        <p>Kode sumber tersedia di <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+        di mana masalah juga dapat dilaporkan.</p>
+        <br>
+        <h2>Terjemahan Bahasa</h2>
+        <p>Terjemahan bahasa dikelola melalui proyek
+            <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> baresip.</p>
+        <br>
+        <h2>Lisensi</h2>
+        <ul>
+   <li><b>BSD-3-Clause</b> kecuali yang berikut ini:</li>
+            <li><b>Apache 2.0</b> kodek AMR dan keamanan TLS</li>
+            <li><b>AGPLv4</b> enkripsi media ZRTP</li>
+            <li><b>GNU LGPL 2.1</b> kodek Codec2</li>
+            <li><b>Gratis</b> kodek G.722</li>
+            <li><b>GNU GPLv3</b> kodek G.729</li>
+        <li><b>GNU GPLv2</b> kodek H.264 dan H.265</li>
+            <li><b>AOMedia</b> kodek AV1</li>
+        </ul>
+        ]]></string>
+    <string name="account">Akun</string>
+    <string name="not_available">Tidak tersedia</string>
+    <string name="account_nickname_help">Nama panggilan (jika ada) yang digunakan untuk mengidentifikasi akun ini di dalam aplikasi baresip.</string>
+    <string name="nickname">Nama Panggilan</string>
+    <string name="invalid_account_nickname">Nama Panggilan Akun Tidak Valid \'%1$s\'</string>
+    <string name="non_unique_account_nickname">Nama panggilan \'%1$s\' sudah ada</string>
+    <string name="display_name">Nama Tampilan</string>
+    <string name="display_name_help">Nama (jika ada) yang digunakan dalam URI From pada permintaan keluar.</string>
+    <string name="invalid_display_name">Nama Tampilan Tidak Valid \'%1$s\'</string>
+    <string name="authentication_username">Nama Pengguna Autentikasi</string>
+    <string name="authentication_username_help">Nama pengguna autentikasi jika autentikasi permintaan SIP diperlukan. Nilai default adalah nama pengguna akun.</string>
+    <string name="invalid_authentication_username">Nama Pengguna Autentikasi Tidak Valid \'%1$s\'</string>
+    <string name="authentication_password">Kata Sandi Autentikasi</string>
+    <string name="authentication_password_help">Kata Sandi Autentikasi hingga 64 karakter. Jika Nama Pengguna Autentikasi diberikan, tetapi Kata Sandi tidak diberikan, kata sandi akan diminta saat baresip dijalankan.</string>
+    <string name="invalid_authentication_password">Kata Sandi Autentikasi Tidak Valid \'%1$s\'</string>
+    <string name="outbound_proxies">Proksi Keluar</string>
+    <string name="outbound_proxies_help">"URI SIP dari satu atau dua proksi yang harus digunakan saat mengirim permintaan. Jika dua proksi diberikan, permintaan REGISTER dikirim ke keduanya dan permintaan lainnya dikirim ke satu yang merespons. Jika tidak ada proksi keluar yang diberikan, permintaan dikirim berdasarkan pencarian rekaman DNS NAPTR/SRV/A dari bagian host URI callee. Jika bagian host URI SIP adalah alamat IPv6, alamat tersebut harus ditulis di dalam tanda kurung siku []. \nContoh: \n -  sip:example.com:5061;transport=tls \n -  sip:[2001:67c:223:777::10];transport=tcp \n -  sip:192.168.43.50:443;transport=wss"</string>
+    <string name="sip_uri_of_proxy_server">URI SIP Server Proksi</string>
+    <string name="sip_uri_of_another_proxy_server">URI SIP Server Proksi Lainnya</string>
+    <string name="invalid_proxy_server_uri">URI Server Proksi Tidak Valid \'%1$s\'</string>
+    <string name="register">Daftar</string>
+    <string name="register_help">Jika dicentang, registrasi diaktifkan dan permintaan REGISTER dikirim pada interval yang ditentukan oleh Interval Registrasi.</string>
+    <string name="reg_int">Interval Registrasi</string>
+    <string name="reg_int_help">Menentukan seberapa sering (dalam detik) baresip mengirim permintaan REGISTER. Nilai yang valid adalah dari 60 hingga 3600.</string>
+    <string name="invalid_reg_int">Interval Registrasi Tidak Valid \'%1$s\'</string>
+    <string name="check_origin">Periksa Asal</string>
+    <string name="check_origin_help">Jika dicentang, permintaan masuk hanya diizinkan dari alamat IP tempat permintaan register dikirim.</string>
+    <string name="media_nat">Traversal NAT Media</string>
+    <string name="media_nat_help">Memilih protokol traversal NAT media (jika ada). Pilihan yang tersedia adalah STUN (Session Traversal Utilities for NAT, RFC 5389) dan ICE (Interactive Connectivity Establishment, RFC 5245).</string>
+    <string name="stun_server">Server STUN/TURN</string>
+    <string name="stun_server_help">URI Server STUN/TURN dalam bentuk skema:host[:port][?transport=udp|tcp], di mana skema adalah \'stun\', \'stuns\', \'turn\', atau \'turns\'. Server STUN default pabrik untuk protokol STUN dan ICE adalah \'stun:stun.l.google.com:19302\' yang mengarah ke server STUN publik Google. Tidak ada server TURN default pabrik.</string>
+    <string name="invalid_stun_server">URI Server STUN/TURN Tidak Valid \'%1$s\'</string>
+    <string name="stun_username">Nama Pengguna STUN/TURN</string>
+    <string name="stun_username_help">Nama pengguna jika diperlukan oleh server STUN/TURN</string>
+    <string name="invalid_stun_username">Nama Pengguna Tidak Valid \'%1$s\'</string>
+    <string name="stun_password">Kata Sandi STUN/TURN</string>
+    <string name="stun_password_help">Kata sandi jika diperlukan oleh server STUN/TURN</string>
+    <string name="invalid_stun_password">Kata Sandi Tidak Valid \'%1$s\'</string>
+    <string name="media_encryption">Enkripsi Media</string>
+    <string name="media_encryption_help">"Memilih protokol enkripsi transport media (jika ada). \n -  ZRTP (direkomendasikan) berarti negosiasi enkripsi media ujung-ke-ujung ZRTP dicoba setelah panggilan berhasil tersambung. \n -  DTLS-SRTPF berarti UDP/TLS/RTP/SAVPF ditawarkan dalam panggilan keluar dan RTP/SAVP, RTP/SAVPF, UDP/TLS/RTP/SAVP, atau UDP/TLS/RTP/SAVPF digunakan jika ditawarkan dalam panggilan masuk. \n -  SRTP-MANDF berarti RTP/SAVPF ditawarkan dalam panggilan keluar dan diwajibkan dalam panggilan masuk. \n -  SRTP-MAND berarti RTP/SAVP ditawarkan dalam panggilan keluar dan diwajibkan dalam panggilan masuk. \n -  SRTP berarti RTP/AVP ditawarkan dalam panggilan keluar dan RTP/SAVP atau RTP/SAVPF digunakan jika ditawarkan dalam panggilan masuk."</string>
+    <string name="rtcp_mux">Multipleksing RTCP</string>
+    <string name="rtcp_mux_help">Jika dicentang, paket RTP dan RTCP dimultipleks pada satu port (RFC 5761).</string>
+    <string name="rel_100">Respons Sementara yang Andal</string>
+    <string name="rel_100_help">Jika dicentang, menunjukkan dukungan untuk respons sementara yang andal (RFC 3262).</string>
+    <string name="dtmf_mode">Mode DTMF</string>
+    <string name="dtmf_mode_help">Memilih cara nada DTMF 0–9, #, *, dan A-D dikirim.</string>
+    <string name="dtmf_inband">Peristiwa RTP Dalam-Pita</string>
+    <string name="dtmf_info">Permintaan SIP INFO</string>
+    <string name="dtmf_auto">RTP Dalam-Pita atau SIP INFO</string>
+    <string name="answer_mode">Mode Jawab</string>
+    <string name="answer_mode_help">Memilih cara panggilan masuk dijawab.</string>
+    <string name="redirect_mode">Mode Pengalihan</string>
+    <string name="redirect_mode_help">Memilih apakah permintaan pengalihan panggilan diikuti secara otomatis atau apakah konfirmasi diminta.</string>
+    <string name="manual">Manual</string>
+    <string name="auto">Otomatis</string>
+    <string name="block_unknown">Blokir yang Tidak Dikenal</string>
+    <string name="block_unknown_help">Memblokir panggilan dan pesan dari rekan yang tidak ditemukan dalam kontak.</string>
+    <string name="voicemail_uri">URI Pesan Suara</string>
+    <string name="voicemain_uri_help">URI SIP untuk pemeriksaan pesan suara. Jika dikosongkan, pesan suara (Indikasi Menunggu Pesan) tidak berlangganan.</string>
+    <string name="voicemain_tel_uri_help">URI TEL untuk pemeriksaan pesan suara.</string>
+    <string name="country_code">Kode Negara</string>
+    <string name="country_code_help">Kode negara E.164 dari akun ini. Jika bagian pengguna URI rekan dari panggilan atau pesan berisi nomor telepon yang tidak diawali tanda \'+\' dan jika pencarian kontak gagal, nomor tersebut akan diawali dengan kode negara ini dan pencarian kontak dicoba kembali. Jika nomor diawali dengan satu digit \'0\', digit tersebut dihapus sebelum nomor diawali kode negara.</string>
+    <string name="invalid_country_code">Kode Negara Tidak Valid \'%1$s\'</string>
+    <string name="telephony_provider">Penyedia Telepon</string>
+    <string name="telephony_provider_help">Bagian host URI SIP yang digunakan dalam panggilan ke nomor telepon. Default pabrik adalah domain akun. Jika tidak diberikan, akun ini tidak dapat digunakan untuk menelepon nomor telepon.</string>
+    <string name="numeric_keypad">Papan Tombol Numerik</string>"
+    <string name="numeric_keypad_help">Jika dicentang, papan tombol numerik ditampilkan saat kolom \"Panggil ke …\" difokuskan.</string>"
+    <string name="invalid_sip_uri_hostpart">Bagian host URI SIP Tidak Valid \'%1$s\'</string>
+    <string name="default_account">Akun Default</string>
+    <string name="default_account_help">Jika dicentang, akun ini dipilih saat baresip dijalankan.</string>
+    <string name="custom_parameters">Parameter Kustom</string>
+    <string name="custom_parameters_help">Daftar parameter akun kustom yang dipisahkan titik koma</string>
+    <string name="accounts">Akun</string>
+    <string name="new_account">URI SIP Akun Baru</string>
+    <string name="accounts_help">URI SIP akun baru dalam bentuk &lt;pengguna&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Jika &lt;port&gt; diberikan dan protokol transport tidak diberikan, protokol transport default ke UDP. Jika &lt;port&gt; tidak diberikan dan protokol transport diberikan, &lt;port&gt; default ke 5060 atau 5061 (TLS). Jika keduanya tidak diberikan dan tidak ada proksi keluar yang ditentukan, registrar akun (jika ada) ditentukan semata-mata berdasarkan informasi DNS domain.</string>
+    <string name="invalid_aor">pengguna@domain[:port][;transport=udp|tcp|tls] tidak valid \'%1$s\'</string>
+    <string name="account_exists">Akun \'%1$s\' sudah ada.</string>
+    <string name="account_allocation_failure">Gagal mengalokasikan akun baru.</string>
+    <string name="encrypt_password">Enkripsi Kata Sandi</string>
+    <string name="decrypt_password">Dekripsi Kata Sandi</string>
+    <string name="delete_account">Apakah Anda ingin menghapus akun \'%1$s\'?</string>
+    <string name="is_calling">sedang memanggil</string>
+    <string name="missed_call_from">Panggilan tak terjawab dari</string>
+    <string name="missed_calls">Panggilan tak terjawab</string>
+    <string name="missed_calls_count" tools:ignore="PluralsCandidate">%1$d panggilan tak terjawab</string>
+    <string name="transfer_request_to">Permintaan transfer panggilan ke</string>
+    <string name="call_auto_rejected">Panggilan dari %1$s ditolak otomatis</string>
+    <string name="call_blocked">Panggilan diblokir dari %1$s ditolak otomatis</string>
+    <string name="message_blocked">Pesan diblokir dari %1$s ditolak otomatis</string>
+    <string name="blocked">Diblokir</string>
+    <string name="blocked_calls">Panggilan yang Diblokir</string>
+    <string name="blocked_messages">Pesan yang Diblokir</string>
+    <string name="blocked_delete_alert">Apakah Anda ingin menghapus permintaan yang diblokir dari \'%1$s\'?</string>
+    <string name="blocked_contact_question">Apakah Anda ingin menambahkan rekan \'%1$s\' ke kontak?</string>
+    <string name="call_history">Riwayat Panggilan</string>
+    <string name="call_details">Detail Panggilan</string>
+    <string name="call">Panggilan</string>
+    <string name="calls_calls">panggilan</string>
+    <string name="calls_call">panggilan</string>
+    <string name="peer">Rekan</string>
+    <string name="direction">Arah</string>
+    <string name="time">Waktu</string>
+    <string name="calls_duration">Durasi</string>
+    <string name="calls_add_delete_question">Apakah Anda ingin menambahkan \'%1$s\' ke kontak atau menghapus %2$s dari riwayat panggilan?</string>
+    <string name="calls_delete_question">Apakah Anda ingin menghapus \'%1$s\' %2$s dari riwayat panggilan?</string>
+    <string name="disable_history">Nonaktifkan</string>
+    <string name="enable_history">Aktifkan</string>
+    <string name="delete_history_alert">Apakah Anda ingin menghapus riwayat panggilan akun \'%1$s\'?</string>
+    <string name="call_answered">Panggilan dijawab</string>
+    <string name="call_answered_elsewhere">Panggilan dijawab di tempat lain</string>
+    <string name="call_missed">Panggilan tak terjawab</string>
+    <string name="call_rejected">Panggilan ditolak</string>
+    <string name="playing_recording">Memutar rekaman …</string>
+    <string name="save_recording">Simpan Rekaman</string>
+    <string name="save_recording_question">Apakah Anda ingin menyimpan rekaman ini?</string>
+    <string name="recording_saved">Rekaman tersimpan</string>
+    <string name="delete_call_alert">Apakah Anda ingin menghapus panggilan ini dari riwayat?</string>
+    <string name="chat_with">Obrolan dengan %1$s</string>
+    <string name="new_message">Pesan baru</string>
+    <string name="long_message_question">Apakah Anda ingin menghapus pesan atau menambahkan rekan \'%1$s\' ke kontak?</string>
+    <string name="short_message_question">Apakah Anda ingin menghapus pesan?</string>
+    <string name="add_contact">Tambah Kontak</string>
+    <string name="sending_failed">Pengiriman pesan gagal</string>
+    <string name="message_failed">Gagal</string>
+    <string name="chats">Riwayat Obrolan</string>
+    <string name="today">Hari ini</string>
+    <string name="you">Anda</string>
+    <string name="new_chat_peer">Rekan Obrolan Baru</string>
+    <string name="long_chat_question">Apakah Anda ingin menghapus obrolan dengan rekan \'%1$s\' atau menambahkan rekan ke kontak?</string>
+    <string name="short_chat_question">Apakah Anda ingin menghapus obrolan dengan \'%1$s\'?</string>
+    <string name="delete_chats_alert">Apakah Anda ingin menghapus riwayat obrolan akun \'%1$s\'?</string>
+    <string name="audio_codecs">Kodek Audio</string>
+    <string name="video_codecs">Kodek Video</string>
+    <string name="configuration">Pengaturan</string>
+    <string name="start_automatically">Mulai Otomatis</string>
+    <string name="start_automatically_help">Jika dicentang, baresip dimulai secara otomatis setelah perangkat dinyalakan atau setelah versi baru baresip diinstal. Mulai ditunda hingga perangkat dibuka kuncinya.</string>
+    <string name="appear_on_top_permission">Mulai otomatis memerlukan izin Tampil di Atas.</string>
+    <string name="battery_optimizations">Optimasi Baterai</string>
+    <string name="battery_optimizations_help">Nonaktifkan optimasi baterai jika Anda ingin mengurangi kemungkinan Android membatasi akses baresip ke jaringan atau memasukkan baresip ke status siaga.</string>
+    <string name="default_phone_app">Aplikasi Telepon Default</string>
+    <string name="dialer_role_not_available">Peran aplikasi telepon default tidak tersedia</string>
+    <string name="default_phone_app_help">Jika dicentang, baresip adalah aplikasi telepon default.</string>
+    <string name="default_messaging_app">Aplikasi Pesan Default</string>
+    <string name="default_messaging_app_help">Jika dicentang, baresip adalah aplikasi pesan default untuk SMS/MMS.</string>
+    <string name="messaging_role_not_available">Peran aplikasi pesan default tidak tersedia</string>
+    <string name="enable_default_messaging">Harap aktifkan Aplikasi Pesan Default di Pengaturan</string>
+    <string name="listen_address">Alamat Dengar</string>
+    <string name="listen_address_help">Alamat IP dan port dalam bentuk \'alamat:port\' tempat baresip mendengarkan permintaan SIP masuk. Jika alamat IP adalah alamat IPv6, alamat tersebut harus ditulis di dalam tanda kurung siku []. Alamat IPv4 0.0.0.0 atau alamat IPv6 [::] membuat baresip mendengarkan di semua alamat yang tersedia. Jika dikosongkan (default pabrik), baresip mendengarkan pada port sembarang di semua alamat yang tersedia.</string>
+    <string name="invalid_listen_address">Alamat Dengar Tidak Valid</string>
+    <string name="address_family">Keluarga Alamat</string>
+    <string name="address_family_help">Memilih alamat IP mana yang digunakan oleh baresip. Jika IPv4 atau IPv6 dipilih, baresip hanya menggunakan alamat IPv4 atau IPv6. Jika tidak ada yang dipilih, baresip menggunakan alamat IPv4 dan IPv6.</string>
+    <string name="transport_protocols">Protokol Transport</string>
+    <string name="transport_protocols_help">Daftar protokol transport permintaan/respons SIP yang didukung, dipisahkan koma. Jika dikosongkan, nilai default adalah \'udp,tcp,tls,ws,wss\' yang mencakup semua protokol transport yang didukung. Cantumkan hanya yang Anda butuhkan. Penggunaan UDP tidak direkomendasikan karena alasan keamanan dan lainnya.</string>
+    <string name="invalid_transport_protocols">Daftar Protokol Transport tidak valid</string>
+    <string name="dns_servers">Server DNS</string>
+    <string name="dns_servers_help">Daftar alamat server DNS yang dipisahkan koma. Jika tidak diberikan, alamat server DNS diperoleh secara dinamis dari sistem. Setiap alamat DNS dalam bentuk \'ip:port\' atau \'ip\'. Jika port dihilangkan, defaultnya adalah 53. Jika ip adalah alamat IPv6 dan port juga diberikan, ip harus ditulis di dalam tanda kurung siku []. Sebagai contoh, daftar \'8.8.8.8:53,[2001:4860:4860::8888]:53\' mengarah ke alamat IPv4 dan IPv6 server DNS publik Google.</string>
+    <string name="invalid_dns_servers">Server DNS Tidak Valid</string>
+    <string name="failed_to_set_dns_servers">Gagal mengatur server DNS</string>
+    <string name="tls_certificate_file">Berkas Sertifikat TLS</string>
+    <string name="tls_certificate_file_help">Jika dicentang, berkas yang berisi sertifikat TLS dan kunci privat instans baresip ini telah atau akan dimuat. Pada Android versi 9, berkas bernama \'cert.pem\' dimuat dari folder Unduhan. Demi keamanan, hapus berkas tersebut setelah dimuat.</string>
+    <string name="verify_server">Verifikasi Sertifikat Server</string>
+    <string name="verify_server_help">Jika dicentang, baresip memverifikasi sertifikat TLS dari Agen Pengguna SIP dan Server Proksi SIP saat transport TLS digunakan.</string>
+    <string name="tls_ca_file">Berkas CA TLS</string>
+    <string name="tls_ca_file_help">Jika dicentang, sebuah berkas telah atau akan dimuat yang berisi sertifikat TLS dari Otoritas Sertifikat yang tidak termasuk dalam OS Android. Pada Android versi 9, berkas bernama \'ca_certs.crt\' dimuat dari folder Unduhan.</string>
+    <string name="no_read_permission">Tidak ada izin baca Penyimpanan Eksternal</string>
+    <string name="unique_contact_uri">URI Kontak Unik</string>
+    <string name="unique_contact_uri_help">Jika dicentang, URI Kontak dijamin unik. Perlu dicentang jika terdapat lebih dari satu akun dengan bagian pengguna URI SIP yang sama, tetapi juga meningkatkan perlindungan akun dari serangan.</string>
+    <string name="audio_settings">Pengaturan Audio</string>
+    <string name="speaker_phone">Telepon Loudspeaker</string>
+    <string name="speaker_phone_help">Jika dicentang, loudspeaker dinyalakan secara otomatis saat panggilan dimulai.</string>
+    <string name="audio_modules_title">Modul Audio</string>
+    <string name="audio_modules_help">Kodek audio yang disediakan oleh modul yang dicentang tersedia untuk digunakan oleh akun.</string>
+    <string name="failed_to_load_module">Gagal memuat modul.</string>
+    <string name="microphone_gain">Penguatan Mikrofon</string>
+    <string name="microphone_gain_help">Kalikan volume mikrofon dengan angka desimal ini. Nilai minimum adalah 1,0 (default pabrik) yang menonaktifkan penguatan mikrofon. Nilai yang lebih besar dapat berdampak negatif pada kualitas audio.</string>
+    <string name="invalid_microphone_gain">Nilai Penguatan Mikrofon tidak valid</string>
+    <string name="opus_bit_rate">Bit Rate Opus</string>
+    <string name="opus_bit_rate_help">Bit rate maksimum rata-rata yang digunakan oleh aliran audio Opus. Nilai yang valid adalah 6000–510000. Default pabrik adalah 28000.</string>
+    <string name="opus_packet_loss">Perkiraan kehilangan paket Opus</string>
+    <string name="opus_packet_loss_help">Persentase kehilangan paket aliran audio Opus yang diperkirakan, dari 0–100. Nilai default pabrik adalah 1. Nilai 0 juga menonaktifkan Koreksi Kesalahan Maju (FEC) Opus.</string>
+    <string name="invalid_opus_bitrate">Bit rate Opus tidak valid</string>
+    <string name="invalid_opus_packet_loss">Persentase Kehilangan Paket Opus tidak valid</string>
+    <string name="audio_delay">Penundaan Audio</string>
+    <string name="audio_delay_help">Waktu (dalam milidetik) untuk menunggu audio dari callee saat panggilan tersambung. Atur ke nilai yang lebih tinggi jika Anda melewatkan audio dari callee di awal panggilan.</string>
+    <string name="invalid_audio_delay">Penundaan Audio Tidak Valid \'%1$s\'. Nilai yang valid adalah dari 100 hingga 3000.</string>
+    <string name="default_call_volume">Volume Panggilan Default</string>
+    <string name="default_call_volume_help">Jika diatur, volume audio panggilan default pada skala 1–10.</string>
+    <string name="tone_country">Negara Nada</string>
+    <string name="tone_country_help">Negara untuk nada dering panggilan, nada tunggu, dan nada sibuk callee</string>
+    <string name="dark_theme">Tema Gelap</string>
+    <string name="dark_theme_help">Paksa tema tampilan gelap</string>
+    <string name="dynamic_colors">Warna Dinamis</string>
+    <string name="dynamic_colors_help">Gunakan warna dinamis jika diaktifkan di Pengaturan Android</string>
+    <string name="colorblind">Buta Warna</string>
+    <string name="colorblind_help">Gunakan ikon status registrasi yang ramah buta warna</string>
+    <string name="proximity_sensing">Sensor Kedekatan</string>
+    <string name="proximity_sensing_help">Jika dicentang, sensor kedekatan aktif selama panggilan.</string>
+    <string name="video_size">Ukuran Bingkai Video</string>
+    <string name="video_size_help">Ukuran bingkai video yang dikirimkan (lebar x tinggi)</string>
+    <string name="video_fps">Bingkai Video Per Detik</string>
+    <string name="video_fps_help">Kecepatan bingkai video yang akan ditawarkan selama jabat tangan SDP. Nilai yang valid adalah dari 10 hingga 30.</string>
+    <string name="invalid_fps">Bingkai Per Detik Tidak Valid \'%1$d\'</string>
+    <string name="ringtone">Nada Dering</string>
+    <string name="select_ringtone">Pilih Nada Dering</string>
+    <string name="user_agent">Agen Pengguna</string>
+    <string name="user_agent_help">Nilai bidang header User-Agent permintaan/respons SIP kustom</string>
+    <string name="invalid_user_agent">Nilai bidang header User-Agent tidak valid</string>
+    <string name="contacts_help">Memilih apakah kontak baresip, kontak Android, atau keduanya digunakan. Jika keduanya digunakan dan terdapat kontak dengan nama yang sama di kedua kontak, kontak baresip akan dipilih.</string>
+    <string name="both">Keduanya</string>
+    <string name="debug">Debug</string>
+    <string name="debug_help">Jika dicentang, menyediakan pesan log tingkat debug dan info ke Logcat.</string>
+    <string name="sip_trace">Lacak SIP</string>
+    <string name="sip_trace_help">Jika dicentang dan jika Debug dicentang, pesan Logcat juga menyertakan lacak permintaan dan respons SIP. Dinonaktifkan secara otomatis saat baresip dimulai.</string>
+    <string name="reset_config">Setel Ulang ke Default Pabrik</string>
+    <string name="reset_config_help">Jika dicentang, pengaturan disetel ulang ke nilai default pabrik.</string>
+    <string name="reset_config_alert">Apakah Anda yakin ingin menyetel ulang pengaturan ke nilai default pabrik?</string>
+    <string name="reset">Setel Ulang</string>
+    <string name="read_cert_error">Gagal membaca berkas \'cert.pem\'.</string>
+    <string name="read_ca_certs_error">Gagal membaca berkas \'ca_certs.crt\'.</string>
+    <string name="config_restart">Anda perlu memulai ulang baresip untuk mengaktifkan pengaturan baru. Mulai ulang sekarang?</string>
+    <string name="consent_request">Permintaan Persetujuan</string>
+    <string name="contacts_consent">Jika kontak Android dipilih, kontak tersebut dapat digunakan dalam panggilan dan pesan sebagai referensi ke URI SIP dan tel. Aplikasi baresip tidak menyimpan kontak Android maupun membagikannya kepada siapa pun. Untuk membuat kontak Android tersedia di baresip, Google mengharuskan Anda menyetujui penggunaannya sebagaimana dijelaskan di sini dan dalam <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">Kebijakan Privasi</a> aplikasi.</string>
+    <string name="new_contact">Kontak Baru</string>
+    <string name="contact_name">Nama</string>
+    <string name="email">Email</string>
+    <string name="sip_or_tel_uri">URI SIP atau tel</string>
+    <string name="user_domain_or_number">pengguna@domain atau nomor telepon</string>
+    <string name="favorite">Favorit</string>
+    <string name="favorite_help">Jika dicentang, kontak ditampilkan di antara favorit lainnya di bagian atas daftar kontak.</string>
+    <string name="invalid_contact">Nama kontak tidak valid \'%1$s\'</string>
+    <string name="contact_already_exists">Kontak \'%1$s\' sudah ada.</string>
+    <string name="android_contact_help">Jika dicentang, kontak ini ditambahkan ke kontak Android.</string>
+    <string name="avatar_image">Gambar profil</string>
+    <string name="contacts">Kontak</string>
+    <string name="contact_action_question">Apakah Anda ingin menelepon atau mengirim pesan ke \'%1$s\'?</string>
+    <string name="contact_email_action_question">Apakah Anda ingin menelepon, mengirim pesan, atau mengirim email ke \'%1$s\'?</string>
+    <string name="send_message">Kirim Pesan</string>
+    <string name="send_email">Kirim Email</string>
+    <string name="contact_delete_question">Apakah Anda ingin menghapus kontak \'%1$s\'?</string>
+    <string name="search">Cari</string>
+    <string name="import_contacts">Impor</string>
+    <string name="contact_import_success">Kontak berhasil diimpor</string>
+    <string name="contact_import_failure">Gagal mengimpor kontak</string>
+    <string name="alert">Peringatan</string>
+    <string name="info">Info</string>
+    <string name="notice">Pemberitahuan</string>
+    <string name="cancel">Batal</string>
+    <string name="stop">Hentikan</string>
+    <string name="reply">Balas</string>
+    <string name="save">Simpan</string>
+    <string name="ok">OK</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="accept">Terima</string>
+    <string name="deny">Tolak</string>
+    <string name="add">Tambah</string>
+    <string name="delete">Hapus</string>
+    <string name="edit">Ubah</string>
+    <string name="status">Status</string>
+    <string name="error">Kesalahan</string>
+    <string name="confirmation">Konfirmasi</string>
+    <string name="anonymous">Anonim</string>
+    <string name="unknown">Tidak diketahui</string>
+    <string name="invalid_sip_or_tel_uri">URI SIP atau tel tidak valid \'%1$s\'</string>
+    <string name="backup">Cadangan</string>
+    <string name="restore">Pulihkan</string>
+    <string name="about">Tentang</string>
+    <string name="restart">Mulai Ulang</string>
+    <string name="quit">Keluar</string>
+    <string name="outgoing_call_to_dots">Panggil ke …</string>
+    <string name="incoming_call_from_dots">Panggilan dari …</string>
+    <string name="diverted_by_dots">Dialihkan oleh …</string>
+    <string name="diverted_by">dialihkan oleh</string>
+    <string name="no_telephony_provider">Akun \'%1$s\' tidak memiliki Penyedia Telepon</string>
+    <string name="no_telephone_number">Panggilan seluler hanya dapat dilakukan ke nomor telepon</string>
+    <string name="video_call">Panggilan video</string>
+    <string name="video_request">Permintaan Video</string>
+    <string name="allow_video">Terima pengiriman dan penerimaan video dengan \'%1$s\'?</string>
+    <string name="allow_video_send">Terima pengiriman video ke \'%1$s\'?</string>
+    <string name="allow_video_recv">Terima penerimaan video dari \'%1$s\'?</string>
+    <string name="call_is_ringing">Panggilan sedang berdering</string>
+    <string name="call_is_on_hold">Panggilan sedang ditahan</string>
+    <string name="call_is_connected">Panggilan tersambung</string>
+    <string name="rec_in_call">Rekaman hanya dapat dinyalakan atau dimatikan saat panggilan belum tersambung</string>
+    <string name="call_transfer">Transfer Panggilan</string>
+    <string name="blind">Buta</string>
+    <string name="attended">Terdampingi</string>
+    <string name="transfer_destination">Tujuan transfer</string>
+    <string name="choose_destination_uri">Pilih URI tujuan</string>
+    <string name="transfer">Transfer</string>
+    <string name="transfer_failed">Transfer gagal</string>
+    <string name="replaces_not_supported">Rekan tidak mendukung fitur REPLACES</string>
+    <string name="dtmf">DTMF</string>
+    <string name="call_info">Info Panggilan</string>
+    <string name="call_info_not_available">Tidak ada info yang tersedia</string>
+    <string name="duration">Durasi: %1$d (detik)</string>
+    <string name="codecs">Kodek</string>
+    <string name="rate">Kecepatan Saat Ini: %1$s (Kbits/d)</string>
+    <string name="average_rate">Kecepatan Rata-rata: %1$s (Kbits/d)</string>
+    <string name="packets">Paket</string>
+    <string name="lost">Hilang</string>
+    <string name="jitter">Jitter: %1$s (md)</string>
+    <string name="voicemail_messages">Pesan Suara</string>
+    <string name="you_have">Anda memiliki</string>
+    <string name="one_new_message">satu pesan baru</string>
+    <string name="new_messages">pesan baru</string>
+    <string name="one_old_message">satu pesan lama</string>
+    <string name="old_messages">pesan lama</string>
+    <string name="and">dan</string>
+    <string name="no_messages">Anda tidak memiliki pesan</string>
+    <string name="listen">Dengarkan</string>
+    <string name="call_already_active">Anda sudah memiliki panggilan aktif.</string>
+    <string name="start_failed">Baresip gagal dimulai. Hal ini mungkin disebabkan oleh nilai Pengaturan yang tidak valid. Periksa Alamat Dengar, Berkas Sertifikat TLS, dan Berkas CA TLS. Kemudian mulai ulang baresip.</string>
+    <string name="registering_failed">Registrasi %1$s gagal.</string>
+    <string name="verify">Permintaan Verifikasi</string>
+    <string name="verify_sas">Apakah Anda ingin memverifikasi SAS &lt;%1$s&gt;?</string>
+    <string name="transfer_request">Permintaan Transfer</string>
+    <string name="transfer_request_query">Apakah Anda menerima untuk mentransfer panggilan ini ke \'%1$s\'?</string>
+    <string name="call_request">Permintaan Panggilan</string>
+    <string name="call_request_query">Apakah Anda menerima permintaan untuk menelepon \'%1$s\'?</string>
+    <string name="redirect_notice">Pengalihan otomatis ke \'%1$s\'\\</string>
+    <string name="redirect_request">Permintaan Pengalihan</string>
+    <string name="redirect_request_query">Apakah Anda menerima pengalihan panggilan ke \'%1$s\'?</string>
+    <string name="call_failed">Panggilan gagal</string>
+    <string name="call_closed">Panggilan ditutup</string>
+    <string name="call_not_secure">Panggilan ini TIDAK aman!</string>
+    <string name="peer_not_verified">Panggilan ini AMAN, tetapi rekan BELUM diverifikasi!</string>
+    <string name="call_is_secure">Panggilan ini AMAN dan rekan TELAH DIVERIFIKASI! Apakah Anda ingin membatalkan verifikasi rekan?</string>
+    <string name="unverify">Batalkan Verifikasi</string>
+    <string name="backed_up">Data aplikasi (tidak termasuk rekaman) dicadangkan ke berkas \'%1$s\'. Pada Android versi 9, berkas tersebut ada di folder Unduhan.</string>
+    <string name="backup_failed">Gagal mencadangkan data aplikasi ke berkas \'%1$s\'. Periksa Aplikasi → baresip → Izin → Penyimpanan.</string>
+    <string name="restart_request">Permintaan Mulai Ulang</string>
+    <string name="restored">Data aplikasi dipulihkan. baresip perlu dimulai ulang. Mulai ulang sekarang?</string>
+    <string name="restore_failed">Gagal memulihkan data aplikasi. Pastikan Anda memasukkan kata sandi yang benar dan berkas cadangan berasal dari aplikasi ini. Pada Android versi 9, periksa juga Aplikasi → baresip → Izin → Penyimpanan dan pastikan berkas \'%1$s\' ada di folder Unduhan.</string>
+    <string name="restore_unzip_failed">Gagal memulihkan data aplikasi. Android versi 14 ke atas tidak mengizinkan pemulihan data yang dicadangkan sebelum %1$s versi %2$s.</string>
+    <string name="no_notifications">Anda tidak dapat menggunakan aplikasi ini tanpa izin \"Notifikasi\".</string>
+    <string name="no_calls">baresip memerlukan izin \"Mikrofon\" untuk panggilan suara.</string>
+    <string name="no_video_calls">Berikan izin \"Kamera\" untuk melakukan atau menjawab panggilan video.</string>
+    <string name="no_backup">Anda tidak dapat membuat cadangan tanpa izin \"Penyimpanan\".</string>
+    <string name="no_restore">Anda tidak dapat memulihkan cadangan tanpa izin \"Penyimpanan\".</string>
+    <string name="no_android_contacts">Anda tidak dapat mengakses kontak Android tanpa izin \"Kontak\".</string>
+    <string name="no_cameras">Tidak ada kamera video yang didukung!</string>
+    <string name="no_network">Tidak ada koneksi jaringan!</string>
+    <string name="no_aec">Tidak ada Pembatalan Gema Akustik perangkat keras!</string>
+    <string name="audio_focus_denied">Fokus audio ditolak!</string>
+    <string name="permissions_rationale">Alasan izin</string>
+    <string name="audio_permissions">baresip memerlukan izin \"Mikrofon\" untuk panggilan suara, izin \"Perangkat terdekat\" untuk deteksi mikrofon/speaker Bluetooth, izin \"Notifikasi\" untuk menampilkan notifikasi, dan pada Android 9 izin \"Penyimpanan\" untuk operasi Cadangan/Pemulihan.</string>
+    <string name="audio_and_video_permissions">baresip+ memerlukan izin \"Mikrofon\" untuk panggilan suara, izin \"Kamera\" untuk panggilan video, izin \"Perangkat terdekat\" untuk deteksi mikrofon/speaker Bluetooth, izin \"Notifikasi\" untuk menampilkan notifikasi, dan pada Android 9 izin \"Penyimpanan\" untuk operasi Cadangan/Pemulihan.</string>
+    <string name="call_recording_title">Rekaman Panggilan</string>
+    <string name="call_recording_tip">Jika diaktifkan, panggilan masuk dan keluar baru akan direkam. Rekaman dapat diputar di halaman Detail Panggilan.</string>
+    <string name="microphone_title">Mikrofon</string>
+    <string name="microphone_tip">Jika diaktifkan selama panggilan, mikrofon dimatikan.</string>
+    <string name="speakerphone_title">Loudspeaker</string>
+    <string name="speakerphone_tip">Jika diaktifkan, audio diputar melalui loudspeaker perangkat.</string>
 </resources>
