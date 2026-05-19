@@ -45,9 +45,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -810,7 +810,7 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Email,
+                    imageVector = Icons.Filled.Email,
                     contentDescription = "Send Email",
                     tint = MaterialTheme.colorScheme.onBackground
                 )
