@@ -283,7 +283,7 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
                             peerUri)
                         lastButtonText.value = ctx.getString(R.string.add_contact)
                         lastAction.value = {
-                            navController.navigate("baresip_contact/$peerUri/new")
+                            navController.navigate("contact/$peerUri/new")
                         }
                         showDialog.value = true
                     })

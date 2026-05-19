@@ -418,7 +418,7 @@ private fun Messages(
                             )
                             secondButtonText.value = ctx.getString(R.string.add_contact)
                             secondAction.value = {
-                                navController.navigate("baresip_contact/$peerUri/new")
+                                navController.navigate("contact/$peerUri/new")
                             }
                             lastButtonText.value = ctx.getString(R.string.delete)
                             lastAction.value = {

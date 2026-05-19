@@ -473,7 +473,7 @@ private fun BottomBar(
             )
         )
         SmallFloatingActionButton(
-            onClick = { navController.navigate("baresip_contact//new") },
+            onClick = { navController.navigate("contact//new") },
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
@@ -621,7 +621,7 @@ private fun ContactsContent(
                                 .padding(start = 10.dp)
                                 .combinedClickable(
                                     onClick = {
-                                        navController.navigate("contact/${contact.name()}")
+                                        navController.navigate("contact/${contact.name()}/old")
                                     },
                                     onLongClick = {
                                         confirmationDialogMessage.value = String.format(
@@ -650,18 +650,6 @@ private fun ContactsContent(
                                     }
                                 )
                         )
-                        SmallFloatingActionButton(
-                            modifier = Modifier.padding(end = 10.dp),
-                            onClick = { navController.navigate("baresip_contact/${contact.name()}/old") },
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = stringResource(R.string.edit)
-                            )
-                        }
                     }
 
                     is Contact.AndroidContact -> {
@@ -673,7 +661,7 @@ private fun ContactsContent(
                                 .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
                                 .combinedClickable(
                                     onClick = {
-                                        navController.navigate("contact/${contact.name()}")
+                                        navController.navigate("contact/${contact.name()}/old")
                                     },
                                     onLongClick = {
                                         confirmationDialogMessage.value = String.format(

@@ -436,7 +436,7 @@ private fun Calls(
                                     secondButtonText.value = ctx.getString(R.string.add_contact)
                                     secondAction.value = {
                                         val uri = Utils.sipToTel(peerUri)
-                                        navController.navigate("baresip_contact/$uri/new")
+                                        navController.navigate("contact/$uri/new")
                                     }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {

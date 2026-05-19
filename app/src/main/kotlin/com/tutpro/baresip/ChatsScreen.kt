@@ -369,7 +369,7 @@ private fun Chats(
                             }
                             lastButtonText.value = ctx.getString(R.string.add_contact)
                             lastAction.value = {
-                                navController.navigate("baresip_contact/${message.peerUri}/new")
+                                navController.navigate("contact/${message.peerUri}/new")
                             }
                         }
                         showDialog.value = true

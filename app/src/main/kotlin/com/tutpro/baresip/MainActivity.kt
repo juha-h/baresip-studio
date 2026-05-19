@@ -286,7 +286,6 @@ class MainActivity : ComponentActivity() {
                     accountScreenRoute(navController)
                     codecsScreenRoute(navController)
                     contactsScreenRoute(navController)
-                    baresipContactScreenRoute(navController)
                     contactScreenRoute(navController, viewModel)
                     callsScreenRoute(navController, viewModel)
                     callDetailsScreenRoute(navController, viewModel)
