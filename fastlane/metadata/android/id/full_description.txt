@@ -1,0 +1,13 @@
+Ini adalah aplikasi Agen Pengguna panggilan SIP dan seluler untuk Android berbasis <a href="https://github.com/baresip/baresip">baresip</a>.
+
+Saat ini baresip mendukung panggilan suara berbasis SIP, panggilan suara seluler, panggilan konferensi suara berbasis SIP dan pesan teks, Indikasi Menunggu Pesan suara serta transfer panggilan buta dan terdampingi.
+
+Dalam panggilan SIP, audio dapat dikodekan dengan kodek Opus, AMR, Codec2, G.729, G.722, G.722.1, atau PCMU/PCMA. Keamanan dicapai melalui transport sinyal SIP TLS atau WSS dan enkapsulasi media ZRTP atau (DTLS) SRTP.
+
+Pengembangan baresip didorong oleh kebutuhan akan Agen Pengguna VoIP berbasis SIP yang aman dan bersumber terbuka untuk Android yang tidak bergantung pada layanan notifikasi push pihak ketiga yang bersifat proprietary. Panggilan seluler ditambahkan untuk menghindari kebutuhan akan dua aplikasi panggilan suara.
+
+Aplikasi ini dapat dipasang pada perangkat Android yang menjalankan Android versi 9 atau lebih baru. Panggilan seluler memerlukan Android versi 10 atau lebih baru.
+
+Jika Anda memerlukan panggilan video, Anda dapat memasang aplikasi saudaranya yaitu baresip+ sebagai pengganti aplikasi ini.
+
+Kode sumber tersedia di <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, di mana masalah juga dapat dilaporkan.
