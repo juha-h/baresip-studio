@@ -2046,14 +2046,26 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
         val uriText = dialerState.callUri.value.trim()
         if (uriText.isNotEmpty()) {
             if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
-                val uris = Contact.contactUris(uriText)
-                if (uris.isEmpty())
-                    makeCall(
-                        ctx,
-                        viewModel,
-                        uriText,
-                        dialerState
-                    )
+                val aor = viewModel.selectedAor.value
+                val ua = UserAgent.ofAor(aor)
+                val uris = Contact.contactUris(uriText, ua?.account?.isMobile ?: false)
+                if (uris.isEmpty()) {
+                    if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
+                        alertTitle.value = ctx.getString(R.string.notice)
+                        alertMessage.value = if (ua?.account?.isMobile == true)
+                            String.format(ctx.getString(R.string.contact_no_tel_uri), uriText)
+                        else
+                            String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), uriText)
+                        showAlert.value = true
+                    } else {
+                        makeCall(
+                            ctx,
+                            viewModel,
+                            uriText,
+                            dialerState
+                        )
+                    }
+                }
                 else if (uris.size == 1)
                     makeCall(
                         ctx,
@@ -2119,6 +2131,12 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
             alertMessage.value = ctx.getString(R.string.no_telephone_number)
             showAlert.value = true
             return
+    }
+    else if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+        alertTitle.value = ctx.getString(R.string.notice)
+        alertMessage.value = ctx.getString(R.string.no_airplane_mode)
+        showAlert.value = true
+        return
     }
     else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
             !Call.calls().any { it.ua.account.aor == ua.account.aor })

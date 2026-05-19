@@ -106,8 +106,11 @@ sealed class Contact {
                     }
                     is AndroidContact -> {
                         if (c.name == name) {
-                            for (u in c.uris)
+                            for (u in c.uris) {
+                                if (tel && !u.startsWith("tel:"))
+                                    continue
                                 uris.add(u)
+                            }
                             return uris
                         }
                     }
@@ -207,7 +210,7 @@ sealed class Contact {
             cur?.close()
             val newList = mutableListOf<AndroidContact>()
             for ((_, value) in contacts)
-                if (value.name != "" && value.uris.isNotEmpty())
+                if (value.name != "" && (value.uris.isNotEmpty() || value.email != ""))
                     newList.add(value)
             BaresipService.androidContacts.value = newList.toList()
         }

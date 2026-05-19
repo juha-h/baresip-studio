@@ -156,7 +156,7 @@ private fun ContactsScreen(navController: NavController) {
                                 }
                             }
                             line.startsWith("END:VCARD", ignoreCase = true) -> {
-                                if (name.isNotEmpty() && uris.isNotEmpty()) {
+                                if (name.isNotEmpty() && (uris.isNotEmpty() || email.isNotEmpty())) {
                                     val existingContact = Contact.baresipContact(name)
                                     if (existingContact != null) {
                                         var updated = false

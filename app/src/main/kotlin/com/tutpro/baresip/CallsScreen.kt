@@ -359,16 +359,26 @@ private fun Calls(
                                     )
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
-                                    handleIntent(ctx, viewModel, intent, "call")
-                                    navController.navigate("main") {
-                                        popUpTo("main")
-                                        launchSingleTop = true
+                                    if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                        alertTitle.value = ctx.getString(R.string.notice)
+                                        alertMessage.value = ctx.getString(R.string.no_airplane_mode)
+                                        showAlert.value = true
+                                    } else {
+                                        handleIntent(ctx, viewModel, intent, "call")
+                                        navController.navigate("main") {
+                                            popUpTo("main")
+                                            launchSingleTop = true
+                                        }
                                     }
                                 }
                                 thirdButtonText.value = ctx.getString(R.string.send_message)
                                 thirdAction.value = {
                                     if (ua.account.isMobile) {
-                                        if (!Utils.isDefaultSmsApp(ctx)) {
+                                        if (Utils.isAirplaneModeOn(ctx)) {
+                                            alertTitle.value = ctx.getString(R.string.notice)
+                                            alertMessage.value = ctx.getString(R.string.no_airplane_mode)
+                                            showAlert.value = true
+                                        } else if (!Utils.isDefaultSmsApp(ctx)) {
                                             alertTitle.value = ctx.getString(R.string.notice)
                                             alertMessage.value = ctx.getString(R.string.enable_default_messaging)
                                             showAlert.value = true

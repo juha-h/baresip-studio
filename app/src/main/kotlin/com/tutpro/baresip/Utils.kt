@@ -873,6 +873,13 @@ object Utils {
                         Configuration.UI_MODE_NIGHT_YES
     }
 
+    fun isAirplaneModeOn(ctx: Context): Boolean {
+        return android.provider.Settings.Global.getInt(
+            ctx.contentResolver,
+            android.provider.Settings.Global.AIRPLANE_MODE_ON, 0
+        ) != 0
+    }
+
     @Suppress("unused")
     fun isPSTNCallActive(ctx: Context): Boolean {
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false

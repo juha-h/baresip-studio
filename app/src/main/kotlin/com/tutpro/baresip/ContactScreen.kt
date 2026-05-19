@@ -290,7 +290,10 @@ private fun Uris(
                         if (ua == null)
                             Log.w(TAG, "Message clickable did not find AoR $aor")
                         else {
-                            if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                            if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                handleDialog(ctx, ctx.getString(R.string.notice),
+                                    ctx.getString(R.string.no_airplane_mode))
+                            } else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
                                 handleDialog(ctx, ctx.getString(R.string.notice),
                                     ctx.getString(R.string.enable_default_messaging))
                             } else {
@@ -321,13 +324,18 @@ private fun Uris(
                         if (ua == null)
                             Log.w(TAG, "Call clickable did not find AoR $aor")
                         else {
-                            val intent = Intent(ctx, MainActivity::class.java)
-                            intent.putExtra("uap", ua.uap)
-                            intent.putExtra("peer", uri)
-                            handleIntent(ctx, viewModel, intent, "call")
-                            navController.navigate("main") {
-                                popUpTo("main") { inclusive = false }
-                                launchSingleTop = true
+                            if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                handleDialog(ctx, ctx.getString(R.string.notice),
+                                    ctx.getString(R.string.no_airplane_mode))
+                            } else {
+                                val intent = Intent(ctx, MainActivity::class.java)
+                                intent.putExtra("uap", ua.uap)
+                                intent.putExtra("peer", uri)
+                                handleIntent(ctx, viewModel, intent, "call")
+                                navController.navigate("main") {
+                                    popUpTo("main") { inclusive = false }
+                                    launchSingleTop = true
+                                }
                             }
                         }
                     }

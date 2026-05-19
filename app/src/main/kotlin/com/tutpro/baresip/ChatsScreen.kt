@@ -594,9 +594,18 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 val peerText = newPeer.trim()
                 if (peerText.isNotEmpty()) {
                     val uris = Contact.contactUris(peerText, account.isMobile)
-                    if (uris.isEmpty())
-                        makeChat(ctx, navController, account, peerText)
-                    else if (uris.size == 1)
+                    if (uris.isEmpty()) {
+                        if (Contact.nameExists(peerText, BaresipService.contacts, true)) {
+                            alertTitle.value = ctx.getString(R.string.notice)
+                            alertMessage.value = if (account.isMobile)
+                                String.format(ctx.getString(R.string.contact_no_tel_uri), peerText)
+                            else
+                                String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), peerText)
+                            showAlert.value = true
+                        } else {
+                            makeChat(ctx, navController, account, peerText)
+                        }
+                    } else if (uris.size == 1)
                         makeChat(ctx, navController, account, uris[0])
                     else {
                         items.value = uris

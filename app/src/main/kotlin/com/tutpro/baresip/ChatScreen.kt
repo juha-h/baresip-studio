@@ -582,19 +582,24 @@ private fun NewMessage(
                     var msgUri = ""
                     addMessage(msg)
                     if (ua.account.isMobile) {
-                        val destination = Utils.uriUserPart(peerUri)
-                        if (Utils.sendSms(ctx, destination, msgText)) {
-                            msg.direction = MESSAGE_UP
-                            newMessage.value = TextFieldValue("")
-                            viewModel.updateAorPeerMessage(aor, peerUri, "")
-                            keyboardController?.hide()
+                        if (Utils.isAirplaneModeOn(ctx)) {
+                            dialogMessage.value = ctx.getString(R.string.no_airplane_mode)
+                            showDialog.value = true
                         } else {
-                            Toast.makeText(
-                                ctx, "${ctx.getString(R.string.message_failed)}!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            msg.direction = MESSAGE_UP_FAIL
-                            msg.responseReason = ctx.getString(R.string.message_failed)
+                            val destination = Utils.uriUserPart(peerUri)
+                            if (Utils.sendSms(ctx, destination, msgText)) {
+                                msg.direction = MESSAGE_UP
+                                newMessage.value = TextFieldValue("")
+                                viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                keyboardController?.hide()
+                            } else {
+                                Toast.makeText(
+                                    ctx, "${ctx.getString(R.string.message_failed)}!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                msg.direction = MESSAGE_UP_FAIL
+                                msg.responseReason = ctx.getString(R.string.message_failed)
+                            }
                         }
                     } else {
                         if (Utils.isTelUri(peerUri))

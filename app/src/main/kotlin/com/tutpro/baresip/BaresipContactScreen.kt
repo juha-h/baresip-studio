@@ -618,7 +618,7 @@ private fun checkOnClick(
         newUris.add(u)
     }
 
-    if (newUris.isEmpty()) {
+    if (newUris.isEmpty() && currentState.email.trim().isEmpty()) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = ctx.getString(R.string.sip_or_tel_uri)
         showAlert.value = true
