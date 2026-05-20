@@ -1,12 +1,12 @@
-这是一款基于 <a href="https://github.com/baresip/baresip">baresip</a> 的适用于 Android 的 SIP 和移动通话用户代理应用程序。
+这是一款基于 <a href="https://github.com/baresip/baresip">baresip</a> 的适用于 Android 的 SIP 和移动通话及消息传递用户代理应用程序。
 
-目前，baresip+ 支持基于 SIP 的语音通话、移动语音通话、基于 SIP 的语音电话会议和文本消息、语音信箱消息等待指示以及盲转和协商转接。
+目前，baresip 支持基于 SIP 和移动的语音通话和消息，此外，在使用 SIP 时，还支持语音电话会议、语音信箱消息等待指示以及盲转和协商转接。尚不支持彩信。
 
 在 SIP 通话中，音频可以使用 Opus、AMR、Codec2、G.729、G.722、G.722.1 或 PCMU/PCMA 编解码器进行编码。通过 TLS 或 WSS SIP 信令传输以及 ZRTP 或（DTLS）SRTP 媒体封装实现安全保障。通过 TLS 或 WSS 信令传输以及 ZRTP 或（DTLS）SRTP 媒体封装实现安全保障。
 
-开发 baresip 的初衷是为 Android 提供一款安全、开源的基于 SIP 的 VoIP 用户代理，且不依赖任何专有的第三方推送通知服务。添加移动通话功能是为了避免需要安装两个语音通话应用。
+开发 baresip 的初衷是为 Android 提供一款安全、开源的基于 SIP 的 VoIP 用户代理，且不依赖任何专有的第三方推送通知服务。添加移动通话及消息传递功能是为了减少应用冗余。
 
-此应用程序可安装在运行 Android 9 或更高版本的 Android 设备上。移动通话功能需要 Android 10 或更高版本。
+此应用程序可安装在运行 Android 9 或更高版本的 Android 设备上。移动通话及消息传递功能需要 Android 10 或更高版本。
 
 如果您需要视频通话功能，可以安装其姊妹应用 baresip+ 来代替此应用。
 
