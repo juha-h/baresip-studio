@@ -1,0 +1,10 @@
+- Added capability to Mobile account to send and receive SMS messages
+- Added possibility to send email to contact, call peer, or chat peer
+- Merged Baresip and Android Contact screens to new Contact screen
+- Added support for multiple URIs in baresip contact
+- Added possibility to import contacts from vcf file
+- Mobile account's status is now white if device is in airplane mode
+- Alert if Mobile account call or SMS is attempted while in airplane mode
+- Alert if contact does not have suitable URI for call or message
+- Fixed speakerphone toggling during mobile calls
+- New translations (Chinese, Finnish, Indonesian, and Czech)
