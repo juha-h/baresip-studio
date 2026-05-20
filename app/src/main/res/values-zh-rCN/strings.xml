@@ -450,4 +450,8 @@
     <string name="contact_no_sip_or_tel_uri">联系人“%1$s”没有 SIP 或 TEL URI</string>
     <string name="contact_no_tel_uri">联系人“%1$s”没有 TEL URI</string>
     <string name="airplane_mode">飞行模式已开启。请将其关闭以使用移动账号。</string>
+    <string name="contacts_delete_question">是否要删除所有联系人？</string>
+    <string name="export_contacts">导出</string>
+    <string name="contact_export_success">联系人已成功导出</string>
+    <string name="contact_export_failure">无法导出联系人</string>
 </resources>
