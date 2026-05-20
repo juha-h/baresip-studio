@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -570,7 +570,9 @@ private fun ContactsContent(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(filteredContacts, key = { it.first.id() }) { (contact, annotatedName) ->
+        itemsIndexed(
+            filteredContacts, key = { index, (contact, _) -> "${contact.id()}_$index" }
+        ) { _, (contact, annotatedName) ->
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
