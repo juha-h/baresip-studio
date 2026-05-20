@@ -222,11 +222,14 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         }
 
         override fun diverterUri(): String = ""
-
         override fun duration(): Int = 0
         override fun stats(stream: String): String = ""
         override fun state(): Int = 0
         override fun audioCodecs(): String = "PSTN"
+        override fun transfer(uri: String): Boolean = false
+        override fun executeTransfer(): Boolean = false
+        override fun notifySipfrag(code: Int, reason: String) {}
+        override fun replaces(): Boolean = false
     }
 
     companion object {
