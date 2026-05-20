@@ -267,6 +267,20 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         override fun stats(stream: String): String = ""
         override fun state(): Int = 0
         override fun audioCodecs(): String = "PSTN"
+
+        override fun hasVideo(): Boolean = false
+        override fun videoEnabled(): Boolean = false
+        override fun startVideoDisplay(): Int = 0
+        override fun stopVideoDisplay() {}
+        override fun setVideoSource(front: Boolean): Int = 0
+        override fun transfer(uri: String): Boolean = false
+        override fun executeTransfer(): Boolean = false
+        override fun notifySipfrag(code: Int, reason: String) {}
+        override fun videoCodecs(): String = ""
+        override fun replaces(): Boolean = false
+        override fun disableVideoStream(disable: Boolean) {}
+        override fun setVideoDirection(vdir: Int) {}
+        override fun setMediaDirection(adir: Int, vdir: Int) {}
     }
 
     companion object {

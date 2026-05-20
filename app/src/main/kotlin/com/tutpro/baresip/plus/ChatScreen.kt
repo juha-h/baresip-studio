@@ -243,29 +243,30 @@ private fun TopAppBar(
         },
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
-            IconButton(
-                onClick = {
-                    val ua = UserAgent.ofAor(account.aor)
-                    if (ua != null) {
-                        val intent = Intent(ctx, MainActivity::class.java)
-                        intent.putExtra("uap", ua.uap)
-                        intent.putExtra("peer", peerUri)
-                        handleIntent(ctx, viewModel, intent, "video call")
-                        navController.navigate("main") {
-                            popUpTo("main")
-                            launchSingleTop = true
+            if (!account.isMobile)
+                IconButton(
+                    onClick = {
+                        val ua = UserAgent.ofAor(account.aor)
+                        if (ua != null) {
+                            val intent = Intent(ctx, MainActivity::class.java)
+                            intent.putExtra("uap", ua.uap)
+                            intent.putExtra("peer", peerUri)
+                            handleIntent(ctx, viewModel, intent, "video call")
+                            navController.navigate("main") {
+                                popUpTo("main")
+                                launchSingleTop = true
+                            }
                         }
+                        else
+                            Log.w(TAG, "Video Call button onClick listener did not find UA for $aor")
                     }
-                    else
-                        Log.w(TAG, "Video Call button onClick listener did not find UA for $aor")
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Videocam,
+                        modifier = Modifier.size(36.dp),
+                        contentDescription = "Video Call",
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Videocam,
-                    modifier = Modifier.size(36.dp),
-                    contentDescription = "Video Call",
-                )
-            }
             IconButton(
                 onClick = {
                     val ua = UserAgent.ofAor(account.aor)
