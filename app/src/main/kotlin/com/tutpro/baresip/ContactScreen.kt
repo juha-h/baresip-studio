@@ -682,7 +682,7 @@ private fun UrisSection(
                     val ua = UserAgent.ofAor(selectedAor)
 
                     // Chat Button
-                    if (ua != null)
+                    if (ua != null && (!ua.account.isMobile || uri.startsWith("tel:")))
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
@@ -714,7 +714,7 @@ private fun UrisSection(
                         }
 
                     // Call Button
-                    if (ua != null)
+                    if (ua != null && (!ua.account.isMobile || uri.startsWith("tel:")))
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
