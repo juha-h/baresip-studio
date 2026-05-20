@@ -475,10 +475,14 @@
     <string name="send_message">Send Message</string>
     <string name="send_email">Send Email</string>
     <string name="contact_delete_question">Do you want to delete contact \'%1$s\'\?</string>
+    <string name="contacts_delete_question">Do you want to delete all contacts?</string>
     <string name="search">Search</string>
     <string name="import_contacts">Import</string>
+    <string name="export_contacts">Export</string>
     <string name="contact_import_success">Contacts imported successfully</string>
     <string name="contact_import_failure">Failed to import contacts</string>
+    <string name="contact_export_success">Contacts exported successfully</string>
+    <string name="contact_export_failure">Failed to export contacts</string>
     <!-- Generic -->
     <string name="alert">Alert</string>
     <string name="info">Info</string>
