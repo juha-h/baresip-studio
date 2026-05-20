@@ -231,7 +231,7 @@ sealed class Contact {
             val contacts = String(content)
             var contactNo = 0
             val baseId = System.currentTimeMillis()
-            BaresipService.baresipContacts.value = mutableListOf()
+            val newBaresipContacts = mutableListOf<BaresipContact>()
             contacts.lines().forEach {
                 val parts = it.split("\"")
                 if (parts.size == 3) {
@@ -266,25 +266,29 @@ sealed class Contact {
                             Log.e(TAG, "Could not read avatar image from file $id.png: ${e.message}")
                         }
                     }
-                    BaresipService.baresipContacts.value += contact
+                    newBaresipContacts.add(contact)
                 }
             }
+            BaresipService.baresipContacts.value = newBaresipContacts.toList()
             return true
         }
 
         fun contactsUpdate() {
-            BaresipService.contacts = mutableListOf()
+            val newContacts = mutableListOf<Contact>()
             if (BaresipService.contactsMode != "android")
                 for (c in BaresipService.baresipContacts.value)
-                    BaresipService.contacts.add(c.copy())
+                    newContacts.add(c.copy())
             if (BaresipService.contactsMode != "baresip")
                 for (c in BaresipService.androidContacts.value)
-                    if (!nameExists(c.name, BaresipService.contacts, true))
-                        BaresipService.contacts.add(c.copy())
-            BaresipService.contacts.sortBy{ when (it) {
-                is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
-                is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
-            }}
+                    if (!nameExists(c.name, newContacts, true))
+                        newContacts.add(c.copy())
+            newContacts.sortBy {
+                when (it) {
+                    is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
+                    is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
+                }
+            }
+            BaresipService.contacts = newContacts
             generateContactNames()
         }
 
