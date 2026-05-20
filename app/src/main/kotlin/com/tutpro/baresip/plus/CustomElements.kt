@@ -270,6 +270,8 @@ object CustomElements {
         onSecondClicked: () -> Unit = {},
         thirdButtonText: String = "",
         onThirdClicked: () -> Unit = {},
+        fourthButtonText: String = "",
+        onFourthClicked: () -> Unit = {},
         lastButtonText: String = "",
         onLastClicked: () -> Unit = {}
     ) {
@@ -305,7 +307,8 @@ object CustomElements {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             val buttons = listOf(
-                                firstButtonText, secondButtonText, thirdButtonText, lastButtonText
+                                firstButtonText, secondButtonText, thirdButtonText,
+                                fourthButtonText, lastButtonText
                             )
                             val buttonCount = buttons.count { it.isNotEmpty() }
 
@@ -346,6 +349,17 @@ object CustomElements {
                                             }) {
                                                 Text(
                                                     text = thirdButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                )
+                                            }
+                                        if (fourthButtonText.isNotEmpty())
+                                            TextButton(onClick = {
+                                                onFourthClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = fourthButtonText.uppercase(),
                                                     fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.primary,
                                                 )
@@ -397,6 +411,17 @@ object CustomElements {
                                             }) {
                                                 Text(
                                                     text = thirdButtonText.uppercase(),
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        if (fourthButtonText.isNotEmpty())
+                                            TextButton(onClick = {
+                                                onFourthClicked()
+                                                showDialog.value = false
+                                            }) {
+                                                Text(
+                                                    text = fourthButtonText.uppercase(),
                                                     fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.primary
                                                 )

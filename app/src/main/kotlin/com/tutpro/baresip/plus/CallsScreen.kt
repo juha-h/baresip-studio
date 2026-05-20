@@ -169,6 +169,7 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
         firstButtonText = stringResource(R.string.cancel),
         secondButtonText = "",
         thirdButtonText = "",
+        fourthButtonText = "",
         lastButtonText = stringResource(R.string.delete),
         onLastClicked = lastAction.value,
     )
@@ -286,6 +287,8 @@ private fun Calls(
     val secondAction = remember { mutableStateOf({}) }
     val thirdButtonText = remember { mutableStateOf("") }
     val thirdAction = remember { mutableStateOf({}) }
+    val fourthButtonText = remember { mutableStateOf("") }
+    val fourthAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
@@ -298,6 +301,8 @@ private fun Calls(
         onSecondClicked = secondAction.value,
         thirdButtonText = thirdButtonText.value,
         onThirdClicked = thirdAction.value,
+        fourthButtonText = fourthButtonText.value,
+        onFourthClicked = fourthAction.value,
         lastButtonText = lastButtonText.value,
         onLastClicked = lastAction.value,
     )
@@ -373,16 +378,18 @@ private fun Calls(
                                         }
                                     }
                                 }
-                                thirdButtonText.value = ctx.getString(R.string.video_call)
-                                thirdAction.value = {
-                                    handleIntent(ctx, viewModel, intent, "video call")
-                                    navController.navigate("main") {
-                                        popUpTo("main")
-                                        launchSingleTop = true
+                                if (!ua.account.isMobile) {
+                                    thirdButtonText.value = ctx.getString(R.string.video_call)
+                                    thirdAction.value = {
+                                        handleIntent(ctx, viewModel, intent, "video call")
+                                        navController.navigate("main") {
+                                            popUpTo("main")
+                                            launchSingleTop = true
                                         }
+                                    }
                                 }
-                                thirdButtonText.value = ctx.getString(R.string.send_message)
-                                thirdAction.value = {
+                                fourthButtonText.value = ctx.getString(R.string.send_message)
+                                fourthAction.value = {
                                     if (ua.account.isMobile) {
                                         if (Utils.isAirplaneModeOn(ctx)) {
                                             alertTitle.value = ctx.getString(R.string.notice)
@@ -434,6 +441,7 @@ private fun Calls(
                                     )
                                     secondButtonText.value = ""
                                     thirdButtonText.value = ""
+                                    fourthButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
@@ -450,6 +458,7 @@ private fun Calls(
                                         navController.navigate("contact/$uri/new")
                                     }
                                     thirdButtonText.value = ""
+                                    fourthButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
