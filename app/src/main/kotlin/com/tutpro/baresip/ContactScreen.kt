@@ -685,7 +685,7 @@ private fun UrisSection(
                     if (ua != null)
                         IconButton(
                             onClick = {
-git                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
                                     alertTitle.value = ctx.getString(R.string.notice)
                                     alertMessage.value = ctx.getString(R.string.airplane_mode)
                                     showAlert.value = true
