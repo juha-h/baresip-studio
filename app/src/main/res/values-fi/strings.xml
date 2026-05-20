@@ -508,6 +508,8 @@
     <string name="import_contacts">Tuo</string>
     <string name="contact_import_success">Yhteystietojen tuonti onnistui</string>
     <string name="contact_import_failure">Yhteystietojen tuonti epäonnistui</string>
+    <string name="contact_export_success">Yhteistietojen vienti onnistui</string>
+    <string name="contact_export_failure">Yhteistietojen vienti epäonnistui</string>
 
     <!-- Generic -->
     <string name="alert">Varoitus</string>

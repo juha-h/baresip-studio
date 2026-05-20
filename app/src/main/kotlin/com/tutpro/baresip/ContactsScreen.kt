@@ -29,14 +29,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -112,6 +111,43 @@ private fun ContactsScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
     val both = stringResource(R.string.both)
     val import = stringResource(R.string.import_contacts)
+    val export = stringResource(R.string.export_contacts)
+
+    val vcfExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/vcard")
+    ) { uri: android.net.Uri? ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    val writer = outputStream.bufferedWriter()
+                    for (contact in BaresipService.baresipContacts.value) {
+                        writer.write("BEGIN:VCARD\n")
+                        writer.write("VERSION:3.0\n")
+                        writer.write("FN:${contact.name}\n")
+                        val nameParts = contact.name.split(" ", limit = 2)
+                        if (nameParts.size == 2)
+                            writer.write("N:${nameParts[1]};${nameParts[0]};;;\n")
+                        else
+                            writer.write("N:;${contact.name};;;\n")
+                        if (contact.email.isNotEmpty())
+                            writer.write("EMAIL:${contact.email}\n")
+                        for (u in contact.uris) {
+                            if (u.startsWith("tel:"))
+                                writer.write("TEL:${u.substring(4)}\n")
+                            else if (u.startsWith("sip:"))
+                                writer.write("X-SIP:${u.substring(4)}\n")
+                        }
+                        writer.write("END:VCARD\n")
+                    }
+                    writer.flush()
+                }
+                Toast.makeText(ctx, R.string.contact_export_success, Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to export VCF: ${e.message}")
+                Toast.makeText(ctx, R.string.contact_export_failure, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     val vcfImportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -357,11 +393,15 @@ private fun ContactsScreen(navController: NavController) {
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames + import,
+                            items = contactNames + import + export,
                             onItemClick = { name ->
                                 expanded = false
                                 if (name == import) {
                                     vcfImportLauncher.launch(arrayOf("text/vcard", "text/x-vcard"))
+                                    return@DropdownMenu
+                                }
+                                if (name == export) {
+                                    vcfExportLauncher.launch("baresip_contacts.vcf")
                                     return@DropdownMenu
                                 }
                                 val mode = contactValues[contactNames.indexOf(name)]
@@ -571,7 +611,9 @@ private fun ContactsContent(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(filteredContacts, key = { it.first.id() }) { (contact, annotatedName) ->
+        itemsIndexed(
+            filteredContacts, key = { index, (contact, _) -> "${contact.id()}_$index" }
+        ) { _, (contact, annotatedName) ->
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
