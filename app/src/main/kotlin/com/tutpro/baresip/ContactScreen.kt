@@ -685,13 +685,15 @@ private fun UrisSection(
                     if (ua != null)
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
-                                    handleDialog(ctx, ctx.getString(R.string.notice),
-                                        ctx.getString(R.string.airplane_mode))
-                                else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx))
-                                    handleDialog(ctx, ctx.getString(R.string.notice),
-                                        ctx.getString(R.string.enable_default_messaging))
-                                else {
+git                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                    alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.airplane_mode)
+                                    showAlert.value = true
+                                } else if (ua.account.isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                                    alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                                    showAlert.value = true
+                                } else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
@@ -715,10 +717,11 @@ private fun UrisSection(
                     if (ua != null)
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx))
-                                    handleDialog(ctx, ctx.getString(R.string.notice),
-                                        ctx.getString(R.string.airplane_mode))
-                                else {
+                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                    alertTitle.value = ctx.getString(R.string.notice)
+                                    alertMessage.value = ctx.getString(R.string.airplane_mode)
+                                    showAlert.value = true
+                                } else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
