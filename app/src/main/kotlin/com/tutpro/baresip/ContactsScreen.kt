@@ -88,6 +88,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 const val avatarSize: Int = 96
 
@@ -447,7 +450,12 @@ private fun ContactsScreen(navController: NavController) {
                                     return@DropdownMenu
                                 }
                                 if (name == export) {
-                                    vcfExportLauncher.launch("baresip_contacts.vcf")
+                                    val fileName = "contacts_" +
+                                            SimpleDateFormat(
+                                                "yyyy_MM_dd_HH_mm",
+                                                Locale.getDefault()
+                                            ).format(Date()) + ".vcf"
+                                    vcfExportLauncher.launch(fileName)
                                     return@DropdownMenu
                                 }
                                 if (name == delete) {
