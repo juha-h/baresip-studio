@@ -2428,8 +2428,8 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                 val parts = stats.split(",")
                                 val codecs = call!!.videoCodecs().split(',')
                                 val duration = call!!.duration()
-                                val txCodec = if (codecs.isNotEmpty()) codecs[0] else ""
-                                val rxCodec = if (codecs.size > 1) codecs[1] else ""
+                                val txCodec = codecs[0]
+                                val rxCodec = codecs[1]
                                 alertMessage.value = "${String.format(ctx.getString(R.string.duration), duration)}\n" +
                                         "${ctx.getString(R.string.codecs)}: $txCodec/$rxCodec\n" +
                                         "${String.format(ctx.getString(R.string.rate), parts[0])}\n" +

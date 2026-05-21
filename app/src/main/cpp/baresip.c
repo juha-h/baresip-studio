@@ -1577,10 +1577,12 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1codecs(
     int len = -1;
     if (tx && rx)
         len = re_snprintf(start, left, "%s,%s", tx->name, rx->name);
-    if (len == -1) {
-        LOGE("failed to get video codecs of call %ld\n", (long)call);
-        codec_buf[0] = '\0';
-    }
+    else if (tx)
+        len = re_snprintf(start, left, "%s,%s", tx->name, "");
+    else if (rx)
+        len = re_snprintf(start, left, "%s,%s", "", rx->name);
+    else
+        len = re_snprintf(start, left, "%s,%s", "", "");
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
