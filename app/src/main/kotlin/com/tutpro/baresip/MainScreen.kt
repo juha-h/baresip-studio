@@ -1956,7 +1956,8 @@ private fun CallRow(
                             alertTitle.value = ctx.getString(R.string.call_info)
                             alertMessage.value =
                                 "${String.format(ctx.getString(R.string.duration), duration)}\n" +
-                                        "${ctx.getString(R.string.codecs)}: ${txCodec[0]} ch ${txCodec[2]}/${rxCodec[0]} ch ${rxCodec[2]}\n" +
+                                        "${ctx.getString(R.string.codecs)}: tx ${txCodec[0]} ${txCodec[1]}Hz ${txCodec[2]}ch\n " +
+                                        "    rx ${rxCodec[0]} ${rxCodec[1]}Hz ${rxCodec[2]}ch\n" +
                                         "${String.format(ctx.getString(R.string.rate), parts[0])}\n" +
                                         "${String.format(ctx.getString(R.string.average_rate), parts[1])}\n" +
                                         "${ctx.getString(R.string.packets)}: ${parts[2]}\n" +
