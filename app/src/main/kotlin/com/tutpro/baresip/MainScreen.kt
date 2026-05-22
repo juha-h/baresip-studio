@@ -1227,6 +1227,7 @@ private fun CallUriRow(
                     if (isDialer) {
                         if (it != dialerState.callUri.value) {
                             dialerState.callUri.value = it
+                            dialerState.redialUri = ""
                             if (it == "") {
                                 dialerState.showCallButton.value = true
                                 dialerState.showCallConferenceButton.value = true
@@ -2042,6 +2043,7 @@ private fun spinToAor(viewModel: ViewModel, aor: String, call: Call? = null) {
     }
 }
 
+// In MainScreen.kt, update callClick function
 private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?) {
     if (viewModel.selectedAor.value != "" && dialerState != null) {
         val uriText = dialerState.callUri.value.trim()
@@ -2049,43 +2051,37 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
             if (Utils.checkPermissions(ctx, arrayOf(RECORD_AUDIO))) {
                 val aor = viewModel.selectedAor.value
                 val ua = UserAgent.ofAor(aor)
-                val uris = Contact.contactUris(uriText, ua?.account?.isMobile ?: false)
-                if (uris.isEmpty()) {
-                    if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
-                        alertTitle.value = ctx.getString(R.string.notice)
-                        alertMessage.value = if (ua?.account?.isMobile == true)
-                            String.format(ctx.getString(R.string.contact_no_tel_uri), uriText)
-                        else
-                            String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), uriText)
-                        showAlert.value = true
-                    }
-		    else
-                        makeCall(
-                            ctx,
-                            viewModel,
-                            uriText,
-                            dialerState
-                        )
-                }
-                else if (uris.size == 1)
-                    makeCall(
-                        ctx,
-                        viewModel,
-                        uris[0],
-                        dialerState
-                    )
+                val uriToCall = if (dialerState.redialUri != "" &&
+                        uriText == Utils.friendlyUri(ctx, dialerState.redialUri, ua!!.account))
+                    dialerState.redialUri
                 else {
-                    selectItems.value = uris
-                    selectItemAction.value = { index ->
-                        makeCall(
-                            ctx,
-                            viewModel,
-                            uris[index],
-                            dialerState
-                        )
+                    val uris = Contact.contactUris(uriText, ua?.account?.isMobile ?: false)
+                    if (uris.isEmpty()) {
+                        if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
+                            alertTitle.value = ctx.getString(R.string.notice)
+                            alertMessage.value = if (ua?.account?.isMobile == true)
+                                String.format(ctx.getString(R.string.contact_no_tel_uri), uriText)
+                            else
+                                String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), uriText)
+                            showAlert.value = true
+                            return
+                        }
+                        uriText
                     }
-                    showSelectItemDialog.value = true
+                    else if (uris.size == 1)
+                        uris[0]
+                    else {
+                        selectItems.value = uris
+                        selectItemAction.value = { index ->
+                            makeCall(ctx, viewModel, uris[index], dialerState)
+                        }
+                        showSelectItemDialog.value = true
+                        return
+                    }
                 }
+
+                dialerState.redialUri = ""
+                makeCall(ctx, viewModel, uriToCall, dialerState)
             }
             else
                 Toast.makeText(ctx, R.string.no_calls, Toast.LENGTH_SHORT).show()
@@ -2093,8 +2089,10 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
         else {
             val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
             val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
-            if (latestPeerUri != null)
+            if (latestPeerUri != null) {
+                dialerState.redialUri = latestPeerUri
                 dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
+            }
         }
     }
 }
