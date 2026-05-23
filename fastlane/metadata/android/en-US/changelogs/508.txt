@@ -1,0 +1,4 @@
+- Fixed crash that occurred in call info when getting of audio codecs failed
+- Improved showing of call info
+- When re-dialing, don't ask again to select contact URI
+- New translations (Chinese and Spanish)
