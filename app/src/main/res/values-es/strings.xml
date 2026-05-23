@@ -2,7 +2,53 @@
 <resources>
     <!-- About Activity -->
     <string name="about_title">Acerca de Baresip</string>
-    <string name="about_text"><![CDATA["\n        <h1> Agente de Usuario SIP basado en la biblioteca <a href=\"https://github.com/baresip/baresip\">baresip</a> </h1>\n        <br>\n        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>\n        <p> Versión %1$s </p>\n         <br>\n        <h2> Consejos de uso </h2>\n        <ul>\n            <li> Compruebe que los valores predeterminados en la configuración de baresip se ajusten a sus necesidades\n                (toque los títulos de los elementos para obtener ayuda). </li>\n            <li> Luego, en Cuentas, crea una o más cuentas (nuevamente toca los títulos de los elementos para obtener ayuda). </li>\n            <li> El estado de registro de una cuenta se muestra con un punto de color: verde (registro logrado),\n                amarillo (el registro está en proceso), rojo (el registro falló), blanco (el registro está en progreso)\n                no ha sido activado). </li>\n            <li> Al tocar el punto de estado se accede directamente a la configuración de la cuenta. </li>\n            <li> Mantén pulsado un icono de la barra de baresip para ver información sobre dicho icono.</li>\n            <li> El gesto de deslizar hacia abajo provoca el registro nuevo de la cuenta mostrada actualmente. </li>\n            <li> Al mantener pulsada la cuenta que se muestra actualmente, se habilita o deshabilita el registro de la cuenta. </li>\n            <li> El gesto de deslizar hacia la izquierda o hacia la derecha alterna entre las cuentas. </li>\n            <li> Se puede volver a seleccionar la persona con la que se llamó anteriormente tocando el icono de llamada cuando el campo Destinatario esté vacío.</li>\n            <li> Las parejas de llamadas y mensajes se pueden agregar a los contactos mediante toques prolongados. </li>\n            <li> Los toques prolongados también se pueden utilizar para eliminar llamadas, chats, mensajes y contactos. </li>\n            <li> Se puede utilizar el toque o toque prolongado del icono de contacto para instalar o desinstalar la imagen del avatar. </li>\n            <li> Mantener pulsado un códice de audio permite activarlo o desactivarlo.</li>\n            <li> Consulte <a href=\"https://github.com/juha-h/baresip-studio/wiki\"> Wiki </a> para obtener más información.</li>\n        </ul>\n        <h2> Directiva de privacidad </h2>\n            <p>La directiva de privacidad está disponible <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">aquí </a> .</p>\n        <br>\n        <h2> Código Fuente</h2>\n            <p>El código fuente está disponible en <a href=\"https://github.com/juha-h/baresip-studio\"> GitHub </a> ,\n            donde también se pueden reportar problemas.</p>\n          <br>\n        <h2>Traducciones de Idioma</h2>\n            <p>Las traducciones de idioma son gestionadas por baresip en el proyecto\n                <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>.</p>\n        <br>\n        <h2> Licencias </h2>\n        <ul>\n            <li> <b> Cláusula BSD-3 </b> excepto lo siguiente: </li>\n            <li> <b> Codecs AMR y seguridad TLS de Apache 2.0 </b>\n            <li> <b> AGPLv4 </b> Cifrado de medios ZRTP </li>\n            <li> <b> GNU LGPL 2.1</b> codec Codec2</li>\n            <li> <b> Libre</b> G.722 codec</li>\n            <li> <b> GNU GPLv3 </b> Codec G.729 </li>\n        </ul>\n        "]]></string>
+    <string name="about_text"><![CDATA[
+        <h1> Agente de Usuario SIP basado en la biblioteca <a href="https://github.com/baresip/baresip">baresip</a> </h1>
+        <br>
+        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>
+        <p> Versión %1$s </p>
+         <br>
+        <h2> Consejos de uso </h2>
+        <ul>
+            <li> Compruebe que los valores predeterminados en la configuración de baresip se ajusten a sus necesidades
+                (toque los títulos de los elementos para obtener ayuda). </li>
+            <li> Luego, en Cuentas, crea una o más cuentas (nuevamente toca los títulos de los elementos para obtener ayuda). </li>
+            <li> El estado de registro de una cuenta se muestra con un punto de color: verde (registro logrado),
+                amarillo (el registro está en proceso), rojo (el registro falló), blanco (el registro está en progreso)
+                no ha sido activado). </li>
+            <li> Al tocar el punto de estado se accede directamente a la configuración de la cuenta. </li>
+            <li> Mantén pulsado un icono de la barra de baresip para ver información sobre dicho icono.</li>
+            <li> El gesto de deslizar hacia abajo provoca el registro nuevo de la cuenta mostrada actualmente. </li>
+            <li> Al mantener pulsada la cuenta que se muestra actualmente, se habilita o deshabilita el registro de la cuenta. </li>
+            <li> El gesto de deslizar hacia la izquierda o hacia la derecha alterna entre las cuentas. </li>
+            <li> Se puede volver a seleccionar la persona con la que se llamó anteriormente tocando el icono de llamada cuando el campo Destinatario esté vacío.</li>
+            <li> Las parejas de llamadas y mensajes se pueden agregar a los contactos mediante toques prolongados. </li>
+            <li> Los toques prolongados también se pueden utilizar para eliminar llamadas, chats, mensajes y contactos. </li>
+            <li> Se puede utilizar el toque o toque prolongado del icono de contacto para instalar o desinstalar la imagen del avatar.</li>
+            <li> Mantener pulsado un códice de audio permite activarlo o desactivarlo.</li>
+            <li> Consulte el <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obtener más información.</li>
+        </ul>
+        <h2> Directiva de privacidad </h2>
+            <p>La directiva de privacidad está disponible <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">aquí </a> .</p>
+        <br>
+        <h2> Código Fuente</h2>
+            <p>El código fuente está disponible en <a href="https://github.com/juha-h/baresip-studio"> GitHub </a> ,
+            donde también se pueden reportar problemas.</p>
+          <br>
+        <h2>Traducciones de Idioma</h2>
+            <p>Las traducciones de idioma son gestionadas por baresip en el proyecto
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>.</p>
+        <br>
+        <h2> Licencias </h2>
+        <ul>
+            <li> <b> Cláusula BSD-3 </b> excepto lo siguiente: </li>
+            <li> <b> Codecs AMR y seguridad TLS de Apache 2.0 </b>
+            <li> <b> AGPLv4 </b> Cifrado de medios ZRTP </li>
+            <li> <b> GNU LGPL 2.1</b> codec Codec2</li>
+            <li> <b> Libre</b> G.722 codec</li>
+            <li> <b> GNU GPLv3 </b> Codec G.729 </li>
+        </ul>
+       ]]></string>
     <!-- Account Activity -->
     <string name="account">Cuenta</string>
     <string name="display_name">Nombre para mostrar</string>
@@ -282,7 +328,7 @@
     <string name="packets">Paquetes</string>
     <string name="audio_permissions">baresip necesita el permiso «Micrófono» para las llamadas de voz, el permiso «Dispositivos cercanos» para la detección de micrófonos/altavoces Bluetooth, el permiso «Notificaciones» para publicar notificaciones, y permisos de «Almacén» en Android 9 para operaciones de Respaldo/Restauración.</string>
     <string name="missed_calls">Llamadas perdidas</string>
-    <string name="country_code_help">Código de país E.164 de esta cuenta. Si la parte de usuario From URI de la llamada entrante o del mensaje contiene un número de teléfono que no empieza por el signo \"+\" y si falla la búsqueda de contacto, se antepone al número este prefijo de país y se vuelve a intentar la búsqueda de contacto. Si el número de teléfono comienza con un solo dígito \"0\", el dígito \"0\" se elimina antes de anteponer el prefijo al número.</string>
+    <string name="country_code_help">Código de país E.164 de esta cuenta. Si la parte de emparejado del usuario URI de la llamada o del mensaje contiene un número de teléfono que no empieza por el signo \"+\" y si falla la búsqueda de contacto, se antepone al número este prefijo de país y se vuelve a intentar la búsqueda de contacto. Si el número comienza con un único dígito \'0\', es eliminado antes de anteponer el prefijo al número.</string>
     <string name="time">Tiempo</string>
     <string name="diverted_by_dots">Desviada por …</string>
     <string name="no_notifications">No podrá utilizar esta aplicación sin el permiso de \"Notificaciones\".</string>
@@ -300,8 +346,8 @@
     <string name="invalid_audio_delay">Retardo de audio no válido \'%1$s\'. Los valores válidos van de 100 a 3000.</string>
     <string name="call_auto_rejected">Llamada rechazada automáticamente de %1$s</string>
     <string name="default_phone_app">Aplicación de teléfono predeterminada</string>
-    <string name="dialer_role_not_available">La función de teléfono no está disponible</string>
-    <string name="default_phone_app_help">Si está marcada, baresip es la aplicación de teléfono predeterminada. No verifiques si tu dispositivo puede necesitar manejar también llamadas o mensajes que no sean SIP.</string>
+    <string name="dialer_role_not_available">No está disponible el rol de app de teléfono por defecto</string>
+    <string name="default_phone_app_help">Si está marcada, baresip es la aplicación de teléfono predeterminada.</string>
     <string name="redirect_notice">Redirección automática a \'%1$s\'\\</string>
     <string name="redirect_request">Solicitud de redirección</string>
     <string name="redirect_request_query">¿Aceptas la redirección de llamadas a \'%1$s\'\?</string>
@@ -383,4 +429,24 @@
     <string name="custom_parameters">Parámetros personales</string>
     <string name="custom_parameters_help">Listado separador por punto y coma de parámetros de cuenta personal</string>
     <string name="diverted_by">desviado por</string>
+    <string name="not_available">No disponible</string>
+    <string name="default_messaging_app">App de Mensajería por Defecto</string>
+    <string name="default_messaging_app_help">Si se marcó, baresip es la app de mensajería por defecto para SMS/MMS.</string>
+    <string name="messaging_role_not_available">No está disponible el rol de la app de mensajería por defecto</string>
+    <string name="enable_default_messaging">Habilite App de Mensajería Predeterminada en Ajustes</string>
+    <string name="email">Correo-e</string>
+    <string name="contact_no_sip_or_tel_uri">El contacto \'%1$s\' no tiene URI de SIP o TEL</string>
+    <string name="contact_no_tel_uri">El contacto \'%1$s\' no tiene URI TEL</string>
+    <string name="contact_email_action_question">¿Desea llamar, enviar mensaje o correo a \'%1$s\'?</string>
+    <string name="send_email">Enviar Correo-e</string>
+    <string name="contacts_delete_question">¿Desea eliminar todos los contactos?</string>
+    <string name="import_contacts">Importar</string>
+    <string name="export_contacts">Exportar</string>
+    <string name="contact_import_success">Contactos importados correctamente</string>
+    <string name="contact_import_failure">Hubo un error al importar contactos</string>
+    <string name="contact_export_success">Contactos exportados correctamente</string>
+    <string name="contact_export_failure">Hubo un error al exportar contactos</string>
+    <string name="no_telephone_number">La llamada móvil solo puede hacerse a número de teléfono</string>
+    <string name="airplane_mode">Modo avión está ACTIVO. Apáguelo para utilizar cuenta de móvil.</string>
+    <string name="voicemain_tel_uri_help">URI TEL para comprobar mensajes de correo por voz.</string>
 </resources>
