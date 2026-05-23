@@ -2043,7 +2043,6 @@ private fun spinToAor(viewModel: ViewModel, aor: String, call: Call? = null) {
     }
 }
 
-// In MainScreen.kt, update callClick function
 private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState?) {
     if (viewModel.selectedAor.value != "" && dialerState != null) {
         val uriText = dialerState.callUri.value.trim()
