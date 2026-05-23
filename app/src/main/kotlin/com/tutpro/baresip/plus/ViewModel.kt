@@ -42,6 +42,7 @@ class ViewModel: ViewModel() {
         val callUri: MutableState<String> = mutableStateOf(""),
         val callUriEnabled: MutableState<Boolean> = mutableStateOf(true),
         val callUriLabel: MutableState<String> = mutableStateOf(""),
+        var redialUri: String = "",
         val showSuggestions: MutableState<Boolean> = mutableStateOf(false),
         val showCallButton: MutableState<Boolean> = mutableStateOf(true),
         val showCallVideoButton: MutableState<Boolean> = mutableStateOf(true),
