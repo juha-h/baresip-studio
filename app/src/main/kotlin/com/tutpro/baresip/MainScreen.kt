@@ -552,44 +552,46 @@ private fun TopAppBar(
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
 
-            Spacer(modifier = Modifier.width(8.dp))
+            val selectedAor by viewModel.selectedAor.collectAsState()
+            val uas by BaresipService.uas
+            val isMobile = uas.find { it.account.aor == selectedAor }?.account?.isMobile ?: false
 
-            val callRecordingTitle = stringResource(R.string.call_recording_title)
-            val callRecordingMessage = stringResource(R.string.call_recording_tip)
-            Box(contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .combinedClickable(
-                        onClick = {
-                            if (Call.call("connected") == null) {
-                                BaresipService.isRecOn = !BaresipService.isRecOn
-                                if (BaresipService.isRecOn) {
-                                    Api.module_load("sndfile")
-                                } else {
-                                    Api.module_unload("sndfile")
+            if (!isMobile) {
+                Spacer(modifier = Modifier.width(8.dp))
+
+                val callRecordingTitle = stringResource(R.string.call_recording_title)
+                val callRecordingMessage = stringResource(R.string.call_recording_tip)
+                Box(contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .combinedClickable(
+                            onClick = {
+                                if (!Call.isAnyCallActive(ctx)) {
+                                    BaresipService.isRecOn = !BaresipService.isRecOn
+                                    Api.aufilt_enable("sndfile", BaresipService.isRecOn)
+                                    isRecOn = BaresipService.isRecOn
                                 }
-                                isRecOn = BaresipService.isRecOn
-                            } else {
-                                Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                                else
+                                    Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                            },
+                            onLongClick = {
+                                alertTitle.value = callRecordingTitle
+                                alertMessage.value = callRecordingMessage
+                                showAlert.value = true
                             }
-                        },
-                        onLongClick = {
-                            alertTitle.value = callRecordingTitle
-                            alertMessage.value = callRecordingMessage
-                            showAlert.value = true
-                        }
+                        )
+                ) {
+                    Icon(
+                        imageVector = if (isRecOn) recOnImage else recOffImage,
+                        contentDescription = null,
+                        tint = if (isRecOn)
+                            MaterialTheme.colorScheme.error
+                        else
+                            MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(40.dp)
                     )
-            ) {
-                Icon(
-                    imageVector = if (isRecOn) recOnImage else recOffImage,
-                    contentDescription = null,
-                    tint = if (isRecOn)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(40.dp)
-                )
+                }
             }
 
             Spacer(modifier = Modifier.width(22.dp))
@@ -1086,18 +1088,20 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             val ua = UserAgent.ofAor(selected)
                             if (ua != null) {
                                 val acc = ua.account
-                                if (Api.account_regint(acc.accp) > 0) {
-                                    Api.account_set_regint(acc.accp, 0)
-                                    Api.ua_unregister(ua.uap)
-                                } else {
-                                    Api.account_set_regint(
-                                        acc.accp,
-                                        acc.configuredRegInt
-                                    )
-                                    Api.ua_register(ua.uap)
+                                if (!acc.isMobile) {
+                                    if (Api.account_regint(acc.accp) > 0) {
+                                        Api.account_set_regint(acc.accp, 0)
+                                        Api.ua_unregister(ua.uap)
+                                    } else {
+                                        Api.account_set_regint(
+                                            acc.accp,
+                                            acc.configuredRegInt
+                                        )
+                                        Api.ua_register(ua.uap)
+                                    }
+                                    acc.regint = Api.account_regint(acc.accp)
+                                    Account.saveAccounts()
                                 }
-                                acc.regint = Api.account_regint(acc.accp)
-                                Account.saveAccounts()
                             }
                         }
                     )
@@ -1137,18 +1141,20 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             val ua = UserAgent.ofAor(selected)
                             if (ua != null) {
                                 val acc = ua.account
-                                if (Api.account_regint(acc.accp) > 0) {
-                                    Api.account_set_regint(acc.accp, 0)
-                                    Api.ua_unregister(ua.uap)
-                                } else {
-                                    Api.account_set_regint(
-                                        acc.accp,
-                                        acc.configuredRegInt
-                                    )
-                                    Api.ua_register(ua.uap)
+                                if (!acc.isMobile) {
+                                    if (Api.account_regint(acc.accp) > 0) {
+                                        Api.account_set_regint(acc.accp, 0)
+                                        Api.ua_unregister(ua.uap)
+                                    } else {
+                                        Api.account_set_regint(
+                                            acc.accp,
+                                            acc.configuredRegInt
+                                        )
+                                        Api.ua_register(ua.uap)
+                                    }
+                                    acc.regint = Api.account_regint(acc.accp)
+                                    Account.saveAccounts()
                                 }
-                                acc.regint = Api.account_regint(acc.accp)
-                                Account.saveAccounts()
                             }
                         }
                     )
@@ -2249,7 +2255,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
     if (viewModel.isUIRedundant(aor, callp, status, security)) return
 
     if (call == null) {
-        pullToRefreshEnabled.value = true
+        pullToRefreshEnabled.value = !ua.account.isMobile
         viewModel.dialerState.callUri.value = ua.account.resumeUri
         viewModel.dialerState.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
         Handler(Looper.getMainLooper()).postDelayed({
