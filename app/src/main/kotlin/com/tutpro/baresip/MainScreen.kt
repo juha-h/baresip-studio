@@ -567,13 +567,17 @@ private fun TopAppBar(
                         .clip(CircleShape)
                         .combinedClickable(
                             onClick = {
-                                if (!Call.isAnyCallActive(ctx)) {
+                                if (Call.call("connected") == null) {
                                     BaresipService.isRecOn = !BaresipService.isRecOn
-                                    Api.aufilt_enable("sndfile", BaresipService.isRecOn)
+                                    if (BaresipService.isRecOn) {
+                                        Api.module_load("sndfile")
+                                    } else {
+                                        Api.module_unload("sndfile")
+                                    }
                                     isRecOn = BaresipService.isRecOn
-                                }
-                                else
+                                } else {
                                     Toast.makeText(ctx, R.string.rec_in_call, Toast.LENGTH_SHORT).show()
+                                }
                             },
                             onLongClick = {
                                 alertTitle.value = callRecordingTitle
