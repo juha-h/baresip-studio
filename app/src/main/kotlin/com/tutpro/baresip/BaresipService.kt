@@ -54,6 +54,9 @@ import android.system.OsConstants
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.ServiceState
+import android.telephony.TelephonyCallback
+import android.telephony.TelephonyManager
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
@@ -98,6 +101,8 @@ class BaresipService: Service() {
     private lateinit var wm: WifiManager
     private lateinit var tm: TelecomManager
     private lateinit var btm: BluetoothManager
+    private lateinit var telephonyManager: TelephonyManager
+    private lateinit var telephonyCallback: TelephonyCallback
     private lateinit var vibrator: Vibrator
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
@@ -122,6 +127,7 @@ class BaresipService: Service() {
     private var hotSpotReceiverRegistered = false
     private var bluetoothReceiverRegistered = false
     private var airplaneModeReceiverRegistered = false
+    private var telephonyCallbackRegistered = false
     private var isNotificationInCall = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
@@ -295,7 +301,7 @@ class BaresipService: Service() {
                 if (intent.action == Intent.ACTION_AIRPLANE_MODE_CHANGED) {
                     val isAirplaneModeOn = intent.getBooleanExtra("state", false)
                     Log.d(TAG, "Airplane mode changed: $isAirplaneModeOn")
-                    updateMobileStatus(isAirplaneModeOn)
+                    updateMobileStatus()
                 }
             }
         }
@@ -363,6 +369,23 @@ class BaresipService: Service() {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        if (VERSION.SDK_INT >= 31) {
+            telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
+                override fun onServiceStateChanged(serviceState: ServiceState) {
+                    val isAirplaneModeOn = Utils.isAirplaneModeOn(this@BaresipService)
+                    val status = if (isAirplaneModeOn)
+                        R.drawable.circle_white
+                    else if (serviceState.state == ServiceState.STATE_IN_SERVICE)
+                        circleGreen.getValue(colorblind)
+                    else
+                        circleRed.getValue(colorblind)
+                    Log.d(TAG, "Mobile service state changed: ${serviceState.state}, updating status to $status")
+                    updateMobileStatus(status)
                 }
             }
         }
@@ -1575,6 +1598,15 @@ class BaresipService: Service() {
         Log.d(TAG, "Received 'started' from baresip")
         isNativeReady = true
         addMobileUserAgent()
+        if (VERSION.SDK_INT >= 31 && !telephonyCallbackRegistered) {
+            try {
+                telephonyManager.registerTelephonyCallback(mainExecutor, telephonyCallback)
+                telephonyCallbackRegistered = true
+                Log.d(TAG, "Registered TelephonyCallback")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to register TelephonyCallback: ${e.message}")
+            }
+        }
         Api.net_debug()
         postServiceEvent(
             ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime())
@@ -2050,6 +2082,7 @@ class BaresipService: Service() {
         val mobileUa = UserAgent(0L, account)
         val isAirplaneModeOn = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
         mobileUa.status = if (isAirplaneModeOn) R.drawable.circle_white else circleGreen.getValue(colorblind)
+        updateMobileStatus()
 
         val updatedUas = uas.value.toMutableList()
         updatedUas.add(mobileUa)
@@ -2065,16 +2098,21 @@ class BaresipService: Service() {
         }
     }
 
-    private fun updateMobileStatus(isAirplaneModeOn: Boolean) {
+    private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
-            val status = if (isAirplaneModeOn)
-                R.drawable.circle_white
-            else
-                circleGreen.getValue(colorblind)
-            ua.updateStatus(status)
-            updateStatusNotification()
-            if (isMainVisible)
-                registrationUpdate.postValue(System.currentTimeMillis())
+            val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+            val status = newStatus
+                ?: if (isAirplaneModeOn)
+                    R.drawable.circle_white
+                else
+                    ua.status
+            if (ua.status != status) {
+                Log.d(TAG, "Updating Mobile status to $status")
+                ua.updateStatus(status)
+                updateStatusNotification()
+                if (isMainVisible)
+                    registrationUpdate.postValue(System.currentTimeMillis())
+            }
         }
     }
 
@@ -2676,6 +2714,12 @@ class BaresipService: Service() {
                     unregisterReceiver(airplaneModeReceiver)
                     airplaneModeReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
+            }
+            if (telephonyCallbackRegistered) {
+                if (VERSION.SDK_INT >= 31) {
+                    telephonyManager.unregisterTelephonyCallback(telephonyCallback)
+                    telephonyCallbackRegistered = false
+                }
             }
             val callps = ConnectionService.connections.keys.toList()
             for (callp in callps)
