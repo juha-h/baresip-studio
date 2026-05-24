@@ -553,7 +553,7 @@ private fun TopAppBar(
         actions = {
 
             val selectedAor by viewModel.selectedAor.collectAsState()
-            val uas by BaresipService.uas
+            val uas by uas
             val isMobile = uas.find { it.account.aor == selectedAor }?.account?.isMobile ?: false
 
             if (!isMobile) {
