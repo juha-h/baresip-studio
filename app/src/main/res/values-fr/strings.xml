@@ -126,8 +126,8 @@
     <string name="invalid_country_code">Code de pays invalide \'%1$s’</string>
     <string name="telephony_provider">Fournisseur téléphonie</string>
     <string name="telephony_provider_help">Partie hôte URI SIP utilisée dans les appels vers des numéros de téléphone. La valeur par défaut d’usine est le domaine du compte. Si ce compte n’est pas indiqué, il ne peut pas être utilisé pour appeler des numéros de téléphone.</string>
-    <string name="numeric_keypad">Pavé numérique</string>"
-    <string name="numeric_keypad_help">Si coché, le pavé numérique s’affiche lorsque le champ \"Appel à …\" est désigné.</string>"
+    <string name="numeric_keypad">Pavé numérique</string>
+    <string name="numeric_keypad_help">Si coché, le pavé numérique s’affiche lorsque le champ \"Appel à …\" est désigné.</string>
     <string name="default_account_help">Si coché, ce compte est sélectionné lorsque Baresip est démarré.</string>
     <string name="account_exists">Le compte \'%1$s\' existe déjà.</string>
     <string name="account_allocation_failure">Échec d’allocation d’un nouveau compte.</string>
@@ -181,7 +181,7 @@
     <string name="dark_theme_help">Forcer le thème d’affichage sombre</string>
     <string name="colorblind">Daltonien</string>
     <string name="colorblind_help">Utilisez des icônes de statut d’inscription conviviales pour les personnes daltoniennes</string>
-    <string name="proximity_sensing">Détection de proximité</string>"&gt;
+    <string name="proximity_sensing">Détection de proximité</string>
     <string name="proximity_sensing_help">Si coché, la détection de proximité est active pendant les appels.</string>
     <string name="video_size">Taille trame vidéo</string>
     <string name="video_size_help">Taille des trames vidéo transmises (largeur x hauteur)</string>

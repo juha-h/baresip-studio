@@ -335,8 +335,8 @@ där även problem kan rapporteras.</p>
     <string name="speakerphone_title">Högtalartelefon</string>
     <string name="redirect_mode_help">Väljer om begäran om vidarekoppling av samtal ska följas automatiskt eller om bekräftelse ska begäras.</string>
     <string name="redirect_mode">Vidarekopplingsläge</string>
-    <string name="numeric_keypad">Numeriskt tangentbord</string>"
-    <string name="numeric_keypad_help">Om denna ruta är markerad visas det numeriska tangentbordet när fältet ”Ring till …” är markerat.</string>"
+    <string name="numeric_keypad">Numeriskt tangentbord</string>
+    <string name="numeric_keypad_help">Om denna ruta är markerad visas det numeriska tangentbordet när fältet ”Ring till …” är markerat.</string>
     <string name="reply">Svara</string>
     <string name="save">Spara</string>
     <string name="call_auto_rejected">Automatiskt avvisat samtal från %1$s</string>
@@ -354,7 +354,7 @@ där även problem kan rapporteras.</p>
     <string name="tone_country_help">Land för ringsignal, vänteläge och upptaget-signaler</string>
     <string name="colorblind">Färgblind</string>
     <string name="colorblind_help">Använd vänliga ikoner för registreringsstatus för färgblinda</string>
-    <string name="proximity_sensing">Närhetssensor</string>"&gt;
+    <string name="proximity_sensing">Närhetssensor</string>
     <string name="proximity_sensing_help">Om denna ruta är markerad är närhetssensorn aktiv under samtal.</string>
     <string name="video_fps">Bildfrekvens för video</string>
     <string name="video_fps_help">Videobildfrekvens som kommer att erbjudas under SDP-handskakningen. Giltiga värden är mellan 10 och 30.</string>

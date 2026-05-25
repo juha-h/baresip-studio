@@ -330,7 +330,7 @@
     <string name="rel_100">Надёжные предварительные ответы</string>
     <string name="appear_on_top_permission">Для автоматического запуска требуется разрешение отображения поверх других приложений.</string>
     <string name="video_fps">Кадровая частота</string>
-    <string name="numeric_keypad">Цифровая клавиатура</string>"
+    <string name="numeric_keypad">Цифровая клавиатура</string>
     <string name="user_agent">Юзер агент</string>
     <string name="speaker_phone">Громкоговоритель</string>
     <string name="speaker_phone_help">Если этот флажок установлен, громкоговоритель автоматически включается при начале вызова.</string>
@@ -343,7 +343,7 @@
     <string name="speakerphone_tip">Если активирован, звук воспроизводится через громкоговоритель устройства.</string>
     <string name="call_recording_title">Запись звонков</string>
     <string name="call_recording_tip">Если активирован, будут записываться новые входящие и исходящие вызовы. Записи можно воспроизвести на странице Сведений о вызове</string>
-    <string name="numeric_keypad_help">Если флажок установлен, цифровая клавиатура отображается, когда выделено поле \'Позвонить на ...\'.</string>"
+    <string name="numeric_keypad_help">Если флажок установлен, цифровая клавиатура отображается, когда выделено поле \'Позвонить на ...\'.</string>
     <string name="microphone_gain_help">Умножить громкость микрофона на это десятичное число. Минимальное значение равно 1.0 (заводское значение по умолчанию), которое отключает усиление микрофона. Большие значения могут негативно повлиять на качество звука.</string>
     <string name="no_read_permission">Нет разрешения на чтение из внешнего хранилища</string>
     <string name="favorite_help">Если этот флажок установлен, контакт отображается среди других избранных в верхней части списка контактов.</string>
@@ -366,7 +366,7 @@
     <string name="call_rejected">Звонок отклонен</string>
     <string name="colorblind">Цвет для слепых</string>
     <string name="colorblind_help">Используйте удобные для слепых значки состояния регистрации</string>
-    <string name="proximity_sensing">Датчик приближения</string>"&gt;
+    <string name="proximity_sensing">Датчик приближения</string>
     <string name="proximity_sensing_help">Если флажок установлен, функция определения приближения активна во время вызовов.</string>
     <string name="block_unknown">Блокировать неизвестных</string>
     <string name="block_unknown_help">Блокировать звонки и сообщения от участников которые не найдены в контактах.</string>
