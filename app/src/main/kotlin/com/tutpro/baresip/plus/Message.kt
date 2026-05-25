@@ -7,12 +7,13 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
               var new: Boolean): Serializable {
 
     fun add() {
-        val updatedMessages = BaresipService.messages.toMutableList()
+        val updatedMessages = synchronized(BaresipService.messages) {
+            BaresipService.messages.toMutableList()
+        }
         updatedMessages.add(this)
-        BaresipService.messages = updatedMessages.toList()
         var count = 0
         var remove: Message? = null
-        for (message in BaresipService.messages)
+        for (message in updatedMessages)
             if (message.aor == this.aor) {
                 count++
                 if (count > MESSAGE_HISTORY_SIZE) {
@@ -22,14 +23,20 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             }
         if (remove != null)
             updatedMessages.remove(remove)
-        BaresipService.messages = updatedMessages.toList()
+        synchronized(BaresipService.messages) {
+            BaresipService.messages = updatedMessages.toList()
+        }
         save()
     }
 
     fun delete() {
-        val updatedMessages = BaresipService.messages.toMutableList()
+        val updatedMessages = synchronized(BaresipService.messages) {
+            BaresipService.messages.toMutableList()
+        }
         updatedMessages.remove(this)
-        BaresipService.messages = updatedMessages.toList()
+        synchronized(BaresipService.messages) {
+            BaresipService.messages = updatedMessages.toList()
+        }
         save()
     }
 
@@ -42,51 +49,69 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun clearMessagesOfAor(aor: String) {
-            val updatedMessages = BaresipService.messages.toMutableList()
+            val updatedMessages = synchronized(BaresipService.messages) {
+                BaresipService.messages.toMutableList()
+            }
             val it = updatedMessages.iterator()
             while (it.hasNext()) if (it.next().aor == aor) it.remove()
-            BaresipService.messages = updatedMessages.toList()
+            synchronized(BaresipService.messages) {
+                BaresipService.messages = updatedMessages.toList()
+            }
             save()
         }
 
         fun deleteAorMessage(aor: String, time: Long) {
-            val updatedMessages = BaresipService.messages.toMutableList()
+            val updatedMessages = synchronized(BaresipService.messages) {
+                BaresipService.messages.toMutableList()
+            }
             for (message in updatedMessages.reversed())
                 if (message.aor == aor && message.timeStamp == time) {
                     updatedMessages.remove(message)
-                    BaresipService.messages = updatedMessages.toList()
+                    synchronized(BaresipService.messages) {
+                        BaresipService.messages = updatedMessages.toList()
+                    }
                     save()
                     return
                 }
         }
 
         fun updateAorMessage(aor: String, time: Long) {
-            val updatedMessages = BaresipService.messages.toMutableList()
+            val updatedMessages = synchronized(BaresipService.messages) {
+                BaresipService.messages.toMutableList()
+            }
             for (message in updatedMessages.reversed())
                 if (message.aor == aor && message.timeStamp == time) {
                     message.new = false
-                    BaresipService.messages = updatedMessages.toList()
+                    synchronized(BaresipService.messages) {
+                        BaresipService.messages = updatedMessages.toList()
+                    }
                     save()
                     return
                 }
         }
 
         fun unreadMessages(aor: String): Boolean {
-            for (message in BaresipService.messages.reversed())
-                if (message.aor == aor && message.new)
-                    return true
+            synchronized(BaresipService.messages) {
+                for (message in BaresipService.messages.reversed())
+                    if (message.aor == aor && message.new)
+                        return true
+            }
             return false
         }
 
         fun unreadMessagesFromPeer(aor: String, peerUri: String): Boolean {
-            for (message in BaresipService.messages.reversed())
-                if (message.aor == aor && message.peerUri == peerUri && message.new)
-                    return true
+            synchronized(BaresipService.messages) {
+                for (message in BaresipService.messages.reversed())
+                    if (message.aor == aor && message.peerUri == peerUri && message.new)
+                        return true
+            }
             return false
         }
 
         fun updateMessagesFromPearRead(aor: String, peerUri: String): Boolean {
-            val updatedMessages = BaresipService.messages.toMutableList()
+            val updatedMessages = synchronized(BaresipService.messages) {
+                BaresipService.messages.toMutableList()
+            }
             var updated = false
             for (message in updatedMessages)
                 if (message.aor == aor && message.peerUri == peerUri && message.new) {
@@ -94,21 +119,26 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     updated = true
                 }
             if (updated) {
-                BaresipService.messages = updatedMessages.toList()
+                synchronized(BaresipService.messages) {
+                    BaresipService.messages = updatedMessages.toList()
+                }
                 save()
             }
             return updated
         }
 
         fun save() {
+            val messagesCopy = synchronized(BaresipService.messages) {
+                BaresipService.messages.toList()
+            }
             val file = File(BaresipService.filesPath, "messages")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
-                oos.writeObject(BaresipService.messages)
+                oos.writeObject(messagesCopy)
                 oos.close()
                 fos.close()
-                Log.d(TAG, "Saved ${BaresipService.messages.size} messages")
+                Log.d(TAG, "Saved ${messagesCopy.size} messages")
             } catch (e: IOException) {
                 Log.e(TAG, "OutputStream exception", e)
             }

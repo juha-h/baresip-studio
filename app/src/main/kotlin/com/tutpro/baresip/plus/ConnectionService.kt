@@ -33,7 +33,6 @@ class ConnectionService : ConnectionService() {
         fun onCallClosed(callp: Long) {
             connections[callp]?.let {
                 it.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
-                it.destroy()
                 connections.remove(callp)
             }
         }

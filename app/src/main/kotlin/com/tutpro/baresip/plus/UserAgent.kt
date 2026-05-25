@@ -16,36 +16,45 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
     }
 
     fun add() {
-        val updatedUas = uas.value.toMutableList()
-        updatedUas.add(this)
-        uas.value = updatedUas.toList()
-        uasStatus.value = statusMap()
+        synchronized(uas) {
+            val updatedUas = uas.value.toMutableList()
+            updatedUas.add(this)
+            uas.value = updatedUas.toList()
+            uasStatus.value = statusMap()
+        }
     }
 
     fun remove() {
-        val updatedUas = uas.value.toMutableList()
-        updatedUas.remove(this)
-        uas.value = updatedUas.toList()
-        uasStatus.value = statusMap()
+        synchronized(uas) {
+            val updatedUas = uas.value.toMutableList()
+            updatedUas.remove(this)
+            uas.value = updatedUas.toList()
+            uasStatus.value = statusMap()
+        }
     }
 
     fun updateStatus(status: Int) {
-        uas.value.find { it.uap == this.uap }?.status = status
-        uasStatus.value = statusMap()
+        synchronized(uas) {
+            uas.value.find { it.uap == this.uap }?.status = status
+            uasStatus.value = statusMap()
+        }
     }
 
     fun calls(dir: String = ""): ArrayList<Call> {
         val result = ArrayList<Call>()
-        for (c in BaresipService.calls)
-            if ((c.ua == this) && ((dir == "") || c.dir == dir)) result.add(c)
+        synchronized(BaresipService.calls) {
+            for (c in BaresipService.calls)
+                if ((c.ua == this) && ((dir == "") || c.dir == dir)) result.add(c)
+        }
         return result
     }
 
-    // Returns call of UA that was added last or NULL
     fun currentCall(): Call? {
-        for (c in BaresipService.calls.reversed())
-            if (c.ua == this)
-                return c
+        synchronized(BaresipService.calls) {
+            for (c in BaresipService.calls.reversed())
+                if (c.ua == this)
+                    return c
+        }
         return null
     }
 
@@ -59,12 +68,14 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
     }
 
     fun makeDefault() {
-        val index = uas.value.indexOf(this)
-        val updatedUas = uas.value.toMutableList()
-        updatedUas.removeAt(index)
-        updatedUas.add(0, this)
-        uas.value = updatedUas.toList()
-        uasStatus.value = statusMap()
+        synchronized(uas) {
+            val index = uas.value.indexOf(this)
+            val updatedUas = uas.value.toMutableList()
+            updatedUas.removeAt(index)
+            updatedUas.add(0, this)
+            uas.value = updatedUas.toList()
+            uasStatus.value = statusMap()
+        }
     }
 
     companion object {
@@ -111,25 +122,27 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
         }
 
         fun updateColorblindStatus() {
-            val updatedUas = uas.value.toMutableList()
-            for (ua in updatedUas)
-                ua.status =
-                    if (colorblind)
-                        when (ua.status) {
-                            R.drawable.circle_green -> R.drawable.circle_green_blind
-                            R.drawable.circle_yellow -> R.drawable.circle_yellow_blind
-                            R.drawable.circle_red -> R.drawable.circle_red_blind
-                            else -> R.drawable.circle_white
-                        }
-                    else
-                        when (ua.status) {
-                            R.drawable.circle_green_blind -> R.drawable.circle_green
-                            R.drawable.circle_yellow_blind -> R.drawable.circle_yellow
-                            R.drawable.circle_red_blind -> R.drawable.circle_red
-                            else -> R.drawable.circle_white
-                        }
-            uas.value = updatedUas.toList()
-            uasStatus.value = statusMap()
+            synchronized(uas) {
+                val updatedUas = uas.value.toMutableList()
+                for (ua in updatedUas)
+                    ua.status =
+                        if (colorblind)
+                            when (ua.status) {
+                                R.drawable.circle_green -> R.drawable.circle_green_blind
+                                R.drawable.circle_yellow -> R.drawable.circle_yellow_blind
+                                R.drawable.circle_red -> R.drawable.circle_red_blind
+                                else -> R.drawable.circle_white
+                            }
+                        else
+                            when (ua.status) {
+                                R.drawable.circle_green_blind -> R.drawable.circle_green
+                                R.drawable.circle_yellow_blind -> R.drawable.circle_yellow
+                                R.drawable.circle_red_blind -> R.drawable.circle_red
+                                else -> R.drawable.circle_white
+                            }
+                uas.value = updatedUas.toList()
+                uasStatus.value = statusMap()
+            }
         }
 
         fun statusMap(): Map<String, Int> {

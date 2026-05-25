@@ -75,64 +75,74 @@ sealed class Contact {
         }
 
         fun baresipContact(name: String): BaresipContact? {
-            for (c in BaresipService.baresipContacts.value)
-                if (c.name == name)
-                    return c
+            synchronized(BaresipService.baresipContacts) {
+                for (c in BaresipService.baresipContacts.value)
+                    if (c.name == name)
+                        return c
+            }
             return null
         }
 
         fun androidContact(name: String): AndroidContact? {
-            for (c in BaresipService.androidContacts.value)
-                if (c.name == name)
-                    return c
+            synchronized(BaresipService.androidContacts) {
+                for (c in BaresipService.androidContacts.value)
+                    if (c.name == name)
+                        return c
+            }
             return null
         }
 
-        // Return URIs of contact name
         fun contactUris(name: String, tel: Boolean = false): ArrayList<String> {
             val uris = ArrayList<String>()
-            for (c in BaresipService.contacts)
-                when (c) {
-                    is BaresipContact -> {
-                        if (c.name.equals(name, ignoreCase = true)) {
-                            for (u in c.uris) {
-                                if (tel && !u.startsWith("tel:"))
-                                    continue
-                                uris.add(u)
+            synchronized(BaresipService.contacts) {
+                for (c in BaresipService.contacts)
+                    when (c) {
+                        is BaresipContact -> {
+                            if (c.name.equals(name, ignoreCase = true)) {
+                                for (u in c.uris) {
+                                    if (tel && !u.startsWith("tel:"))
+                                        continue
+                                    uris.add(u)
+                                }
+                                return uris
                             }
-                            return uris
+                        }
+                        is AndroidContact -> {
+                            if (c.name == name) {
+                                for (u in c.uris) {
+                                    if (tel && !u.startsWith("tel:"))
+                                        continue
+                                    uris.add(u)
+                                }
+                                return uris
+                            }
                         }
                     }
-                    is AndroidContact -> {
-                        if (c.name == name) {
-                            for (u in c.uris) {
-                                if (tel && !u.startsWith("tel:"))
-                                    continue
-                                uris.add(u)
-                            }
-                            return uris
-                        }
-                    }
-                }
+            }
             return uris
         }
 
         fun findContact(uri: String): Contact? {
-            for (c in BaresipService.contacts)
-                when (c) {
-                    is BaresipContact -> {
-                        for (u in c.uris)
-                            if (Utils.uriMatch(u, uri))
-                                return c
+            synchronized(BaresipService.contacts) {
+                for (c in BaresipService.contacts)
+                    when (c) {
+                        is BaresipContact -> {
+                            for (u in c.uris)
+                                if (Utils.uriMatch(u, uri))
+                                    return c
+                        }
+                        is AndroidContact -> {
+                            val cleanUri = uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
+                            for (u in c.uris)
+                                if (Utils.uriMatch(
+                                        u.filterNot { setOf('-', ' ', '(', ')').contains(it) },
+                                        cleanUri
+                                    )
+                                )
+                                    return c
+                        }
                     }
-                    is AndroidContact -> {
-                        val cleanUri = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
-                        for (u in c.uris)
-                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)},
-                                    cleanUri))
-                                return c
-                    }
-                }
+            }
             return null
         }
 
@@ -146,7 +156,10 @@ sealed class Contact {
         fun saveBaresipContacts() {
             val avatarFiles = avatarFileNames()
             var contents = ""
-            for (c in BaresipService.baresipContacts.value) {
+            val contacts = synchronized(BaresipService.baresipContacts) {
+                BaresipService.baresipContacts.value.toList()
+            }
+            for (c in contacts) {
                 contents += "\"${c.name}\" <${c.uris.joinToString(",")}>;email=${c.email};id=${c.id}" +
                         ";color=${c.color};favorite=${if (c.favorite) "yes" else "no"}\n"
                 avatarFiles.remove(c.id.toString() + ".png")
@@ -274,13 +287,21 @@ sealed class Contact {
 
         fun contactsUpdate() {
             val newContacts = mutableListOf<Contact>()
-            if (BaresipService.contactsMode != "android")
-                for (c in BaresipService.baresipContacts.value)
+            if (BaresipService.contactsMode != "android") {
+                val baresipContacts = synchronized(BaresipService.baresipContacts) {
+                    BaresipService.baresipContacts.value.toList()
+                }
+                for (c in baresipContacts)
                     newContacts.add(c.copy())
-            if (BaresipService.contactsMode != "baresip")
-                for (c in BaresipService.androidContacts.value)
+            }
+            if (BaresipService.contactsMode != "baresip") {
+                val androidContacts = synchronized(BaresipService.androidContacts) {
+                    BaresipService.androidContacts.value.toList()
+                }
+                for (c in androidContacts)
                     if (!nameExists(c.name, newContacts, true))
                         newContacts.add(c.copy())
+            }
             newContacts.sortBy {
                 when (it) {
                     is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
@@ -292,24 +313,30 @@ sealed class Contact {
         }
 
         fun addBaresipContact(contact: BaresipContact) {
-            BaresipService.baresipContacts.value += contact
+            synchronized(BaresipService.baresipContacts) {
+                BaresipService.baresipContacts.value += contact
+            }
             saveBaresipContacts()
             contactsUpdate()
         }
 
         fun updateBaresipContact(id: Long, contact: BaresipContact) {
-            val updatedContacts = BaresipService.baresipContacts.value.toMutableList()
-            updatedContacts.removeIf { it.id == id }
-            updatedContacts.add(contact)
-            BaresipService.baresipContacts.value = updatedContacts.toList()
+            synchronized(BaresipService.baresipContacts) {
+                val updatedContacts = BaresipService.baresipContacts.value.toMutableList()
+                updatedContacts.removeIf { it.id == id }
+                updatedContacts.add(contact)
+                BaresipService.baresipContacts.value = updatedContacts.toList()
+            }
             saveBaresipContacts()
             contactsUpdate()
         }
 
         fun removeBaresipContact(contact: BaresipContact) {
-            val removed = BaresipService.baresipContacts.value.toMutableList()
-            removed.removeIf { it.id == contact.id }
-            BaresipService.baresipContacts.value = removed.toList()
+            synchronized(BaresipService.baresipContacts) {
+                val removed = BaresipService.baresipContacts.value.toMutableList()
+                removed.removeIf { it.id == contact.id }
+                BaresipService.baresipContacts.value = removed.toList()
+            }
             saveBaresipContacts()
             contactsUpdate()
         }

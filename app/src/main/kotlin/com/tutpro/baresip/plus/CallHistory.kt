@@ -18,12 +18,14 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
     var recording = arrayOf("", "")           // Encoder and decoder recording files, merged file is in [0]
 
     fun add() {
-        BaresipService.callHistory.add(this)
-        val aorSpecificHistory = BaresipService.callHistory.filter { it.aor == this.aor }
-        if (aorSpecificHistory.size > CALL_HISTORY_SIZE) {
-            val oldestToRemove = aorSpecificHistory.first()
-            deleteRecordingFiles(oldestToRemove.recording)
-            BaresipService.callHistory.remove(oldestToRemove)
+        synchronized(BaresipService.callHistory) {
+            BaresipService.callHistory.add(this)
+            val aorSpecificHistory = BaresipService.callHistory.filter { it.aor == this.aor }
+            if (aorSpecificHistory.size > CALL_HISTORY_SIZE) {
+                val oldestToRemove = aorSpecificHistory.first()
+                deleteRecordingFiles(oldestToRemove.recording)
+                BaresipService.callHistory.remove(oldestToRemove)
+            }
         }
         save()
     }
@@ -35,41 +37,50 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
         private const val CALL_HISTORY_SIZE = 256
 
         fun aorLatestPeerUri(aor: String): String? {
-            for (h in BaresipService.callHistory.reversed())
-                if (h.aor == aor) return h.peerUri
+            synchronized(BaresipService.callHistory) {
+                for (h in BaresipService.callHistory.reversed())
+                    if (h.aor == aor) return h.peerUri
+            }
             return null
         }
 
         fun clear(aor: String) {
-            for (i in BaresipService.callHistory.indices.reversed()) {
-                val h = BaresipService.callHistory[i]
-                if (h.aor == aor) {
-                    deleteRecordingFiles(h.recording)
-                    BaresipService.callHistory.removeAt(i)
+            synchronized(BaresipService.callHistory) {
+                for (i in BaresipService.callHistory.indices.reversed()) {
+                    val h = BaresipService.callHistory[i]
+                    if (h.aor == aor) {
+                        deleteRecordingFiles(h.recording)
+                        BaresipService.callHistory.removeAt(i)
+                    }
                 }
             }
             save()
         }
 
         fun remove(startTime: GregorianCalendar?, stopTime: GregorianCalendar) {
-            val iterator = BaresipService.callHistory.iterator()
-            while (iterator.hasNext()) {
-                val h = iterator.next()
-                if (h.startTime == startTime && h.stopTime == stopTime) {
-                    deleteRecordingFiles(h.recording)
-                    iterator.remove()
+            synchronized(BaresipService.callHistory) {
+                val iterator = BaresipService.callHistory.iterator()
+                while (iterator.hasNext()) {
+                    val h = iterator.next()
+                    if (h.startTime == startTime && h.stopTime == stopTime) {
+                        deleteRecordingFiles(h.recording)
+                        iterator.remove()
+                    }
                 }
             }
             save()
         }
 
         fun save() {
-            Log.d(TAG, "Saving history of ${BaresipService.callHistory.size} calls")
+            val historyCopy = synchronized(BaresipService.callHistory) {
+                ArrayList(BaresipService.callHistory)
+            }
+            Log.d(TAG, "Saving history of ${historyCopy.size} calls")
             val file = File(BaresipService.filesPath + "/call_history")
             try {
                 val fos = FileOutputStream(file)
                 val oos = ObjectOutputStream(fos)
-                oos.writeObject(BaresipService.callHistory)
+                oos.writeObject(historyCopy)
                 oos.close()
                 fos.close()
             } catch (e: IOException) {
@@ -103,8 +114,10 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
         }
 
         fun clearRecordings() {
-            for (h in BaresipService.callHistory)
-                h.recording = arrayOf("", "")
+            synchronized(BaresipService.callHistory) {
+                for (h in BaresipService.callHistory)
+                    h.recording = arrayOf("", "")
+            }
         }
 
         @Suppress("UNUSED")

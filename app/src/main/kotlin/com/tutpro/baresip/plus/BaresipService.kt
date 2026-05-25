@@ -54,9 +54,13 @@ import android.os.VibratorManager
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.system.OsConstants
+import android.telecom.Connection
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.ServiceState
+import android.telephony.TelephonyCallback
+import android.telephony.TelephonyManager
 import android.util.Size
 import android.view.View
 import android.widget.RemoteViews
@@ -103,6 +107,8 @@ class BaresipService: Service() {
     private lateinit var wm: WifiManager
     private lateinit var tm: TelecomManager
     private lateinit var btm: BluetoothManager
+    private lateinit var telephonyManager: TelephonyManager
+    private lateinit var telephonyCallback: TelephonyCallback
     private lateinit var vibrator: Vibrator
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
@@ -127,6 +133,7 @@ class BaresipService: Service() {
     private var hotSpotReceiverRegistered = false
     private var bluetoothReceiverRegistered = false
     private var airplaneModeReceiverRegistered = false
+    private var telephonyCallbackRegistered = false
     private var isNotificationInCall = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
@@ -307,7 +314,7 @@ class BaresipService: Service() {
                 if (intent.action == Intent.ACTION_AIRPLANE_MODE_CHANGED) {
                     val isAirplaneModeOn = intent.getBooleanExtra("state", false)
                     Log.d(TAG, "Airplane mode changed: $isAirplaneModeOn")
-                    updateMobileStatus(isAirplaneModeOn)
+                    updateMobileStatus()
                 }
             }
         }
@@ -377,6 +384,23 @@ class BaresipService: Service() {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        if (VERSION.SDK_INT >= 31) {
+            telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
+                override fun onServiceStateChanged(serviceState: ServiceState) {
+                    val isAirplaneModeOn = Utils.isAirplaneModeOn(this@BaresipService)
+                    val status = if (isAirplaneModeOn)
+                        R.drawable.circle_white
+                    else if (serviceState.state == ServiceState.STATE_IN_SERVICE)
+                        circleGreen.getValue(colorblind)
+                    else
+                        circleRed.getValue(colorblind)
+                    Log.d(TAG, "Mobile service state changed: ${serviceState.state}, updating status to $status")
+                    updateMobileStatus(status)
                 }
             }
         }
@@ -1068,10 +1092,14 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
-                        if (call!!.status.value == "incoming")
-                            call.status.value = "answered"
-                        else
-                            return
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                if (call.status.value == "incoming")
+                                    call.status.value = "answered"
+                                else
+                                    return@post
+                            }
+                        }
                     }
 
                     "call redirect", "video call redirect" -> {
@@ -1083,10 +1111,17 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
-                        call!!.status.value = "connected"
-                        call.onhold = false
-                        call.startTime = GregorianCalendar()
-                        updateStatusNotification()
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                call.status.value = "connected"
+                                call.onhold = false
+                                call.startTime = GregorianCalendar()
+                                if (call.conferenceCall)
+                                    Api.cmd_exec("conference")
+                            }
+                            updateStatusNotification()
+                            proximitySensing(proximitySensing)
+                        }
                         if (!isMainVisible)
                             return
                     }
@@ -1097,55 +1132,66 @@ class BaresipService: Service() {
                             else -> false
                         }
                         val connection = ConnectionService.connections[callp]
-                        if (call!!.held && !newHeldState) {
-                            Log.d(TAG, "Call ${call.callp} un-held by peer.")
-                            call.onhold = false
-                            // Use a Coroutine with a small delay to let the SIP
-                            // transaction (the re-INVITE from the peer) finish
-                            // before trying to hold the other call and resume this one.
-                            CoroutineScope(Dispatchers.Main).launch {
-                                delay(100)
-                                call.resume()
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                if (call.held && !newHeldState) {
+                                    Log.d(TAG, "Call ${call.callp} un-held by peer.")
+                                    call.onhold = false
+                                    // Use a Coroutine with a small delay to let the SIP
+                                    // transaction (the re-INVITE from the peer) finish
+                                    // before trying to hold the other call and resume this one.
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        delay(100)
+                                        call.resume()
+                                    }
+                                }
+                                call.held = newHeldState
+                                if (newHeldState) {
+                                    // Peer put us on hold
+                                    call.showOnHoldNotice.value = true
+                                    call.callOnHold.value = true
+                                    if (connection?.state != Connection.STATE_HOLDING)
+                                        connection?.setOnHold()
+                                } else {
+                                    // Peer un-held us
+                                    call.showOnHoldNotice.value = false
+                                    if (!call.onhold) {
+                                        call.callOnHold.value = false
+                                        if (connection?.state != Connection.STATE_ACTIVE)
+                                            connection?.setActive()
+                                    }
+                                }
+                                if (call.state() == Api.CALL_STATE_EARLY) {
+                                    if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
+                                        stopMediaPlayer()
+                                }
+                                if (call.status.value == "connected" && !call.held && !call.onhold) {
+                                    if (call.callOnHold.value || call.showOnHoldNotice.value) {
+                                        Log.d(
+                                            TAG,
+                                            "Safety guard: Clearing stuck hold flags for ${call.callp}"
+                                        )
+                                        call.callOnHold.value = false
+                                        call.showOnHoldNotice.value = false
+                                        connection?.setActive()
+                                    }
+                                }
                             }
                         }
-                        call.held = newHeldState
-                        if (newHeldState) {
-                            // Peer put us on hold
-                            call.showOnHoldNotice.value = true
-                            call.callOnHold.value = true
-                            connection?.setOnHold()
-                        }
-                        else {
-                            // Peer un-held us
-                            call.showOnHoldNotice.value = false
-                            if (!call.onhold) {
-                                call.callOnHold.value = false
-                                connection?.setActive()
-                            }
-                        }
-                        if (call.state() == Api.CALL_STATE_EARLY) {
-                            if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
-                                stopMediaPlayer()
-                        }
-                        if (call.status.value == "connected" && !call.held && !call.onhold) {
-                            if (call.callOnHold.value || call.showOnHoldNotice.value) {
-                                Log.d(TAG, "Safety guard: Clearing stuck hold flags for ${call.callp}")
-                                call.callOnHold.value = false
-                                call.showOnHoldNotice.value = false
-                                connection?.setActive()
-                            }
-                        }
-                        if (!isMainVisible || call.status.value != "connected")
+                        if (!isMainVisible || call?.status?.value != "connected")
                             return
                     }
 
                     "call verified", "call secure" -> {
-                        if (ev[0] == "call secure") {
-                            call!!.security = R.color.colorTrafficYellow
-                        }
-                        else {
-                            call!!.security = R.color.colorTrafficGreen
-                            call.zid = ev[1]
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                if (ev[0] == "call secure") {
+                                    call.security = R.color.colorTrafficYellow
+                                } else {
+                                    call.security = R.color.colorTrafficGreen
+                                    call.zid = ev[1]
+                                }
+                            }
                         }
                         if (!isMainVisible)
                             return
@@ -1218,12 +1264,6 @@ class BaresipService: Service() {
 
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
-                        if (call != null) {
-                            call.terminated.value = true
-                            call.remove()
-                            if (!Call.inCall())
-                                proximitySensing(false)
-                        }
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
                             val cause = when {
@@ -1235,15 +1275,21 @@ class BaresipService: Service() {
                                 else -> DisconnectCause.REMOTE
                             }
                             connection.setDisconnected(DisconnectCause(cause))
-                            connection.destroy()
                             ConnectionService.connections.remove(callp)
                         }
-                        updateStatusNotification()
                         if (call != null) {
+                            call.terminated.value = true
+                            call.remove()
+                            val noMoreCalls = synchronized(calls) { !Call.inCall() }
+
                             stopRinging()
                             stopMediaPlayer()
-                            if (!Call.inCall())
+
+                            if (noMoreCalls) {
+                                proximitySensing(false)
                                 abandonAudioFocus(this)
+                            }
+
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -1256,8 +1302,8 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             val isConference = call.conferenceCall
-                            val hasOtherCalls = calls.any { it.ua == ua }
-                            if (calls.isEmpty()) {
+                            val hasOtherCalls = synchronized(calls) { calls.any { it.ua == ua } }
+                            if (noMoreCalls) {
                                 aec?.release()
                                 aec = null
                                 agc?.release()
@@ -1270,7 +1316,10 @@ class BaresipService: Service() {
                             if (isConference && !hasOtherCalls) {
                                 Log.d(TAG, "Last conference call closed, scheduling mixminus unload")
                                 Handler(Looper.getMainLooper()).postDelayed({
-                                    if (calls.none { it.conferenceCall }) {
+                                    val conferenceActive = synchronized(calls) {
+                                        calls.any { it.conferenceCall }
+                                    }
+                                    if (!conferenceActive) {
                                         Log.d(TAG, "Unloading mixminus module")
                                         Api.module_unload("mixminus")
                                     }
@@ -1701,6 +1750,15 @@ class BaresipService: Service() {
         Log.d(TAG, "Received 'started' from baresip")
         isNativeReady = true
         addMobileUserAgent()
+        if (VERSION.SDK_INT >= 31 && !telephonyCallbackRegistered) {
+            try {
+                telephonyManager.registerTelephonyCallback(mainExecutor, telephonyCallback)
+                telephonyCallbackRegistered = true
+                Log.d(TAG, "Registered TelephonyCallback")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to register TelephonyCallback: ${e.message}")
+            }
+        }
         Api.net_debug()
         postServiceEvent(
             ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime())
@@ -2108,7 +2166,9 @@ class BaresipService: Service() {
             }
         })
 
-        calls.add(call)
+        synchronized(calls) {
+            calls.add(call)
+        }
         setCallVolume()
         ensureCommunicationMode()
 
@@ -2146,11 +2206,13 @@ class BaresipService: Service() {
                 if (call.dir == "in" && call.startTime == null && !call.rejected)
                     call.ua.account.missedCalls = true
             }
-            calls.remove(call)
-            postServiceEvent(ServiceEvent(
-                "call closed",
-                arrayListOf(uap, callp),
-                System.nanoTime())
+            synchronized(calls) {
+                calls.remove(call)
+            }
+            postServiceEvent(
+                ServiceEvent(
+                "call closed", arrayListOf(uap, callp), System.nanoTime()
+                )
             )
         }
         if (!Call.inCall()) {
@@ -2204,6 +2266,7 @@ class BaresipService: Service() {
         val mobileUa = UserAgent(0L, account)
         val isAirplaneModeOn = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
         mobileUa.status = if (isAirplaneModeOn) R.drawable.circle_white else circleGreen.getValue(colorblind)
+        updateMobileStatus()
 
         val updatedUas = uas.value.toMutableList()
         updatedUas.add(mobileUa)
@@ -2219,16 +2282,21 @@ class BaresipService: Service() {
         }
     }
 
-    private fun updateMobileStatus(isAirplaneModeOn: Boolean) {
+    private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
-            val status = if (isAirplaneModeOn)
-                R.drawable.circle_white
-            else
-                circleGreen.getValue(colorblind)
-            ua.updateStatus(status)
-            updateStatusNotification()
-            if (isMainVisible)
-                registrationUpdate.postValue(System.currentTimeMillis())
+            val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+            val status = newStatus
+                ?: if (isAirplaneModeOn)
+                    R.drawable.circle_white
+                else
+                    ua.status
+            if (ua.status != status) {
+                Log.d(TAG, "Updating Mobile status to $status")
+                ua.updateStatus(status)
+                updateStatusNotification()
+                if (isMainVisible)
+                    registrationUpdate.postValue(System.currentTimeMillis())
+            }
         }
     }
 
@@ -2768,13 +2836,15 @@ class BaresipService: Service() {
                     if (!servers.contains(server)) servers.add(server)
         }
         // Update if change
-        if (servers != dnsServers) {
-            if (isServiceRunning && Config.updateDnsServers(servers) != 0) {
-                Log.w(TAG, "Failed to update DNS servers '${servers}'")
-            } else {
-                // Log.d(TAG, "Updated DNS servers: '${servers}'")
-                dnsServers = servers
-                return true
+        synchronized(dnsServers) {
+            if (servers != dnsServers) {
+                if (isServiceRunning && Config.updateDnsServers(servers) != 0) {
+                    Log.w(TAG, "Failed to update DNS servers '${servers}'")
+                } else {
+                    // Log.d(TAG, "Updated DNS servers: '${servers}'")
+                    dnsServers = servers
+                    return true
+                }
             }
         }
         return false
@@ -2829,6 +2899,12 @@ class BaresipService: Service() {
                     unregisterReceiver(airplaneModeReceiver)
                     airplaneModeReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
+            }
+            if (telephonyCallbackRegistered) {
+                if (VERSION.SDK_INT >= 31) {
+                    telephonyManager.unregisterTelephonyCallback(telephonyCallback)
+                    telephonyCallbackRegistered = false
+                }
             }
             val callps = ConnectionService.connections.keys.toList()
             for (callp in callps)
@@ -2963,13 +3039,14 @@ class BaresipService: Service() {
         }
 
         fun postServiceEvent(event: ServiceEvent) {
-            serviceEvents.add(event)
-            if (serviceEvents.size == 1) {
-                Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
-                serviceEvent.postValue(Event(event.timeStamp))
+            synchronized(serviceEvents) {
+                serviceEvents.add(event)
+                if (serviceEvents.size == 1) {
+                    Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
+                    serviceEvent.postValue(Event(event.timeStamp))
+                } else
+                    Log.d(TAG, "Added service event ${event.event}")
             }
-            else
-                Log.d(TAG, "Added service event ${event.event}")
         }
 
         fun requestAudioFocus(ctx: Context): Boolean {
