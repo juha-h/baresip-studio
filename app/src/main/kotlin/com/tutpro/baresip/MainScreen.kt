@@ -2371,9 +2371,11 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     fun handleNextEvent(logMessage: String? = null) {
         if (logMessage != null)
             Log.w(TAG, logMessage)
-        if (BaresipService.serviceEvents.isNotEmpty()) {
-            val first = BaresipService.serviceEvents.removeAt(0)
-            handleServiceEvent(ctx, viewModel, first.event, first.params)
+        synchronized(BaresipService.serviceEvents) {
+            if (BaresipService.serviceEvents.isNotEmpty()) {
+                val first = BaresipService.serviceEvents.removeAt(0)
+                handleServiceEvent(ctx, viewModel, first.event, first.params)
+            }
         }
     }
 
