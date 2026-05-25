@@ -1136,12 +1136,6 @@ class BaresipService: Service() {
                     }
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
-                        if (call != null) {
-                            call.terminated.value = true
-                            call.remove()
-                            if (!Call.inCall())
-                                proximitySensing(false)
-                        }
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
                             val cause = when {
@@ -1156,12 +1150,19 @@ class BaresipService: Service() {
                             connection.destroy()
                             ConnectionService.connections.remove(callp)
                         }
-                        updateStatusNotification()
                         if (call != null) {
+                            call.terminated.value = true
+                            call.remove()
+                            val noMoreCalls = synchronized(calls) { !Call.inCall() }
+
                             stopRinging()
                             stopMediaPlayer()
-                            if (!Call.inCall())
+
+                            if (noMoreCalls) {
+                                proximitySensing(false)
                                 abandonAudioFocus(this)
+                            }
+
                             val newCall = call.newCall
                             if (newCall != null) {
                                 newCall.onHoldCall = null
@@ -1174,8 +1175,8 @@ class BaresipService: Service() {
                                 call.onHoldCall = null
                             }
                             val isConference = call.conferenceCall
-                            val hasOtherCalls = calls.any { it.ua == ua }
-                            if (calls.isEmpty()) {
+                            val hasOtherCalls = synchronized(calls) { calls.any { it.ua == ua } }
+                            if (noMoreCalls) {
                                 aec?.release()
                                 aec = null
                                 agc?.release()
@@ -1188,7 +1189,10 @@ class BaresipService: Service() {
                             if (isConference && !hasOtherCalls) {
                                 Log.d(TAG, "Last conference call closed, scheduling mixminus unload")
                                 Handler(Looper.getMainLooper()).postDelayed({
-                                    if (calls.none { it.conferenceCall }) {
+                                    val conferenceActive = synchronized(calls) {
+                                        calls.any { it.conferenceCall }
+                                    }
+                                    if (!conferenceActive) {
                                         Log.d(TAG, "Unloading mixminus module")
                                         Api.module_unload("mixminus")
                                     }
