@@ -14,11 +14,6 @@
 #include "android_camera2.h"
 #include "common.h"
 
-enum
-{
-    ASYNC_WORKERS = 4
-};
-
 typedef struct baresip_context
 {
     JavaVM *javaVM;
@@ -28,6 +23,36 @@ typedef struct baresip_context
 } BaresipContext;
 
 BaresipContext g_ctx;
+
+enum
+{
+    ASYNC_WORKERS = 4
+};
+
+static pthread_key_t g_thread_key;
+
+static void detach_thread(void *env)
+{
+    (void)env;
+    LOGD("detaching thread from JVM\n");
+    (*g_ctx.javaVM)->DetachCurrentThread(g_ctx.javaVM);
+}
+
+static JNIEnv *get_jni_env(void)
+{
+    JNIEnv *env;
+    jint res = (*g_ctx.javaVM)->GetEnv(g_ctx.javaVM, (void**)&env, JNI_VERSION_1_6);
+    if (res != JNI_OK) {
+        res = (*g_ctx.javaVM)->AttachCurrentThread(g_ctx.javaVM, &env, NULL);
+        if (res == JNI_OK) {
+            pthread_setspecific(g_thread_key, env);
+        } else {
+            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
+            return NULL;
+        }
+    }
+    return env;
+}
 
 static int vprintf_null(const char *p, size_t size, void *arg)
 {
@@ -313,23 +338,23 @@ static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
         return;
     }
 
-    JavaVM *javaVM = g_ctx.javaVM;
-    JNIEnv *env;
-    jint res = (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_6);
-    if (res != JNI_OK) {
-        LOGD("failed to get javaVM environment, ErrorCode = %d\n", res);
-        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        if (JNI_OK != res) {
-            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            return;
-        }
-    }
+    JNIEnv *env = get_jni_env();
+    if (!env) return;
+
+    if (!g_ctx.mainActivityClz || !g_ctx.mainActivityObj) return;
 
     jmethodID methodId =
             (*env)->GetMethodID(env, g_ctx.mainActivityClz, "uaEvent", "(Ljava/lang/String;JJ)V");
     jstring jEvent = (*env)->NewStringUTF(env, event_buf);
     LOGD("sending ua/call %ld/%ld event %s\n", (long)ua, (long)call, event_buf);
-    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, jEvent, (jlong)ua, (jlong)call);
+    if (methodId) {
+        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, jEvent, (jlong)ua, (jlong)call);
+        if ((*env)->ExceptionCheck(env)) {
+            LOGE("uaEvent method call failed\n");
+            (*env)->ExceptionDescribe(env);
+            (*env)->ExceptionClear(env);
+        }
+    }
     (*env)->DeleteLocalRef(env, jEvent);
 
 }
@@ -347,16 +372,10 @@ static void message_handler(
         return;
     }
 
-    JavaVM *javaVM = g_ctx.javaVM;
-    JNIEnv *env;
-    jint res = (*javaVM)->GetEnv(javaVM, (void **)&env, JNI_VERSION_1_6);
-    if (res != JNI_OK) {
-        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        if (JNI_OK != res) {
-            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            return;
-        }
-    }
+    JNIEnv *env = get_jni_env();
+    if (!env) return;
+
+    if (!g_ctx.mainActivityClz || !g_ctx.mainActivityObj) return;
 
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "messageEvent",
             "(JLjava/lang/String;Ljava/lang/String;[B)V");
@@ -375,7 +394,14 @@ static void message_handler(
     (*env)->ReleasePrimitiveArrayCritical(env, jMsg, temp, 0);
     LOGD("sending message %ld/%s/%s/%.*s\n", (long)ua, peer_buf, ctype_buf, (int)size,
             mbuf_buf(body));
-    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, (jlong)ua, jPeer, jCtype, jMsg);
+    if (methodId) {
+        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, (jlong)ua, jPeer, jCtype, jMsg);
+        if ((*env)->ExceptionCheck(env)) {
+            LOGE("messageEvent method call failed\n");
+            (*env)->ExceptionDescribe(env);
+            (*env)->ExceptionClear(env);
+        }
+    }
     (*env)->DeleteLocalRef(env, jCtype);
     (*env)->DeleteLocalRef(env, jPeer);
     (*env)->DeleteLocalRef(env, jMsg);
@@ -384,37 +410,47 @@ static void message_handler(
 
 static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
 {
-    (void)arg;
+    char *native_time = (char *)arg;
     char reason_buf[64];
 
     if (err) {
         LOGD("send_response_handler received error %d\n", err);
+        mem_deref(native_time);
         return;
     }
 
     pl_strcpy(&(msg->reason), reason_buf, 64);
     LOGD("send_response_handler received response '%u %s' at %s\n", msg->scode, reason_buf,
-            (char *)arg);
+            native_time);
 
-    JavaVM *javaVM = g_ctx.javaVM;
-    JNIEnv *env;
-    jint res = (*javaVM)->GetEnv(javaVM, (void **)&env, JNI_VERSION_1_6);
-    if (res != JNI_OK) {
-        res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        if (JNI_OK != res) {
-            LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
-            return;
-        }
+    JNIEnv *env = get_jni_env();
+    if (!env) {
+        mem_deref(native_time);
+        return;
+    }
+
+    if (!g_ctx.mainActivityClz || !g_ctx.mainActivityObj) {
+        mem_deref(native_time);
+        return;
     }
 
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "messageResponse",
             "(ILjava/lang/String;Ljava/lang/String;)V");
     jstring javaReason = (*env)->NewStringUTF(env, reason_buf);
-    jstring javaTime = (*env)->NewStringUTF(env, (char *)arg);
-    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, msg->scode, javaReason, javaTime);
+    jstring javaTime = (*env)->NewStringUTF(env, native_time);
+    if (methodId) {
+        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, msg->scode, javaReason,
+                               javaTime);
+        if ((*env)->ExceptionCheck(env)) {
+            LOGE("uaEvent messageResponse method call failed\n");
+            (*env)->ExceptionDescribe(env);
+            (*env)->ExceptionClear(env);
+        }
+    }
     (*env)->DeleteLocalRef(env, javaReason);
     (*env)->DeleteLocalRef(env, javaTime);
 
+    mem_deref(native_time);
 }
 
 enum
@@ -485,6 +521,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 
     jni_set_jvm(vm);
     av_jni_set_java_vm(vm, NULL);
+
+    if (pthread_key_create(&g_thread_key, detach_thread) != 0) {
+        LOGE("failed to create pthread key\n");
+    }
 
     return JNI_VERSION_1_6;
 }
@@ -1687,16 +1727,20 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_message_1send(
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     const char *native_msg = (*env)->GetStringUTFChars(env, jMsg, 0);
     const char *native_time = (*env)->GetStringUTFChars(env, jTime, 0);
+    char *time_copy = NULL;
+    str_dup(&time_copy, native_time);
     LOGD("sending message from ua %ld to %s at %s\n", (long)ua, native_peer, native_time);
     re_thread_enter();
     int err = message_send(
-            (struct ua *)ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
+            (struct ua *)ua, native_peer, native_msg, send_resp_handler, (void *)time_copy);
     re_thread_leave();
     if (err) {
         LOGW("message_send failed with error %d\n", err);
+        mem_deref(time_copy);
     }
     (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
     (*env)->ReleaseStringUTFChars(env, jMsg, native_msg);
+    (*env)->ReleaseStringUTFChars(env, jTime, native_time);
     return err;
 }
 
