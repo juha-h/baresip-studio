@@ -172,8 +172,8 @@
     <string name="invalid_country_code">Kode Negara Tidak Valid \'%1$s\'</string>
     <string name="telephony_provider">Penyedia Telepon</string>
     <string name="telephony_provider_help">Bagian host URI SIP yang digunakan dalam panggilan ke nomor telepon. Default pabrik adalah domain akun. Jika tidak diberikan, akun ini tidak dapat digunakan untuk menelepon nomor telepon.</string>
-    <string name="numeric_keypad">Papan Tombol Numerik</string>"
-    <string name="numeric_keypad_help">Jika dicentang, papan tombol numerik ditampilkan saat kolom \"Panggil ke …\" difokuskan.</string>"
+    <string name="numeric_keypad">Papan Tombol Numerik</string>
+    <string name="numeric_keypad_help">Jika dicentang, papan tombol numerik ditampilkan saat kolom \"Panggil ke …\" difokuskan.</string>
     <string name="invalid_sip_uri_hostpart">Bagian host URI SIP Tidak Valid \'%1$s\'</string>
     <string name="default_account">Akun Default</string>
     <string name="default_account_help">Jika dicentang, akun ini dipilih saat baresip dijalankan.</string>

@@ -61,8 +61,8 @@
     <string name="invalid_country_code">国家/地区代码“%1$s”无效</string>
     <string name="telephony_provider">电话服务提供者</string>
     <string name="telephony_provider_help">用于拨打电话号码的 SIP URI 主机部分。出厂默认为账号的域名。如果未提供，则此账号不能用于拨打电话号码。</string>
-    <string name="numeric_keypad">数字键盘</string>"
-    <string name="numeric_keypad_help">如果选中，当“呼叫…”字段聚焦时，将显示数字键盘。</string>"
+    <string name="numeric_keypad">数字键盘</string>
+    <string name="numeric_keypad_help">如果选中，当“呼叫…”字段聚焦时，将显示数字键盘。</string>
     <string name="invalid_sip_uri_hostpart">SIP URI 主机部分“%1$s”无效</string>
     <string name="default_account">默认账号</string>
     <string name="default_account_help">如果选中，则在启动 baresip 时选择此账号。</string>
@@ -168,7 +168,7 @@
     <string name="dark_theme_help">强制启用深色显示主题</string>
     <string name="colorblind">色盲</string>
     <string name="colorblind_help">使用色盲友好型注册状态图标</string>
-    <string name="proximity_sensing">近距离感应</string>"&gt;
+    <string name="proximity_sensing">近距离感应</string>
     <string name="proximity_sensing_help">如果选中，则在通话期间将启用近距离感应功能。</string>
     <string name="video_size">视频帧大小</string>
     <string name="video_size_help">传输的视频帧大小（宽 × 高）</string>
