@@ -1990,7 +1990,9 @@ class BaresipService: Service() {
             }
         })
 
-        calls.add(call)
+        synchronized(calls) {
+            calls.add(call)
+        }
         setCallVolume()
         ensureCommunicationMode()
 
@@ -2028,7 +2030,9 @@ class BaresipService: Service() {
                 if (call.dir == "in" && call.startTime == null && !call.rejected)
                     call.ua.account.missedCalls = true
             }
-            calls.remove(call)
+            synchronized(calls) {
+                calls.remove(call)
+            }
             postServiceEvent(
                 ServiceEvent(
                     "call closed", arrayListOf(uap, callp), System.nanoTime()
