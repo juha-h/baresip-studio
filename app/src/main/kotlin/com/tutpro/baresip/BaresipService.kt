@@ -2851,13 +2851,14 @@ class BaresipService: Service() {
         }
 
         fun postServiceEvent(event: ServiceEvent) {
-            serviceEvents.add(event)
-            if (serviceEvents.size == 1) {
-                Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
-                serviceEvent.postValue(Event(event.timeStamp))
+            synchronized(serviceEvents) {
+                serviceEvents.add(event)
+                if (serviceEvents.size == 1) {
+                    Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
+                    serviceEvent.postValue(Event(event.timeStamp))
+                } else
+                    Log.d(TAG, "Added service event ${event.event}")
             }
-            else
-                Log.d(TAG, "Added service event ${event.event}")
         }
 
         fun requestAudioFocus(ctx: Context): Boolean {
