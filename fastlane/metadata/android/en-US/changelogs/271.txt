@@ -1,0 +1,4 @@
+- When mobile account is selected, disable account spinner long touch and screen swipe
+- Do not show top bar record icon when mobile account is selected
+- Turn mobile account status to red when mobile connectivity is lost
+- Try to avoid call state change related crashes
