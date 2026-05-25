@@ -51,6 +51,7 @@ import android.os.VibratorManager
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.system.OsConstants
+import android.telecom.Connection
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
@@ -1003,10 +1004,14 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
-                        if (call!!.status.value == "incoming")
-                            call.status.value = "answered"
-                        else
-                            return
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                if (call.status.value == "incoming")
+                                    call.status.value = "answered"
+                                else
+                                    return@post
+                            }
+                        }
                     }
                     "call redirect" -> {
                         stopMediaPlayer()
@@ -1016,64 +1021,85 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
-                        call!!.status.value = "connected"
-                        call.onhold = false
-                        call.startTime = GregorianCalendar()
-                        updateStatusNotification()
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                call.status.value = "connected"
+                                call.onhold = false
+                                call.startTime = GregorianCalendar()
+                                if (call.conferenceCall)
+                                    Api.cmd_exec("conference")
+                            }
+                            updateStatusNotification()
+                            proximitySensing(proximitySensing)
+                        }
                         if (!isMainVisible)
                             return
                     }
                     "call update" -> {
-                        val newHeldState = when (ev[1].toInt()) {Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
+                        val newHeldState = when (ev[1].toInt()) {
+                            Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
                             else -> false
                         }
                         val connection = ConnectionService.connections[callp]
-                        if (call!!.held && !newHeldState) {
-                            Log.d(TAG, "Call ${call.callp} un-held by peer.")
-                            call.onhold = false
-                            // Use a Coroutine with a small delay to let the SIP
-                            // transaction (the re-INVITE from the peer) finish
-                            // before trying to hold the other call and resume this one.
-                            CoroutineScope(Dispatchers.Main).launch {
-                                delay(100)
-                                call.resume()
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                if (call.held && !newHeldState) {
+                                    Log.d(TAG, "Call ${call.callp} un-held by peer.")
+                                    call.onhold = false
+                                    // Use a Coroutine with a small delay to let the SIP
+                                    // transaction (the re-INVITE from the peer) finish
+                                    // before trying to hold the other call and resume this one.
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        delay(100)
+                                        call.resume()
+                                    }
+                                }
+                                call.held = newHeldState
+                                if (newHeldState) {
+                                    // Peer put us on hold
+                                    call.showOnHoldNotice.value = true
+                                    call.callOnHold.value = true
+                                    if (connection?.state != Connection.STATE_HOLDING)
+                                        connection?.setOnHold()
+                                } else {
+                                    // Peer un-held us
+                                    call.showOnHoldNotice.value = false
+                                    if (!call.onhold) {
+                                        call.callOnHold.value = false
+                                        if (connection?.state != Connection.STATE_ACTIVE)
+                                            connection?.setActive()
+                                    }
+                                }
+                                if (call.state() == Api.CALL_STATE_EARLY) {
+                                    if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
+                                        stopMediaPlayer()
+                                }
+                                if (call.status.value == "connected" && !call.held && !call.onhold) {
+                                    if (call.callOnHold.value || call.showOnHoldNotice.value) {
+                                        Log.d(
+                                            TAG,
+                                            "Safety guard: Clearing stuck hold flags for ${call.callp}"
+                                        )
+                                        call.callOnHold.value = false
+                                        call.showOnHoldNotice.value = false
+                                        connection?.setActive()
+                                    }
+                                }
                             }
                         }
-                        call.held = newHeldState
-                        if (newHeldState) {
-                            // Peer put us on hold
-                            call.showOnHoldNotice.value = true
-                            call.callOnHold.value = true
-                            connection?.setOnHold()
-                        } else {
-                            // Peer un-held us
-                            call.showOnHoldNotice.value = false
-                            if (!call.onhold) {
-                                call.callOnHold.value = false
-                                connection?.setActive()
-                            }
-                        }
-                        if (call.state() == Api.CALL_STATE_EARLY) {
-                            if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
-                                stopMediaPlayer()
-                        }
-                        if (call.status.value == "connected" && !call.held && !call.onhold) {
-                            if (call.callOnHold.value || call.showOnHoldNotice.value) {
-                                Log.d(TAG, "Safety guard: Clearing stuck hold flags for ${call.callp}")
-                                call.callOnHold.value = false
-                                call.showOnHoldNotice.value = false
-                                connection?.setActive()
-                            }
-                        }
-                        if (!isMainVisible || call.status.value != "connected")
+                        if (!isMainVisible || call?.status?.value != "connected")
                             return
                     }
                     "call verified", "call secure" -> {
-                        if (ev[0] == "call secure") {
-                            call!!.security = R.color.colorTrafficYellow
-                        } else {
-                            call!!.security = R.color.colorTrafficGreen
-                            call.zid = ev[1]
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null) {
+                                if (ev[0] == "call secure") {
+                                    call.security = R.color.colorTrafficYellow
+                                } else {
+                                    call.security = R.color.colorTrafficGreen
+                                    call.zid = ev[1]
+                                }
+                            }
                         }
                         if (!isMainVisible)
                             return
@@ -1147,7 +1173,6 @@ class BaresipService: Service() {
                                 else -> DisconnectCause.REMOTE
                             }
                             connection.setDisconnected(DisconnectCause(cause))
-                            connection.destroy()
                             ConnectionService.connections.remove(callp)
                         }
                         if (call != null) {
@@ -2661,13 +2686,15 @@ class BaresipService: Service() {
                     if (!servers.contains(server)) servers.add(server)
         }
         // Update if change
-        if (servers != dnsServers) {
-            if (isServiceRunning && Config.updateDnsServers(servers) != 0) {
-                Log.w(TAG, "Failed to update DNS servers '${servers}'")
-            } else {
-                // Log.d(TAG, "Updated DNS servers: '${servers}'")
-                dnsServers = servers
-                return true
+        synchronized(dnsServers) {
+            if (servers != dnsServers) {
+                if (isServiceRunning && Config.updateDnsServers(servers) != 0) {
+                    Log.w(TAG, "Failed to update DNS servers '${servers}'")
+                } else {
+                    // Log.d(TAG, "Updated DNS servers: '${servers}'")
+                    dnsServers = servers
+                    return true
+                }
             }
         }
         return false

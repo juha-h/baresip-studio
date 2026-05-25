@@ -2427,10 +2427,14 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
 
     when (ev[0]) {
         "call rejected" -> {
-            if (aor == viewModel.selectedAor.value)
-                viewModel.triggerAccountUpdate()
         }
-        "call incoming", "call outgoing" -> {
+        "call outgoing" -> {
+            val callp = params[1] as Long
+            if (!BaresipService.isMainVisible)
+                viewModel.navigateToHome()
+            spinToAor(viewModel, aor, Call.ofCallp(callp))
+        }
+        "call incoming" -> {
             val callp = params[1] as Long
             if (!BaresipService.isMainVisible)
                 viewModel.navigateToHome()
@@ -2464,7 +2468,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 }
                 showDialog.value = true
             }
-            viewModel.triggerAccountUpdate()
         }
         "call established" -> {
             (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -2472,16 +2475,11 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
                 val call = Call.ofCallp(callp)
-                if (call != null) {
+                if (call != null)
                     call.dtmfText.value = ""
-                    if (call.conferenceCall)
-                        Api.cmd_exec("conference")
-                }
-                viewModel.triggerAccountUpdate(call)
             }
         }
         "call update" -> {
-            viewModel.triggerAccountUpdate()
         }
         "call verify" -> {
             val callp = params[1] as Long
@@ -2524,7 +2522,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             }
             if (aor == viewModel.selectedAor.value) {
                 call.securityIconTint.value = call.security
-                viewModel.triggerAccountUpdate(call)
             }
         }
         "call transfer", "transfer show" -> {
@@ -2568,9 +2565,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             showCall(ctx, viewModel, ua)
         }
         "call closed" -> {
-            if (Call.calls().isEmpty())
+            val calls = Call.calls()
+            if (calls.isEmpty())
                 (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            viewModel.updateCalls(Call.calls().toList())
+            viewModel.updateCalls(calls.toList())
             val activity = ctx as? Activity
             if (activity != null) {
                 val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -2583,8 +2581,6 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.dialerState.callButtonsEnabled.value = true
                 ua.account.resumeUri = ""
                 viewModel.triggerAccountUpdate()
-                if (acc.missedCalls)
-                    viewModel.triggerAccountUpdate()
             }
         }
         "message", "message show", "message reply" -> {
@@ -2602,13 +2598,12 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     break
                 }
             }
-            if (aor == viewModel.selectedAor.value)
-                viewModel.triggerAccountUpdate()
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
 
     viewModel.updateCalls(Call.calls().toList())
+    viewModel.triggerAccountUpdate()
     handleNextEvent()
 }
 
