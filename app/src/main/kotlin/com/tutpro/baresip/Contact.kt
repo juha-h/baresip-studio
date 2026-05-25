@@ -89,51 +89,57 @@ sealed class Contact {
             return null
         }
 
-        // Return URIs of contact name
         fun contactUris(name: String, tel: Boolean = false): ArrayList<String> {
             val uris = ArrayList<String>()
-            for (c in BaresipService.contacts)
-                when (c) {
-                    is BaresipContact -> {
-                        if (c.name.equals(name, ignoreCase = true)) {
-                            for (u in c.uris) {
-                                if (tel && !u.startsWith("tel:"))
-                                    continue
-                                uris.add(u)
+            synchronized(BaresipService.contacts) {
+                for (c in BaresipService.contacts)
+                    when (c) {
+                        is BaresipContact -> {
+                            if (c.name.equals(name, ignoreCase = true)) {
+                                for (u in c.uris) {
+                                    if (tel && !u.startsWith("tel:"))
+                                        continue
+                                    uris.add(u)
+                                }
+                                return uris
                             }
-                            return uris
+                        }
+                        is AndroidContact -> {
+                            if (c.name == name) {
+                                for (u in c.uris) {
+                                    if (tel && !u.startsWith("tel:"))
+                                        continue
+                                    uris.add(u)
+                                }
+                                return uris
+                            }
                         }
                     }
-                    is AndroidContact -> {
-                        if (c.name == name) {
-                            for (u in c.uris) {
-                                if (tel && !u.startsWith("tel:"))
-                                    continue
-                                uris.add(u)
-                            }
-                            return uris
-                        }
-                    }
-                }
+            }
             return uris
         }
 
         fun findContact(uri: String): Contact? {
-            for (c in BaresipService.contacts)
-                when (c) {
-                    is BaresipContact -> {
-                        for (u in c.uris)
-                            if (Utils.uriMatch(u, uri))
-                                return c
+            synchronized(BaresipService.contacts) {
+                for (c in BaresipService.contacts)
+                    when (c) {
+                        is BaresipContact -> {
+                            for (u in c.uris)
+                                if (Utils.uriMatch(u, uri))
+                                    return c
+                        }
+                        is AndroidContact -> {
+                            val cleanUri = uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
+                            for (u in c.uris)
+                                if (Utils.uriMatch(
+                                        u.filterNot { setOf('-', ' ', '(', ')').contains(it) },
+                                        cleanUri
+                                    )
+                                )
+                                    return c
+                        }
                     }
-                    is AndroidContact -> {
-                        val cleanUri = uri.filterNot{setOf('-', ' ', '(', ')').contains(it)}
-                        for (u in c.uris)
-                            if (Utils.uriMatch(u.filterNot{setOf('-', ' ', '(', ')').contains(it)},
-                                    cleanUri))
-                                return c
-                    }
-                }
+            }
             return null
         }
 
