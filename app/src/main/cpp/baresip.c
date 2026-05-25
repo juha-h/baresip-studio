@@ -328,17 +328,18 @@ static void message_handler(
 
 static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
 {
-    (void)arg;
+    char *native_time = (char *)arg;
     char reason_buf[64];
 
     if (err) {
         LOGD("send_response_handler received error %d\n", err);
+        mem_deref(native_time);
         return;
     }
 
     pl_strcpy(&(msg->reason), reason_buf, 64);
     LOGD("send_response_handler received response '%u %s' at %s\n", msg->scode, reason_buf,
-            (char *)arg);
+            native_time);
 
     JavaVM *javaVM = g_ctx.javaVM;
     JNIEnv *env;
@@ -347,6 +348,7 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
         res = (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
         if (JNI_OK != res) {
             LOGE("failed to AttachCurrentThread, ErrorCode = %d\n", res);
+            mem_deref(native_time);
             return;
         }
     }
@@ -354,11 +356,13 @@ static void send_resp_handler(int err, const struct sip_msg *msg, void *arg)
     jmethodID methodId = (*env)->GetMethodID(env, g_ctx.mainActivityClz, "messageResponse",
             "(ILjava/lang/String;Ljava/lang/String;)V");
     jstring javaReason = (*env)->NewStringUTF(env, reason_buf);
-    jstring javaTime = (*env)->NewStringUTF(env, (char *)arg);
-    (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, msg->scode, javaReason, javaTime);
+    jstring javaTime = (*env)->NewStringUTF(env, native_time);
+    if (methodId)
+        (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, methodId, msg->scode, javaReason, javaTime);
     (*env)->DeleteLocalRef(env, javaReason);
     (*env)->DeleteLocalRef(env, javaTime);
 
+    mem_deref(native_time);
 }
 
 enum
@@ -1569,16 +1573,20 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_message_1send(
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     const char *native_msg = (*env)->GetStringUTFChars(env, jMsg, 0);
     const char *native_time = (*env)->GetStringUTFChars(env, jTime, 0);
+    char *time_copy = NULL;
+    str_dup(&time_copy, native_time);
     LOGD("sending message from ua %ld to %s at %s\n", (long)ua, native_peer, native_time);
     re_thread_enter();
     int err = message_send(
-            (struct ua *)ua, native_peer, native_msg, send_resp_handler, (void *)native_time);
+            (struct ua *)ua, native_peer, native_msg, send_resp_handler, (void *)time_copy);
     re_thread_leave();
     if (err) {
         LOGW("message_send failed with error %d\n", err);
+        mem_deref(time_copy);
     }
     (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
     (*env)->ReleaseStringUTFChars(env, jMsg, native_msg);
+    (*env)->ReleaseStringUTFChars(env, jTime, native_time);
     return err;
 }
 
