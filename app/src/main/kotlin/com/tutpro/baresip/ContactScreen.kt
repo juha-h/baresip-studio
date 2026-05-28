@@ -245,11 +245,17 @@ private fun ContactScreen(
                 navController.previousBackStackEntry?.savedStateHandle?.set("scrollToContact", screenState.name)
                 navController.navigateUp()
             } else {
-                screenState = screenState.copy(isEditing = false, tmpAvatarFile = null)
                 // Update UI state with saved values
                 val contact = Contact.baresipContact(screenState.name)!!
                 val avatarFile = File(BaresipService.filesPath, "${contact.id}.png")
                 screenState = screenState.copy(
+                    isEditing = false,
+                    tmpAvatarFile = null,
+                    name = contact.name,
+                    uris = contact.uris,
+                    email = contact.email,
+                    favorite = contact.favorite,
+                    color = contact.color,
                     id = contact.id,
                     newId = contact.id,
                     avatarImageUri = if (contact.avatarImage != null && avatarFile.exists())
