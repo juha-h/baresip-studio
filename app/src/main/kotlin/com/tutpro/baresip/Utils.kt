@@ -1380,39 +1380,36 @@ object Utils {
         try {
             if (Build.VERSION.SDK_INT >= 33) {
                 if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_NUMBERS) ==
-                    PackageManager.PERMISSION_GRANTED
-                ) {
-                    val sm =
-                        ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                        PackageManager.PERMISSION_GRANTED) {
+                    val sm = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
                     val number = sm.getPhoneNumber(subscriptionId)
                     if (number != "") {
                         Log.d(TAG, "Retrieved SIM number $number via SubscriptionManager for $subscriptionId")
                         return number
-                    } else
+                    }
+                    else
                         Log.d(TAG, "Did not get SIM number via SubscriptionManager for $subscriptionId")
-                } else
+                }
+                else
                     Log.d(TAG, "No READ_PHONE_NUMBERS permission")
-            } else {
-                if (checkPermissions(
-                        ctx, arrayOf(
-                            Manifest.permission.READ_PHONE_NUMBERS,
-                            Manifest.permission.READ_PHONE_STATE
-                        )
-                    )
-                ) {
+            }
+            else {
+                if (checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS,
+                        Manifest.permission.READ_PHONE_STATE))) {
                     val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                     val targetTm = if (subscriptionId == SubscriptionManager.DEFAULT_SUBSCRIPTION_ID)
                         tm
                     else
                         tm.createForSubscriptionId(subscriptionId)
-
                     @Suppress("DEPRECATION")
                     val number = targetTm.line1Number
                     if (number != null && number != "") {
                         Log.d(TAG, "Retrieved SIM number $number via TelephonyManager for $subscriptionId")
                         return number
                     }
-                } else
+                    Log.d(TAG, "Could not retrieve SIM number")
+                }
+                else
                     Log.d(TAG, "No READ_PHONE_NUMBERS and/or READ_PHONE_STATE permissions")
             }
         } catch (e: Exception) {
