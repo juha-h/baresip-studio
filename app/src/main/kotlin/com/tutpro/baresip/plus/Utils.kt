@@ -1221,33 +1221,40 @@ object Utils {
         }
     }
 
+    @RequiresApi(29)
     @SuppressLint("HardwareIds")
-    fun getLine1Number(ctx: Context): String? {
+    fun getLine1Number(ctx: Context, subscriptionId: Int = SubscriptionManager.DEFAULT_SUBSCRIPTION_ID): String? {
         try {
             if (Build.VERSION.SDK_INT >= 33) {
                 if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_NUMBERS) ==
                         PackageManager.PERMISSION_GRANTED) {
                     val sm = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-                    val number = sm.getPhoneNumber(SubscriptionManager.DEFAULT_SUBSCRIPTION_ID)
+                    val number = sm.getPhoneNumber(subscriptionId)
                     if (number != "") {
-                        Log.d(TAG, "Retrieved SIM number $number via SubscriptionManager")
+                        Log.d(TAG, "Retrieved SIM number $number via SubscriptionManager for $subscriptionId")
                         return number
                     }
                     else
-                        Log.d(TAG, "Did not get SIM number via SubscriptionManager")
+                        Log.d(TAG, "Did not get SIM number via SubscriptionManager for $subscriptionId")
                 }
                 else
                     Log.d(TAG, "No READ_PHONE_NUMBERS permission")
-            } else {
+            }
+            else {
                 if (checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS,
                         Manifest.permission.READ_PHONE_STATE))) {
                     val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    val targetTm = if (subscriptionId == SubscriptionManager.DEFAULT_SUBSCRIPTION_ID)
+                        tm
+                    else
+                        tm.createForSubscriptionId(subscriptionId)
                     @Suppress("DEPRECATION")
-                    val number = tm.line1Number
-                    if (number != null) {
-                        Log.d(TAG, "Retrieved SIM number $number via TelephonyManager")
+                    val number = targetTm.line1Number
+                    if (!number.isNullOrEmpty()) {
+                        Log.d(TAG, "Retrieved SIM number $number via TelephonyManager for $subscriptionId")
                         return number
                     }
+                    Log.d(TAG, "Could not retrieve SIM number")
                 }
                 else
                     Log.d(TAG, "No READ_PHONE_NUMBERS and/or READ_PHONE_STATE permissions")

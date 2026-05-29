@@ -2239,21 +2239,9 @@ class BaresipService: Service() {
             return
         }
 
-        val userPart = Utils.getLine1Number(this) ?: "mobile"
-        val mobileAor = "sip:$userPart@pstn"
+        val mobileAor = "sip:mobile@pstn"
 
         if (existingMobileUa != null) {
-            // Update AOR if it previously was sip:mobile@pstn but now a real number
-            if (existingMobileUa.account.aor == "sip:mobile@pstn" && mobileAor != "sip:mobile@pstn") {
-                Log.d(TAG, "Updating existing Mobile account AOR to $mobileAor")
-                val aorField = Account::class.java.getDeclaredField("aor")
-                aorField.isAccessible = true
-                aorField.set(existingMobileUa.account, mobileAor)
-                val luriField = Account::class.java.getDeclaredField("luri")
-                luriField.isAccessible = true
-                luriField.set(existingMobileUa.account, mobileAor)
-                Account.saveAccounts()
-            }
             return
         }
 
