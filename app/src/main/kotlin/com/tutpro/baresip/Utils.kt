@@ -1403,7 +1403,7 @@ object Utils {
                         tm.createForSubscriptionId(subscriptionId)
                     @Suppress("DEPRECATION")
                     val number = targetTm.line1Number
-                    if (number != null && number != "") {
+                    if (!number.isNullOrEmpty()) {
                         Log.d(TAG, "Retrieved SIM number $number via TelephonyManager for $subscriptionId")
                         return number
                     }
