@@ -45,6 +45,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,6 +63,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -81,6 +86,7 @@ import java.io.StringReader
 import java.net.URL
 import java.util.Locale
 import javax.net.ssl.HttpsURLConnection
+import android.telephony.SubscriptionManager
 
 fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
     composable(
@@ -126,6 +132,20 @@ private fun AccountScreen(
 ) {
     val ua = UserAgent.ofAor(aor)!!
     val acc = ua.account
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var resumeToggle by remember { mutableLongStateOf(0L) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                resumeToggle = System.currentTimeMillis()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     var isAccountAvailable by remember { mutableStateOf(false) }
     var isAccountLoaded by remember { mutableStateOf(false) }
@@ -190,7 +210,7 @@ private fun AccountScreen(
         }
     ) { contentPadding ->
         if (isAccountLoaded)
-            AccountContent(viewModel, navController, contentPadding, ua)
+            AccountContent(viewModel, navController, contentPadding, ua, resumeToggle)
         else
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -215,7 +235,8 @@ private fun AccountContent(
     viewModel: AccountViewModel,
     navController: NavController,
     contentPadding: PaddingValues,
-    ua: UserAgent
+    ua: UserAgent,
+    resumeToggle: Long
 ) {
     val ctx = LocalContext.current
     val aor = ua.account.aor
@@ -224,42 +245,79 @@ private fun AccountContent(
     val showStun by remember { derivedStateOf { mediaNat.isNotEmpty() } }
 
     @Composable
-    fun AoR() {
-        Row(
+    fun AoRField(value: String, label: String) {
+        OutlinedTextField(
+            value = value,
+            enabled = false,
+            onValueChange = {},
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(fontSize = 18.sp),
+            label = {
+                Text(
+                    text = label,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledBorderColor = MaterialTheme.colorScheme.outline,
+                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        )
+    }
+
+    @Composable
+    fun AoR(toggle: Long) {
+        Column(
             Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp, end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val aorText = if (ua.account.isMobile) {
-                if (ua.account.aor == "sip:mobile@pstn")
-                    stringResource(R.string.not_available)
-                else
-                    "tel:${Utils.uriUserPart(ua.account.aor)}"
-            } else
-                ua.account.luri
+            if (ua.account.isMobile && android.os.Build.VERSION.SDK_INT >= 29) {
+                val voiceSubId = remember(toggle) { SubscriptionManager.getDefaultVoiceSubscriptionId() }
+                val smsSubId = remember(toggle) { SubscriptionManager.getDefaultSmsSubscriptionId() }
 
-            OutlinedTextField(
-                value = aorText,
-                enabled = false,
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = TextStyle(fontSize = 18.sp),
-                label = {
-                    Text(
-                        text = stringResource(if (ua.account.isMobile) R.string.tel_uri else R.string.sip_uri),
-                        fontWeight = FontWeight.Bold
+                if (voiceSubId != smsSubId &&
+                    voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID &&
+                    smsSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
+                ) {
+                    val voiceNumber = remember(voiceSubId, toggle) { Utils.getLine1Number(ctx, voiceSubId) }
+                    AoRField(
+                        value = if (voiceNumber != null) "tel:$voiceNumber" else stringResource(R.string.not_available),
+                        label = stringResource(R.string.tel_uri_calls)
                     )
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    val smsNumber = remember(smsSubId, toggle) { Utils.getLine1Number(ctx, smsSubId) }
+                    AoRField(
+                        value = if (smsNumber != null) "tel:$smsNumber" else stringResource(R.string.not_available),
+                        label = stringResource(R.string.tel_uri_messages)
+                    )
+                } else {
+                    val currentSubId = remember(toggle) {
+                        if (voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID)
+                            voiceSubId
+                        else
+                            smsSubId
+                    }
+                    val currentNumber = remember(currentSubId, toggle) {
+                        if (currentSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID)
+                            Utils.getLine1Number(ctx, currentSubId)
+                        else
+                            Utils.getLine1Number(ctx)
+                    }
+                    AoRField(
+                        value = if (currentNumber != null) "tel:$currentNumber" else stringResource(R.string.not_available),
+                        label = stringResource(R.string.tel_uri)
+                    )
+                }
+            } else {
+                AoRField(
+                    value = if (ua.account.isMobile) stringResource(R.string.not_available) else ua.account.luri,
+                    label = stringResource(if (ua.account.isMobile) R.string.tel_uri else R.string.sip_uri)
                 )
-            )
+            }
         }
     }
 
@@ -1259,7 +1317,7 @@ private fun AccountContent(
             .verticalScroll(state = scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        AoR()
+        AoR(resumeToggle)
         Nickname()
         if (!ua.account.isMobile) {
             DisplayName()

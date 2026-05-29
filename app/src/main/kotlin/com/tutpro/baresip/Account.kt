@@ -90,7 +90,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
     fun print() : String {
 
         var res = if (isMobile) {
-            "<${aor};transport=udp>"
+            "<sip:mobile@pstn;transport=udp>"
         } else {
             if (displayName != "")
                 "\"${displayName}\" "

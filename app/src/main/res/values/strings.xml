@@ -116,6 +116,10 @@
     </string>
     <!-- Account Activity -->
     <string name="account">Account</string>
+    <string name="sip_uri" translatable="false">SIP URI</string>
+    <string name="tel_uri" translatable="false">TEL URI</string>
+    <string name="tel_uri_calls">TEL URI for Calls</string>
+    <string name="tel_uri_messages">TEL URI for Messages</string>
     <string name="not_available">Not available</string>
     <string name="account_nickname_help">Nickname (if any) used to identify this account within
         baresip app.</string>
@@ -496,8 +500,6 @@
     <string name="no">No</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
-    <string name="sip_uri" translatable="false">SIP URI</string>
-    <string name="tel_uri" translatable="false">TEL URI</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>

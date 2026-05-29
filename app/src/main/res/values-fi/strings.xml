@@ -113,6 +113,8 @@
     </string>
     <!-- Account Activity -->
     <string name="account">Tili</string>
+    <string name="tel_uri_calls">TEL URI Puhelut</string>
+    <string name="tel_uri_messages">TEL URI Viestit</string>
     <string name="not_available">Ei saatavana</string>
     <string name="account_nickname_help">Lempinimi (jos annettu) millä tämä tili identifioidaan
         baresip sovelluksessa.</string>
