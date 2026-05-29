@@ -266,7 +266,7 @@ sealed class Contact {
                     else
                         baseId + contactNo
                     val favorite = Utils.paramValue(params, "favorite" ) == "yes"
-                    Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
+                    // Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
                     val contact = BaresipContact(name, uris, email, color, id, favorite)
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
