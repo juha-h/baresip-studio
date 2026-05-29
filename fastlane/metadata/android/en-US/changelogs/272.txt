@@ -1,0 +1,3 @@
+- Show two mobile account tel URIs if different SIM is preferred for calls and messages
+- Properly show edited contact URIs right after check icon is touched
+- New translations (Chinese)
