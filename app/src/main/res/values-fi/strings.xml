@@ -485,6 +485,7 @@
     <!-- Contact Activity -->
     <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
+    <string name="label">Kuvaus</string>
     <string name="email">Sähköposti</string>
     <string name="sip_or_tel_uri">SIP tai TEL URI</string>
     <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>

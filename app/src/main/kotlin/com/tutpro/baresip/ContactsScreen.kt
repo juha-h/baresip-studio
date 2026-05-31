@@ -151,10 +151,17 @@ private fun ContactsScreen(navController: NavController) {
                             writer.write("PHOTO;ENCODING=BASE64;JPEG:$base64Image\n")
                         }
                         for (u in contact.uris) {
-                            if (u.startsWith("tel:"))
-                                writer.write("TEL:${u.substring(4)}\n")
-                            else if (u.startsWith("sip:"))
-                                writer.write("X-SIP:${u.substring(4)}\n")
+                            if (u.uri.startsWith("tel:")) {
+                                if (u.label.isNotEmpty())
+                                    writer.write("TEL;X-${u.label}:${u.uri.substring(4)}\n")
+                                else
+                                    writer.write("TEL:${u.uri.substring(4)}\n")
+                            } else if (u.uri.startsWith("sip:")) {
+                                if (u.label.isNotEmpty())
+                                    writer.write("X-SIP;X-${u.label}:${u.uri.substring(4)}\n")
+                                else
+                                    writer.write("X-SIP:${u.uri.substring(4)}\n")
+                            }
                         }
                         writer.write("END:VCARD\n")
                     }
@@ -188,7 +195,7 @@ private fun ContactsScreen(navController: NavController) {
 
                     var name = ""
                     var email = ""
-                    val uris = mutableListOf<String>()
+                    val uris = mutableListOf<Contact.ContactUri>()
                     var photoBase64 = ""
                     var contactNo = 0
                     val newBaresipContacts = BaresipService.baresipContacts.value.toMutableList()
@@ -212,18 +219,20 @@ private fun ContactsScreen(navController: NavController) {
                                     email = line.substringAfter(":").trim()
                             }
                             line.startsWith("TEL", ignoreCase = true) -> {
+                                val label = if (line.contains("X-")) line.substringAfter("X-").substringBefore(":") else ""
                                 val value = line.substringAfter(":").trim()
                                 val cleanValue = value.filterNot { setOf('-', ' ', '(', ')').contains(it) }
                                 if (cleanValue.isNotEmpty()) {
                                     val telUri = if (cleanValue.startsWith("tel:")) cleanValue else "tel:$cleanValue"
-                                    if (telUri !in uris) uris.add(telUri)
+                                    if (uris.none { it.uri == telUri }) uris.add(Contact.ContactUri(telUri, label))
                                 }
                             }
-                            line.startsWith("X-SIP:", ignoreCase = true) -> {
-                                val sipUri = line.substring(6).trim()
+                            line.startsWith("X-SIP", ignoreCase = true) -> {
+                                val label = if (line.contains("X-")) line.substringAfter("X-").substringBefore(":") else ""
+                                val sipUri = line.substringAfter(":").trim()
                                 if (sipUri.isNotEmpty()) {
                                     val fullSipUri = if (sipUri.startsWith("sip:")) sipUri else "sip:$sipUri"
-                                    if (fullSipUri !in uris) uris.add(fullSipUri)
+                                    if (uris.none { it.uri == fullSipUri }) uris.add(Contact.ContactUri(fullSipUri, label))
                                 }
                             }
                             line.startsWith("PHOTO", ignoreCase = true) && line.contains("BASE64", ignoreCase = true) -> {
@@ -249,7 +258,7 @@ private fun ContactsScreen(navController: NavController) {
                                     }
                                     if (existingContact != null) {
                                         for (u in uris) {
-                                            if (u !in existingContact.uris) {
+                                            if (existingContact.uris.none { it.uri == u.uri }) {
                                                 existingContact.uris.add(u)
                                             }
                                         }

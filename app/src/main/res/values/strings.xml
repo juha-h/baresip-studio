@@ -460,6 +460,7 @@
     <!-- Contact Activity -->
     <string name="new_contact">New Contact</string>
     <string name="contact_name">Name</string>
+    <string name="label">Label</string>
     <string name="email">Email</string>
     <string name="sip_or_tel_uri">SIP or tel URI</string>
     <string name="user_domain_or_number">user@domain or telephone number</string>

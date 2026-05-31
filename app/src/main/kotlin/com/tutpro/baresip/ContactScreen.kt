@@ -54,6 +54,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -124,7 +125,7 @@ private data class ScreenState(
     val id: Long = 0,
     val newId: Long = 0,
     val name: String = "",
-    val uris: List<String> = emptyList(),
+    val uris: List<Contact.ContactUri> = emptyList(),
     val email: String = "",
     val color: Int = 0,
     val avatarImageUri: String? = null,
@@ -157,7 +158,7 @@ private fun ContactScreen(
                 new = true,
                 isEditing = true,
                 name = "",
-                uris = if (uriOrNameArg == "") emptyList() else listOf(uriOrNameArg),
+                uris = if (uriOrNameArg == "") emptyList() else listOf(Contact.ContactUri(uriOrNameArg, "")),
                 email = "",
                 favorite = false,
                 android = BaresipService.contactsMode == "android",
@@ -606,9 +607,9 @@ private fun UrisSection(
     ctx: Context,
     viewModel: ViewModel,
     navController: NavController,
-    uris: List<String>,
+    uris: List<Contact.ContactUri>,
     isEditing: Boolean,
-    onUrisChange: (List<String>) -> Unit
+    onUrisChange: (List<Contact.ContactUri>) -> Unit
 ) {
     val selectedAor by viewModel.selectedAor.collectAsState()
 
@@ -617,24 +618,39 @@ private fun UrisSection(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            uris.forEachIndexed { index, uri ->
+            uris.forEachIndexed { index, contactUri ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
-                        value = uri,
-                        placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
-                        onValueChange = { newUri ->
-                            val newList = uris.toMutableList()
-                            newList[index] = newUri
-                            onUrisChange(newList.toList())
-                        },
-                        modifier = Modifier.weight(1f),
-                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                        label = { Text("${stringResource(R.string.sip_or_tel_uri)} ${index + 1}") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                    )
+                    Column (modifier = Modifier.weight(1f)) {
+                        OutlinedTextField(
+                            value = contactUri.uri,
+                            placeholder = { Text(stringResource(R.string.user_domain_or_number)) },
+                            onValueChange = { newUri ->
+                                val newList = uris.toMutableList()
+                                newList[index] = contactUri.copy(uri = newUri)
+                                onUrisChange(newList.toList())
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                            label = { Text("${stringResource(R.string.sip_or_tel_uri)} ${index + 1}") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        )
+                        OutlinedTextField(
+                            value = contactUri.label,
+                            placeholder = { Text(stringResource(R.string.label)) },
+                            onValueChange = { newLabel ->
+                                val newList = uris.toMutableList()
+                                newList[index] = contactUri.copy(label = newLabel)
+                                onUrisChange(newList.toList())
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                            label = { Text(stringResource(R.string.label)) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        )
+                    }
                     if (uris.size > 1) {
                         CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
                             IconButton(
@@ -659,7 +675,7 @@ private fun UrisSection(
             IconButton(
                 onClick = {
                     val newList = uris.toMutableList()
-                    newList.add("")
+                    newList.add(Contact.ContactUri("", ""))
                     onUrisChange(newList.toList())
                 },
                 modifier = Modifier.align(Alignment.Start)
@@ -674,15 +690,32 @@ private fun UrisSection(
     } else {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            for (uri in uris) {
+            uris.forEachIndexed { index, contactUri ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(R.string.bullet_item, uri.substringAfter(":")),
+                    val uri = contactUri.uri
+                    val label = contactUri.label.ifEmpty {
+                        if (uri.startsWith("tel:"))
+                            "${stringResource(R.string.tel_uri)} ${index + 1}"
+                        else
+                            "${stringResource(R.string.sip_uri)} ${index + 1}"
+                    }
+
+                    OutlinedTextField(
+                        value = uri.substringAfter(":"),
+                        onValueChange = {},
+                        enabled = false,
                         modifier = Modifier.weight(1f),
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                        label = { Text(text = label, fontWeight = FontWeight.Bold) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledBorderColor = MaterialTheme.colorScheme.outline,
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     )
 
                     val ua = UserAgent.ofAor(selectedAor)
@@ -772,15 +805,24 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
         )
     } else if (email.isNotEmpty()) {
         Row(
-            Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(
-                text = stringResource(R.string.bullet_item, email),
+            OutlinedTextField(
+                value = email,
+                onValueChange = {},
+                enabled = false,
                 modifier = Modifier.weight(1f),
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onBackground,
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
+                label = { Text(text = stringResource(R.string.email), fontWeight = FontWeight.Bold) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             )
             IconButton(
                 onClick = {
@@ -855,9 +897,9 @@ private fun checkOnClick(
     currentState: ScreenState,
     uriOrNameArg: String
 ): Boolean {
-    val newUris = ArrayList<String>()
-    for (uri in currentState.uris) {
-        var u = uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
+    val newUris = ArrayList<Contact.ContactUri>()
+    for (contactUri in currentState.uris) {
+        var u = contactUri.uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
         if (u == "") continue
         if (!u.startsWith("sip:") && !u.startsWith("tel:"))
             u = if (Utils.isTelNumber(u)) "tel:$u" else "sip:$u"
@@ -868,7 +910,7 @@ private fun checkOnClick(
             showAlert.value = true
             return false
         }
-        newUris.add(u)
+        newUris.add(Contact.ContactUri(u, contactUri.label))
     }
 
     if (newUris.isEmpty() && currentState.email.trim().isEmpty()) {
@@ -879,7 +921,7 @@ private fun checkOnClick(
     }
 
     var newName = currentState.name.trim()
-    if (newName == "") newName = if (newUris.isNotEmpty()) newUris[0].substringAfter(":") else currentState.email
+    if (newName == "") newName = if (newUris.isNotEmpty()) newUris[0].uri.substringAfter(":") else currentState.email
     if (!Utils.checkName(newName)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_contact), newName)
@@ -1015,12 +1057,21 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
             .withValue(CommonDataKinds.Email.ADDRESS, contact.email)
             .withValue(CommonDataKinds.Email.TYPE, CommonDataKinds.Email.TYPE_HOME).build())
     }
-    for (uri in contact.uris) {
+    for (contactUri in contact.uris) {
+        val uri = contactUri.uri
+        val label = contactUri.label
         val mimeType = if (uri.startsWith("sip:")) CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE else CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-        ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+        val builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
             .withValueBackReference(Data.RAW_CONTACT_ID, 0)
             .withValue(Data.MIMETYPE, mimeType)
-            .withValue(Data.DATA1, uri.substringAfter(":")).build())
+            .withValue(Data.DATA1, uri.substringAfter(":"))
+        if (mimeType == CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
+            val type = Contact.stringToType(label)
+            builder.withValue(CommonDataKinds.Phone.TYPE, type)
+            if (type == CommonDataKinds.Phone.TYPE_CUSTOM)
+                builder.withValue(CommonDataKinds.Phone.LABEL, label)
+        }
+        ops.add(builder.build())
     }
     if (contact.avatarImage != null) {
         val photoData = bitmapToPNGByteArray(contact.avatarImage!!)
@@ -1044,17 +1095,26 @@ private fun updateAndroidContact(ctx: Context, rawContactId: Long, contact: Cont
     if (contact.email.isNotEmpty()) {
         if (updateAndroidEmail(ctx, rawContactId, contact.email) == 0) addAndroidEmail(ctx, rawContactId, contact.email)
     }
-    for (uri in contact.uris) if (updateAndroidUri(ctx, rawContactId, uri) == 0) addAndroidUri(ctx, rawContactId, uri)
+    for (contactUri in contact.uris) if (updateAndroidUri(ctx, rawContactId, contactUri) == 0) addAndroidUri(ctx, rawContactId, contactUri)
     if (updateAndroidPhoto(ctx, rawContactId, contact.avatarImage) == 0) if (contact.avatarImage != null) addAndroidPhoto(ctx, rawContactId, contact.avatarImage!!)
 }
 
-private fun addAndroidUri(ctx: Context, rawContactId: Long, uri: String) {
+private fun addAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.ContactUri) {
+    val uri = contactUri.uri
+    val label = contactUri.label
     val mimeType = if (uri.startsWith("sip:")) CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE else CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-    val ops = ArrayList<ContentProviderOperation>()
-    ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+    val builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         .withValue(Data.RAW_CONTACT_ID, rawContactId)
         .withValue(Data.MIMETYPE, mimeType)
-        .withValue(Data.DATA1, uri.substringAfter(":")).build())
+        .withValue(Data.DATA1, uri.substringAfter(":"))
+    if (mimeType == CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
+        val type = Contact.stringToType(label)
+        builder.withValue(CommonDataKinds.Phone.TYPE, type)
+        if (type == CommonDataKinds.Phone.TYPE_CUSTOM)
+            builder.withValue(CommonDataKinds.Phone.LABEL, label)
+    }
+    val ops = ArrayList<ContentProviderOperation>()
+    ops.add(builder.build())
     try {
         ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
     } catch (e: Exception) {
@@ -1062,10 +1122,18 @@ private fun addAndroidUri(ctx: Context, rawContactId: Long, uri: String) {
     }
 }
 
-private fun updateAndroidUri(ctx: Context, rawContactId: Long, uri: String): Int {
+private fun updateAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.ContactUri): Int {
+    val uri = contactUri.uri
+    val label = contactUri.label
     val mimeType = if (uri.startsWith("sip:")) CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE else CommonDataKinds.Phone.CONTENT_ITEM_TYPE
     val contentValues = ContentValues()
-    contentValues.put(ContactsContract.Data.DATA1, uri)
+    contentValues.put(ContactsContract.Data.DATA1, uri.substringAfter(":"))
+    if (mimeType == CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
+        val type = Contact.stringToType(label)
+        contentValues.put(CommonDataKinds.Phone.TYPE, type)
+        if (type == CommonDataKinds.Phone.TYPE_CUSTOM)
+            contentValues.put(CommonDataKinds.Phone.LABEL, label)
+    }
     val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and ${ContactsContract.Data.MIMETYPE}='$mimeType'"
     return try {
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
