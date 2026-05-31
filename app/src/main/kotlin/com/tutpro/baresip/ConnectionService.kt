@@ -33,6 +33,7 @@ class ConnectionService : ConnectionService() {
         fun onCallClosed(callp: Long) {
             connections[callp]?.let {
                 it.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
+                it.safeDestroy()
                 connections.remove(callp)
             }
         }
@@ -152,6 +153,14 @@ class ConnectionService : ConnectionService() {
     inner class BaresipConnection(val uap: Long, var callp: Long) : Connection() {
 
         var isDisconnecting = false
+        private var isDestroyed = false
+
+        fun safeDestroy() {
+            if (!isDestroyed) {
+                isDestroyed = true
+                destroy()
+            }
+        }
 
         override fun onAnswer() {
             Log.d(TAG, "Telecom Connection onAnswer $callp")
@@ -218,8 +227,7 @@ class ConnectionService : ConnectionService() {
             Log.d(TAG, "onCallAudioStateChanged: $state")
             state.let {
                 if (BaresipService.isMicMuted != it.isMuted) {
-                    BaresipService.isMicMuted = it.isMuted
-                    Api.calls_mute(it.isMuted)
+                    BaresipService.setMicMute(it.isMuted)
                     BaresipService.postServiceEvent(
                         ServiceEvent("mic muted,${it.isMuted}", arrayListOf(uap, callp),
                             System.nanoTime())

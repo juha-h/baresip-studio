@@ -610,14 +610,12 @@ private fun TopAppBar(
                     .combinedClickable(
                         onClick = {
                             if (Call.call("connected") != null) {
-                                BaresipService.isMicMuted = !BaresipService.isMicMuted
-                                if (BaresipService.isMicMuted) {
+                                val newMuteState = !BaresipService.isMicMuted
+                                BaresipService.setMicMute(newMuteState)
+                                if (newMuteState)
                                     viewModel.updateMicIcon(Icons.Filled.MicOff)
-                                    Api.calls_mute(true)
-                                } else {
+                                else
                                     viewModel.updateMicIcon(Icons.Filled.Mic)
-                                    Api.calls_mute(false)
-                                }
                             }
                         },
                         onLongClick = {
