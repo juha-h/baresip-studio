@@ -95,34 +95,29 @@ sealed class Contact {
             return null
         }
 
-        fun contactUris(name: String, tel: Boolean = false): ArrayList<String> {
-            val uris = ArrayList<String>()
+        fun contactContactUris(name: String, tel: Boolean = false): List<ContactUri> {
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts)
                     when (c) {
                         is BaresipContact -> {
                             if (c.name.equals(name, ignoreCase = true)) {
-                                for (u in c.uris) {
-                                    if (tel && !u.uri.startsWith("tel:"))
-                                        continue
-                                    uris.add(u.uri)
-                                }
-                                return uris
+                                return if (tel)
+                                    c.uris.filter { it.uri.startsWith("tel:") }
+                                else
+                                    c.uris
                             }
                         }
                         is AndroidContact -> {
                             if (c.name == name) {
-                                for (u in c.uris) {
-                                    if (tel && !u.uri.startsWith("tel:"))
-                                        continue
-                                    uris.add(u.uri)
-                                }
-                                return uris
+                                return if (tel)
+                                    c.uris.filter { it.uri.startsWith("tel:") }
+                                else
+                                    c.uris
                             }
                         }
                     }
             }
-            return uris
+            return emptyList()
         }
 
         fun findContact(uri: String): Contact? {

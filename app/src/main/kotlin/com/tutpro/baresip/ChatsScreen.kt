@@ -593,7 +593,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 showSuggestions = false
                 val peerText = newPeer.trim()
                 if (peerText.isNotEmpty()) {
-                    val uris = Contact.contactUris(peerText, account.isMobile)
+                    val uris = Contact.contactContactUris(peerText, account.isMobile)
                     if (uris.isEmpty()) {
                         if (Contact.nameExists(peerText, BaresipService.contacts, true)) {
                             alertTitle.value = ctx.getString(R.string.notice)
@@ -606,11 +606,11 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                             makeChat(ctx, navController, account, peerText)
                         }
                     } else if (uris.size == 1)
-                        makeChat(ctx, navController, account, uris[0])
+                        makeChat(ctx, navController, account, uris[0].uri)
                     else {
-                        items.value = uris
+                        items.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
                         itemAction.value = { index ->
-                            makeChat(ctx, navController, account, uris[index])
+                            makeChat(ctx, navController, account, uris[index].uri)
                         }
                         showDialog.value = true
                     }

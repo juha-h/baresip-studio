@@ -1830,11 +1830,11 @@ private fun CallRow(
                                             call.showSuggestions.value = false
                                             var uriText = transferUri.trim()
                                             if (uriText.isNotEmpty()) {
-                                                val uris = Contact.contactUris(uriText)
+                                                val uris = Contact.contactContactUris(uriText)
                                                 if (uris.size > 1) {
-                                                    selectItems.value = uris
+                                                    selectItems.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
                                                     selectItemAction.value = { index ->
-                                                        val uri = uris[index]
+                                                        val uri = uris[index].uri
                                                         transfer(
                                                             ctx,
                                                             viewModel,
@@ -1847,7 +1847,7 @@ private fun CallRow(
                                                     showSelectItemDialog.value = true
                                                 }
                                                 else {
-                                                    if (uris.size == 1) uriText = uris[0]
+                                                    if (uris.size == 1) uriText = uris[0].uri
                                                     transfer(
                                                         ctx,
                                                         viewModel,
@@ -2062,7 +2062,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         uriText == Utils.friendlyUri(ctx, dialerState.redialUri, ua!!.account))
                     dialerState.redialUri
                 else {
-                    val uris = Contact.contactUris(uriText, ua?.account?.isMobile ?: false)
+                    val uris = Contact.contactContactUris(uriText, ua?.account?.isMobile ?: false)
                     if (uris.isEmpty()) {
                         if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
                             alertTitle.value = ctx.getString(R.string.notice)
@@ -2076,11 +2076,11 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         uriText
                     }
                     else if (uris.size == 1)
-                        uris[0]
+                        uris[0].uri
                     else {
-                        selectItems.value = uris
+                        selectItems.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
                         selectItemAction.value = { index ->
-                            makeCall(ctx, viewModel, uris[index], dialerState)
+                            makeCall(ctx, viewModel, uris[index].uri, dialerState)
                         }
                         showSelectItemDialog.value = true
                         return

@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -71,9 +72,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import androidx.core.net.toUri
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: ViewModel) {
@@ -309,15 +308,6 @@ private fun Calls(
         title = alertTitle.value,
         message = alertMessage.value,
         lastButtonText = stringResource(R.string.ok),
-    )
-
-    SelectableAlertDialog(
-        openDialog = CustomElements.showSelectItemDialog,
-        title = stringResource(R.string.choose_destination_uri),
-        items = CustomElements.selectItems.value,
-        onItemClicked = CustomElements.selectItemAction.value,
-        neutralButtonText = stringResource(R.string.cancel),
-        onNeutralClicked = {}
     )
 
     val lazyListState = rememberLazyListState()

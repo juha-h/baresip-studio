@@ -81,7 +81,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.tutpro.baresip.CustomElements.AlertDialog
-import com.tutpro.baresip.CustomElements.SelectableAlertDialog
 import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.io.ByteArrayOutputStream
@@ -395,15 +394,6 @@ private fun ContactsScreen(navController: NavController) {
                 )
             )
         }
-    )
-
-    SelectableAlertDialog(
-        openDialog = CustomElements.showSelectItemDialog,
-        title = stringResource(R.string.choose_destination_uri),
-        items = CustomElements.selectItems.value,
-        onItemClicked = CustomElements.selectItemAction.value,
-        neutralButtonText = stringResource(R.string.cancel),
-        onNeutralClicked = {}
     )
 
     Scaffold(

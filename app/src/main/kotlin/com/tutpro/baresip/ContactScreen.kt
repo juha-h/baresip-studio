@@ -648,7 +648,10 @@ private fun UrisSection(
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
                             label = { Text(stringResource(R.string.label)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                keyboardType = KeyboardType.Text
+                            )
                         )
                     }
                     if (uris.size > 1) {
