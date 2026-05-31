@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,18 @@ fun NavGraphBuilder.aboutScreenRoute(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AboutScreen(onBack: () -> Unit) {
+fun AboutScreen(onBack: () -> Unit) {
+    val version = BuildConfig.VERSION_NAME
+    val aboutText = stringResource(R.string.about_text, version)
+    val errorColor = MaterialTheme.colorScheme.error
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    val annotatedText = remember(aboutText, errorColor) {
+        AnnotatedString.fromHtml(
+            htmlString = aboutText,
+            linkStyles = TextLinkStyles(SpanStyle(color = errorColor))
+        )
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -81,11 +93,8 @@ private fun AboutScreen(onBack: () -> Unit) {
         }
     ) { contentPadding ->
         Text(
-            text = AnnotatedString.fromHtml(
-                htmlString = stringResource(R.string.about_text, BuildConfig.VERSION_NAME),
-                linkStyles = TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.error))
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
+            text = annotatedText,
+            color = onBackground,
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 16.dp)
                 .padding(contentPadding)
