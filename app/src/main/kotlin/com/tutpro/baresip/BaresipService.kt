@@ -374,6 +374,18 @@ class BaresipService: Service() {
             }
         }
 
+        val bluetoothFilter = IntentFilter()
+        bluetoothFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
+        bluetoothFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
+        bluetoothFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+        ContextCompat.registerReceiver(
+            this,
+            bluetoothReceiver,
+            bluetoothFilter,
+            ContextCompat.RECEIVER_EXPORTED
+        )
+        bluetoothReceiverRegistered = true
+
         telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         if (VERSION.SDK_INT >= 31) {
             telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
@@ -2769,6 +2781,8 @@ class BaresipService: Service() {
                 cm.unregisterNetworkCallback(networkCallback)
             if (this::androidContactsObserver.isInitialized)
                 contentResolver.unregisterContentObserver(androidContactsObserver)
+            if (this::bluetoothReceiver.isInitialized)
+                unregisterReceiver(bluetoothReceiver)
             releaseAudioEffects()
             isServiceClean = true
         }
