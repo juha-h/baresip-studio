@@ -1953,8 +1953,10 @@ class BaresipService: Service() {
             if (ua.account.blockUnknown && Contact.contactName(e164Uri) == e164Uri) {
                 Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri")
                 telecomCall.disconnect()
-                toast(String.format(getString(R.string.call_blocked),
-                    Utils.friendlyUri(this, uri, ua.account)))
+                toast(
+                    String.format(getString(R.string.call_blocked),
+                    Utils.friendlyUri(this, uri, ua.account))
+                )
                 if (ua.account.callHistory) {
                     Blocked(
                         ua.account.aor,

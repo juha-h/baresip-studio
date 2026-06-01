@@ -165,8 +165,7 @@ private fun CallDetailsContent(
 @Composable
 private fun Peer(ctx: Context, callRow: CallRow) {
     val account = Account.ofAor(callRow.aor)!!
-    val headerText = stringResource(R.string.peer) + " " +
-            Utils.friendlyUri(ctx, callRow.peerUri, account)
+    val headerText = stringResource(R.string.peer) + " " + Utils.friendlyUri(ctx, callRow.peerUri, account)
     Text(
         text = headerText,
         modifier = Modifier.fillMaxWidth(),

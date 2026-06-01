@@ -347,13 +347,14 @@ private fun Chats(
                         navController.navigate("chat/${aor}/${message.peerUri}")
                     },
                     onLongClick = {
-                        val peer = Utils.friendlyUri(ctx, message.peerUri, account)
+                        val peerName = Utils.friendlyUri(ctx, message.peerUri, account, includeLabel = false)
+                        val peerNameWithLabel = Utils.friendlyUri(ctx, message.peerUri, account)
                         val contactExists =
-                            Contact.nameExists(peer, BaresipService.contacts, false)
+                            Contact.nameExists(peerName, BaresipService.contacts, false)
                         if (contactExists) {
                             dialogMessage.value = String.format(
                                 ctx.getString(R.string.short_chat_question),
-                                peer
+                                peerNameWithLabel
                             )
                             secondButtonText.value = ""
                             lastButtonText.value = ctx.getString(R.string.delete)
@@ -362,7 +363,10 @@ private fun Chats(
                             }
                         } else {
                             dialogMessage.value =
-                                String.format(ctx.getString(R.string.long_chat_question), peer)
+                                String.format(
+                                    ctx.getString(R.string.long_chat_question),
+                                    peerName
+                                )
                             secondButtonText.value = ctx.getString(R.string.delete)
                             secondAction.value = {
                                 deleteMessages(uaMessages, account, message.peerUri)
@@ -382,7 +386,7 @@ private fun Chats(
                     else
                         MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    val peer = Utils.friendlyUri(ctx, message.peerUri, account)
+                    val peerName = Utils.friendlyUri(ctx, message.peerUri, account)
                     val cal = GregorianCalendar()
                     cal.timeInMillis = message.timeStamp
                     val fmt: DateFormat = if (isToday(message.timeStamp))
@@ -396,7 +400,7 @@ private fun Chats(
                         else
                             MaterialTheme.colorScheme.onPrimaryContainer
                         Row {
-                            Text(text = peer, color = textColor, fontSize = 12.sp)
+                            Text(text = peerName, color = textColor, fontSize = 12.sp)
                             Spacer(modifier = Modifier.weight(1f))
                             Text(text = info, color = textColor, fontSize = 12.sp)
                         }

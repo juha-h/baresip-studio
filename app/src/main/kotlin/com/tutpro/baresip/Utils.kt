@@ -154,13 +154,14 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true): String {
-        var u = Contact.contactName(uri)
+    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true,
+                    includeLabel: Boolean = true): String {
+        var u = Contact.contactName(uri, includeLabel)
         if (u != uri)
             return u
         if (e164Check) {
             val e164Uri = e164Uri(uri, account.countryCode)
-            u = Contact.contactName(e164Uri)
+            u = Contact.contactName(e164Uri, includeLabel)
             if (u != e164Uri)
                 return u
         }

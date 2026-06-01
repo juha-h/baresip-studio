@@ -64,16 +64,28 @@ sealed class Contact {
     companion object {
 
         // Return contact name of uri or uri itself if contact with uri is not found
-        fun contactName(uri: String): String {
-            var contact = findContact(uri)
-            if (contact == null) {
-                val userPart = Utils.uriUserPart(uri).replace("%23", "#")
-                if (Utils.isTelNumber(userPart)) {
-                    contact = findContact("tel:$userPart")
+        fun contactName(uri: String, includeLabel: Boolean = false): String {
+            val contactWithUri = findContactWithUri(uri)
+            if (contactWithUri != null) {
+                val name = contactWithUri.first.name()
+                if (includeLabel) {
+                    val label = contactWithUri.second.label
+                    return if (label.isNotEmpty()) "$name $label" else name
+                }
+                return name
+            }
+            val userPart = Utils.uriUserPart(uri).replace("%23", "#")
+            if (Utils.isTelNumber(userPart)) {
+                val telContactWithUri = findContactWithUri("tel:$userPart")
+                if (telContactWithUri != null) {
+                    val name = telContactWithUri.first.name()
+                    if (includeLabel) {
+                        val label = telContactWithUri.second.label
+                        return if (label.isNotEmpty()) "$name $label" else name
+                    }
+                    return name
                 }
             }
-            if (contact != null)
-                return contact.name()
             return uri
         }
 
@@ -120,14 +132,14 @@ sealed class Contact {
             return emptyList()
         }
 
-        fun findContact(uri: String): Contact? {
+        fun findContactWithUri(uri: String): Pair<Contact, ContactUri>? {
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts)
                     when (c) {
                         is BaresipContact -> {
                             for (u in c.uris)
                                 if (Utils.uriMatch(u.uri, uri))
-                                    return c
+                                    return Pair(c, u)
                         }
                         is AndroidContact -> {
                             val cleanUri = uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
@@ -137,11 +149,15 @@ sealed class Contact {
                                         cleanUri
                                     )
                                 )
-                                    return c
+                                    return Pair(c, u)
                         }
                     }
             }
             return null
+        }
+
+        fun findContact(uri: String): Contact? {
+            return findContactWithUri(uri)?.first
         }
 
         fun nameExists(name: String, list: List<Contact>, ignoreCase: Boolean): Boolean {

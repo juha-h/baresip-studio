@@ -335,17 +335,17 @@ private fun Calls(
                                 val intent = Intent(ctx, MainActivity::class.java)
                                 intent.putExtra("uap", ua.uap)
                                 intent.putExtra("peer", peerUri)
-                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account)
+                                val peerNameWithLabel = Utils.friendlyUri(ctx, peerUri, ua.account)
                                 val contact = Contact.findContact(peerUri)
                                 if (contact is Contact.BaresipContact && contact.email.isNotEmpty())
                                     message.value = String.format(
                                         ctx.getString(R.string.contact_email_action_question),
-                                        peerName
+                                        peerNameWithLabel
                                     )
                                 else
                                     message.value = String.format(
                                         ctx.getString(R.string.contact_action_question),
-                                        peerName
+                                        peerNameWithLabel
                                     )
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
@@ -401,7 +401,8 @@ private fun Calls(
                                 showDialog.value = true
                             },
                             onLongClick = {
-                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account)
+                                val peerName = Utils.friendlyUri(ctx, peerUri, ua.account, includeLabel = false)
+                                val peerNameWithLabel = Utils.friendlyUri(ctx, peerUri, ua.account)
                                 val callText: String = if (callRow.details.size > 1)
                                     ctx.getString(R.string.calls_calls)
                                 else
@@ -410,7 +411,7 @@ private fun Calls(
                                 if (contactExists) {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_delete_question),
-                                        peerName, callText
+                                        peerNameWithLabel, callText
                                     )
                                     secondButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
@@ -421,7 +422,7 @@ private fun Calls(
                                 else {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_add_delete_question),
-                                        peerName, callText
+                                        peerNameWithLabel, callText
                                     )
                                     secondButtonText.value = ctx.getString(R.string.add_contact)
                                     secondAction.value = {
