@@ -222,7 +222,8 @@ private fun TopAppBar(
     TopAppBar(
         title = {
             Text(
-                text = format(ctx.getString(R.string.chat_with), Utils.friendlyUri(ctx, peerUri, account)),
+                text = format(ctx.getString(R.string.chat_with),
+                    Utils.friendlyUri(ctx, peerUri, account)),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )

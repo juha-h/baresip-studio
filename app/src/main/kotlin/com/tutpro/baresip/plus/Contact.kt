@@ -13,14 +13,16 @@ import java.util.ArrayList
 
 sealed class Contact {
 
+    data class ContactUri(var uri: String, var label: String = "")
+
     abstract fun name(): String
     abstract fun id(): Long
     abstract fun favorite(): Boolean
     abstract fun colorInt(): Int
-    abstract fun uris(): List<String>
+    abstract fun uris(): List<ContactUri>
     abstract fun email(): String
 
-    class BaresipContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
+    class BaresipContact(var name: String, val uris: ArrayList<ContactUri>, var email: String, var color: Int,
                          var id: Long, var favorite: Boolean): Contact() {
         var avatarImage: Bitmap? = null
         override fun name() = name
@@ -31,7 +33,7 @@ sealed class Contact {
         override fun email() = email
     }
 
-    class AndroidContact(var name: String, val uris: ArrayList<String>, var email: String, var color: Int,
+    class AndroidContact(var name: String, val uris: ArrayList<ContactUri>, var email: String, var color: Int,
                          var thumbnailUri: Uri?, var id: Long, var favorite: Boolean): Contact() {
         override fun name() = name
         override fun id() = id
@@ -50,9 +52,9 @@ sealed class Contact {
     fun copy(): Contact {
         val copy = when (this) {
             is BaresipContact ->
-                BaresipContact(name, ArrayList(uris), email, color, id, favorite)
+                BaresipContact(name, ArrayList(uris.map { it.copy() }), email, color, id, favorite)
             is AndroidContact ->
-                AndroidContact(name, ArrayList(uris), email, color, thumbnailUri, id, favorite)
+                AndroidContact(name, ArrayList(uris.map { it.copy() }), email, color, thumbnailUri, id, favorite)
         }
         if (this is BaresipContact)
             (copy as BaresipContact).avatarImage = this.avatarImage
@@ -62,15 +64,29 @@ sealed class Contact {
     companion object {
 
         // Return contact name of uri or uri itself if contact with uri is not found
-        fun contactName(uri: String): String {
-            var contact = findContact(uri)
-            if (contact == null) {
-                val userPart = Utils.uriUserPart(uri).replace("%23", "#")
-                if (Utils.isTelNumber(userPart))
-                    contact = findContact("tel:$userPart")
+        // Return contact name of uri or uri itself if contact with uri is not found
+        fun contactName(uri: String, includeLabel: Boolean = false): String {
+            val contactWithUri = findContactWithUri(uri)
+            if (contactWithUri != null) {
+                val name = contactWithUri.first.name()
+                if (includeLabel) {
+                    val label = contactWithUri.second.label
+                    return if (label.isNotEmpty()) "$name $label" else name
+                }
+                return name
             }
-            if (contact != null)
-                return contact.name()
+            val userPart = Utils.uriUserPart(uri).replace("%23", "#")
+            if (Utils.isTelNumber(userPart)) {
+                val telContactWithUri = findContactWithUri("tel:$userPart")
+                if (telContactWithUri != null) {
+                    val name = telContactWithUri.first.name()
+                    if (includeLabel) {
+                        val label = telContactWithUri.second.label
+                        return if (label.isNotEmpty()) "$name $label" else name
+                    }
+                    return name
+                }
+            }
             return uri
         }
 
@@ -92,58 +108,57 @@ sealed class Contact {
             return null
         }
 
-        fun contactUris(name: String, tel: Boolean = false): ArrayList<String> {
-            val uris = ArrayList<String>()
+        fun contactContactUris(name: String, tel: Boolean = false): List<ContactUri> {
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts)
                     when (c) {
                         is BaresipContact -> {
                             if (c.name.equals(name, ignoreCase = true)) {
-                                for (u in c.uris) {
-                                    if (tel && !u.startsWith("tel:"))
-                                        continue
-                                    uris.add(u)
-                                }
-                                return uris
+                                return if (tel)
+                                    c.uris.filter { it.uri.startsWith("tel:") }
+                                else
+                                    c.uris
                             }
                         }
                         is AndroidContact -> {
                             if (c.name == name) {
-                                for (u in c.uris) {
-                                    if (tel && !u.startsWith("tel:"))
-                                        continue
-                                    uris.add(u)
-                                }
-                                return uris
+                                return if (tel)
+                                    c.uris.filter { it.uri.startsWith("tel:") }
+                                else
+                                    c.uris
                             }
                         }
                     }
             }
-            return uris
+            return emptyList()
         }
 
-        fun findContact(uri: String): Contact? {
+        fun findContactWithUri(uri: String): Pair<Contact, ContactUri>? {
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts)
                     when (c) {
                         is BaresipContact -> {
                             for (u in c.uris)
-                                if (Utils.uriMatch(u, uri))
-                                    return c
+                                if (Utils.uriMatch(u.uri, uri))
+                                    return Pair(c, u)
                         }
                         is AndroidContact -> {
                             val cleanUri = uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
                             for (u in c.uris)
                                 if (Utils.uriMatch(
-                                        u.filterNot { setOf('-', ' ', '(', ')').contains(it) },
+                                        u.uri.filterNot { setOf('-', ' ', '(', ')').contains(it) },
                                         cleanUri
                                     )
                                 )
-                                    return c
+                                    return Pair(c, u)
                         }
                     }
             }
             return null
+        }
+
+        fun findContact(uri: String): Contact? {
+            return findContactWithUri(uri)?.first
         }
 
         fun nameExists(name: String, list: List<Contact>, ignoreCase: Boolean): Boolean {
@@ -160,7 +175,10 @@ sealed class Contact {
                 BaresipService.baresipContacts.value.toList()
             }
             for (c in contacts) {
-                contents += "\"${c.name}\" <${c.uris.joinToString(",")}>;email=${c.email};id=${c.id}" +
+                val uris = c.uris.joinToString(",") {
+                    if (it.label.isNotEmpty()) "${it.uri}[${it.label}]" else it.uri
+                }
+                contents += "\"${c.name}\" <$uris>;email=${c.email};id=${c.id}" +
                         ";color=${c.color};favorite=${if (c.favorite) "yes" else "no"}\n"
                 avatarFiles.remove(c.id.toString() + ".png")
             }
@@ -175,7 +193,7 @@ sealed class Contact {
             // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                 ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
-                /* ContactsContract.Data.DATA2 ,*/ ContactsContract.Data.PHOTO_THUMBNAIL_URI,
+                ContactsContract.Data.DATA2, ContactsContract.Data.PHOTO_THUMBNAIL_URI,
                 ContactsContract.Contacts.STARRED)
             val selection =
                 ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
@@ -190,12 +208,13 @@ sealed class Contact {
                 val name = cur.getString(1) ?: ""
                 val mime = cur.getString(2)
                 val data = cur.getString(3) ?: continue
-                val thumb = cur.getString(4)?.toUri()
-                val starred = cur.getInt(5)
+                val type = cur.getInt(4)
+                val thumb = cur.getString(5)?.toUri()
+                val starred = cur.getInt(6)
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
-                    AndroidContact(name, ArrayList<String>(), "", Utils.randomColor(), thumb, id, starred == 1)
+                    AndroidContact(name, ArrayList<ContactUri>(), "", Utils.randomColor(), thumb, id, starred == 1)
                 if (contact.name == "" && name != "")
                     contact.name = name
                 if (contact.thumbnailUri == null &&  thumb != null)
@@ -203,13 +222,14 @@ sealed class Contact {
                 when (mime) {
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
                         val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
-                        if (uri !in contact.uris)
-                            contact.uris.add(uri)
+                        val label = typeToString(type)
+                        if (contact.uris.none { it.uri == uri })
+                            contact.uris.add(ContactUri(uri, label))
                     }
                     ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> {
                         val uri = "sip:$data"
-                        if (uri !in contact.uris)
-                            contact.uris.add(uri)
+                        if (contact.uris.none { it.uri == uri })
+                            contact.uris.add(ContactUri(uri, ""))
                     }
                     ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> {
                         if (contact.email == "")
@@ -227,13 +247,22 @@ sealed class Contact {
             BaresipService.androidContacts.value = newList.toList()
         }
 
-        @Suppress("unused")
         private fun typeToString(type: Int): String {
             return when(type) {
                 ContactsContract.CommonDataKinds.Phone.TYPE_HOME -> "Home"
                 ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> "Mobile"
                 ContactsContract.CommonDataKinds.Phone.TYPE_WORK -> "Work"
-                else -> "Unknown"
+                else -> ""
+            }
+        }
+
+        fun stringToType(label: String): Int {
+            return when (label) {
+                "Home" -> ContactsContract.CommonDataKinds.Phone.TYPE_HOME
+                "Mobile" -> ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE
+                "Work" -> ContactsContract.CommonDataKinds.Phone.TYPE_WORK
+                "" -> ContactsContract.CommonDataKinds.Phone.TYPE_OTHER
+                else -> ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM
             }
         }
 
@@ -251,21 +280,25 @@ sealed class Contact {
                     val name = parts[1]
                     val uriParams = parts[2].trim()
                     val urisPart = uriParams.substringAfter("<").substringBefore(">")
-                    val uris = ArrayList(urisPart.split(","))
+                    val uris = ArrayList<ContactUri>()
+                    for (uPart in urisPart.split(",")) {
+                        if (uPart.isEmpty()) continue
+                        if (uPart.endsWith("]") && uPart.contains("[")) {
+                            val uri = uPart.substringBeforeLast("[")
+                            val label = uPart.substringAfterLast("[").substringBeforeLast("]")
+                            uris.add(ContactUri(uri, label))
+                        } else {
+                            uris.add(ContactUri(uPart, ""))
+                        }
+                    }
                     val params = uriParams.substringAfter(">;")
                     val email = Utils.paramValue(params, "email")
                     val colorValue = Utils.paramValue(params, "color" )
-                    val color: Int = if (colorValue != "")
-                        colorValue.toInt()
-                    else
-                        Utils.randomColor()
+                    val color: Int = colorValue.toIntOrNull() ?: Utils.randomColor()
                     val idValue = Utils.paramValue(params, "id" )
-                    val id: Long = if (idValue != "")
-                        idValue.toLong()
-                    else
-                        baseId + contactNo
+                    val id: Long = idValue.toLongOrNull() ?: (baseId + contactNo)
                     val favorite = Utils.paramValue(params, "favorite" ) == "yes"
-                    Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
+                    // Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
                     val contact = BaresipContact(name, uris, email, color, id, favorite)
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {

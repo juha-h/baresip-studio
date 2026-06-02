@@ -154,13 +154,14 @@ object Utils {
         return if (params.size == 1) listOf() else params.subList(1, params.size)
     }
 
-    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true): String {
-        var u = Contact.contactName(uri)
+    fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true,
+                    includeLabel: Boolean = true): String {
+        var u = Contact.contactName(uri, includeLabel)
         if (u != uri)
             return u
         if (e164Check) {
             val e164Uri = e164Uri(uri, account.countryCode)
-            u = Contact.contactName(e164Uri)
+            u = Contact.contactName(e164Uri, includeLabel)
             if (u != e164Uri)
                 return u
         }
@@ -756,9 +757,9 @@ object Utils {
 
     fun decryptFromUri(ctx: Context, uri: Uri, password: String): ByteArray? {
         var plainData: ByteArray? = null
-        var stream: FileInputStream
+        var stream: InputStream
         try {
-            stream = (ctx.contentResolver.openInputStream(uri) as? FileInputStream)
+            stream = ctx.contentResolver.openInputStream(uri)
                 ?: return null
         } catch(e: Exception) {
             Log.w(TAG, "decryptFromUri could not open stream: $e")
@@ -769,19 +770,17 @@ object Utils {
                 val content = it.readObject() as ByteArray
                 plainData = decrypt(content, password.toCharArray())
             }
-            stream.close()
         } catch (e: Exception) {
             Log.w(TAG, "decryptFromUri as ByteArray failed: $e")
-            stream.close()
             try {
-                stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
-                ObjectInputStream(stream).use {
-                    val obj = it.readObject() as Crypto
-                    plainData = decryptOld(obj, password.toCharArray())
+                ctx.contentResolver.openInputStream(uri)?.use { newStream ->
+                    ObjectInputStream(newStream).use {
+                        val obj = it.readObject() as Crypto
+                        plainData = decryptOld(obj, password.toCharArray())
+                    }
                 }
-                stream.close()
-            } catch (e: Exception) {
-                Log.w(TAG, "decryptFromUri as Crypto failed: $e")
+            } catch (e2: Exception) {
+                Log.w(TAG, "decryptFromUri as Crypto failed: $e2")
             }
         }
         return plainData

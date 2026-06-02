@@ -689,14 +689,12 @@ private fun TopAppBar(
                     .combinedClickable(
                         onClick = {
                             if (Call.call("connected") != null) {
-                                BaresipService.isMicMuted = !BaresipService.isMicMuted
-                                if (BaresipService.isMicMuted) {
+                                val newMuteState = !BaresipService.isMicMuted
+                                BaresipService.setMicMute(newMuteState)
+                                if (newMuteState)
                                     viewModel.updateMicIcon(Icons.Filled.MicOff)
-                                    Api.calls_mute(true)
-                                } else {
+                                else
                                     viewModel.updateMicIcon(Icons.Filled.Mic)
-                                    Api.calls_mute(false)
-                                }
                             }
                         },
                         onLongClick = {
@@ -1937,11 +1935,11 @@ private fun CallRow(
                                             call.showSuggestions.value = false
                                             var uriText = transferUri.trim()
                                             if (uriText.isNotEmpty()) {
-                                                val uris = Contact.contactUris(uriText)
+                                                val uris = Contact.contactContactUris(uriText)
                                                 if (uris.size > 1) {
-                                                    selectItems.value = uris
+                                                    selectItems.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
                                                     selectItemAction.value = { index ->
-                                                        val uri = uris[index]
+                                                        val uri = uris[index].uri
                                                         transfer(
                                                             ctx,
                                                             viewModel,
@@ -1954,7 +1952,7 @@ private fun CallRow(
                                                     showSelectItemDialog.value = true
                                                 }
                                                 else {
-                                                    if (uris.size == 1) uriText = uris[0]
+                                                    if (uris.size == 1) uriText = uris[0].uri
                                                     transfer(
                                                         ctx,
                                                         viewModel,
@@ -2510,7 +2508,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                     uriText == Utils.friendlyUri(ctx, dialerState.redialUri, ua!!.account))
                     dialerState.redialUri
                 else {
-                    val uris = Contact.contactUris(uriText, ua?.account?.isMobile ?: false)
+                    val uris = Contact.contactContactUris(uriText, ua?.account?.isMobile ?: false)
                     if (uris.isEmpty()) {
                         if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
                             alertTitle.value = ctx.getString(R.string.notice)
@@ -2524,11 +2522,11 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                         uriText
                     }
                     else if (uris.size == 1)
-                        uris[0]
+                        uris[0].uri
                     else {
-                        selectItems.value = uris
+                        selectItems.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
                         selectItemAction.value = { index ->
-                            makeCall(ctx, viewModel, uris[index], dialerState, video)
+                            makeCall(ctx, viewModel, uris[index].uri, dialerState, video)
                         }
                         showSelectItemDialog.value = true
                         return
@@ -3350,7 +3348,7 @@ private fun backup(ctx: Context, password: String) {
         Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
     showAlert.value = true
     Utils.deleteFile(File(zipFilePath))
-    downloadsOutputUri = null
+    downloadsInputUri = null
 }
 
 private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
@@ -3360,18 +3358,18 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     if (zipData == null) {
         alertTitle.value = ctx.getString(R.string.error)
         alertMessage.value = String.format(ctx.getString(R.string.restore_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+            Utils.fileNameOfUri(ctx, downloadsInputUri!!))
         showAlert.value = true
-        downloadsOutputUri = null
+        downloadsInputUri = null
         return
     }
     if (!Utils.putFileContents(zipFilePath, zipData)) {
         Log.w(TAG, "Failed to write zip file '$zipFile'")
         alertTitle.value = ctx.getString(R.string.error)
         alertMessage.value = String.format(ctx.getString(R.string.restore_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+            Utils.fileNameOfUri(ctx, downloadsInputUri!!))
         showAlert.value = true
-        downloadsOutputUri = null
+        downloadsInputUri = null
         return
     }
     if (!Utils.unZip(zipFilePath)) {
@@ -3383,7 +3381,7 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
             BuildConfig.VERSION_NAME
         )
         showAlert.value = true
-        downloadsOutputUri = null
+        downloadsInputUri = null
         return
     }
     Utils.deleteFile(File(zipFilePath))
@@ -3409,5 +3407,5 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     }
     showDialog.value = true
 
-    downloadsOutputUri = null
+    downloadsInputUri = null
 }

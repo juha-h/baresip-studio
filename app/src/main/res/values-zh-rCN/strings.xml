@@ -456,4 +456,5 @@
     <string name="contact_export_failure">无法导出联系人</string>
     <string name="tel_uri_calls">用于通话的 TEL URI</string>
     <string name="tel_uri_messages">用于消息的 TEL URI</string>
+    <string name="label">标签</string>
 </resources>

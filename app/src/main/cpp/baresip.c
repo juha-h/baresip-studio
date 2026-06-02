@@ -309,6 +309,7 @@ static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
             len = re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
             break;
         case BEVENT_CALL_CLOSED:
+            audio_set_source(call_audio(call), "nil", NULL);
             tone = call_scode(call) ? translate_errorcode(call_scode(call)) : "";
             len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s,%s", prm, tone);
             break;
@@ -1477,7 +1478,13 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_calls_1mute(
         const struct ua *ua = ua_le->data;
         for (call_le = list_head(ua_calls(ua)); call_le != NULL; call_le = call_le->next) {
             const struct call *call = call_le->data;
-            audio_mute(call_audio(call), mute);
+            struct audio *audio = call_audio(call);
+            audio_mute(audio, mute);
+            if (mute)
+                audio_set_source(audio, "nil", NULL);
+            else
+                audio_set_source(audio, conf_config()->audio.src_mod,
+                                 conf_config()->audio.src_dev);
         }
     }
     re_thread_leave();
@@ -2127,6 +2134,7 @@ JNIEXPORT void JNICALL
 Java_com_tutpro_baresip_plus_Api_AAudio_1close_1stream(JNIEnv *env, jobject obj)
 {
     if (AAudio_stream != NULL) {
+        AAudioStream_requestStop(AAudio_stream);
         AAudioStream_close(AAudio_stream);
         AAudio_stream = NULL;
     }

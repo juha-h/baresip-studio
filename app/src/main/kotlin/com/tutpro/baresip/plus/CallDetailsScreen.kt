@@ -165,8 +165,7 @@ private fun CallDetailsContent(
 @Composable
 private fun Peer(ctx: Context, callRow: CallRow) {
     val account = Account.ofAor(callRow.aor)!!
-    val headerText = stringResource(R.string.peer) + " " +
-            Utils.friendlyUri(ctx, callRow.peerUri, account)
+    val headerText = stringResource(R.string.peer) + " " + Utils.friendlyUri(ctx, callRow.peerUri, account)
     Text(
         text = headerText,
         modifier = Modifier.fillMaxWidth(),
@@ -314,7 +313,7 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
     val mediaPlayer = remember { MediaPlayer() }
     val scope = rememberCoroutineScope()
 
-    // 1. Setup the File Saver Launcher
+    // 1. Set up the File Saver Launcher
     val saveLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("audio/x-wav")
     ) { uri ->

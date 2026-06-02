@@ -388,6 +388,18 @@ class BaresipService: Service() {
             }
         }
 
+        val bluetoothFilter = IntentFilter()
+        bluetoothFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
+        bluetoothFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
+        bluetoothFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+        ContextCompat.registerReceiver(
+            this,
+            bluetoothReceiver,
+            bluetoothFilter,
+            ContextCompat.RECEIVER_EXPORTED
+        )
+        bluetoothReceiverRegistered = true
+
         telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         if (VERSION.SDK_INT >= 31) {
             telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
@@ -1121,19 +1133,21 @@ class BaresipService: Service() {
                             }
                             updateStatusNotification()
                             proximitySensing(proximitySensing)
+                            if (isMicMuted)
+                                setMicMute(true)
                         }
                         if (!isMainVisible)
                             return
                     }
 
                     "call update" -> {
-                        val newHeldState = when (ev[1].toInt()) {
-                            Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
-                            else -> false
-                        }
-                        val connection = ConnectionService.connections[callp]
                         Handler(Looper.getMainLooper()).post {
                             if (call != null) {
+                                val newHeldState = when (ev[1].toInt()) {
+                                    Api.SDP_INACTIVE, Api.SDP_RECVONLY -> true
+                                    else -> false
+                                }
+                                val connection = ConnectionService.connections[callp]
                                 if (call.held && !newHeldState) {
                                     Log.d(TAG, "Call ${call.callp} un-held by peer.")
                                     call.onhold = false
@@ -1275,6 +1289,7 @@ class BaresipService: Service() {
                                 else -> DisconnectCause.REMOTE
                             }
                             connection.setDisconnected(DisconnectCause(cause))
+                            connection.safeDestroy()
                             ConnectionService.connections.remove(callp)
                         }
                         if (call != null) {
@@ -1303,15 +1318,8 @@ class BaresipService: Service() {
                             }
                             val isConference = call.conferenceCall
                             val hasOtherCalls = synchronized(calls) { calls.any { it.ua == ua } }
-                            if (noMoreCalls) {
-                                aec?.release()
-                                aec = null
-                                agc?.release()
-                                agc = null
-                                ns?.release()
-                                ns = null
-                                recorderSessionId = 0
-                            }
+                            if (noMoreCalls)
+                                releaseAudioEffects()
                             updateStatusNotification()
                             if (isConference && !hasOtherCalls) {
                                 Log.d(TAG, "Last conference call closed, scheduling mixminus unload")
@@ -1338,9 +1346,9 @@ class BaresipService: Service() {
                                         !reason.startsWith("Connection reset by")
 
                             val missed = call.dir == "in" && call.startTime == null && !call.rejected
-                            val completedElsewhere = missed && ev[2].startsWith("SIP") &&
-                                    ev[2].contains(";cause=200")
                             if (ua.account.callHistory) {
+                                val completedElsewhere = missed && ev[2].startsWith("SIP") &&
+                                        ev[2].contains(";cause=200")
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val history = CallHistoryNew(aor, call.peerUri, call.dir)
                                     history.stopTime = GregorianCalendar()
@@ -2108,8 +2116,10 @@ class BaresipService: Service() {
             if (ua.account.blockUnknown && Contact.contactName(e164Uri) == e164Uri) {
                 Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri")
                 telecomCall.disconnect()
-                toast(String.format(getString(R.string.call_blocked),
-                    Utils.friendlyUri(this, uri, ua.account)))
+                toast(
+                    String.format(getString(R.string.call_blocked),
+                    Utils.friendlyUri(this, uri, ua.account))
+                )
                 if (ua.account.callHistory) {
                     Blocked(
                         ua.account.aor,
@@ -2662,7 +2672,7 @@ class BaresipService: Service() {
                     )
                 }
                 if (isMicMuted) {
-                    isMicMuted = false
+                    setMicMute(false)
                     postServiceEvent(
                         ServiceEvent(
                             "mic muted,false",
@@ -2868,31 +2878,31 @@ class BaresipService: Service() {
 
     private fun cleanService() {
         if (!isServiceClean) {
-            try {
-                if (hotSpotReceiverRegistered) {
+            if (hotSpotReceiverRegistered) {
+                try {
                     unregisterReceiver(hotSpotReceiver)
-                    hotSpotReceiverRegistered = false
-                }
-            } catch (_: IllegalArgumentException) {
-                Log.e(TAG, "hotSpotReceiver was not registered")
+                } catch (_: IllegalArgumentException) {}
+                hotSpotReceiverRegistered = false
             }
             if (bluetoothReceiverRegistered) {
                 try {
                     unregisterReceiver(bluetoothReceiver)
-                    bluetoothReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
+                bluetoothReceiverRegistered = false
             }
             if (airplaneModeReceiverRegistered) {
                 try {
                     unregisterReceiver(airplaneModeReceiver)
-                    airplaneModeReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
+                airplaneModeReceiverRegistered = false
             }
             if (telephonyCallbackRegistered) {
                 if (VERSION.SDK_INT >= 31) {
-                    telephonyManager.unregisterTelephonyCallback(telephonyCallback)
-                    telephonyCallbackRegistered = false
+                    try {
+                        telephonyManager.unregisterTelephonyCallback(telephonyCallback)
+                    } catch (_: Exception) {}
                 }
+                telephonyCallbackRegistered = false
             }
             val callps = ConnectionService.connections.keys.toList()
             for (callp in callps)
@@ -2917,10 +2927,18 @@ class BaresipService: Service() {
                 proximityWakeLock.release()
             if (this::wifiLock.isInitialized)
                 wifiLock.release()
-            if (this::networkCallback.isInitialized)
-                cm.unregisterNetworkCallback(networkCallback)
-            if (this::androidContactsObserver.isInitialized)
-                contentResolver.unregisterContentObserver(androidContactsObserver)
+            if (this::networkCallback.isInitialized) {
+                try {
+                    cm.unregisterNetworkCallback(networkCallback)
+                } catch (_: Exception) {}
+            }
+            if (androidContactsObserverRegistered) {
+                try {
+                    contentResolver.unregisterContentObserver(androidContactsObserver)
+                } catch (_: Exception) {}
+                androidContactsObserverRegistered = false
+            }
+            releaseAudioEffects()
             isServiceClean = true
         }
     }
@@ -3002,6 +3020,19 @@ class BaresipService: Service() {
         private var btAdapter: BluetoothAdapter? = null
         private var audioFocusRequest: AudioFocusRequest? = null
 
+        private fun releaseAudioEffects() {
+            aec?.enabled = false
+            aec?.release()
+            aec = null
+            agc?.enabled = false
+            agc?.release()
+            agc = null
+            ns?.enabled = false
+            ns?.release()
+            ns = null
+            recorderSessionId = 0
+        }
+
         var rt: Ringtone? = null
 
         var colorblind = false
@@ -3024,6 +3055,15 @@ class BaresipService: Service() {
         fun getPhoneAccountHandle(ctx: Context): PhoneAccountHandle {
             val componentName = android.content.ComponentName(ctx, ConnectionService::class.java)
             return PhoneAccountHandle(componentName, PHONE_ACCOUNT_ID)
+        }
+
+        fun setMicMute(mute: Boolean) {
+            instance?.let {
+                val am = it.getSystemService(AUDIO_SERVICE) as AudioManager
+                am.isMicrophoneMute = mute
+            }
+            isMicMuted = mute
+            Api.calls_mute(mute)
         }
 
         fun postServiceEvent(event: ServiceEvent) {
