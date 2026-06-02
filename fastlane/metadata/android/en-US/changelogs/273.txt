@@ -1,0 +1,5 @@
+- Added possibility to add labels to contacts
+- When showing name of contact, show also label when appropriate
+- Do not show Android system bar mic icon when call is muted
+- Backup/restore fixes and improvements
+- New translations (Chinese and French)
