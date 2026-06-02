@@ -67,7 +67,9 @@
             <h2>Käyttövihjeitä</h2>
             <ul>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+                <li>Jos haluat käyttää baresip+-sovellusta mobiilipuheluihin, aktivoi Oletus puhelusovellus
+                    -asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
+                <li>Sen jälkeen luo yksi tai useampi SIP-tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä ympyrällä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
@@ -485,6 +487,7 @@
     <!-- Contact Activity -->
     <string name="new_contact">Uusi yhteystieto</string>
     <string name="contact_name">Nimi</string>
+    <string name="label">Kuvaus</string>
     <string name="email">Sähköposti</string>
     <string name="sip_or_tel_uri">SIP tai TEL URI</string>
     <string name="user_domain_or_number">käyttäjä@domain tai puhelinnumero</string>
