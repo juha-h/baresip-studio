@@ -751,9 +751,9 @@ object Utils {
 
     fun decryptFromUri(ctx: Context, uri: Uri, password: String): ByteArray? {
         var plainData: ByteArray? = null
-        var stream: FileInputStream
+        var stream: InputStream
         try {
-            stream = (ctx.contentResolver.openInputStream(uri) as? FileInputStream)
+            stream = ctx.contentResolver.openInputStream(uri)
                 ?: return null
         } catch(e: Exception) {
             Log.w(TAG, "decryptFromUri could not open stream: $e")
@@ -764,19 +764,17 @@ object Utils {
                 val content = it.readObject() as ByteArray
                 plainData = decrypt(content, password.toCharArray())
             }
-            stream.close()
         } catch (e: Exception) {
             Log.w(TAG, "decryptFromUri as ByteArray failed: $e")
-            stream.close()
             try {
-                stream = ctx.contentResolver.openInputStream(uri) as FileInputStream
-                ObjectInputStream(stream).use {
-                    val obj = it.readObject() as Crypto
-                    plainData = decryptOld(obj, password.toCharArray())
+                ctx.contentResolver.openInputStream(uri)?.use { newStream ->
+                    ObjectInputStream(newStream).use {
+                        val obj = it.readObject() as Crypto
+                        plainData = decryptOld(obj, password.toCharArray())
+                    }
                 }
-                stream.close()
-            } catch (e: Exception) {
-                Log.w(TAG, "decryptFromUri as Crypto failed: $e")
+            } catch (e2: Exception) {
+                Log.w(TAG, "decryptFromUri as Crypto failed: $e2")
             }
         }
         return plainData

@@ -2817,7 +2817,7 @@ private fun backup(ctx: Context, password: String) {
         Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
     showAlert.value = true
     Utils.deleteFile(File(zipFilePath))
-    downloadsOutputUri = null
+    downloadsInputUri = null
 }
 
 private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
@@ -2827,18 +2827,18 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     if (zipData == null) {
         alertTitle.value = ctx.getString(R.string.error)
         alertMessage.value = String.format(ctx.getString(R.string.restore_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+            Utils.fileNameOfUri(ctx, downloadsInputUri!!))
         showAlert.value = true
-        downloadsOutputUri = null
+        downloadsInputUri = null
         return
     }
     if (!Utils.putFileContents(zipFilePath, zipData)) {
         Log.w(TAG, "Failed to write zip file '$zipFile'")
         alertTitle.value = ctx.getString(R.string.error)
         alertMessage.value = String.format(ctx.getString(R.string.restore_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+            Utils.fileNameOfUri(ctx, downloadsInputUri!!))
         showAlert.value = true
-        downloadsOutputUri = null
+        downloadsInputUri = null
         return
     }
     if (!Utils.unZip(zipFilePath)) {
@@ -2850,7 +2850,7 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
             BuildConfig.VERSION_NAME
         )
         showAlert.value = true
-        downloadsOutputUri = null
+        downloadsInputUri = null
         return
     }
     Utils.deleteFile(File(zipFilePath))
@@ -2876,6 +2876,6 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     }
     showDialog.value = true
 
-    downloadsOutputUri = null
+    downloadsInputUri = null
 }
 

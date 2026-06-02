@@ -52,9 +52,9 @@ sealed class Contact {
     fun copy(): Contact {
         val copy = when (this) {
             is BaresipContact ->
-                BaresipContact(name, ArrayList(uris), email, color, id, favorite)
+                BaresipContact(name, ArrayList(uris.map { it.copy() }), email, color, id, favorite)
             is AndroidContact ->
-                AndroidContact(name, ArrayList(uris), email, color, thumbnailUri, id, favorite)
+                AndroidContact(name, ArrayList(uris.map { it.copy() }), email, color, thumbnailUri, id, favorite)
         }
         if (this is BaresipContact)
             (copy as BaresipContact).avatarImage = this.avatarImage
@@ -282,9 +282,9 @@ sealed class Contact {
                     val uris = ArrayList<ContactUri>()
                     for (uPart in urisPart.split(",")) {
                         if (uPart.isEmpty()) continue
-                        if (uPart.contains("[") && uPart.contains("]")) {
-                            val uri = uPart.substringBefore("[")
-                            val label = uPart.substringAfter("[").substringBefore("]")
+                        if (uPart.endsWith("]") && uPart.contains("[")) {
+                            val uri = uPart.substringBeforeLast("[")
+                            val label = uPart.substringAfterLast("[").substringBeforeLast("]")
                             uris.add(ContactUri(uri, label))
                         } else {
                             uris.add(ContactUri(uPart, ""))
@@ -293,15 +293,9 @@ sealed class Contact {
                     val params = uriParams.substringAfter(">;")
                     val email = Utils.paramValue(params, "email")
                     val colorValue = Utils.paramValue(params, "color" )
-                    val color: Int = if (colorValue != "")
-                        colorValue.toInt()
-                    else
-                        Utils.randomColor()
+                    val color: Int = colorValue.toIntOrNull() ?: Utils.randomColor()
                     val idValue = Utils.paramValue(params, "id" )
-                    val id: Long = if (idValue != "")
-                        idValue.toLong()
-                    else
-                        baseId + contactNo
+                    val id: Long = idValue.toLongOrNull() ?: (baseId + contactNo)
                     val favorite = Utils.paramValue(params, "favorite" ) == "yes"
                     // Log.d(TAG, "Restoring contact $name, $urisPart, $color, $id")
                     val contact = BaresipContact(name, uris, email, color, id, favorite)

@@ -2728,31 +2728,31 @@ class BaresipService: Service() {
 
     private fun cleanService() {
         if (!isServiceClean) {
-            try {
-                if (hotSpotReceiverRegistered) {
+            if (hotSpotReceiverRegistered) {
+                try {
                     unregisterReceiver(hotSpotReceiver)
-                    hotSpotReceiverRegistered = false
-                }
-            } catch (_: IllegalArgumentException) {
-                Log.e(TAG, "hotSpotReceiver was not registered")
+                } catch (_: IllegalArgumentException) {}
+                hotSpotReceiverRegistered = false
             }
             if (bluetoothReceiverRegistered) {
                 try {
                     unregisterReceiver(bluetoothReceiver)
-                    bluetoothReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
+                bluetoothReceiverRegistered = false
             }
             if (airplaneModeReceiverRegistered) {
                 try {
                     unregisterReceiver(airplaneModeReceiver)
-                    airplaneModeReceiverRegistered = false
                 } catch (_: IllegalArgumentException) {}
+                airplaneModeReceiverRegistered = false
             }
             if (telephonyCallbackRegistered) {
                 if (VERSION.SDK_INT >= 31) {
-                    telephonyManager.unregisterTelephonyCallback(telephonyCallback)
-                    telephonyCallbackRegistered = false
+                    try {
+                        telephonyManager.unregisterTelephonyCallback(telephonyCallback)
+                    } catch (_: Exception) {}
                 }
+                telephonyCallbackRegistered = false
             }
             val callps = ConnectionService.connections.keys.toList()
             for (callp in callps)
@@ -2777,12 +2777,17 @@ class BaresipService: Service() {
                 proximityWakeLock.release()
             if (this::wifiLock.isInitialized)
                 wifiLock.release()
-            if (this::networkCallback.isInitialized)
-                cm.unregisterNetworkCallback(networkCallback)
-            if (this::androidContactsObserver.isInitialized)
-                contentResolver.unregisterContentObserver(androidContactsObserver)
-            if (this::bluetoothReceiver.isInitialized)
-                unregisterReceiver(bluetoothReceiver)
+            if (this::networkCallback.isInitialized) {
+                try {
+                    cm.unregisterNetworkCallback(networkCallback)
+                } catch (_: Exception) {}
+            }
+            if (androidContactsObserverRegistered) {
+                try {
+                    contentResolver.unregisterContentObserver(androidContactsObserver)
+                } catch (_: Exception) {}
+                androidContactsObserverRegistered = false
+            }
             releaseAudioEffects()
             isServiceClean = true
         }
