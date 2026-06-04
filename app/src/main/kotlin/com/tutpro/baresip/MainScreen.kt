@@ -165,6 +165,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 private val dialpadButtonEnabled = mutableStateOf(true)
 private var pullToRefreshEnabled = mutableStateOf(true)
@@ -396,7 +397,7 @@ private fun MainScreen(
         if (isConnected) {
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 call.focusDtmf.value = true
-                delay(300)
+                delay(300.milliseconds)
                 keyboardController?.show()
             }
             else
@@ -906,7 +907,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
 
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
-            delay(1000)
+            delay(1000.milliseconds)
             isRefreshing = false
         }
     }
@@ -1456,7 +1457,7 @@ private fun CallTimer(
             val elapsedMillis = now - startTime
             val seconds = if (elapsedMillis > 0) elapsedMillis / 1000 else 0
             timeText = android.text.format.DateUtils.formatElapsedTime(seconds)
-            delay(1000L)
+            delay(1000L.milliseconds)
         }
     }
 
@@ -2778,7 +2779,7 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
 
 private fun backup(ctx: Context, password: String) {
     val files = arrayListOf("accounts", "config", "contacts", "call_history",
-        "messages", "uuid", "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
+        "messages", "uuid", "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt", "blocked.json")
     File(BaresipService.filesPath).walk().forEach {
         if (it.name.endsWith(".png"))
             files.add(it.name)

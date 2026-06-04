@@ -2104,6 +2104,8 @@ class BaresipService: Service() {
                 Log.d(TAG, "Removing Mobile account (role lost or SIM missing)")
                 existingMobileUa.remove()
                 Account.saveAccounts()
+                CallHistoryNew.save()
+                Message.save()
                 updateStatusNotification()
             }
             return
@@ -2132,6 +2134,8 @@ class BaresipService: Service() {
         uasStatus.value = UserAgent.statusMap()
 
         Account.saveAccounts()
+        CallHistoryNew.save()
+        Message.save()
         updateStatusNotification()
     }
 
