@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package com.tutpro.baresip.plus
 
 import android.Manifest.permission.CAMERA
@@ -58,6 +59,7 @@ import android.telecom.Connection
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.PhoneStateListener
 import android.telephony.ServiceState
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
@@ -80,12 +82,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.tutpro.baresip.plus.Utils.e164Uri
 import com.tutpro.baresip.plus.Utils.toCircle
-import kotlin.concurrent.schedule
-import kotlin.math.roundToInt
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.net.InetAddress
@@ -94,6 +90,13 @@ import java.nio.charset.StandardCharsets
 import java.util.GregorianCalendar
 import java.util.Timer
 import java.util.TimerTask
+import kotlin.concurrent.schedule
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class BaresipService: Service() {
 
@@ -109,6 +112,8 @@ class BaresipService: Service() {
     private lateinit var btm: BluetoothManager
     private lateinit var telephonyManager: TelephonyManager
     private lateinit var telephonyCallback: TelephonyCallback
+    @Suppress("DEPRECATION")
+    private lateinit var phoneStateListener: PhoneStateListener
     private lateinit var vibrator: Vibrator
     private lateinit var partialWakeLock: PowerManager.WakeLock
     private lateinit var proximityWakeLock: PowerManager.WakeLock
@@ -404,15 +409,15 @@ class BaresipService: Service() {
         if (VERSION.SDK_INT >= 31) {
             telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
                 override fun onServiceStateChanged(serviceState: ServiceState) {
-                    val isAirplaneModeOn = Utils.isAirplaneModeOn(this@BaresipService)
-                    val status = if (isAirplaneModeOn)
-                        R.drawable.circle_white
-                    else if (serviceState.state == ServiceState.STATE_IN_SERVICE)
-                        circleGreen.getValue(colorblind)
-                    else
-                        circleRed.getValue(colorblind)
-                    Log.d(TAG, "Mobile service state changed: ${serviceState.state}, updating status to $status")
-                    updateMobileStatus(status)
+                    updateMobileStatusFromServiceState(serviceState.state)
+                }
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            phoneStateListener = object : PhoneStateListener() {
+                @Deprecated("Deprecated in Java")
+                override fun onServiceStateChanged(serviceState: ServiceState) {
+                    updateMobileStatusFromServiceState(serviceState.state)
                 }
             }
         }
@@ -1155,7 +1160,7 @@ class BaresipService: Service() {
                                     // transaction (the re-INVITE from the peer) finish
                                     // before trying to hold the other call and resume this one.
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        delay(100)
+                                        delay(100.milliseconds)
                                         call.resume()
                                     }
                                 }
@@ -1362,7 +1367,7 @@ class BaresipService: Service() {
                                     }
                                     history.add()
                                     if (call.startTime != null && call.dumpfiles[0] != "") {
-                                        delay(500)
+                                        delay(500.milliseconds)
                                         val rxFile = File(call.dumpfiles[0])
                                         val txFile = File(call.dumpfiles[1])
                                         val mergedFileName = rxFile.name
@@ -1766,6 +1771,11 @@ class BaresipService: Service() {
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to register TelephonyCallback: ${e.message}")
             }
+        } else if (!telephonyCallbackRegistered) {
+            @Suppress("DEPRECATION")
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SERVICE_STATE)
+            telephonyCallbackRegistered = true
+            Log.d(TAG, "Registered PhoneStateListener")
         }
         Api.net_debug()
         postServiceEvent(
@@ -2245,6 +2255,9 @@ class BaresipService: Service() {
                 Log.d(TAG, "Removing Mobile account (role lost or SIM missing)")
                 existingMobileUa.remove()
                 Account.saveAccounts()
+                CallHistoryNew.save()
+                Message.save()
+                updateStatusNotification()
             }
             return
         }
@@ -2272,6 +2285,9 @@ class BaresipService: Service() {
         uasStatus.value = UserAgent.statusMap()
 
         Account.saveAccounts()
+        CallHistoryNew.save()
+        Message.save()
+        updateStatusNotification()
     }
 
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
@@ -2284,10 +2300,16 @@ class BaresipService: Service() {
         uas.value.find { it.account.isMobile }?.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
             val status = newStatus
-                ?: if (isAirplaneModeOn)
+                ?: if (isAirplaneModeOn) {
                     R.drawable.circle_white
-                else
-                    ua.status
+                } else {
+                    if (ua.status == R.drawable.circle_white) {
+                        // Show "Red" (not yet in service)
+                        circleRed.getValue(colorblind)
+                    } else {
+                        ua.status
+                    }
+                }
             if (ua.status != status) {
                 Log.d(TAG, "Updating Mobile status to $status")
                 ua.updateStatus(status)
@@ -2296,6 +2318,18 @@ class BaresipService: Service() {
                     registrationUpdate.postValue(System.currentTimeMillis())
             }
         }
+    }
+
+    private fun updateMobileStatusFromServiceState(state: Int) {
+        val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+        val status = if (isAirplaneModeOn)
+            R.drawable.circle_white
+        else if (state == ServiceState.STATE_IN_SERVICE)
+            circleGreen.getValue(colorblind)
+        else
+            circleRed.getValue(colorblind)
+        Log.d(TAG, "Mobile service state changed: $state, updating status to $status")
+        updateMobileStatus(status)
     }
 
     @SuppressLint("FullScreenIntentPolicy")
@@ -2901,6 +2935,9 @@ class BaresipService: Service() {
                     try {
                         telephonyManager.unregisterTelephonyCallback(telephonyCallback)
                     } catch (_: Exception) {}
+                } else {
+                    @Suppress("DEPRECATION")
+                    telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
                 }
                 telephonyCallbackRegistered = false
             }
