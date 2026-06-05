@@ -81,8 +81,7 @@
     </string>
     <string name="default_account_help">If checked, this account is selected when baresip is started.</string>
     <string name="accounts_help">Account\'s port number and transport protocol may be optionally given when a new account is created: username@domain[:port][;transport=udp|tcp|tls]. If port is given and transport protocol is not given, transport protocol defaults to udp. If port is not given and transport protocol is given, port defaults to 5060 or 5061 (TLS). If neither is given and no outbound proxy is specified, account\'s registrar (if any) is determined solely based on domain\'s DNS information.</string>
-    <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete %2$s from call history?
-    </string>
+    <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts or delete %2$s from call history?</string>
     <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or add peer to contacts?</string>
     <string name="listen_address_help">IP address and port of form \'address:port\' at which baresip listens
         for incoming SIP requests. If IP address is an IPv6 address, it must be written inside
@@ -124,7 +123,7 @@
     </string>
     <string name="restore_failed">Failed to restore application data from Download folder. Check Apps → baresip → Permissions → Storage and that backup file \'%1$s\' exists in the folder and, if so, you gave correct Decrypt Password.</string>
     <string name="restored">Application data restored. baresip needs to be restarted. Restart now?</string>
-    <string name="calls_delete_question"> %1$s  %2$s を通話履歴から削除してもよいですか?</string>
+    <string name="calls_delete_question">%1$s %2$s を通話履歴から削除してもよいですか?</string>
     <string name="long_message_question"> %1$s のメッセージと連絡先を削除してもよいですか?</string>
     <string name="invalid_authentication_username">無効な認証ユーザー名 %1$s です</string>
     <string name="transfer">転送</string>
