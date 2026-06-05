@@ -95,7 +95,7 @@
     <string name="call">Chamada</string>
     <string name="video_codecs">Codecs de Vídeo</string>
     <string name="auto">Automático</string>
-    <string name="calls_add_delete_question">Quer adicionar \'%1$s\' aos contatos ou deletar %2$s do histórico de chamadas\?</string>
+    <string name="calls_add_delete_question">Quer adicionar \'%1$s\' aos contatos ou deletar %2$s do histórico de chamadas?</string>
     <string name="you">Você</string>
     <string name="codecs">Codecs</string>
     <string name="failed_to_load_module">Falha ao carregar módulo.</string>
@@ -186,7 +186,7 @@
     <string name="unverify">Desverificar</string>
     <string name="tls_certificate_file_help">Se marcado, o ficheiro que contém o certificado TLS e a chave privada desta instância do baresip foi ou será carregado. Na versão do Android 9, um ficheiro chamado \'cert.pen\' será lido a partir da pasta Download. Por motivos de segurança, apague o ficheiro após o carregamento.</string>
     <string name="invalid_stun_username">Nome do utilizador inválido \'%1$s\'</string>
-    <string name="calls_delete_question">Quer apagar %1$s\' %2$s do histórico de chamadas\?</string>
+    <string name="calls_delete_question">Quer apagar %1$s\' %2$s do histórico de chamadas?</string>
     <string name="transfer_failed">A transferência falhou</string>
     <string name="transfer_destination">Destino da transferência</string>
     <string name="call_transfer">Transferência de chamada</string>
