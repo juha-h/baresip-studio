@@ -182,8 +182,10 @@ object Utils {
                 else
                     "$user@$host;" + params.joinToString(";")
         }
-        if (uri.startsWith("<") && (uri.endsWith(">")))
-            u = uri.substring(1).substringBeforeLast(">")
+        if (u.startsWith("<") && u.endsWith(">"))
+            u = u.substring(1).substringBeforeLast(">")
+        if (u.startsWith("tel:", ignoreCase = true))
+            u = u.substring(4)
         u = u.substringBefore("?")
         u = u.replace(":5060", "")
         u = u.replace(";transport=udp", "", true)
