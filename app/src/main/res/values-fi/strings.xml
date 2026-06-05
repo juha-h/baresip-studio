@@ -294,10 +294,11 @@
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
-    <string name="calls_add_delete_question">Haluatko luoda uuden yhteystiedon \'%1$s\' tai poistaa
-        %2$s puheluhistoriasta\?
+    <string name="calls_add_delete_question">Haluatko luoda kohteelle \'%1$s\' uuden yhteystiedon,
+        kopioida sen URI:n tai poistaa %2$s puheluhistoriasta\?
     </string>
-    <string name="calls_delete_question">Haluatko poistaa \'%1$s\' %2$s puheluhistoriasta\?</string>
+    <string name="calls_delete_question">Haluatko kopioida yhteystiedon \'%1$s\' URI:n tai poistaa
+        %2$s puheluhistoriasta\?</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
@@ -532,6 +533,8 @@
     <string name="add">Lisää</string>
     <string name="delete">Poista</string>
     <string name="edit">Muokkaa</string>
+    <string name="copy_uri">Kopioi URI</string>
+    <string name="copied_to_clipboard">Kopioitu leikepöydälle</string>
     <string name="status">Tila</string>
     <string name="error">Virhe</string>
     <string name="confirmation">Vahvistus</string>

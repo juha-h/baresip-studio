@@ -428,11 +428,15 @@ private fun Calls(
                                 if (contactExists) {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_delete_question),
-                                        peerNameWithLabel, callText
+                                        peerNameWithLabel,
+                                        callText
                                     )
                                     secondButtonText.value = ""
                                     thirdButtonText.value = ""
-                                    fourthButtonText.value = ""
+                                    fourthButtonText.value = ctx.getString(R.string.copy_uri)
+                                    fourthAction.value = {
+                                        Utils.copyToClipboard(ctx, peerUri)
+                                    }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
@@ -441,7 +445,8 @@ private fun Calls(
                                 else {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_add_delete_question),
-                                        peerNameWithLabel, callText
+                                        peerNameWithLabel,
+                                        callText
                                     )
                                     secondButtonText.value = ctx.getString(R.string.add_contact)
                                     secondAction.value = {
@@ -449,7 +454,10 @@ private fun Calls(
                                         navController.navigate("contact/$uri/new")
                                     }
                                     thirdButtonText.value = ""
-                                    fourthButtonText.value = ""
+                                    fourthButtonText.value = ctx.getString(R.string.copy_uri)
+                                    fourthAction.value = {
+                                        Utils.copyToClipboard(ctx, peerUri)
+                                    }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)

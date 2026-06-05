@@ -5,6 +5,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.role.RoleManager
+import android.widget.Toast
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -182,8 +185,10 @@ object Utils {
                 else
                     "$user@$host;" + params.joinToString(";")
         }
-        if (uri.startsWith("<") && (uri.endsWith(">")))
-            u = uri.substring(1).substringBeforeLast(">")
+        if (u.startsWith("<") && u.endsWith(">"))
+            u = u.substring(1).substringBeforeLast(">")
+        if (u.startsWith("tel:", ignoreCase = true))
+            u = u.substring(4)
         u = u.substringBefore("?")
         u = u.replace(":5060", "")
         u = u.replace(";transport=udp", "", true)
@@ -261,7 +266,7 @@ object Utils {
     }
 
     fun checkUriUser(user: String): Boolean {
-        val escaped = """%(\d|A|B|C|D|E|F|a|b|c|d|e|f){2}""".toRegex()
+        val escaped = """%([\dABCDEFabcdef]){2}""".toRegex()
         escaped.replace(user, "").forEach {
             if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+$,;?/".contains(it))) return false }
         return user.isNotEmpty() && !checkIpV4(user) && !checkIpV6(user)
@@ -524,6 +529,13 @@ object Utils {
         return BaresipService.supportedCameras &&
                 ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED
+    }
+
+    fun copyToClipboard(ctx: Context, text: String) {
+        val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("text", text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(ctx, ctx.getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
     }
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
