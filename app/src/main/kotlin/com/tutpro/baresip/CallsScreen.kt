@@ -414,6 +414,10 @@ private fun Calls(
                                         peerNameWithLabel, callText
                                     )
                                     secondButtonText.value = ""
+                                    thirdButtonText.value = ctx.getString(R.string.copy_uri)
+                                    thirdAction.value = {
+                                        Utils.copyToClipboard(ctx, peerUri)
+                                    }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
                                         removeFromHistory(callHistory, callRow)
@@ -422,12 +426,17 @@ private fun Calls(
                                 else {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_add_delete_question),
-                                        peerNameWithLabel, callText
+                                        peerNameWithLabel,
+                                        callText
                                     )
                                     secondButtonText.value = ctx.getString(R.string.add_contact)
                                     secondAction.value = {
                                         val uri = Utils.sipToTel(peerUri)
                                         navController.navigate("contact/$uri/new")
+                                    }
+                                    thirdButtonText.value = ctx.getString(R.string.copy_uri)
+                                    thirdAction.value = {
+                                        Utils.copyToClipboard(ctx, peerUri)
                                     }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = {
