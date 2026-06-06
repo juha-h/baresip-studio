@@ -52,61 +52,7 @@
             <li><b>GNU GPLv3</b> kodek G.729</li>
         </ul>
         ]]></string>
-    <string name="about_text_plus"><![CDATA[
-        <h1>Agen Pengguna SIP dengan panggilan video berbasis <a href="https://github.com/baresip/baresip">pustaka baresip</a></h1>
-        <br>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Versi %1$s</p>
-        <br>
-   <h2>Petunjuk Penggunaan</h2>
-        <ul>
-            <li>Periksa apakah nilai default di Pengaturan baresip+ sudah sesuai kebutuhan Anda
-                (sentuh judul item untuk bantuan).</li>
-        <li>Kemudian di Akun, buat satu atau lebih akun (sekali lagi sentuh judul item untuk bantuan).</li>
-            <li>Status registrasi akun ditampilkan dengan titik berwarna: hijau (registrasi
-            berhasil), kuning (registrasi sedang berlangsung), merah (registrasi gagal), putih (registrasi
-                belum diaktifkan).</li>
-   <li>Menyentuh titik status akan langsung menuju konfigurasi akun.</li>
-            <li>Sentuhan lama pada ikon bilah baresip menampilkan informasi tentang ikon tersebut.</li>
-            <li>Gestur geser ke bawah menyebabkan registrasi ulang akun yang sedang ditampilkan.</li>
-            <li>Sentuhan lama pada akun yang sedang ditampilkan mengaktifkan atau menonaktifkan registrasi akun.</li>
-            <li>Gestur geser kiri/kanan beralih antar akun.</li>
-            <li>Pihak panggilan sebelumnya dapat dipilih kembali dengan menyentuh ikon panggilan saat Callee kosong.</li>
-     <li>Rekan panggilan dan pesan dapat ditambahkan ke kontak dengan sentuhan lama.</li>
-            <li>Sentuhan lama juga dapat digunakan untuk menghapus panggilan, obrolan, pesan, dan kontak.</li>
-            <li>Sentuh/sentuh lama pada ikon kontak dapat digunakan untuk memasang/menghapus avatar gambar.</li>
-         <li>Sentuhan lama pada kodek audio atau video dapat digunakan untuk mengaktifkan/menonaktifkan kodek tersebut.</li>
-            <li>Lihat <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> untuk
-                informasi lebih lanjut.</li>
-        </ul>
-   <h2>Masalah yang Diketahui</h2>
-        <ul>
-            <li>Tampilan diri tidak ditampilkan dengan benar saat aliran video bersifat sendonly.</li>
-        </ul>
-        <h2>Kebijakan Privasi</h2>
-        <p>Kebijakan privasi tersedia
-            <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">di sini</a>.</p>
-        <br>
-        <h2>Kode Sumber</h2>
-        <p>Kode sumber tersedia di <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-        di mana masalah juga dapat dilaporkan.</p>
-        <br>
-        <h2>Terjemahan Bahasa</h2>
-        <p>Terjemahan bahasa dikelola melalui proyek
-            <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> baresip.</p>
-        <br>
-        <h2>Lisensi</h2>
-        <ul>
-   <li><b>BSD-3-Clause</b> kecuali yang berikut ini:</li>
-            <li><b>Apache 2.0</b> kodek AMR dan keamanan TLS</li>
-            <li><b>AGPLv4</b> enkripsi media ZRTP</li>
-            <li><b>GNU LGPL 2.1</b> kodek Codec2</li>
-            <li><b>Gratis</b> kodek G.722</li>
-            <li><b>GNU GPLv3</b> kodek G.729</li>
-        <li><b>GNU GPLv2</b> kodek H.264 dan H.265</li>
-            <li><b>AOMedia</b> kodek AV1</li>
-        </ul>
-        ]]></string>
+    <string name="about_text_plus"><![CDATA["\n        <h1>Agen Pengguna SIP dengan panggilan video berbasis <a href=\"https://github.com/baresip/baresip\">pustaka baresip</a></h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>Versi %1$s</p>\n        <br>\n   <h2>Petunjuk Penggunaan</h2>\n        <ul>\n            <li>Periksa apakah nilai default di Pengaturan baresip+ sudah sesuai kebutuhan Anda\n                (sentuh judul item untuk bantuan).</li>\n        <li>Kemudian di Akun, buat satu atau lebih akun (sekali lagi sentuh judul item untuk bantuan).</li>\n            <li>Status registrasi akun ditampilkan dengan titik berwarna: hijau (registrasi\n            berhasil), kuning (registrasi sedang berlangsung), merah (registrasi gagal), putih (registrasi\n                belum diaktifkan).</li>\n   <li>Menyentuh titik status akan langsung menuju konfigurasi akun.</li>\n            <li>Sentuhan lama pada ikon bilah baresip menampilkan informasi tentang ikon tersebut.</li>\n            <li>Gestur geser ke bawah menyebabkan registrasi ulang akun yang sedang ditampilkan.</li>\n            <li>Sentuhan lama pada akun yang sedang ditampilkan mengaktifkan atau menonaktifkan registrasi akun.</li>\n            <li>Gestur geser kiri/kanan beralih antar akun.</li>\n            <li>Pihak panggilan sebelumnya dapat dipilih kembali dengan menyentuh ikon panggilan saat Callee kosong.</li>\n     <li>Rekan panggilan dan pesan dapat ditambahkan ke kontak dengan sentuhan lama.</li>\n            <li>Sentuhan lama juga dapat digunakan untuk menghapus panggilan, obrolan, pesan, dan kontak.</li>\n            <li>Sentuh/sentuh lama pada ikon kontak dapat digunakan untuk memasang/menghapus avatar gambar.</li>\n         <li>Sentuhan lama pada kodek audio atau video dapat digunakan untuk mengaktifkan/menonaktifkan kodek tersebut.</li>\n            <li>Lihat <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> untuk\n                informasi lebih lanjut.</li>\n        </ul>\n   <h2>Masalah yang Diketahui</h2>\n        <ul>\n            <li>Tampilan diri tidak ditampilkan dengan benar saat aliran video bersifat sendonly.</li>\n        </ul>\n        <h2>Kebijakan Privasi</h2>\n        <p>Kebijakan privasi tersedia\n            <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt\">di sini</a>.</p>\n        <br>\n        <h2>Kode Sumber</h2>\n        <p>Kode sumber tersedia di <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\n        di mana masalah juga dapat dilaporkan.</p>\n        <br>\n        <h2>Terjemahan Bahasa</h2>\n        <p>Terjemahan bahasa dikelola melalui proyek\n            <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a> baresip.</p>\n        <br>\n        <h2>Lisensi</h2>\n        <ul>\n   <li><b>BSD-3-Clause</b> kecuali yang berikut ini:</li>\n            <li><b>Apache 2.0</b> kodek AMR dan keamanan TLS</li>\n            <li><b>AGPLv4</b> enkripsi media ZRTP</li>\n            <li><b>GNU LGPL 2.1</b> kodek Codec2</li>\n            <li><b>Gratis</b> kodek G.722</li>\n            <li><b>GNU GPLv3</b> kodek G.729</li>\n        <li><b>GNU GPLv2</b> kodek H.264 dan H.265</li>\n            <li><b>AOMedia</b> kodek AV1</li>\n        </ul>\n        "]]></string>
     <string name="account">Akun</string>
     <string name="not_available">Tidak tersedia</string>
     <string name="account_nickname_help">Nama panggilan (jika ada) yang digunakan untuk mengidentifikasi akun ini di dalam aplikasi baresip.</string>
