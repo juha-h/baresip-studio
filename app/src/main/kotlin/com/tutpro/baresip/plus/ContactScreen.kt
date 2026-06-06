@@ -711,16 +711,15 @@ private fun UrisSection(
                     OutlinedTextField(
                         value = uri.substringAfter(":"),
                         onValueChange = {},
-                        enabled = false,
+                        readOnly = true,
                         modifier = Modifier.weight(1f),
                         textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
                         label = { Text(text = label, fontWeight = FontWeight.Bold) },
                         colors = OutlinedTextFieldDefaults.colors(
-                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                            disabledBorderColor = MaterialTheme.colorScheme.outline,
-                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedBorderColor = MaterialTheme.colorScheme.outline,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     )
 
@@ -848,16 +847,15 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
             OutlinedTextField(
                 value = email,
                 onValueChange = {},
-                enabled = false,
+                readOnly = true,
                 modifier = Modifier.weight(1f),
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
                 label = { Text(text = stringResource(R.string.email), fontWeight = FontWeight.Bold) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedBorderColor = MaterialTheme.colorScheme.outline,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             )
             IconButton(
