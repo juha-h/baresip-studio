@@ -1,0 +1,3 @@
+- Enabled copying of URIs to clipboard on calls and contact screens
+- Removed tel: URI scheme when telephone number is shown on some screens
+- New translations (several languages)
