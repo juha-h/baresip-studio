@@ -92,8 +92,8 @@
     <string name="time">时间</string>
     <string name="calls_duration">时长</string>
     <string name="playing_recording">正在播放录音…</string>
-    <string name="calls_add_delete_question">您要将“%1$s”添加到联系人中，还是从通话记录中删除 %2$s？</string>
-    <string name="calls_delete_question">是否要从通话记录中删除“%1$s”%2$s？</string>
+    <string name="calls_add_delete_question">您要将“%1$s”添加到联系人中、复制其 URI，还是从通话记录中删除此 %2$s？</string>
+    <string name="calls_delete_question">您要复制“%1$s”的 URI，还是从通话记录中删除此 %2$s？</string>
     <string name="disable_history">禁用</string>
     <string name="enable_history">启用</string>
     <string name="delete_history_alert">是否要删除账号“%1$s”的通话记录？</string>
@@ -457,4 +457,6 @@
     <string name="tel_uri_calls">用于通话的 TEL URI</string>
     <string name="tel_uri_messages">用于消息的 TEL URI</string>
     <string name="label">标签</string>
+    <string name="copy_uri">复制 URI</string>
+    <string name="copied_to_clipboard">已复制到剪贴板</string>
 </resources>

@@ -24,7 +24,7 @@
     <string name="call">Ring</string>
     <string name="calls_calls">samtaler</string>
     <string name="calls_call">samtale</string>
-    <string name="calls_add_delete_question">Ønsker du å legge til «%1$s» i kontaktlisten, eller slette «%2$s» fra anropsloggen\?</string>
+    <string name="calls_add_delete_question">Ønsker du å legge til «%1$s» i kontaktlisten, eller slette «%2$s» fra anropsloggen?</string>
     <string name="disable_history">Skru av</string>
     <string name="enable_history">Skru på</string>
     <string name="chat_with">Sludre med %1$s</string>
@@ -105,7 +105,7 @@
     <string name="voicemain_uri_help">SIP-URI for sjekk av telefonsvarermeldinger. Hvis levnet tom, vil telefonsvarermeldinger (melding venter-anvisninger) ikke bli levert.</string>
     <string name="default_account_help">Velger denne kontoen når baresip startes.</string>
     <string name="transfer_request">Samtaleoverføringsforespørsel til</string>
-    <string name="calls_delete_question">Ønsker du å slette \"%1$s\" %2$s fra anropshistorikk\?</string>
+    <string name="calls_delete_question">Ønsker du å slette \"%1$s\" %2$s fra anropshistorikk?</string>
     <string name="message_failed">Mislyktes</string>
     <string name="short_chat_question">Ønsker du å slette sludringen med \"%1$s\"\?</string>
     <string name="start_automatically_help">Starter baresip automatisk sammen med enheten.</string>
