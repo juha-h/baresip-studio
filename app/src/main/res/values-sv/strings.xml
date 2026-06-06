@@ -177,64 +177,7 @@
     <string name="decrypt_password">Lösenord för avkryptering</string>
     <string name="encrypt_password">Lösenord för kryptering</string>
     <string name="accounts_help">SIP URI för nytt konto i formatet &lt;användare&gt;@&lt;domän&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Om &lt;port&gt; anges och transportprotokollet inte anges, är standardtransportprotokollet UDP. Om &lt;port&gt; inte anges och transportprotokollet anges, är standardporten 5060 eller 5061 (TLS). Om varken det ena eller det andra anges och ingen utgående proxy specificeras, bestäms kontots registrator (om sådan finns) enbart utifrån domänens DNS-information.</string>
-    <string name="about_text_plus"><![CDATA[
-<h1>SIP-användaragent med videosamtal baserat på <a href="https://github.com/baresip/baresip">baresip</a>-biblioteket</h1>
-<br>
-<p>Juha Heinanen &lt;jh@tutpro.com></p>
-<p>Version %1$s</p>
-<br>
-<h2>Användningstips</h2>
-<ul>
-<li>Kontrollera att standardvärdena i baresip+\'s Inställningar uppfyller dina behov
-(tryck på objektets titel för hjälp).</li>
-<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>
-<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering
-lyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering
-har inte aktiverats).</li>
-<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.
-<li>Långt tryck på baresip-ikonerna visar information om ikonerna.
-<li>Svep nedåt för att omregistrera det aktuella kontot.
-<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.
-<li>Svep åt vänster/höger för att växla mellan kontona.
-<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.
-<li>Samtalspartner och meddelanden kan läggas till i kontakter genom att trycka länge på dem.
-<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.
-<li>Tryck/långt tryck på kontaktikonen kan användas för att installera/ta bort bildavatar.
-<li>Långt tryck på en ljud- eller videokodek kan användas för att aktivera/inaktivera kodeken.
-<li>Se <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> för mer
-information.
-</li>
-</ul>
-<h2>Kända problem
-<ul>
-<li>Vid videosamtal måste enheten hållas i liggande
- 
-läge, roterat 90 grader åt vänster från stående läge.
-<li>Självbilden visas inte korrekt när videoströmmen är sendonly. </li>
-</ul>
-<h2>Integritet</h2>
-<p>Integritet finns
-<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">här</a>.</p>
-<br>
-<h2>Källkod</h2>
-<p>Källkoden finns tillgänglig på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-där även problem kan rapporteras.</p>
-<br>
-<h2>Språköversättningar</h2>
-<p>Språköversättningar hanteras via baresip
-<a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>-projektet.</p>
-<br>
-<h2>Licenser</h2>
-<ul>
-<li><b>BSD-3-klausul</b> med undantag för följande:</li>
-<li><b>Apache 2.0</b> AMR-kodeken och TLS-säkerhet</li>
-<li><b>AGPLv4</b> ZRTP-mediekryptering</li>
-<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>
-<li><b>GNU GPLv3</b> G.729-kodeken</li>
-<li><b>GNU GPLv2</b> H.264- och H.265-kodeken</li>
-<li><b>AOMedia</b> AV1-kodeken</li>
-</ul>
-]]></string>
+    <string name="about_text_plus"><![CDATA[\n<h1>SIP-användaragent med videosamtal baserat på <a href=\"https://github.com/baresip/baresip\">baresip</a>-biblioteket</h1>\n<br>\n<p>Juha Heinanen &lt;jh@tutpro.com></p>\n<p>Version %1$s</p>\n<br>\n<h2>Användningstips</h2>\n<ul>\n<li>Kontrollera att standardvärdena i baresip+\'s Inställningar uppfyller dina behov\n(tryck på objektets titel för hjälp).</li>\n<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>\n<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering\nlyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering\nhar inte aktiverats).</li>\n<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.\n<li>Långt tryck på baresip-ikonerna visar information om ikonerna.\n<li>Svep nedåt för att omregistrera det aktuella kontot.\n<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.\n<li>Svep åt vänster/höger för att växla mellan kontona.\n<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.\n<li>Samtalspartner och meddelanden kan läggas till i kontakter genom att trycka länge på dem.\n<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.\n<li>Tryck/långt tryck på kontaktikonen kan användas för att installera/ta bort bildavatar.\n<li>Långt tryck på en ljud- eller videokodek kan användas för att aktivera/inaktivera kodeken.\n<li>Se <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> för mer\ninformation.\n</li>\n</ul>\n<h2>Kända problem\n<ul>\n<li>Vid videosamtal måste enheten hållas i liggande\n \nläge, roterat 90 grader åt vänster från stående läge.\n<li>Självbilden visas inte korrekt när videoströmmen är sendonly. </li>\n</ul>\n<h2>Integritet</h2>\n<p>Integritet finns\n<a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt\">här</a>.</p>\n<br>\n<h2>Källkod</h2>\n<p>Källkoden finns tillgänglig på <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\ndär även problem kan rapporteras.</p>\n<br>\n<h2>Språköversättningar</h2>\n<p>Språköversättningar hanteras via baresip\n<a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>-projektet.</p>\n<br>\n<h2>Licenser</h2>\n<ul>\n<li><b>BSD-3-klausul</b> med undantag för följande:</li>\n<li><b>Apache 2.0</b> AMR-kodeken och TLS-säkerhet</li>\n<li><b>AGPLv4</b> ZRTP-mediekryptering</li>\n<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>\n<li><b>GNU GPLv3</b> G.729-kodeken</li>\n<li><b>GNU GPLv2</b> H.264- och H.265-kodeken</li>\n<li><b>AOMedia</b> AV1-kodeken</li>\n</ul>\n]]></string>
     <string name="default_call_volume">Förvald samtalsvolym</string>
     <string name="invalid_opus_packet_loss">Ogiltig procentuell paketförlust för Opus</string>
     <string name="opus_packet_loss_help">Förväntad procentuell förlust av Opus-ljudströmspaket, från 0 till 100. Fabriksinställt standardvärde är 1. Värdet 0 tur inaktiverar även Opus Forward Error Correction (FEC).</string>

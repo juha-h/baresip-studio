@@ -205,53 +205,7 @@
     <string name="dtmf_inband">Eventos na Banda RTP</string>
     <string name="dtmf_mode_help">Selecione como os tons DTMF 0–9, #, * e A-D serão enviados.</string>
     <string name="dtmf_mode">Modo DTMF</string>
-    <string name="about_text_plus"><![CDATA[
-        <h1>Biblioteca Baresip baseado em agente de utilizador SIP com vídeo chamadas</h1>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Versão %1$s</p>
-        <h2>Dicas de uso</h2>
-        <ul>
-            <li>Verifique se os valores padrão nas configurações do baresip+\ atendem às as suas necessidades
-                (toque nos títulos dos elementos para obter ajuda).</li>
-            <li>Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).</li>
-            <li>O estado de uma conta é mostrado com um ponto colorido: verde (registo
-                bem sucedido), amarelo (registo em progresso), vermelho (registo falhou), branco
-                (registo não foi ativado).</li>
-            <li>Toque nos três pontos para ir direto para a configuração da conta.</li>
-            <li>O gesto de deslizar para baixo causa o novo registo da conta exibida no momento.</li>
-            <li>Um toque longo na conta exibida no momento ativa ou desativa o registo da conta.</li>
-            <li>Gestos para a esquerda/direita alternam as contas.</li>
-            <li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone
-                de chamada quando o "Callee" estiver vazio.</li>
-            <li>Os pares de chamadas e mensagens podem ser adicionados aos contatos por meio de toques longos.</li>
-            <li>Os toques longos também podem ser usados para remover chamadas, bate-papos, mensagens e contatos.</li>
-            <li>Toque/toque longo no ícone do contato pode ser usado para instalar/remover o avatar da imagem.</li>
-            <li>Consulte a <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obter
-                mais informações.</li>
-        </ul>
-        <h2>Problemas conhecidos</h2>
-        <ul>
-            <li>Nas chamadas com vídeo, o dispositivo precisa ser mantido no modo paisagem,
-                girado 90 graus para a esquerda em relação à orientação retrato.</li>
-            <li>A própia visualização automática não é exibida corretamente quando o
-                fluxo de vídeo é somente envio.</li>
-        </ul>
-        <h2>Política de privacidade</h2>
-            A política de privacidade está disponível <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">aqui</a>.
-        <h2>Código fonte</h2>
-        O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-        onde os problemas encontrados também podem ser reportados.
-        <h2>Licenças</h2>
-        <ul>
-            <li><b>Cláusula BSD-3</b> exceto os seguintes:</li>
-            <li><b>Apache 2.0</b>, codecs AMR e segurança TLS</li>
-            <li><b>AGPLv4</b>, criptografia de média ZRTP</li>
-            <li><b>GNU LGPL 2.1</b> G.722, G.726 e codecs Codec2</li>
-            <li><b>GNU GPLv3</b> codec G.729</li>
-            <li><b>GNU GPLv2</b> codecs H.264 e H.265</li>
-            <li><b>AOMedia</b> codec AV1</li>
-        </ul>
-        ]]></string>
+    <string name="about_text_plus"><![CDATA[\n \u0020 \u0020 \u0020 \u0020<h1>Biblioteca Baresip baseado em agente de utilizador SIP com vídeo chamadas</h1>\n \u0020 \u0020 \u0020 \u0020<p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n \u0020 \u0020 \u0020 \u0020<p>Versão %1$s</p>\n \u0020 \u0020 \u0020 \u0020<h2>Dicas de uso</h2>\n \u0020 \u0020 \u0020 \u0020<ul>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Verifique se os valores padrão nas configurações do baresip+ atendem às as suas necessidades\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020(toque nos títulos dos elementos para obter ajuda).</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Então em Contas, crie uma ou mais contas (novamente clique nos títulos para ajuda).</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>O estado de uma conta é mostrado com um ponto colorido: verde (registo\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020bem sucedido), amarelo (registo em progresso), vermelho (registo falhou), branco\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020(registo não foi ativado).</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Toque nos três pontos para ir direto para a configuração da conta.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>O gesto de deslizar para baixo causa o novo registo da conta exibida no momento.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Um toque longo na conta exibida no momento ativa ou desativa o registo da conta.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Gestos para a esquerda/direita alternam as contas.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>O participante da chamada anterior pode ser selecionado novamente tocando no ícone\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020de chamada quando o \"Callee\" estiver vazio.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Os pares de chamadas e mensagens podem ser adicionados aos contatos por meio de toques longos.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Os toques longos também podem ser usados para remover chamadas, bate-papos, mensagens e contatos.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Toque/toque longo no ícone do contato pode ser usado para instalar/remover o avatar da imagem.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Consulte a <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obter\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020mais informações.</li>\n \u0020 \u0020 \u0020 \u0020</ul>\n \u0020 \u0020 \u0020 \u0020<h2>Problemas conhecidos</h2>\n \u0020 \u0020 \u0020 \u0020<ul>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>Nas chamadas com vídeo, o dispositivo precisa ser mantido no modo paisagem,\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020girado 90 graus para a esquerda em relação à orientação retrato.</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li>A própia visualização automática não é exibida corretamente quando o\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020fluxo de vídeo é somente envio.</li>\n \u0020 \u0020 \u0020 \u0020</ul>\n \u0020 \u0020 \u0020 \u0020<h2>Política de privacidade</h2>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020A política de privacidade está disponível <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">aqui</a>.\n \u0020 \u0020 \u0020 \u0020<h2>Código fonte</h2>\n \u0020 \u0020 \u0020 \u0020O código fonte está disponível no <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,\n \u0020 \u0020 \u0020 \u0020onde os problemas encontrados também podem ser reportados.\n \u0020 \u0020 \u0020 \u0020<h2>Licenças</h2>\n \u0020 \u0020 \u0020 \u0020<ul>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>Cláusula BSD-3</b> exceto os seguintes:</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>Apache 2.0</b>, codecs AMR e segurança TLS</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>AGPLv4</b>, criptografia de média ZRTP</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>GNU LGPL 2.1</b> G.722, G.726 e codecs Codec2</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>GNU GPLv3</b> codec G.729</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>GNU GPLv2</b> codecs H.264 e H.265</li>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<li><b>AOMedia</b> codec AV1</li>\n \u0020 \u0020 \u0020 \u0020</ul>\n \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="about_title_plus">Sobre o baresip+</string>
     <string name="battery_optimizations">Otimizações da bateria</string>
     <string name="missed_calls">Chamadas perdidas</string>
