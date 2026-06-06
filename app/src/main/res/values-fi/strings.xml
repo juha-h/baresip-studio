@@ -56,8 +56,7 @@
                 </ul>
         ]]>
     </string>
-    <string name="about_text_plus">
-        <![CDATA[
+    <string name="about_text_plus"><![CDATA[
             <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva
                  videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
             <br>
@@ -109,8 +108,7 @@
                 <li><b>GNU GPLv2</b> H.264 ja H.265 koodausmenetelmät</li>
                 <li><b>AOMedia</b> AV1 koodausmenetelmä</li>
             </ul>
-        ]]>
-    </string>
+        ]]></string>
     <!-- Account Activity -->
     <string name="account">Tili</string>
     <string name="tel_uri_calls">TEL URI Puhelut</string>
@@ -496,9 +494,9 @@
     <string name="invalid_contact">Virheellinen yhteystiedon nimi \'%1$s\'</string>
     <string name="contact_already_exists">Yhteystieto \'%1$s\' on jo olemassa</string>
     <string name="contact_no_sip_or_tel_uri">Yhteystiedolla \'%1$s\' ei ole SIP eikä TEL URI:a</string>
-    <string name="contact_no_tel_uri">Yhteystiedolla \'%1$s\' ei ole TEL URI:a</string><string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
+    <string name="contact_no_tel_uri">Yhteystiedolla \'%1$s\' ei ole TEL URI:a</string>
+    <string name="android_contact_help">Jos merkitty, tämä yhteystieto lisätään Androidin yhteystietoihin.</string>
     <string name="avatar_image">Profiilikuva</string>
-
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää viestin
@@ -514,7 +512,6 @@
     <string name="contact_import_failure">Yhteystietojen tuonti epäonnistui</string>
     <string name="contact_export_success">Yhteistietojen vienti onnistui</string>
     <string name="contact_export_failure">Yhteistietojen vienti epäonnistui</string>
-
     <!-- Generic -->
     <string name="alert">Varoitus</string>
     <string name="info">Tieto</string>
