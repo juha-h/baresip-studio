@@ -109,8 +109,8 @@
     <string name="delete_history_alert">Você quer excluir o histórico de chamadas da conta \'%1$s\'\?</string>
     <string name="enable_history">Habilitar</string>
     <string name="disable_history">Desabilitar</string>
-    <string name="calls_delete_question">Você quer apagar %1$s\' %2$s do histórico de chamadas\?</string>
-    <string name="calls_add_delete_question">Você quer adicionar \'%1$s\' aos contatos ou deletar %2$s do histórico de chamadas\?</string>
+    <string name="calls_delete_question">Você quer apagar %1$s\' %2$s do histórico de chamadas?</string>
+    <string name="calls_add_delete_question">Você quer adicionar \'%1$s\' aos contatos ou deletar %2$s do histórico de chamadas?</string>
     <string name="calls_call">chamada</string>
     <string name="calls_calls">chamadas</string>
     <string name="call">Chamada</string>

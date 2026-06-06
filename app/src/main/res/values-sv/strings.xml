@@ -20,8 +20,8 @@
     <string name="delete_history_alert">Vill du ta bort samtalshistoriken för kontot \'%1$s\'\?</string>
     <string name="enable_history">Aktivera</string>
     <string name="disable_history">Inaktivera</string>
-    <string name="calls_delete_question">Vill du ta bort \'%1$s\' %2$s från samtalshistoriken\?</string>
-    <string name="calls_add_delete_question">Vill du lägga till \'%1$s\' to dina kontakter eller ta bort %2$s från samtalshistoriken\?</string>
+    <string name="calls_delete_question">Vill du ta bort \'%1$s\' %2$s från samtalshistoriken?</string>
+    <string name="calls_add_delete_question">Vill du lägga till \'%1$s\' to dina kontakter eller ta bort %2$s från samtalshistoriken?</string>
     <string name="calls_call">samtal</string>
     <string name="calls_calls">samtal</string>
     <string name="call">Ring</string>

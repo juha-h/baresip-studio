@@ -72,10 +72,8 @@
     <string name="call">Обади се</string>
     <string name="calls_calls">повиквания</string>
     <string name="calls_call">обади се</string>
-    <string name="calls_add_delete_question">Искате ли да добавите \'%1$s\' към контакти или изтриване
-		%2$s от историята на обажданията? 
-	</string>
-    <string name="calls_delete_question">Искате ли да изтриете \'%1$s\' %2$s от историята на обажданията? </string>
+    <string name="calls_add_delete_question">Искате ли да добавите \'%1$s\' към контакти или изтриване %2$s от историята на обажданията?</string>
+    <string name="calls_delete_question">Искате ли да изтриете \'%1$s\' %2$s от историята на обажданията?</string>
     <string name="disable_history">Забрани история на обаждания</string>
     <string name="enable_history">Разреши история на обаждания</string>
     <string name="delete_history_alert">Искате ли да изтриете историята на обажданията на акаунта \'%1$s\'?</string>
