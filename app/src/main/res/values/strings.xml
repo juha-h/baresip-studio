@@ -68,6 +68,8 @@
         <ul>
             <li>Check that default values in baresip+\'s Settings meet your needs
                 (touch item titles for help).</li>
+            <li>If you want use baresip+ for mobile calling, turn on Default Phone App setting. It will
+                create Mobile account for mobile calling.</li>
             <li>Then in Accounts, create one or more accounts (again touch item titles for help).</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
                 succeeded), yellow (registration is in progress), red (registration failed), white (registration
