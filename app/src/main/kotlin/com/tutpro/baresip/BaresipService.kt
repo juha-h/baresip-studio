@@ -1940,11 +1940,7 @@ class BaresipService: Service() {
 
     fun handleExternalCall(telecomCall: android.telecom.Call, preferredAor: String? = null) {
         val rawUri = telecomCall.details.handle?.toString() ?: "Unknown"
-        val uri = try {
-            java.net.URLDecoder.decode(rawUri, "UTF-8")
-        } catch (_: Exception) {
-            rawUri
-        }
+        val uri = Utils.uriUnescape(rawUri)
 
         if (uas.value.isEmpty()) {
             Log.e(TAG, "No User Agents available to handle external call")
