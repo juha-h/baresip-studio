@@ -85,6 +85,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.tutpro.baresip.BaresipService.Companion.circleGreen
+import com.tutpro.baresip.BaresipService.Companion.colorblind
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
@@ -583,7 +585,7 @@ private fun NewMessage(
                     var msgUri = ""
                     addMessage(msg)
                     if (ua.account.isMobile) {
-                        if (Utils.isAirplaneModeOn(ctx)) {
+                        if (ua.status != circleGreen.getValue(colorblind)) {
                             dialogMessage.value = ctx.getString(R.string.airplane_mode)
                             showDialog.value = true
                         } else {

@@ -152,6 +152,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.tutpro.baresip.BaresipService.Companion.circleGreen
+import com.tutpro.baresip.BaresipService.Companion.colorblind
 import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
@@ -2139,7 +2141,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
             showAlert.value = true
             return
     }
-    else if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+    else if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = ctx.getString(R.string.airplane_mode)
         showAlert.value = true

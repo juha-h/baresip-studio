@@ -2144,17 +2144,19 @@ class BaresipService: Service() {
     private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus
-                ?: if (isAirplaneModeOn) {
+            val status = newStatus ?: if (isAirplaneModeOn) {
+                if (ua.status == circleGreen.getValue(colorblind))
+                    ua.status
+                else
                     R.drawable.circle_white
+            } else {
+                if (ua.status == R.drawable.circle_white) {
+                    // Show "Red" (not yet in service)
+                    circleRed.getValue(colorblind)
                 } else {
-                    if (ua.status == R.drawable.circle_white) {
-                        // Show "Red" (not yet in service)
-                        circleRed.getValue(colorblind)
-                    } else {
-                        ua.status
-                    }
+                    ua.status
                 }
+            }
             if (ua.status != status) {
                 Log.d(TAG, "Updating Mobile status to $status")
                 ua.updateStatus(status)
@@ -2167,13 +2169,13 @@ class BaresipService: Service() {
 
     private fun updateMobileStatusFromServiceState(state: Int) {
         val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-        val status = if (isAirplaneModeOn)
-            R.drawable.circle_white
-        else if (state == ServiceState.STATE_IN_SERVICE)
+        val status = if (state == ServiceState.STATE_IN_SERVICE)
             circleGreen.getValue(colorblind)
+        else if (isAirplaneModeOn)
+            R.drawable.circle_white
         else
             circleRed.getValue(colorblind)
-        Log.d(TAG, "Mobile service state changed: $state, updating status to $status")
+        Log.d(TAG, "Mobile service state changed: $state, updating status to $status (Airplane=$isAirplaneModeOn)")
         updateMobileStatus(status)
     }
 
