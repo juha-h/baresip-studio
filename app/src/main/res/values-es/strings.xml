@@ -110,8 +110,8 @@
     <string name="call">Llamada</string>
     <string name="calls_calls">llamadas</string>
     <string name="calls_call">llamar</string>
-    <string name="calls_add_delete_question">¿Quiere añadir a «%1$s» a los contactos o eliminar %2$s del historial de llamadas?</string>
-    <string name="calls_delete_question">¿Quiere eliminar «%1$s» %2$s del historial de llamadas?</string>
+    <string name="calls_add_delete_question">¿Quiere añadir a «%1$s» a los contactos, copiar su URL, o eliminar este %2$s del historial de llamadas?</string>
+    <string name="calls_delete_question">¿Quiere copiar la URI de «%1$s» o borrar este %2$s desde el historial de llamadas?</string>
     <string name="disable_history">Desactivar</string>
     <string name="enable_history">Activar</string>
     <string name="delete_history_alert">¿Quiere eliminar el historial de llamadas de la cuenta «%1$s»\?</string>
@@ -449,4 +449,9 @@
     <string name="no_telephone_number">La llamada móvil solo puede hacerse a número de teléfono</string>
     <string name="airplane_mode">Modo avión está ACTIVO. Apáguelo para utilizar cuenta de móvil.</string>
     <string name="voicemain_tel_uri_help">URI TEL para comprobar mensajes de correo por voz.</string>
+    <string name="label">Etiqueta</string>
+    <string name="copy_uri">Copiar URL</string>
+    <string name="copied_to_clipboard">Copiado al portapapeles</string>
+    <string name="tel_uri_calls">TEL URI para llamadas</string>
+    <string name="tel_uri_messages">TEL URI para Mensajes</string>
 </resources>
