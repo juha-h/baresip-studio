@@ -72,6 +72,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.tutpro.baresip.plus.BaresipService.Companion.circleGreen
+import com.tutpro.baresip.plus.BaresipService.Companion.colorblind
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
@@ -356,7 +358,7 @@ private fun Calls(
                                     )
                                 secondButtonText.value = ctx.getString(R.string.call)
                                 secondAction.value = {
-                                    if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                    if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
                                         alertTitle.value = ctx.getString(R.string.notice)
                                         alertMessage.value = ctx.getString(R.string.airplane_mode)
                                         showAlert.value = true
@@ -381,7 +383,7 @@ private fun Calls(
                                 fourthButtonText.value = ctx.getString(R.string.send_message)
                                 fourthAction.value = {
                                     if (ua.account.isMobile) {
-                                        if (Utils.isAirplaneModeOn(ctx)) {
+                                        if (ua.status != circleGreen.getValue(colorblind)) {
                                             alertTitle.value = ctx.getString(R.string.notice)
                                             alertMessage.value = ctx.getString(R.string.airplane_mode)
                                             showAlert.value = true

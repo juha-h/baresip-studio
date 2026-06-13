@@ -94,6 +94,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.rememberAsyncImagePainter
+import com.tutpro.baresip.plus.BaresipService.Companion.circleGreen
+import com.tutpro.baresip.plus.BaresipService.Companion.colorblind
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -732,7 +734,7 @@ private fun UrisSection(
                             !ua.account.isMobile))
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
                                     alertTitle.value = ctx.getString(R.string.notice)
                                     alertMessage.value = ctx.getString(R.string.airplane_mode)
                                     showAlert.value = true
@@ -769,7 +771,7 @@ private fun UrisSection(
                             !ua.account.isMobile))
                         IconButton(
                             onClick = {
-                                if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
+                                if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
                                     alertTitle.value = ctx.getString(R.string.notice)
                                     alertMessage.value = ctx.getString(R.string.airplane_mode)
                                     showAlert.value = true
