@@ -25,6 +25,7 @@ class AccountViewModel: ViewModel() {
     val answerMode = MutableStateFlow(0)
     val autoRedirect = MutableStateFlow(false)
     val blockUnknown = MutableStateFlow(false)
+    val blockHidden = MutableStateFlow(false)
     val vmUri = MutableStateFlow("")
     val countryCode = MutableStateFlow("")
     val telProvider = MutableStateFlow("")
@@ -60,6 +61,7 @@ class AccountViewModel: ViewModel() {
         answerMode.value = acc.answerMode
         autoRedirect.value = acc.autoRedirect
         blockUnknown.value = acc.blockUnknown
+        blockHidden.value = acc.blockHidden
         vmUri.value = acc.vmUri
         countryCode.value = acc.countryCode
         telProvider.value = acc.telProvider

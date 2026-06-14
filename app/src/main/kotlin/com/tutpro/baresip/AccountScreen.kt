@@ -647,6 +647,33 @@ private fun AccountContent(
     }
 
     @Composable
+    fun BlockHidden() {
+        val blockHiddenTitle = stringResource(R.string.block_hidden)
+        val blockHiddenHelp = stringResource(R.string.block_hidden_help)
+        val block by viewModel.blockHidden.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = blockHiddenTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = blockHiddenTitle
+                        alertMessage.value = blockHiddenHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            Switch(
+                checked = block,
+                onCheckedChange = { viewModel.blockHidden.value = it }
+            )
+        }
+    }
+
+    @Composable
     fun AudioCodecs(navController: NavController, aor: String) {
         Row(
             Modifier.fillMaxWidth(),
@@ -1333,6 +1360,7 @@ private fun AccountContent(
             }
         }
         BlockUnknown()
+        BlockHidden()
         if (!ua.account.isMobile) {
             AudioCodecs(navController, aor)
             MediaEnc()
@@ -1671,6 +1699,12 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newBlockUnknown != acc.blockUnknown) {
         acc.blockUnknown = newBlockUnknown
         Log.d(TAG, "New blockUnknown is ${acc.blockUnknown}")
+    }
+
+    val newBlockHidden = viewModel.blockHidden.value
+    if (newBlockHidden != acc.blockHidden) {
+        acc.blockHidden = newBlockHidden
+        Log.d(TAG, "New blockHidden is ${acc.blockHidden}")
     }
 
     var newVmUri = viewModel.vmUri.value.trim()

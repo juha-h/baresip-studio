@@ -213,8 +213,10 @@
         if confirmation is requested.</string>
     <string name="manual">Manual</string>
     <string name="auto">Automatic</string>
-    <string name="block_unknown">Block Unknown</string>
+    <string name="block_unknown">Block Strangers</string>
     <string name="block_unknown_help">Block calls and messages from peers that are not found in contacts.</string>
+    <string name="block_hidden">Block Hidden</string>
+    <string name="block_hidden_help">Block calls and messages from peers with hidden identification.</string>
     <string name="voicemail_uri">Voicemail URI</string>
     <string name="voicemain_uri_help">SIP URI for checking of voicemail messages. If left empty, voicemail
         messages (Message Waiting Indications) are not subscribed to.
@@ -266,7 +268,9 @@
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="call_auto_rejected">Auto-rejected call from \`%1$s\`</string>
     <string name="call_blocked">Auto-rejected blocked call from \`%1$s\`</string>
+    <string name="hidden_call_blocked">Auto-rejected hidden call</string>
     <string name="message_blocked">Auto-rejected blocked message from \`%1$s\`</string>
+    <string name="hidden_message_blocked">Auto-rejected hidden message</string>
     <!-- Blocked Activity -->
     <string name="blocked">Blocked</string>
     <string name="blocked_calls">Blocked Calls</string>
