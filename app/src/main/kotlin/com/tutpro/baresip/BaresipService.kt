@@ -1946,7 +1946,7 @@ class BaresipService: Service() {
     }
 
     fun handleExternalCall(telecomCall: android.telecom.Call, preferredAor: String? = null) {
-        val rawUri = telecomCall.details.handle?.toString() ?: "Unknown"
+        val rawUri = telecomCall.details.handle?.toString() ?: getString(R.string.unknown)
         val uri = Utils.uriUnescape(rawUri)
 
         if (uas.value.isEmpty()) {

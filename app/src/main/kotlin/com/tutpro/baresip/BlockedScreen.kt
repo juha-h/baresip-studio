@@ -253,6 +253,7 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
     val message = remember { mutableStateOf("") }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
+    val unknown = stringResource(R.string.unknown)
 
     AlertDialog(
         showDialog = showDialog,
@@ -278,15 +279,18 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-                    .clickable(onClick = {
-                        message.value = String.format(ctx.getString(R.string.blocked_contact_question),
-                            peerUri)
-                        lastButtonText.value = ctx.getString(R.string.add_contact)
-                        lastAction.value = {
-                            navController.navigate("contact/$peerUri/new")
+                    .clickable(
+                        enabled = !peerUri.contains("anonymous") && peerUri != unknown,
+                        onClick = {
+                            message.value = String.format(ctx.getString(R.string.blocked_contact_question),
+                                peerUri)
+                            lastButtonText.value = ctx.getString(R.string.add_contact)
+                            lastAction.value = {
+                                navController.navigate("contact/$peerUri/new")
+                            }
+                            showDialog.value = true
                         }
-                        showDialog.value = true
-                    })
+                    )
             ) {
                 Text(text = "\u2022",
                     modifier = Modifier.padding(start = 8.dp, end = 4.dp),
