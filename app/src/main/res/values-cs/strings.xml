@@ -254,7 +254,7 @@
     <string name="default_phone_app">Výchozí aplikace telefonu</string>
     <string name="dialer_role_not_available">Role výchozí aplikace pro telefonování není k dispozici</string>
     <string name="default_phone_app_help">Pokud je zaškrtnuto, je výchozí aplikací pro telefonování baresip.</string>
-    <string name="redirect_notice">Automatické přesměrování na \'%1$s\'\\</string>
+    <string name="redirect_notice">Automatické přesměrování na \'%1$s\'</string>
     <string name="favorite">Oblíbené</string>
     <string name="appear_on_top_permission">Automatické spuštění vyžaduje oprávnění Zobrazení přes ostatní aplikace.</string>
     <string name="redirect_mode_help">Vybírá, zda bude požadavek na přesměrování hovoru následován automaticky, nebo zda bude vyžadováno potvrzení.</string>

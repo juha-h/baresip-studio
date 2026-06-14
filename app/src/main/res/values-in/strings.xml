@@ -373,7 +373,7 @@
     <string name="transfer_request_query">Apakah Anda menerima untuk mentransfer panggilan ini ke \'%1$s\'?</string>
     <string name="call_request">Permintaan Panggilan</string>
     <string name="call_request_query">Apakah Anda menerima permintaan untuk menelepon \'%1$s\'?</string>
-    <string name="redirect_notice">Pengalihan otomatis ke \'%1$s\'\\</string>
+    <string name="redirect_notice">Pengalihan otomatis ke \'%1$s\'</string>
     <string name="redirect_request">Permintaan Pengalihan</string>
     <string name="redirect_request_query">Apakah Anda menerima pengalihan panggilan ke \'%1$s\'?</string>
     <string name="call_failed">Panggilan gagal</string>

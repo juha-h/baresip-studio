@@ -53,7 +53,7 @@
     <string name="invalid_reg_int">தவறான பதிவு இடைவெளி \'%1$s\'</string>
     <string name="media_nat">மீடியா நாட் டிராவர்சல்</string>
     <string name="media_nat_help">மீடியா நாட் டிராவர்சல் நெறிமுறையைத் தேர்ந்தெடுக்கிறது (ஏதேனும் இருந்தால்). சாத்தியமான தேர்வுகள் ச்டன் (NAT, RFC 5389 க்கான அமர்வு பயண பயன்பாடுகள்) மற்றும் ICE (ஊடாடும் இணைப்பு நிறுவனம், RFC 5245).</string>
-    <string name="invalid_stun_server">தவறான ச்டன்/டர்ன் சர்வர் யூரி \'%1$s\' \'</string>
+    <string name="invalid_stun_server">தவறான ச்டன்/டர்ன் சர்வர் யூரி \'%1$s\'</string>
     <string name="stun_username">ச்டன்/டர்ன் பயனர்பெயர்</string>
     <string name="stun_username_help">ச்டன்/டர்ன் சேவையகத்தால் தேவைப்பட்டால் பயனர்பெயர்</string>
     <string name="invalid_stun_username">தவறான பயனர்பெயர் \'%1$s\'</string>
@@ -90,7 +90,7 @@
     <string name="accounts">கணக்குகள்</string>
     <string name="new_account">சிப் புதிய கணக்கு முகவரி</string>
     <string name="accounts_help">சிப் புதிய கணக்கு முகவரி வடிவம்: &lt;பயனர்&gt;@&lt;டொமைன்&gt; [: &lt;port&gt;] [; போக்குவரத்து = யுடிபி | டி.சி.பி | டி.எல்.எச்]. &lt;Port&gt; வழங்கப்பட்டு போக்குவரத்து நெறிமுறை வழங்கப்படாவிட்டால், போக்குவரத்து நெறிமுறை இயல்புநிலையாக UDP க்கு. &lt;port&gt; வழங்கப்படாவிட்டால் மற்றும் போக்குவரத்து நெறிமுறை வழங்கப்பட்டால், &lt;PORT&gt; இயல்புநிலை 5060 அல்லது 5061 (TLS) க்கு. எதுவும் வழங்கப்படவில்லை மற்றும் வெளிச்செல்லும் பதிலாள் குறிப்பிடப்படவில்லை என்றால், கணக்கின் பதிவாளர் (ஏதேனும் இருந்தால்) டொமைனின் டிஎன்எச் தகவல்களை மட்டுமே அடிப்படையாகக் கொண்டது.</string>
-    <string name="invalid_aor">தவறான பயனர்@டொமைன் [: போர்ட்] [; போக்குவரத்து = யுடிபி | டி.சி.பி | டி.எல்.எச்] \'%1$s\' \'</string>
+    <string name="invalid_aor">தவறான பயனர்@டொமைன் [: போர்ட்] [; போக்குவரத்து = யுடிபி | டி.சி.பி | டி.எல்.எச்] \'%1$s\'</string>
     <string name="account_exists">கணக்கு \'%1$s\' ஏற்கனவே உள்ளது.</string>
     <string name="account_allocation_failure">புதிய கணக்கை ஒதுக்கத் தவறிவிட்டது.</string>
     <string name="encrypt_password">கடவுச்சொல்லை குறியாக்கவும்</string>
@@ -261,7 +261,7 @@
     <string name="transfer_request_query">இந்த அழைப்பை \'%1$s\' க்கு மாற்ற ஏற்றுக்கொள்கிறீர்களா?</string>
     <string name="call_request">அழைப்பு கோரிக்கை</string>
     <string name="call_request_query">\'%1$s\' என்று அழைப்பதற்கான கோரிக்கையை நீங்கள் ஏற்றுக்கொள்கிறீர்களா?</string>
-    <string name="redirect_notice">\'%1$s\' \\ க்கு தானியங்கி திருப்பிவிடுதல் \\</string>
+    <string name="redirect_notice">\'%1$s\' க்கு தானியங்கி திருப்பிவிடுதல்</string>
     <string name="redirect_request">கோரிக்கையை திருப்பி விடுங்கள்</string>
     <string name="redirect_request_query">\'%1$s\' க்கு அழைப்பு திருப்பிவிடுவதை நீங்கள் ஏற்றுக்கொள்கிறீர்களா?</string>
     <string name="call_failed">அழைப்பு தோல்வியடைந்தது</string>

@@ -26,7 +26,6 @@
             <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>
             <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>
             <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>
-            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ'אטים, הודעות ואנשי קשר.</li>
             <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>
             <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
             <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a> למידע נוסף.</li>
@@ -75,7 +74,6 @@
             <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>
             <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>
             <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>
-            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ'אטים, הודעות ואנשי קשר.</li>
             <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>
             <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
             <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a> למידע
@@ -134,9 +132,9 @@
     <string name="check_origin">בדוק מקור</string>
     <string name="check_origin_help">אם האפשרות מסומנת, בקשות נכנסות מותרות רק מכתובות IP שאליהן נשלחו בקשות רישום.</string>
     <string name="media_nat">מעבר NAT למדיה</string>
-    <string name="media_nat_help">בוחר את פרוטוקול מעבר ה־NAT למדיה (אם יש). האפשרויות הזמינות הן STUN ‏(Session Traversal Utilities for NAT, ‏RFC 5389) ו־ICE ‏(Interactive Connectivity Establishment, ‏RFC 5245).</string>
+    <string name="media_nat_help">בוחר את פרוטוקול מעבר ה־NAT למדיה (אם יש). האפשרויות הזמינות הן STUN (Session Traversal Utilities for NAT, RFC 5389) ו־ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="stun_server">שרת STUN/TURN</string>
-    <string name="stun_server_help">כתובת URI של שרת STUN/TURN בפורמט scheme:host[:port][?transport=udp|tcp], כאשר ‎scheme‎ הוא אחד מהבאים: ‎\'stun\' ‎, ‎\'stuns\'‎, \'turn\'‎ או ‎\'turns\'‎. שרת ה־STUN המוגדר כברירת מחדל מהיצרן עבור פרוטוקולי STUN ו־ICE הוא \'stun:stun.l.google.com:19302\', המצביע על שרת STUN ציבורי של Google. לא קיים שרת TURN המוגדר כברירת מחדל מהיצרן.</string>
+    <string name="stun_server_help">כתובת URI של שרת STUN/TURN בפורמט scheme:host[:port][?transport=udp|tcp], כאשר scheme הוא אחד מהבאים: \'stun\', \'stuns\', \'turn\' או \'turns\'. שרת ה־STUN המוגדר כברירת מחדל מהיצרן עבור פרוטוקולי STUN ו־ICE הוא \'stun:stun.l.google.com:19302\', המצביע על שרת STUN ציבורי של Google. לא קיים שרת TURN המוגדר כברירת מחדל מהיצרן.</string>
     <string name="invalid_stun_server">כתובת URI לא חוקית של שרת STUN/TURN \'%1$s\'</string>
     <string name="media_encryption">הצפנת מדיה</string>
     <string name="media_encryption_help">בוחר את פרוטוקול הצפנת המדיה לתעבורה (אם קיים). \n • ZRTP (מומלץ) משמעותו שמתבצע ניסיון לניהול משא ומתן להצפנת מדיה מקצה לקצה באמצעות ZRTP לאחר שהשיחה כבר נוצרה. \n • DTLS-SRTPF משמעותו שהפרוטוקול UDP/TLS/RTP/SAVPF מוצע בשיחה יוצאת, ושבמקרה של שיחה נכנסת ייעשה שימוש באחד מהפרוטוקולים הבאים אם יוצעו: RTP/SAVP, RTP/SAVPF, UDP/TLS/RTP/SAVP או UDP/TLS/RTP/SAVPF. \n • SRTP-MANDF משמעותו שהפרוטוקול RTP/SAVPF מוצע בשיחה יוצאת ונדרש בשיחה נכנסת. \n • SRTP-MAND משמעותו שהפרוטוקול RTP/SAVP מוצע בשיחה יוצאת ונדרש בשיחה נכנסת. \n • SRTP משמעותו שהפרוטוקול RTP/AVP מוצע בשיחה יוצאת, ובשיחה נכנסת ייעשה שימוש ב-RTP/SAVP או ב-RTP/SAVPF אם הם מוצעים.</string>
@@ -211,12 +209,12 @@
     <string name="default_account_help">אם האפשרות מסומנת, חשבון זה נבחר בהפעלת baresip.</string>
     <string name="accounts">חשבונות</string>
     <string name="new_account">כתובת SIP URI של חשבון חדש</string>
-    <string name="accounts_help">כתובת SIP URI של חשבון חדש בתבנית ‎&lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. אם מצוין &lt;‎port&gt; אך לא מצוין פרוטוקול תעבורה, ברירת המחדל של פרוטוקול התעבורה תהיה UDP. אם לא מצוין &lt;‎&lt;port אך מצוין פרוטוקול תעבורה, ברירת המחדל של &lt;‎&lt;port תהיה 5060 או 5061 ‏(TLS). אם אף אחד מהם לא מצוין ולא הוגדר פרוקסי יוצא, שרת הרישום (registrar) של החשבון (אם קיים) ייקבע אך ורק על סמך מידע ה־DNS של הדומיין.</string>
+    <string name="accounts_help">כתובת SIP URI של חשבון חדש בתבנית &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. אם מצוין &lt;port&gt; אך לא מצוין פרוטוקול תעבורה, ברירת המחדל של פרוטוקול תעבורה תהיה UDP. אם לא מצוין &lt;port&gt; אך מצוין פרוטוקול תעבורה, ברירת המחדל של &lt;port&gt; תהיה 5060 או 5061 (TLS). אם אף אחד מהם לא מצוין ולא הוגדר פרוקסי יוצא, שרת הרישום (registrar) של החשבון (אם קיים) ייקבע אך ורק על סמך מידע ה־DNS של הדומיין.</string>
     <string name="account_exists">חשבון \'%1$s\' כבר קיים.</string>
     <string name="account_allocation_failure">הקצאת חשבון חדש נכשלה.</string>
     <string name="encrypt_password">הצפנת סיסמה</string>
     <string name="stun_password_help">סיסמה אם נדרשת על ידי שרת STUN/TURN</string>
-    <string name="dtmf_mode_help">בוחר כיצד יישלחו צלילי DTMF עבור הספרות 0-9 והתווים ‎#, *, ו־A-D.</string>
+    <string name="dtmf_mode_help">בוחר כיצד יישלחו צלילי DTMF עבור הספרות 0-9 והתווים #, *, ו־A-D.</string>
     <string name="dtmf_inband">אירועי RTP בתוך־הפס</string>
     <string name="decrypt_password">פענוח סיסמה</string>
     <string name="delete_account">האם ברצונך למחוק את החשבון \'%1$s\'?</string>
@@ -272,12 +270,12 @@
     <string name="dialer_role_not_available">תפקיד יישומון טלפון (חייגן) ברירת מחדל אינו זמין</string>
     <string name="default_phone_app_help">אם האפשרות מסומנת, baresip יוגדר כיישומון טלפון ברירת מחדל.</string>
     <string name="listen_address">כתובת האזנה</string>
-    <string name="listen_address_help">כתובת IP ומספר יציאה בתבנית \'‎address:port\' שבהם baresip מאזין לבקשות SIP נכנסות. אם כתובת ה־IP היא כתובת IPv6, יש לכתוב אותה בתוך סוגריים מרובעים []. כתובת IPv4 ‏0.0.0.0 או כתובת IPv6 ‏[::] מאפשרות ל־baresip להאזין בכל הכתובות הזמינות. אם השדה נשאר ריק (ברירת מחדל של היצרן), baresip יאזין ביציאה שרירותית בכל הכתובות הזמינות.</string>
+    <string name="listen_address_help">כתובת IP ומספר יציאה בתבנית \'address:port\' שבהם baresip מאזין לבקשות SIP נכנסות. אם כתובת ה־IP היא כתובת IPv6, יש לכתוב אותה בתוך סוגריים מרובעים []. כתובת IPv4 ‏0.0.0.0 או כתובת IPv6 ‏[::] מאפשרות ל־baresip להאזין בכל הכתובות הזמינות. אם השדה נשאר ריק (ברירת מחדל של היצרן), baresip יאזין ביציאה שרירותית בכל הכתובות הזמינות.</string>
     <string name="invalid_listen_address">כתובת האזנה לא חוקית</string>
     <string name="address_family">משפחת כתובות</string>
     <string name="address_family_help">בוחר באילו כתובות IP ישתמש baresip. אם נבחר IPv4 או IPv6,‏ baresip ישתמש רק בכתובות מסוג IPv4 או IPv6. אם אף אחת מהאפשרויות לא נבחרה, baresip ישתמש גם בכתובות IPv4 וגם בכתובות IPv6.</string>
     <string name="transport_protocols">פרוטוקולי תעבורה</string>
-    <string name="transport_protocols_help">רשימה מופרדת בפסיקים של פרוטוקולי תעבורה נתמכים עבור בקשות/תשובות SIP. אם השדה ריק, ערך ברירת המחדל הוא \'udp,tcp,tls,ws,wss\' הכולל את כל פרוטוקולי התעבורה הנתמכים. יש לציין ברשימה רק את הפרוטוקולים הנחוצים לך. השימוש ב־UDP אינו מומלץ מטעמי אבטחה וסיבות נוספות.</string>
+    <string name="transport_protocols_help">רשימה מופרדת בפסיקים של פרוטוקולי תעבורה נתמכים עבור בקשות/תשובות SIP. אם השדה ריק, ערך ברירת המחדל הוא \'udp,tcp,tls,ws,wss\' הכולל את כל פרוטוקולי תעבורה הנתמכים. יש לציין ברשימה רק את הפרוטוקולים הנחוצים לך. השימוש ב־UDP אינו מומלץ מטעמי אבטחה וסיבות נוספות.</string>
     <string name="invalid_transport_protocols">רשימת פרוטוקולי תעבורה לא חוקית</string>
     <string name="dns_servers">שרתי DNS</string>
     <string name="invalid_dns_servers">שרתי DNS לא חוקיים</string>
@@ -410,7 +408,7 @@
     <string name="transfer_request">בקשת העברה</string>
     <string name="transfer_request_query">האם לאשר העברת שיחה זו אל \'%1$s\'?</string>
     <string name="call_request">בקשת שיחה</string>
-    <string name="redirect_notice">הפניה אוטומטית אל \'%1$s\'\\</string>
+    <string name="redirect_notice">הפניה אוטומטית אל \'%1$s\'</string>
     <string name="redirect_request">בקשת הפניה</string>
     <string name="redirect_request_query">האם לאשר הפניית שיחה אל \'%1$s\'?</string>
     <string name="call_failed">שיחה נכשלה</string>

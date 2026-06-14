@@ -256,7 +256,7 @@
     <string name="call_transfer">Anruftransfer</string>
     <string name="blind">Ohne Rückfrage (blind)</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
-    <string name="redirect_notice">Automatische Weiterleitung zu \'%1$s\'\\</string>
+    <string name="redirect_notice">Automatische Weiterleitung zu \'%1$s\'</string>
     <string name="redirect_request">Umleitungsanfrage</string>
     <string name="redirect_request_query">Einer Anrufsumleitung zu \'%1$s\' zustimmen?</string>
     <string name="call_request">Anrufsanfrage</string>
