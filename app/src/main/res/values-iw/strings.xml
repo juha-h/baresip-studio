@@ -2,8 +2,111 @@
 <resources>
     <string name="about_title">אודות baresip</string>
     <string name="about_title_plus">אודות baresip+</string>
-    <string name="about_text"><![CDATA[\n        <h1>סוכן משתמש SIP המבוסס על ספריית <a href=\"https://github.com/baresip/baresip\">baresip</a></h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>גירסה %1$s</p>\n        <br>\n        <h2>טיפים לשימוש</h2>\n        <ul>\n            <li>בדוק שערכי ברירת מחדל בהגדרות baresip מתאימים לצרכיך\n                (גע בכותרות הפריטים לקבלת עזרה).</li>\n            <li>לאחר מכן, תחת \"חשבונות\", צור חשבון אחד או יותר (שוב, גע בכותרות הפריטים לקבלת עזרה).</li>\n            <li>סטטוס הרישום של חשבון מוצג באמצעות נקודה בצבעים שונים:\n                        ירוק (הרישום הצליח), צהוב (הרישום בתהליך),\n                        אדום (הרישום נכשל), לבן (הרישום לא הופעל).</li>\n            <li>נגיעה בנקודת הסטטוס מובילה ישירות להגדרת החשבון.</li>\n            <li>נגיעה ממושכת על אייקוני סרגל baresip מציגה מידע אודות האייקונים.</li>\n            <li>מחוות החלקה כלפי מטה גורמת לרישום מחדש של החשבון המוצג כרגע.</li>\n            <li>נגיעה ממושכת על החשבון המוצג כרגע מאפשרת או מבטלת את רישום החשבון.</li>\n            <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>\n            <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>\n            <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>\n            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ\'אטים, הודעות ואנשי קשר.</li>\n            <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>\n            <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>\n            <li>ראה את ה־<a href=\"https://github.com/juha-h/baresip-studio/wiki\">ויקי</a> למידע נוסף.</li>\n        </ul>\n        <h2>מדיניות פרטיות</h2>\n            <p>מדיניות פרטיות זמינה <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">כאן</a>.</p>\n        <br>\n        <h2>קוד מקור</h2>\n            <p>קוד מקור זמין ב־<a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\n            שם ניתן גם לדווח על תקלות.</p>\n        <br>\n        <h2>תרגומים</h2>\n            <p>תרגומי שפות מנוהלים דרך פרויקט\n                <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a> של baresip.</p>\n        <br>\n        <h2>רשיונות</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b> חוץ מהבאים:</li>\n            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>\n            <li><b>AGPLv4</b> ZRTP media encryption</li>\n            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>\n            <li><b>Free</b> G.722 codec</li>\n            <li><b>GNU GPLv3</b> G.729 codec</li>\n        </ul>\n        ]]></string>
-    <string name="about_text_plus"><![CDATA["\n        <h1>\n        <h1>סוכן משתמש SIP המבוסס על ספריית <a href=\"https://github.com/baresip/baresip\">baresip</a></h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>גירסה %1$s</p>\n        <br>\n        <h2>טיפים לשימוש</h2>\n        <ul>\n            <li>בדוק שערכי ברירת מחדל בהגדרות baresip מתאימים לצרכיך\n                (גע בכותרות הפריטים לקבלת עזרה).</li>\n            <li>לאחר מכן, תחת \"חשבונות\", צור חשבון אחד או יותר (שוב, גע בכותרות הפריטים לקבלת עזרה).</li>\n            <li>סטטוס הרישום של חשבון מוצג באמצעות נקודה בצבעים שונים:\n                ירוק (הרישום הצליח), צהוב (הרישום בתהליך),\n                אדום (הרישום נכשל), לבן (הרישום לא הופעל).</li>\n            <li>נגיעה בנקודת הסטטוס מובילה ישירות להגדרת החשבון.</li>\n            <li>נגיעה ממושכת על אייקוני סרגל baresip מציגה מידע אודות האייקונים.</li>\n            <li>מחוות החלקה כלפי מטה גורמת לרישום מחדש של החשבון המוצג כרגע.</li>\n            <li>נגיעה ממושכת על החשבון המוצג כרגע מאפשרת או מבטלת את רישום החשבון.</li>\n            <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>\n            <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>\n            <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>\n            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ\'אטים, הודעות ואנשי קשר.</li>\n            <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>\n            <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>\n            <li>ראה את ה־<a href=\"https://github.com/juha-h/baresip-studio/wiki\">ויקי</a>\n                למידע נוסף.</li>\n        </ul>\n        <h2>תקלות ידועות</h2>\n        <ul>\n            <li>תצוגה עצמית אינה מוצגת כראוי כאשר זרם הווידאו מוגדר כשליחה בלבד.</li>\n        </ul>\n        <h2>מדיניות פרטיות</h2>\n            <p>מדיניות פרטיות זמינה <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">כאן</a>.</p>\n        <br>\n        <h2>קוד מקור</h2>\n            <p>קוד מקור זמין ב־<a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\n            שם ניתן גם לדווח על תקלות.</p>\n        <br>\n        <h2>תרגומים</h2>\n            <p>תרגומי שפות מנוהלים דרך פרויקט\n                <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a> של baresip.</p>\n        <br>\n        <h2>רשיונות</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b> חוץ מהבאים:</li>\n            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>\n            <li><b>AGPLv4</b> ZRTP media encryption</li>\n            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>\n            <li><b>Free</b> G.722 codec</li>\n            <li><b>GNU GPLv3</b> G.729 codec</li>\n            <li><b>GNU GPLv2</b> H.264 and H.265 codecs</li>\n            <li><b>AOMedia</b> AV1 codec</li>\n        </ul>\n        "]]></string>
+    <string name="about_text"><![CDATA[
+        <h1>סוכן משתמש SIP המבוסס על
+ספריית <a href="https://github.com/baresip/baresip">baresip</a></h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>גירסה %1$s</p>
+        <br>
+        <h2>טיפים לשימוש</h2>
+        <ul>
+            <li>בדוק שערכי ברירת מחדל בהגדרות baresip מתאימים לצרכיך
+                (גע בכותרות הפריטים לקבלת עזרה).</li>
+	   <li>אם ברצונך להשתמש ב־baresip+ לשיחות סלולריות, הפעל הגדרות יישומון טלפון ברירת מחדל. זה
+	   ייצור חשבון סלולרי לשיחות סלולריות.</li>
+            <li>לאחר מכן, תחת "חשבונות", צור חשבון אחד או יותר (שוב, גע בכותרות הפריטים לקבלת עזרה).</li>
+            <li>סטטוס הרישום של חשבון מוצג באמצעות נקודה בצבעים שונים:
+                        ירוק (הרישום הצליח), צהוב (הרישום בתהליך),
+                        אדום (הרישום נכשל), לבן (הרישום לא הופעל).</li>
+            <li>נגיעה בנקודת הסטטוס מובילה ישירות להגדרת החשבון.</li>
+            <li>נגיעה ממושכת על אייקוני סרגל baresip מציגה מידע אודות האייקונים.</li>
+            <li>מחוות החלקה כלפי מטה גורמת לרישום מחדש של החשבון המוצג כרגע.</li>
+            <li>נגיעה ממושכת על החשבון המוצג כרגע מאפשרת או מבטלת את רישום החשבון.</li>
+            <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>
+            <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>
+            <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>
+            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ'אטים, הודעות ואנשי קשר.</li>
+            <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>
+            <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
+            <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a> למידע נוסף.</li>
+        </ul>
+        <h2>מדיניות פרטיות</h2>
+            <p>מדיניות פרטיות זמינה <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">כאן</a>.</p>
+        <br>
+        <h2>קוד מקור</h2>
+            <p>קוד מקור זמין ב־<a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            שם ניתן גם לדווח על תקלות.</p>
+        <br>
+        <h2>תרגומים</h2>
+            <p>תרגומי שפות מנוהלים דרך פרויקט
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> של baresip.</p>
+        <br>
+        <h2>רשיונות</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> חוץ מהבאים:</li>
+            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+        </ul>
+        ]]></string>
+    <string name="about_text_plus"><![CDATA[
+        <h1>סוכן משתמש SIP המבוסס על ספריית <a href="https://github.com/baresip/baresip">baresip</a></h1>
+        <br>
+        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
+        <p>גירסה %1$s</p>
+        <br>
+        <h2>טיפים לשימוש</h2>
+        <ul>
+            <li>בדוק שערכי ברירת מחדל בהגדרות baresip+ מתאימים לצרכיך
+                (גע בכותרות הפריטים לקבלת עזרה).</li>
+	   <li>אם ברצונך להשתמש ב־baresip+ לשיחות סלולריות, הפעל הגדרות יישומון טלפון ברירת מחדל. זה
+	   ייצור חשבון סלולרי לשיחות סלולריות.</li>
+            <li>לאחר מכן, תחת "חשבונות", צור חשבון אחד או יותר (שוב, גע בכותרות הפריטים לקבלת עזרה).</li>
+            <li>סטטוס הרישום של חשבון מוצג באמצעות נקודה בצבעים שונים:
+                        ירוק (הרישום הצליח), צהוב (הרישום בתהליך),
+                        אדום (הרישום נכשל), לבן (הרישום לא הופעל).</li>
+            <li>נגיעה בנקודת הסטטוס מובילה ישירות להגדרת החשבון.</li>
+            <li>נגיעה ממושכת על אייקוני סרגל baresip מציגה מידע אודות האייקונים.</li>
+            <li>מחוות החלקה כלפי מטה גורמת לרישום מחדש של החשבון המוצג כרגע.</li>
+            <li>נגיעה ממושכת על החשבון המוצג כרגע מאפשרת או מבטלת את רישום החשבון.</li>
+            <li>מחוות החלקה שמאלה/ימינה מעבירה בין החשבונות.</li>
+            <li>הצד השני בשיחה האחרונה יכול להיבחר מחדש על ידי נגיעה באייקון השיחה כאשר שדה איש הקשר ריק.</li>
+            <li>השותפים בשיחות ובהודעות יכולים להתווסף לאנשי קשר על ידי נגיעה ממושכת.</li>
+            <li>נגיעות ממושכות יכולות לשמש גם כדי להסיר שיחות, צ'אטים, הודעות ואנשי קשר.</li>
+            <li>נגיעה/נגיעה ממושכת על אייקון אנשי קשר יכולה לשמש להתקנה/הסרה של תמונת אווטאר.</li>
+            <li>נגיעה ממושכת על קודק אודיו יכולה לשמש להפעלה/השעיית הקודק.</li>
+            <li>ראה את ה־<a href="https://github.com/juha-h/baresip-studio/wiki">ויקי</a> למידע
+                נוסף.</li>
+        </ul>
+        <h2>Known Issues</h2>
+        <ul>
+            <li>תצוגת העצמי (Selfview) אינה מוצגת כראוי כאשר זרם הווידאו מוגדר כ־sendonly.</li>
+        </ul>
+        <h2>מדיניות פרטיות</h2>
+            <p>מדיניות פרטיות זמינה
+<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">כאן</a>.</p>
+        <br>
+        <h2>קוד מקור</h2>
+            <p>קוד מקור זמין ב־<a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
+            שם ניתן גם לדווח על תקלות.</p>
+        <br>
+        <h2>תרגומים</h2>
+            <p>תרגומי שפות מנוהלים דרך פרויקט
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a> של baresip.</p>
+        <br>
+        <h2>רשיונות</h2>
+        <ul>
+            <li><b>BSD-3-Clause</b> חוץ מהבאים:</li>
+            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
+            <li><b>AGPLv4</b> ZRTP media encryption</li>
+            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
+            <li><b>Free</b> G.722 codec</li>
+            <li><b>GNU GPLv3</b> G.729 codec</li>
+        </ul>
+        ]]></string>
     <string name="account">חשבון</string>
     <string name="account_nickname_help">כינוי (אם יש) המשמש לזיהוי החשבון הזה בתוך אפליקציית baresip.</string>
     <string name="nickname">כינוי</string>
@@ -73,7 +176,7 @@
     <string name="delete_call_alert">האם ברצונך למחוק שיחה זו מההיסטוריה?</string>
     <string name="call_answered_elsewhere">השיחה נענתה במקום אחר</string>
     <string name="calls_duration">משך זמן</string>
-    <string name="calls_add_delete_question">האם ברצונך להוסיף \'%1$s\' לאנשי קשר או למחוק %2$s מהיסטוריית השיחות?</string>
+    <string name="calls_add_delete_question">האם ברצונך להוסיף את \'%1$s\' לאנשי קשר, להעתיק את ה־URI שלו, או למחוק את %2$s מהיסטוריית השיחות?</string>
     <string name="call">שיחה</string>
     <string name="blocked">חסום</string>
     <string name="missed_call_from">שיחה שלא נענתה מ</string>
@@ -98,7 +201,7 @@
     <string name="block_unknown_help">חסום שיחות והודעות ממתקשרים שלא קיימים באנשי הקשר.</string>
     <string name="voicemail_uri">כתובת URI של דואר קולי</string>
     <string name="country_code">קידומת מדינה</string>
-    <string name="country_code_help">קוד מדינה בתבנית E.164 עבור חשבון זה. אם חלק המשתמש (userpart) ב־URI של שיחה נכנסת או הודעה נכנסת מכיל מספר טלפון שאינו מתחיל בסימן \'+\' ואם חיפוש איש הקשר נכשל, המספר יקבל קידומת של מדינה זו ויתבצע ניסיון נוסף לאיתור איש הקשר. אם מספר הטלפון מתחיל בספרה בודדת \'0\', הספרה \'0\' תוסר לפני הוספת קוד המדינה.</string>
+    <string name="country_code_help">קוד מדינה בתבנית E.164 עבור חשבון זה. אם חלק המשתמש (userpart) ב־URI של הצד השני בשיחה או בהודעה מכיל מספר טלפון שאינו מתחיל בסימן \'+\' ואם חיפוש איש הקשר נכשל, המספר יקבל קידומת של מדינה זו ויתבצע ניסיון נוסף לאיתור איש הקשר. אם מספר הטלפון מתחיל בספרה בודדת \'0\', הספרה \'0\' תוסר לפני הוספת קוד המדינה.</string>
     <string name="invalid_country_code">קידומת מדינה לא חוקית \'%1$s\'</string>
     <string name="telephony_provider">ספק טלפוניה</string>
     <string name="telephony_provider_help">חלק ה־host של כתובת ה־SIP URI שישמש בשיחות למספרי טלפון. ברירת המחדל של היצרן היא הדומיין של החשבון. אם לא צוין ערך, לא ניתן יהיה להשתמש בחשבון זה לביצוע שיחות למספרי טלפון.</string>
@@ -135,7 +238,7 @@
     <string name="peer">צד (peer)</string>
     <string name="direction">כיוון</string>
     <string name="time">זמן</string>
-    <string name="calls_delete_question">האם ברצונך למחוק \'%1$s\' %2$s מהיסטוריית השיחות?</string>
+    <string name="calls_delete_question">האם ברצונך להעתיק URI של \'%1$s\' או למחוק את %2$s מהיסטוריית השיחות?</string>
     <string name="disable_history">השבת</string>
     <string name="enable_history">הפעל</string>
     <string name="delete_history_alert">האם ברצונך למחוק היסטוריית שיחות של חשבון \'%1$s\'?</string>
@@ -166,8 +269,8 @@
     <string name="appear_on_top_permission">הפעלה אוטומטית דורשת הרשאת \"הצג מעל יישומים אחרים\".</string>
     <string name="battery_optimizations_help">השבת מיטובי סוללה אם ברצונך להפחית את הסיכוי שאנדרואיד תגביל את הגישה של baresip לרשת או תעביר את baresip למצב המתנה.</string>
     <string name="default_phone_app">יישומון הטלפון המוגדר כברירת מחדל</string>
-    <string name="dialer_role_not_available">תפקיד חייגן אינו זמין</string>
-    <string name="default_phone_app_help">אם האפשרות מסומנת, baresip יוגדר כיישומון טלפון ברירת מחדל. אין לסמן אפשרות זו אם המכשיר שלך צריך לטפל גם בשיחות או הודעות שאינן מסוג SIP.</string>
+    <string name="dialer_role_not_available">תפקיד יישומון טלפון (חייגן) ברירת מחדל אינו זמין</string>
+    <string name="default_phone_app_help">אם האפשרות מסומנת, baresip יוגדר כיישומון טלפון ברירת מחדל.</string>
     <string name="listen_address">כתובת האזנה</string>
     <string name="listen_address_help">כתובת IP ומספר יציאה בתבנית \'‎address:port\' שבהם baresip מאזין לבקשות SIP נכנסות. אם כתובת ה־IP היא כתובת IPv6, יש לכתוב אותה בתוך סוגריים מרובעים []. כתובת IPv4 ‏0.0.0.0 או כתובת IPv6 ‏[::] מאפשרות ל־baresip להאזין בכל הכתובות הזמינות. אם השדה נשאר ריק (ברירת מחדל של היצרן), baresip יאזין ביציאה שרירותית בכל הכתובות הזמינות.</string>
     <string name="invalid_listen_address">כתובת האזנה לא חוקית</string>
@@ -230,7 +333,7 @@
     <string name="read_cert_error">קריאת קובץ \'cert.pem\' נכשלה.</string>
     <string name="read_ca_certs_error">קריאת קובץ \'ca_certs.crt\' נכשלה.</string>
     <string name="consent_request">בקשת הסכמה</string>
-    <string name="contacts_consent">אם נבחר להשתמש באנשי הקשר של אנדרואיד, ניתן יהיה להשתמש בהם לצורך שיחות והודעות כהפניות לכתובות SIP ו־tel URI. אפליקציית baresip אינה שומרת את אנשי הקשר של אנדרואיד ואינה משתפת אותם עם אף גורם. כדי לאפשר שימוש באנשי הקשר של אנדרואיד בתוך baresip, נדרש אישור מ־Google עבור השימוש בהם כמתואר כאן וב<a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">מדיניות הפרטיות</a> של האפליקציה.</string>
+    <string name="contacts_consent">אם נבחר להשתמש באנשי הקשר של אנדרואיד, ניתן יהיה להשתמש בהם לצורך שיחות והודעות כהפניות לכתובות SIP ו־tel URI. אפליקציית baresip אינה שומרת את אנשי הקשר של אנדרואיד ואינה משתפת אותם עם אף גורם. כדי לאפשר שימוש באנשי הקשר של אנדרואיד בתוך baresip, נדרש אישור מ־Google עבור השימוש בהם כמתואר כאן וב <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">מדיניות הפרטיות</a> של האפליקציה.</string>
     <string name="new_contact">איש קשר חדש</string>
     <string name="contact_name">שם</string>
     <string name="sip_or_tel_uri">כתובת SIP או tel URI</string>
@@ -284,7 +387,7 @@
     <string name="choose_destination_uri">בחר URI של יעד</string>
     <string name="transfer">העברה</string>
     <string name="dtmf">DTMF</string>
-    <string name="call_info">פרטי שיחה</string>
+    <string name="call_info">מידע שיחה</string>
     <string name="call_info_not_available">אין מידע זמין</string>
     <string name="duration">משך זמן: %1$d (שניות)</string>
     <string name="codecs">מקודדים</string>
@@ -345,4 +448,29 @@
     <string name="call_is_ringing">שיחה מצלצלת</string>
     <string name="call_is_connected">שיחה מחוברת</string>
     <string name="replaces_not_supported">הצד השני אינו תומך בתכונת REPLACES</string>
+    <string name="tel_uri_calls">TEL URI לשיחות</string>
+    <string name="tel_uri_messages">TEL URI להודעות</string>
+    <string name="not_available">לא זמין</string>
+    <string name="voicemain_tel_uri_help">TEL URI לבדיקת הודעות קוליות.</string>
+    <string name="default_messaging_app">יישומון הודעות ברירת מחדל</string>
+    <string name="default_messaging_app_help">אם מסומן, baresip הוא יישומון ברירת מחדל להודעות SMS/MMS.</string>
+    <string name="messaging_role_not_available">תפקיד יישומון הודעות ברירת מחדל לא זמין</string>
+    <string name="enable_default_messaging">אנא הפעל יישומון הודעות ברירת מחדל בהגדרות</string>
+    <string name="label">תווית</string>
+    <string name="email">דוא\"ל</string>
+    <string name="contact_no_sip_or_tel_uri">לאיש קשר \'%1$s\' אין SIP או TEL URI</string>
+    <string name="contact_no_tel_uri">לאיש קשר \'%1$s\' אין TEL URI</string>
+    <string name="contact_email_action_question">האם ברצונך להתקשר, לשלוח הודעה או לשלוח דוא\"ל ל\'%1$s\'?</string>
+    <string name="send_email">שלח דוא\"ל</string>
+    <string name="contacts_delete_question">האם ברצונך למחוק את כל אנשי הקשר?</string>
+    <string name="import_contacts">ייבוא</string>
+    <string name="export_contacts">ייצוא</string>
+    <string name="contact_import_success">אנשי הקשר יובאו בהצלחה</string>
+    <string name="contact_import_failure">ייבוא אנשי קשר נכשל</string>
+    <string name="contact_export_success">אנשי הקשר יוצאו בהצלחה</string>
+    <string name="contact_export_failure">ייצוא אנשי קשר נכשל</string>
+    <string name="copy_uri">העתק URI</string>
+    <string name="copied_to_clipboard">הועתק ללוח</string>
+    <string name="no_telephone_number">שיחה סלולרית נעשית רק למספר טלפון</string>
+    <string name="airplane_mode">מצב טיסה מופעל. כבה אותו כדי להשתמש בחשבון סלולרי.</string>
 </resources>
