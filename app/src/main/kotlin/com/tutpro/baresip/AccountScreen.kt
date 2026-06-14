@@ -1709,18 +1709,36 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
 
     var newVmUri = viewModel.vmUri.value.trim()
     if (newVmUri != acc.vmUri) {
+        var error = ""
         if (newVmUri != "") {
             if (acc.isMobile) {
                 if (!newVmUri.startsWith("tel:")) newVmUri = "tel:$newVmUri"
             }
             else {
-                if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
-                if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+                if (Utils.isTelNumber(newVmUri))
+                    newVmUri = "tel:$newVmUri"
+                if (Utils.isTelUri(newVmUri)) {
+                    if (ua.account.telProvider == "")
+                        error = String.format(
+                            ctx.getString(R.string.no_telephony_provider),
+                            Utils.plainAor(ua.account.aor)
+                        )
+                    else
+                        newVmUri = Utils.telToSip(newVmUri, ua.account)
+                }
+                else {
+                    if (!newVmUri.startsWith("sip:")) newVmUri = "sip:$newVmUri"
+                    if (!newVmUri.contains("@")) newVmUri = "$newVmUri@${acc.host()}"
+                }
             }
-            if (!Utils.checkUri(newVmUri)) {
+            if (!Utils.checkUri(newVmUri))
+                error = String.format(
+                    ctx.getString(R.string.invalid_sip_or_tel_uri),
+                    newVmUri
+                )
+            if (error != "") {
                 alertTitle.value = noticeTitle
-                alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri),
-                    newVmUri)
+                alertMessage.value = error
                 showAlert.value = true
                 return false
             }
