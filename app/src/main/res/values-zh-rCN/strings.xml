@@ -414,6 +414,6 @@
     <string name="copied_to_clipboard">已复制到剪贴板</string>
     <string name="block_hidden">屏蔽隐藏</string>
     <string name="block_hidden_help">屏蔽来自具有隐藏标识的对等方的来电和消息。</string>
-    <string name="hidden_call_blocked">已自动拒绝隐藏来电</string>
-    <string name="hidden_message_blocked">已自动拒绝隐藏消息</string>
+    <string name="hidden_call_blocked">已自动拒绝来自隐藏来电者的来电</string>
+    <string name="hidden_message_blocked">已自动拒绝来自隐藏发送者的消息</string>
 </resources>
