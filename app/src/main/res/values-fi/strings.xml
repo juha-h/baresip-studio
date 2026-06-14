@@ -211,11 +211,13 @@
     <string name="dtmf_info">SIP INFO -pyyntö</string>
     <string name="dtmf_auto">RTP tai SIP INFO</string>
     <string name="answer_mode">Vastaustapa</string>
-    <string name="answer_mode_help">Valitsee tulevien puheluiden vastaustavan.</string>
+    <string name="answer_mode_help">Valitsee tulevien puheluiden vastaustavan</string>
     <string name="manual">Manuaalinen</string>
     <string name="auto">Automaattinen</string>
-    <string name="block_unknown">Estä tuntemattomat</string>
+    <string name="block_unknown">Estä vieraat</string>
     <string name="block_unknown_help">Estä puhelut ja viestit, joiden lähdettä ei löydy yhteystiedoista.</string>
+    <string name="block_hidden">Estä tuntemattomat</string>
+    <string name="block_hidden_help">Estä puhelut ja viestit, joiden lähde on tuntematon.</string>
     <string name="redirect_mode">Uudelleenohjaustapa</string>
     <string name="redirect_mode_help">Valitsee toteutetaanko puhelun uudelleenohjauspyyntö
         automaattisesti vai kysytäänkö vahvistusta.</string>
@@ -273,8 +275,10 @@
     <string name="missed_calls_count">%1$d vastaamatonta puhelua</string>
     <string name="transfer_request_to">Puhelun siirtopyyntö kohteeseen</string>
     <string name="call_auto_rejected">Automaattisesti hylätty puhelu soittajalta \`%1$s\`</string>
-    <string name="call_blocked">Estetty puhelu hylätty soittajalta \`%1$s\`</string>
-    <string name="message_blocked">Estetty viesti hylätty lähettäjältä \`%1$s\`</string>
+    <string name="call_blocked">Estetty puhelu vieraalta soittajalta \`%1$s\`</string>
+    <string name="hidden_call_blocked">Estetty puhelu tuntemattomalta soittajalta</string>
+    <string name="message_blocked">Estetty viesti vieraalta lähettäjältä \`%1$s\`</string>
+    <string name="hidden_message_blocked">Estetty viesti tuntemattomalta lähettäjältä</string>
     <!-- Blocked Activity -->
     <string name="blocked">Estetyt</string>
     <string name="blocked_calls">Estetyt puhelut</string>
