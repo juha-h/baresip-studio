@@ -31,6 +31,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
     var answerMode = if (accp != 0L) Api.account_answermode(accp) else Api.ANSWERMODE_MANUAL
     var autoRedirect = if (accp != 0L) Api.account_sip_autoredirect(accp) else false
     var blockUnknown = false
+    var blockHidden = false
     var vmUri = if (accp != 0L) Api.account_vm_uri(accp) else ""
     var vmNew = 0
     var vmOld = 0
@@ -91,6 +92,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
             configuredRegInt = Utils.paramValue(extra, "regint").toInt()
         callHistory = Utils.paramValue(extra, "call_history") == ""
         blockUnknown = Utils.paramExists(extra, "block_unknown")
+        blockHidden = Utils.paramExists(extra, "block_hidden")
         if (Utils.paramExists(extra, "country_code"))
             countryCode = Utils.paramValue(extra, "country_code")
         if (Utils.paramExists(extra, "tel_provider"))
@@ -205,6 +207,9 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
         if (blockUnknown)
             extra += ";block_unknown=yes"
+
+        if (blockHidden)
+            extra += ";block_hidden=yes"
 
         if (telProvider != "")
             extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"

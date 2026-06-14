@@ -1013,6 +1013,8 @@ class BaresipService: Service() {
                                 getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account)
                             )
+                        else if (ua.account.blockHidden && peerUri.contains("anonymous"))
+                            getString(R.string.hidden_call_blocked)
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else
@@ -1022,7 +1024,8 @@ class BaresipService: Service() {
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(ev[2].toLong())
                             toast(toastMsg)
-                            if (toastMsg.contains(getString(R.string.call_blocked))) {
+                            if (toastMsg.contains(getString(R.string.call_blocked)) ||
+                                toastMsg.contains(getString(R.string.hidden_call_blocked))) {
                                 if (ua.account.callHistory)
                                     Blocked(
                                         ua.account.aor,
@@ -1477,7 +1480,10 @@ class BaresipService: Service() {
             return
         }
 
-        if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
+        val blockedHidden = ua.account.blockHidden && peerUri.contains("anonymous")
+        val blockedUnknown = ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri
+
+        if (blockedHidden || blockedUnknown) {
             Log.d(TAG, "Auto-rejecting incoming message by $uap from $peerUri")
             Blocked(
                 ua.account.aor,
@@ -1485,13 +1491,14 @@ class BaresipService: Service() {
                 "message",
                 GregorianCalendar().timeInMillis
             ).add()
-            toast(String.format(
-                getString(R.string.message_blocked),
-                Utils.friendlyUri(this, peerUri, ua.account)
+            toast(if (blockedHidden)
+                getString(R.string.hidden_message_blocked)
+            else
+                String.format(
+                    getString(R.string.message_blocked),
+                    Utils.friendlyUri(this, peerUri, ua.account)
+                )
             )
-            )
-            // Api.sip_treply(callp, 486, "Busy Here")
-            // Api.bevent_stop(bevent)
             return
         }
 
@@ -2090,7 +2097,7 @@ class BaresipService: Service() {
     }
 
     fun handleExternalCall(telecomCall: android.telecom.Call, preferredAor: String? = null) {
-        val rawUri = telecomCall.details.handle?.toString() ?: "Unknown"
+        val rawUri = telecomCall.details.handle?.toString() ?: getString(R.string.unknown)
         val uri = Utils.uriUnescape(rawUri)
 
         if (uas.value.isEmpty()) {
@@ -2119,6 +2126,23 @@ class BaresipService: Service() {
 
         if (isIncoming) {
             val e164Uri = e164Uri(uri, ua.account.countryCode)
+            val presentation = telecomCall.details.handlePresentation
+            if (ua.account.blockHidden &&
+                (presentation == TelecomManager.PRESENTATION_RESTRICTED ||
+                        presentation == TelecomManager.PRESENTATION_UNKNOWN)) {
+                Log.d(TAG, "Auto-rejecting incoming PSTN hidden call")
+                telecomCall.disconnect()
+                toast(getString(R.string.hidden_call_blocked))
+                if (ua.account.callHistory) {
+                    Blocked(
+                        ua.account.aor,
+                        uri,
+                        "invite",
+                        GregorianCalendar().timeInMillis
+                    ).add()
+                }
+                return
+            }
             if (ua.account.blockUnknown && Contact.contactName(e164Uri) == e164Uri) {
                 Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri")
                 telecomCall.disconnect()

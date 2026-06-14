@@ -311,6 +311,7 @@ private fun Calls(
     val alertTitle = remember { mutableStateOf("") }
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
+    val unknown = stringResource(R.string.unknown)
 
     AlertDialog(
         showDialog = showAlert,
@@ -341,83 +342,97 @@ private fun Calls(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.combinedClickable(
                             onClick = {
-                                val intent = Intent(ctx, MainActivity::class.java)
-                                intent.putExtra("uap", ua.uap)
-                                intent.putExtra("peer", peerUri)
-                                val peerNameWithLabel = Utils.friendlyUri(ctx, peerUri, ua.account)
-                                val contact = Contact.findContact(peerUri)
-                                if (contact is Contact.BaresipContact && contact.email.isNotEmpty())
-                                    message.value = String.format(
-                                        ctx.getString(R.string.contact_email_action_question),
-                                        peerNameWithLabel
-                                    )
-                                else
-                                    message.value = String.format(
-                                        ctx.getString(R.string.contact_action_question),
-                                        peerNameWithLabel
-                                    )
-                                secondButtonText.value = ctx.getString(R.string.call)
-                                secondAction.value = {
-                                    if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
-                                        alertTitle.value = ctx.getString(R.string.notice)
-                                        alertMessage.value = ctx.getString(R.string.airplane_mode)
-                                        showAlert.value = true
-                                    } else {
-                                        handleIntent(ctx, viewModel, intent, "call")
-                                        navController.navigate("main") {
-                                            popUpTo("main")
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-                                if (!ua.account.isMobile) {
-                                    thirdButtonText.value = ctx.getString(R.string.video_call)
-                                    thirdAction.value = {
-                                        handleIntent(ctx, viewModel, intent, "video call")
-                                        navController.navigate("main") {
-                                            popUpTo("main")
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-                                fourthButtonText.value = ctx.getString(R.string.send_message)
-                                fourthAction.value = {
-                                    if (ua.account.isMobile) {
-                                        if (ua.status != circleGreen.getValue(colorblind)) {
-                                            alertTitle.value = ctx.getString(R.string.notice)
-                                            alertMessage.value = ctx.getString(R.string.airplane_mode)
-                                            showAlert.value = true
-                                        } else if (!Utils.isDefaultSmsApp(ctx)) {
-                                            alertTitle.value = ctx.getString(R.string.notice)
-                                            alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                                            showAlert.value = true
-                                        }
-                                        else {
-                                            handleIntent(ctx, viewModel, intent, "message")
-                                            navController.navigateUp()
-                                        }
-                                    }
-                                    else {
-                                        handleIntent(ctx, viewModel, intent, "message")
-                                        navController.navigateUp()
-                                    }
-                                }
-                                if (contact is Contact.BaresipContact && contact.email.isNotEmpty()) {
-                                    lastButtonText.value = ctx.getString(R.string.send_email)
-                                    lastAction.value = {
-                                        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                                            data = "mailto:${contact.email}".toUri()
-                                        }
-                                        try {
-                                            ctx.startActivity(emailIntent)
-                                        } catch (e: Exception) {
-                                            Log.e(TAG, "Failed to start email activity: ${e.message}")
-                                        }
-                                    }
-                                }
-                                else
-                                    lastButtonText.value = ""
-                                showDialog.value = true
+                                 if (!peerUri.contains("anonymous") && peerUri != unknown) {
+                                     val intent = Intent(ctx, MainActivity::class.java)
+                                     intent.putExtra("uap", ua.uap)
+                                     intent.putExtra("peer", peerUri)
+                                     val peerNameWithLabel =
+                                         Utils.friendlyUri(ctx, peerUri, ua.account)
+                                     val contact = Contact.findContact(peerUri)
+                                     if (contact is Contact.BaresipContact && contact.email.isNotEmpty())
+                                         message.value = String.format(
+                                             ctx.getString(R.string.contact_email_action_question),
+                                             peerNameWithLabel
+                                         )
+                                     else
+                                         message.value = String.format(
+                                             ctx.getString(R.string.contact_action_question),
+                                             peerNameWithLabel
+                                         )
+                                     secondButtonText.value = ctx.getString(R.string.call)
+                                     secondAction.value = {
+                                         if (ua.account.isMobile && ua.status != circleGreen.getValue(
+                                                 colorblind
+                                             )
+                                         ) {
+                                             alertTitle.value = ctx.getString(R.string.notice)
+                                             alertMessage.value =
+                                                 ctx.getString(R.string.airplane_mode)
+                                             showAlert.value = true
+                                         }
+                                         else {
+                                             handleIntent(ctx, viewModel, intent, "call")
+                                             navController.navigate("main") {
+                                                 popUpTo("main")
+                                                 launchSingleTop = true
+                                             }
+                                         }
+                                     }
+                                     if (!ua.account.isMobile) {
+                                         thirdButtonText.value = ctx.getString(R.string.video_call)
+                                         thirdAction.value = {
+                                             handleIntent(ctx, viewModel, intent, "video call")
+                                             navController.navigate("main") {
+                                                 popUpTo("main")
+                                                 launchSingleTop = true
+                                             }
+                                         }
+                                     }
+                                     fourthButtonText.value = ctx.getString(R.string.send_message)
+                                     fourthAction.value = {
+                                         if (ua.account.isMobile) {
+                                             if (ua.status != circleGreen.getValue(colorblind)) {
+                                                 alertTitle.value = ctx.getString(R.string.notice)
+                                                 alertMessage.value =
+                                                     ctx.getString(R.string.airplane_mode)
+                                                 showAlert.value = true
+                                             }
+                                             else if (!Utils.isDefaultSmsApp(ctx)) {
+                                                 alertTitle.value = ctx.getString(R.string.notice)
+                                                 alertMessage.value =
+                                                     ctx.getString(R.string.enable_default_messaging)
+                                                 showAlert.value = true
+                                             }
+                                             else {
+                                                 handleIntent(ctx, viewModel, intent, "message")
+                                                 navController.navigateUp()
+                                             }
+                                         }
+                                         else {
+                                             handleIntent(ctx, viewModel, intent, "message")
+                                             navController.navigateUp()
+                                         }
+                                     }
+                                     if (contact is Contact.BaresipContact && contact.email.isNotEmpty()) {
+                                         lastButtonText.value = ctx.getString(R.string.send_email)
+                                         lastAction.value = {
+                                             val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                                 data = "mailto:${contact.email}".toUri()
+                                             }
+                                             try {
+                                                 ctx.startActivity(emailIntent)
+                                             } catch (e: Exception) {
+                                                 Log.e(
+                                                     TAG,
+                                                     "Failed to start email activity: ${e.message}"
+                                                 )
+                                             }
+                                         }
+                                     }
+                                     else
+                                         lastButtonText.value = ""
+                                     showDialog.value = true
+                                 }
                             },
                             onLongClick = {
                                 val peerName = Utils.friendlyUri(ctx, peerUri, ua.account, includeLabel = false)
@@ -427,7 +442,7 @@ private fun Calls(
                                 else
                                     ctx.getString(R.string.calls_call)
                                 val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
-                                if (contactExists) {
+                                if (contactExists || peerUri.contains("anonymous") || peerUri == unknown) {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_delete_question),
                                         peerNameWithLabel,
