@@ -268,9 +268,9 @@
     <string name="transfer_request_to">Call transfer request to</string>
     <string name="call_auto_rejected">Auto-rejected call from \`%1$s\`</string>
     <string name="call_blocked">Auto-rejected blocked call from \`%1$s\`</string>
-    <string name="hidden_call_blocked">Auto-rejected hidden call</string>
+    <string name="hidden_call_blocked">Auto-rejected call from hidden caller</string>
     <string name="message_blocked">Auto-rejected blocked message from \`%1$s\`</string>
-    <string name="hidden_message_blocked">Auto-rejected hidden message</string>
+    <string name="hidden_message_blocked">Auto-rejected message from hidden sender</string>
     <!-- Blocked Activity -->
     <string name="blocked">Blocked</string>
     <string name="blocked_calls">Blocked Calls</string>
