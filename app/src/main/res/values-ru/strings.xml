@@ -270,7 +270,7 @@
     <string name="audio_delay_help">Время (в миллисекундах) ожидания звука вызываемой стороны при установлении соединения. Установите большее значение, если звук собеседника теряется в начале звонка.</string>
     <string name="invalid_audio_delay">Некорректная Задержка звука \'%1$s\'. Допускаются значения от 100 до 3000.</string>
     <string name="call_auto_rejected">Автоматически отклонённый вызов от %1$s</string>
-    <string name="redirect_notice">Автоматическая переадресация на \'%1$s\'\\</string>
+    <string name="redirect_notice">Автоматическая переадресация на \'%1$s\'</string>
     <string name="dialer_role_not_available">Роль номеронабирателя недоступна</string>
     <string name="favorite">Предпочтительный</string>
     <string name="redirect_mode_help">Определяет, будет ли переадресация вызова выполняться автоматически или будет запрошено подтверждение.</string>

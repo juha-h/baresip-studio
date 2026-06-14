@@ -376,7 +376,7 @@
         sisältää kaikki tuetut kuljetusprotokollat.  Listaa vain ne joita tarvitset.  UDP-protokollan
         käyttöä ei suositella turvallisuus- ja muista syistä.
     </string>
-    <string name="invalid_transport_protocols">Virheellinen kuljetusprotokollalista</string>s
+    <string name="invalid_transport_protocols">Virheellinen kuljetusprotokollalista</string>
     <string name="dns_servers">DNS-palvelimet</string>
     <string name="dns_servers_help">Pilkulla toisistaan erotettu luettelo DNS-palvelijoiden
         osoitteita. Jos jätetään antamatta (oletus), osoitteet hankitaan dynaamisesti järjestelmästä.
@@ -601,7 +601,7 @@
     <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'\?</string>
     <string name="call_request">Soittopyyntö</string>
     <string name="call_request_query">Hyväksytkö pyynnön soittaa kohteeseen \'%1$s\'\?</string>
-    <string name="redirect_notice">Automaattinen uudelleenohjaus kohteeseen \'%1$s\'\</string>
+    <string name="redirect_notice">Automaattinen uudelleenohjaus kohteeseen \'%1$s\'</string>
     <string name="redirect_request">Uudelleenohjauspyyntö</string>
     <string name="redirect_request_query">Hyväksytkö puhelun uudelleenohjauksen kohteeseen \'%1$s\'\?</string>
     <string name="call_failed">Puhelu epäonnistui</string>

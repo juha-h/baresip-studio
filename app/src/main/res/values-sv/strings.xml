@@ -311,7 +311,7 @@
     <string name="favorite_help">Om denna ruta är markerad visas kontakten bland andra favoriter högst upp i kontaktlistan.</string>
     <string name="call_request">Samtalsbegäran</string>
     <string name="call_request_query">Accepterar du begäran om att ringa ’%1$s’?</string>
-    <string name="redirect_notice">Automatisk omkoppling till ’%1$s’\\</string>
+    <string name="redirect_notice">Automatisk omkoppling till ’%1$s’</string>
     <string name="redirect_request">Omkopplingsbegäran</string>
     <string name="redirect_request_query">Accepterar du vidarekoppling av samtal till ’%1$s’?</string>
     <string name="restore_unzip_failed">Det gick inte att återställa applikationsdata. Android version 14 och senare tillåter inte återställning av data som säkerhetskopierats före %1$s version %2$s.</string>

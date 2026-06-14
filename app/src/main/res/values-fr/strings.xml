@@ -218,7 +218,7 @@
     <string name="transfer_request_query">Acceptez-vous de transférer cet appel à \'%1$s\' ?</string>
     <string name="call_request">Requête d\'appel</string>
     <string name="call_request_query">Acceptez-vous la demande d’appeller \'%1$s\' ?</string>
-    <string name="redirect_notice">Redirection automatique vers \'%1$s\'\\</string>
+    <string name="redirect_notice">Redirection automatique vers \'%1$s\'</string>
     <string name="redirect_request">Requête de redirection</string>
     <string name="redirect_request_query">Acceptez-vous la redirection d’appel vers \'%1$s\' ?</string>
     <string name="call_failed">Appel échoué</string>
