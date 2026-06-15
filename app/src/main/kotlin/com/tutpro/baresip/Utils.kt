@@ -1159,11 +1159,11 @@ object Utils {
                 }
             }
 
-            // Create an SSLContext that uses our new composite TrsustManager
+            // Create an SSLContext that uses new composite TrustManager
             val sslContext = SSLContext.getInstance("TLS")
             sslContext.init(null, arrayOf(compositeTrustManager), null)
 
-            // Tell HttpsURLConnection to use our custom SSLContext for this connection
+            // Tell HttpsURLConnection to use custom SSLContext for this connection
             urlConnection.sslSocketFactory = sslContext.socketFactory
 
             // Proceed with the connection and return the result
