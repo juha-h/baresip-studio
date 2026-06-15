@@ -1672,9 +1672,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newDtmfMode != acc.dtmfMode) {
         if (Api.account_set_dtmfmode(acc.accp, newDtmfMode) == 0) {
             acc.dtmfMode = Api.account_dtmfmode(acc.accp)
-            Log.d(TAG, "New dtmfmode is ${acc.dtmfMode}")
+            Log.d(TAG, "New dtmfMode is ${acc.dtmfMode}")
         } else {
-            Log.e(TAG, "Setting of dtmfmode $newDtmfMode failed")
+            Log.e(TAG, "Setting of dtmfMode $newDtmfMode failed")
         }
     }
 
@@ -1682,9 +1682,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newAnswerMode != acc.answerMode) {
         if (Api.account_set_answermode(acc.accp, newAnswerMode) == 0) {
             acc.answerMode = Api.account_answermode(acc.accp)
-            Log.d(TAG, "New answermode is ${acc.answerMode}")
+            Log.d(TAG, "New answerMode is ${acc.answerMode}")
         } else {
-            Log.e(TAG, "Setting of answermode $newAnswerMode failed")
+            Log.e(TAG, "Setting of answerMode $newAnswerMode failed")
         }
     }
 
