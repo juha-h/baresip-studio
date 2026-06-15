@@ -1,0 +1,4 @@
+- Added "Block Hidden" account setting
+- Allow tel: URI in as SIP account Voicemail URI
+- Improved rejection toast messages
+- New translations (Chinese, Hebrew)
