@@ -376,7 +376,7 @@
     <string name="invalid_microphone_gain">Valor de ganancia de micrófono no válido</string>
     <string name="check_origin">Comprobar origen</string>
     <string name="check_origin_help">Si está marcado, las solicitudes entrantes solo están concedidas desde las direcciones IP donde fueron enviadas las peticiones del registro.</string>
-    <string name="block_unknown">Bloque Desconocido</string>
+    <string name="block_unknown">Bloquear a desconocidos</string>
     <string name="block_unknown_help">Llamadas y mensajes de bloque desde parejas que no son encontradas en contactos.</string>
     <string name="numeric_keypad">Teclado Numérico</string>
     <string name="numeric_keypad_help">Si se marcó, el teclado numérico se muestra cuando el campo «Llamada a …» está centrada.</string>
@@ -453,5 +453,9 @@
     <string name="copy_uri">Copiar URL</string>
     <string name="copied_to_clipboard">Copiado al portapapeles</string>
     <string name="tel_uri_calls">TEL URI para llamadas</string>
-    <string name="tel_uri_messages">TEL URI para Mensajes</string>
+    <string name="tel_uri_messages">TEL URI para mensajes</string>
+    <string name="block_hidden">Bloquear oculto</string>
+    <string name="block_hidden_help">Bloquear llamadas y mensajes de compañeros con identificación oculta.</string>
+    <string name="hidden_call_blocked">Llamada de auto-rechazada de llamante oculto</string>
+    <string name="hidden_message_blocked">Mensaje auto‐rechazado del remitente oculto</string>
 </resources>
