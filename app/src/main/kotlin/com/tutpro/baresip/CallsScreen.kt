@@ -14,13 +14,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -121,15 +121,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(navController, ua, callHistory)
             }
         },
@@ -203,10 +199,7 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
             IconButton(
                 onClick = { expanded = !expanded }
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
-                )
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
             }
             CustomElements.DropdownMenu(
                 expanded,
@@ -353,15 +346,12 @@ private fun Calls(
                                         )
                                     secondButtonText.value = ctx.getString(R.string.call)
                                     secondAction.value = {
-                                        if (ua.account.isMobile && ua.status != circleGreen.getValue(
-                                                colorblind
-                                            )
-                                        ) {
+                                        if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
                                             alertTitle.value = ctx.getString(R.string.notice)
-                                            alertMessage.value =
-                                                ctx.getString(R.string.airplane_mode)
+                                            alertMessage.value = ctx.getString(R.string.airplane_mode)
                                             showAlert.value = true
-                                        } else {
+                                        }
+                                        else {
                                             handleIntent(ctx, viewModel, intent, "call")
                                             navController.navigate("main") {
                                                 popUpTo("main")
@@ -377,16 +367,20 @@ private fun Calls(
                                                 alertMessage.value =
                                                     ctx.getString(R.string.airplane_mode)
                                                 showAlert.value = true
-                                            } else if (!Utils.isDefaultSmsApp(ctx)) {
-                                                alertTitle.value = ctx.getString(R.string.notice)
-                                                alertMessage.value =
-                                                    ctx.getString(R.string.enable_default_messaging)
-                                                showAlert.value = true
-                                            } else {
+                                            }
+                                            else
+                                                if (!Utils.isDefaultSmsApp(ctx)) {
+                                                    alertTitle.value = ctx.getString(R.string.notice)
+                                                    alertMessage.value =
+                                                        ctx.getString(R.string.enable_default_messaging)
+                                                    showAlert.value = true
+                                                }
+                                                else {
                                                 handleIntent(ctx, viewModel, intent, "message")
                                                 navController.navigateUp()
                                             }
-                                        } else {
+                                        }
+                                        else {
                                             handleIntent(ctx, viewModel, intent, "message")
                                             navController.navigateUp()
                                         }
@@ -400,13 +394,11 @@ private fun Calls(
                                             try {
                                                 ctx.startActivity(emailIntent)
                                             } catch (e: Exception) {
-                                                Log.e(
-                                                    TAG,
-                                                    "Failed to start email activity: ${e.message}"
-                                                )
+                                                Log.e(TAG, "Failed to start email activity: ${e.message}")
                                             }
                                         }
-                                    } else
+                                    }
+                                    else
                                         lastButtonText.value = ""
                                     showDialog.value = true
                                 }
@@ -426,13 +418,9 @@ private fun Calls(
                                     )
                                     secondButtonText.value = ""
                                     thirdButtonText.value = ctx.getString(R.string.copy_uri)
-                                    thirdAction.value = {
-                                        Utils.copyToClipboard(ctx, peerUri)
-                                    }
+                                    thirdAction.value = { Utils.copyToClipboard(ctx, peerUri) }
                                     lastButtonText.value = ctx.getString(R.string.delete)
-                                    lastAction.value = {
-                                        removeFromHistory(callHistory, callRow)
-                                    }
+                                    lastAction.value = { removeFromHistory(callHistory, callRow) }
                                 }
                                 else {
                                     message.value = String.format(
@@ -446,13 +434,10 @@ private fun Calls(
                                         navController.navigate("contact/$uri/new")
                                     }
                                     thirdButtonText.value = ctx.getString(R.string.copy_uri)
-                                    thirdAction.value = {
-                                        Utils.copyToClipboard(ctx, peerUri)
+                                    thirdAction.value = { Utils.copyToClipboard(ctx, peerUri)
                                     }
                                     lastButtonText.value = ctx.getString(R.string.delete)
-                                    lastAction.value = {
-                                        removeFromHistory(callHistory, callRow)
-                                    }
+                                    lastAction.value = { removeFromHistory(callHistory, callRow) }
                                 }
                                 showDialog.value = true
                             }
@@ -509,7 +494,8 @@ private fun Calls(
                         }
                         if (count > 3)
                             Text("...", color = MaterialTheme.colorScheme.onBackground)
-                        Text(text = Utils.friendlyUri(ctx, peerUri, ua.account),
+                        Text(
+                            text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 18.sp,
                             maxLines = 1,

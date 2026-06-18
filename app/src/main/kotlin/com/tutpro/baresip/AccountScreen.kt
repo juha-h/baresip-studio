@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -137,9 +138,8 @@ private fun AccountScreen(
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
+            if (event == Lifecycle.Event.ON_RESUME)
                 resumeToggle = System.currentTimeMillis()
-            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
@@ -164,23 +164,14 @@ private fun AccountScreen(
         }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(
-                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     title = {
-                        Text(
-                            text = acc.text(),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = acc.text(), fontWeight = FontWeight.Bold)
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -199,10 +190,7 @@ private fun AccountScreen(
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     actions = {
                         IconButton(onClick = checkOnClick) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Check"
-                            )
+                            Icon(imageVector = Icons.Filled.Check, contentDescription = "Check")
                         }
                     },
                 )
@@ -253,10 +241,7 @@ private fun AccountContent(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 18.sp),
             label = {
-                Text(
-                    text = label,
-                    fontWeight = FontWeight.Bold
-                )
+                Text(text = label, fontWeight = FontWeight.Bold)
             },
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -271,9 +256,7 @@ private fun AccountContent(
     @Composable
     fun AoR(toggle: Long) {
         Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (ua.account.isMobile && android.os.Build.VERSION.SDK_INT >= 29) {
@@ -294,7 +277,8 @@ private fun AccountContent(
                         value = if (smsNumber != null) "tel:$smsNumber" else stringResource(R.string.not_available),
                         label = stringResource(R.string.tel_uri_messages)
                     )
-                } else {
+                }
+                else {
                     val currentSubId = remember(toggle) {
                         if (voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID)
                             voiceSubId
@@ -312,12 +296,12 @@ private fun AccountContent(
                         label = stringResource(R.string.tel_uri)
                     )
                 }
-            } else {
+            }
+            else
                 AoRField(
                     value = if (ua.account.isMobile) stringResource(R.string.not_available) else ua.account.luri,
                     label = stringResource(if (ua.account.isMobile) R.string.tel_uri else R.string.sip_uri)
                 )
-            }
         }
     }
 

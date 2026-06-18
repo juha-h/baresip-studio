@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +22,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -127,23 +126,15 @@ private fun ChatsScreen(navController: NavController, aor: String) {
                 refreshTrigger++
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(navController, account, uaMessages)
             }
         },
@@ -188,10 +179,7 @@ private fun TopAppBar(
         ),
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                )
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         },
         windowInsets = WindowInsets(0, 0, 0, 0),
@@ -199,10 +187,7 @@ private fun TopAppBar(
             IconButton(
                 onClick = { menuExpanded = !menuExpanded }
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
-                )
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
             }
             DropdownMenu (
                 expanded = menuExpanded,
@@ -218,9 +203,8 @@ private fun TopAppBar(
                             }
                             showDialog.value = true
                         }
-                        blocked -> {
+                        blocked ->
                             navController.navigate("blocked/message/${account.aor}")
-                        }
                     }
                 }
             )
@@ -237,9 +221,7 @@ private fun ChatsContent(
     uaMessages: MutableState<List<Message>>
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(contentPadding),
+        modifier = Modifier.fillMaxWidth().padding(contentPadding),
         verticalArrangement = Arrangement.Top
     ) {
         Account(account)
@@ -308,7 +290,6 @@ private fun Chats(
                         else
                             CustomElements.TextAvatar(contact.name, contact.color)
                     }
-
                     is Contact.AndroidContact -> {
                         val thumbNailUri = contact.thumbnailUri
                         if (thumbNailUri != null)
@@ -321,7 +302,6 @@ private fun Chats(
                         else
                             CustomElements.TextAvatar(contact.name, contact.color)
                     }
-
                     null -> {
                         Icon(
                             imageVector = Icons.Filled.AccountCircle,
@@ -332,20 +312,16 @@ private fun Chats(
                     }
                 }
                 Spacer(modifier = Modifier.width(6.dp))
-                val buttonShape = if (message.direction == MESSAGE_DOWN) {
+                val buttonShape = if (message.direction == MESSAGE_DOWN)
                     RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
-                } else {
+                else
                     RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp)
-                }
-                val borderStroke = if (account.unreadMessages && Message.unreadMessagesFromPeer(aor, message.peerUri)) {
+                val borderStroke = if (account.unreadMessages && Message.unreadMessagesFromPeer(aor, message.peerUri))
                     BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.error)
-                } else {
+                else
                     null
-                }
                 CustomElements.Button(
-                    onClick = {
-                        navController.navigate("chat/${aor}/${message.peerUri}")
-                    },
+                    onClick = { navController.navigate("chat/${aor}/${message.peerUri}") },
                     onLongClick = {
                         val peerName = Utils.friendlyUri(ctx, message.peerUri, account, includeLabel = false)
                         val peerNameWithLabel = Utils.friendlyUri(ctx, message.peerUri, account)
@@ -361,20 +337,17 @@ private fun Chats(
                             lastAction.value = {
                                 deleteMessages(uaMessages, account, message.peerUri)
                             }
-                        } else {
+                        }
+                        else {
                             dialogMessage.value =
                                 String.format(
                                     ctx.getString(R.string.long_chat_question),
                                     peerName
                                 )
                             secondButtonText.value = ctx.getString(R.string.delete)
-                            secondAction.value = {
-                                deleteMessages(uaMessages, account, message.peerUri)
-                            }
+                            secondAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
                             lastButtonText.value = ctx.getString(R.string.add_contact)
-                            lastAction.value = {
-                                navController.navigate("contact/${message.peerUri}/new")
-                            }
+                            lastAction.value = { navController.navigate("contact/${message.peerUri}/new") }
                         }
                         showDialog.value = true
                     },
@@ -497,10 +470,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
         verticalAlignment = Alignment.CenterVertically,
     ) {
         var newPeer by remember { mutableStateOf("") }
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
             if (showSuggestions && filteredSuggestions.isNotEmpty()) {
                 Column(
                     modifier = Modifier
@@ -511,8 +481,7 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                         )
                         .animateContentSize()
                 ) {
-                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)
-                    ) {
+                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -553,9 +522,9 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                 onValueChange = {
                     newPeer = it
                     showSuggestions = newPeer.length > 1
-                    filteredSuggestions = if (it.isEmpty()) {
+                    filteredSuggestions = if (it.isEmpty())
                         emptyList()
-                    } else {
+                    else {
                         val normalizedInput = Utils.unaccent(it)
                         suggestions
                             .filter { suggestion ->
@@ -609,7 +578,8 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                         } else {
                             makeChat(ctx, navController, account, peerText)
                         }
-                    } else if (uris.size == 1)
+                    }
+                    else if (uris.size == 1)
                         makeChat(ctx, navController, account, uris[0].uri)
                     else {
                         items.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
@@ -656,9 +626,7 @@ private fun loadMessages(account: Account) : List<Message> {
 
 private fun deleteMessages(uaMessages: MutableState<List<Message>>, account: Account, peerUri: String) {
     val updatedMessages = BaresipService.messages.toMutableList()
-    updatedMessages.removeAll {
-        it.aor == account.aor && (peerUri == "" || it.peerUri == peerUri)
-    }
+    updatedMessages.removeAll { it.aor == account.aor && (peerUri == "" || it.peerUri == peerUri) }
     BaresipService.messages = updatedMessages.toList()
     Message.save()
     uaMessages.value = loadMessages(account)

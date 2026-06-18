@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,7 +49,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -242,12 +241,10 @@ private fun MainScreen(
                     BaresipService.isMainVisible = true
                     viewModel.updateSpeakerPhoneStatus(BaresipService.speakerPhone)
                     viewModel.updateCalls(Call.calls().toList())
-
                     if (Call.inCall())
                         (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     else
                         (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
                     (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
                         spinToAor(viewModel, it.ua.account.aor, it)
                     } ?: run {
@@ -453,7 +450,8 @@ private fun MainScreen(
                         showPasswordsDialog.value = true
                     }
                 )
-            } else {
+            }
+            else {
                 showPasswordsDialog.value = false
                 showPasswordsDialog.value = true
             }
@@ -471,27 +469,19 @@ private fun MainScreen(
                     Charsets.UTF_8
                 ).lines().toMutableList()
                 showPasswordsDialog.value = true
-            } else {
+            }
+            else
                 // Baresip is started for the first time
                 onRequestPermissions()
-            }
         }
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(
-                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     viewModel = viewModel,
                     navController = navController,
@@ -541,11 +531,7 @@ private fun TopAppBar(
 
     TopAppBar(
         title = {
-            Text(
-                text = stringResource(R.string.baresip),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = stringResource(R.string.baresip), fontSize = 22.sp, fontWeight = FontWeight.Bold)
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -736,10 +722,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     val buttonSize = 48.dp
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(bottom = 16.dp),
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -757,7 +740,8 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                             intent.putExtra("uap", ua.uap)
                             intent.putExtra("peer", acc.vmUri)
                             handleIntent(ctx, viewModel, intent, "call")
-                        } else {
+                        }
+                        else {
                             dialogTitle.value = ctx.getString(R.string.voicemail_messages)
                             dialogMessage.value = acc.vmMessages(ctx)
                             firstText.value = ctx.getString(R.string.cancel)
@@ -774,23 +758,22 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                         }
                     }
                 },
-                modifier = Modifier
-                    .weight(1f)
-                    .size(buttonSize)
+                modifier = Modifier.weight(1f).size(buttonSize)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Voicemail,
                     contentDescription = null,
                     Modifier.size(buttonSize),
-                    tint = if (hasNewVoicemail) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+                    tint = if (hasNewVoicemail)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.secondary
                 )
             }
 
         IconButton(
             onClick = { navController.navigate("contacts") },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize)
+            modifier = Modifier.weight(1f).size(buttonSize)
         ) {
             Icon(
                 imageVector = Icons.Filled.Person,
@@ -803,13 +786,11 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
         IconButton(
             enabled = aor.isNotEmpty(),
             onClick = {
-                if (isMobile) {
-                    if (!Utils.isDefaultSmsApp(ctx)) {
-                        alertTitle.value = ctx.getString(R.string.notice)
-                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                        showAlert.value = true
-                        return@IconButton
-                    }
+                if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                    alertTitle.value = ctx.getString(R.string.notice)
+                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                    showAlert.value = true
+                    return@IconButton
                 }
                 navController.navigate("chats/$aor")
             },
@@ -828,12 +809,8 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 
         IconButton(
             enabled = aor.isNotEmpty(),
-            onClick = {
-                navController.navigate("calls/$aor")
-            },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize)
+            onClick = { navController.navigate("calls/$aor") },
+            modifier = Modifier.weight(1f).size(buttonSize)
         ) {
             Icon(
                 imageVector = Icons.Filled.History,
@@ -845,9 +822,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 
         IconButton(
             onClick = { viewModel.toggleDialpadVisibility() },
-            modifier = Modifier
-                .weight(1f)
-                .size(buttonSize),
+            modifier = Modifier.weight(1f).size(buttonSize),
             enabled = dialpadButtonEnabled.value
         ) {
             Icon(
@@ -985,7 +960,8 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                                     showCall(ctx, viewModel, ua)
                                 }
                             }
-                        } else if (offset > swipeThreshold) {
+                        }
+                        else if (offset > swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
                                 val newPos = when (curPos) {
@@ -1046,26 +1022,18 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
         val selected = viewModel.selectedAor.value
         if (uas.value.isEmpty()) {
             if (selected != "") viewModel.updateSelectedAor("")
-        } else {
-            if (selected == "" || UserAgent.ofAor(selected) == null) {
-                viewModel.updateSelectedAor(uas.value.first().account.aor)
-            }
         }
+        else if (selected == "" || UserAgent.ofAor(selected) == null)
+            viewModel.updateSelectedAor(uas.value.first().account.aor)
         val ua = UserAgent.ofAor(viewModel.selectedAor.value)
-        if (ua != null) {
+        if (ua != null)
             showCall(ctx, viewModel, ua, viewModel.focusedCall.value)
-        }
     }
 
     if (selected == "") {
         OutlinedButton(
-            onClick = {
-                navController.navigate("accounts")
-            },
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .height(50.dp)
-                .fillMaxWidth(),
+            onClick = { navController.navigate("accounts") },
+            modifier = Modifier.padding(horizontal = 4.dp).height(50.dp).fillMaxWidth(),
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1080,18 +1048,14 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
     }
     else
         OutlinedButton(
-            onClick = {
-                expanded = !expanded
-            },
+            onClick = { expanded = !expanded },
             enabled = true,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .height(50.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(
-                        onPress = {
-                            expanded = true
-                        },
+                        onPress = { expanded = true },
                         onLongPress = {
                             val ua = UserAgent.ofAor(selected)
                             if (ua != null) {
@@ -1100,11 +1064,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                     if (Api.account_regint(acc.accp) > 0) {
                                         Api.account_set_regint(acc.accp, 0)
                                         Api.ua_unregister(ua.uap)
-                                    } else {
-                                        Api.account_set_regint(
-                                            acc.accp,
-                                            acc.configuredRegInt
-                                        )
+                                    }
+                                    else {
+                                        Api.account_set_regint(acc.accp, acc.configuredRegInt)
                                         Api.ua_register(ua.uap)
                                     }
                                     acc.regint = Api.account_regint(acc.accp)
@@ -1153,7 +1115,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                     if (Api.account_regint(acc.accp) > 0) {
                                         Api.account_set_regint(acc.accp, 0)
                                         Api.ua_unregister(ua.uap)
-                                    } else {
+                                    }
+                                    else {
                                         Api.account_set_regint(
                                             acc.accp,
                                             acc.configuredRegInt
@@ -1186,11 +1149,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             expanded = false
                             spinToAor(viewModel, acc.aor)
                         },
-                        text = { Text(
-                            text = acc.text(),
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold
-                        ) },
+                        text = {
+                            Text(text = acc.text(), fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                        },
                         leadingIcon = {
                             Icon(
                                 imageVector = ImageVector.vectorResource(uasStatus.value[acc.aor]!!),
@@ -1199,9 +1160,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             )
                         }
                     )
-                    if (index < uas.value.size - 1) {
+                    if (index < uas.value.size - 1)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    }
                 }
             }
         }
@@ -1224,21 +1184,16 @@ private fun CallUriRow(
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp, bottom = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
             OutlinedTextField(
                 value = if (isDialer) dialerState.callUri.value else call!!.callUri.value,
                 readOnly = if (isDialer) !dialerState.callUriEnabled.value else !call!!.callUriEnabled.value,
                 singleLine = true,
                 onValueChange = {
-                    if (isDialer) {
+                    if (isDialer)
                         if (it != dialerState.callUri.value) {
                             dialerState.callUri.value = it
                             dialerState.redialUri = ""
@@ -1258,7 +1213,6 @@ private fun CallUriRow(
                                 }
                             dialerState.showSuggestions.value = it.length > 1
                         }
-                    }
                 },
                 trailingIcon = {
                     if (isDialer && dialerState.callUriEnabled.value && dialerState.callUri.value.isNotEmpty())
@@ -1322,10 +1276,7 @@ private fun CallUriRow(
                         .fillMaxWidth()
                         .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
                     label = {
-                        Text(
-                            text = call.callUriLabel2.value,
-                            fontSize = 18.sp
-                        )
+                        Text(text = call.callUriLabel2.value, fontSize = 18.sp)
                     },
                     textStyle = TextStyle(fontSize = 18.sp)
                 )
@@ -1343,9 +1294,7 @@ private fun CallUriRow(
             ) {
                 if (isDialer && dialerState.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 150.dp)
+                        modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)
                     ) {
                         LazyColumn(
                             modifier = Modifier
@@ -1403,13 +1352,11 @@ private fun CallUriRow(
                                 alertMessage.value = ctx.getString(R.string.call_not_secure)
                                 showAlert.value = true
                             }
-
                             R.color.colorTrafficYellow -> {
                                 alertTitle.value = ctx.getString(R.string.alert)
                                 alertMessage.value = ctx.getString(R.string.peer_not_verified)
                                 showAlert.value = true
                             }
-
                             R.color.colorTrafficGreen -> {
                                 dialogTitle.value = ctx.getString(R.string.info)
                                 dialogMessage.value = ctx.getString(R.string.call_is_secure)
@@ -1419,10 +1366,7 @@ private fun CallUriRow(
                                 lastText.value = ctx.getString(R.string.unverify)
                                 onLastClicked.value = {
                                     if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
-                                        Log.e(
-                                            TAG,
-                                            "Command 'zrtp_unverify ${call.zid}' failed"
-                                        )
+                                        Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
                                     else
                                         call.securityIconTint.value = R.color.colorTrafficYellow
                                 }
@@ -1446,10 +1390,7 @@ private fun CallUriRow(
 }
 
 @Composable
-private fun CallTimer(
-    initialDurationSeconds: Long,
-    modifier: Modifier = Modifier
-) {
+private fun CallTimer(initialDurationSeconds: Long, modifier: Modifier = Modifier) {
     val startTime = remember(initialDurationSeconds) {
         SystemClock.elapsedRealtime() - (initialDurationSeconds * 1000L)
     }
@@ -1489,11 +1430,12 @@ private fun CallRow(
     Row( modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = if (isDialer || call?.showCancelButton?.value == true ||
-                call?.showAnswerRejectButtons?.value == true)
-            Arrangement.Center
-        else
-            Arrangement.SpaceBetween
+        horizontalArrangement =
+            if (isDialer || call?.showCancelButton?.value == true ||
+                    call?.showAnswerRejectButtons?.value == true)
+                Arrangement.Center
+            else
+                Arrangement.SpaceBetween
     ) {
         if (isDialer) {
             if (dialerState.showCallButton.value)
@@ -1686,14 +1628,14 @@ private fun CallRow(
                                             transferUri = it
                                             if (it.length > 1) {
                                                 val normalizedInput = Utils.unaccent(it)
-                                                filteredSuggestions =
-                                                    suggestions.filter { suggestion ->
+                                                filteredSuggestions = suggestions
+                                                    .filter { suggestion ->
                                                         Utils.unaccent(suggestion)
                                                             .contains(normalizedInput, ignoreCase = true)
                                                     }
-                                                        .map { suggestion ->
-                                                            Utils.buildAnnotatedStringWithHighlight(suggestion, it)
-                                                        }
+                                                    .map { suggestion ->
+                                                        Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                                                    }
                                             }
                                             call.showSuggestions.value = transferUri.length > 1
                                         }
@@ -1714,12 +1656,7 @@ private fun CallRow(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            start = 4.dp,
-                                            end = 4.dp,
-                                            top = 12.dp,
-                                            bottom = 2.dp
-                                        )
+                                        .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 2.dp)
                                         .focusRequester(focusRequester),
                                     label = { Text(stringResource(R.string.transfer_destination)) },
                                     textStyle = TextStyle(fontSize = 18.sp),
@@ -1740,16 +1677,11 @@ private fun CallRow(
                                         .animateContentSize()
                                 ) {
                                     if (call.showSuggestions.value && filteredSuggestions.isNotEmpty()) {
-                                        Box(modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(max = 150.dp)) {
+                                        Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)) {
                                             LazyColumn(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .verticalScrollbar(
-                                                        state = lazyListState,
-                                                        width = 6.dp,
-                                                    ),
+                                                    .verticalScrollbar(state = lazyListState, width = 6.dp),
                                                 horizontalAlignment = Alignment.Start,
                                                 state = lazyListState,
                                             ) {
@@ -1761,10 +1693,8 @@ private fun CallRow(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-                                                                transferUri =
-                                                                    suggestion.toString()
-                                                                call.showSuggestions.value =
-                                                                    false
+                                                                transferUri = suggestion.toString()
+                                                                call.showSuggestions.value = false
                                                             }
                                                             .padding(12.dp)
                                                     ) {
@@ -1793,9 +1723,7 @@ private fun CallRow(
                                             )
                                             Switch(
                                                 checked = blindChecked.value,
-                                                onCheckedChange = {
-                                                    blindChecked.value = true
-                                                }
+                                                onCheckedChange = { blindChecked.value = true }
                                             )
                                         }
                                         Spacer(modifier = Modifier.width(8.dp))
@@ -1807,9 +1735,7 @@ private fun CallRow(
                                             )
                                             Switch(
                                                 checked = !blindChecked.value,
-                                                onCheckedChange = {
-                                                    blindChecked.value = false
-                                                }
+                                                onCheckedChange = { blindChecked.value = false }
                                             )
                                         }
                                     }
@@ -1902,14 +1828,9 @@ private fun CallRow(
                         }
                         call.dtmfText.value = newText
                     },
-                    modifier = Modifier
-                        .width(80.dp)
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.width(80.dp).focusRequester(focusRequester),
                     enabled = call.dtmfEnabled.value,
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
+                    textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     singleLine = true,
@@ -1923,17 +1844,9 @@ private fun CallRow(
                             enabled = call.dtmfEnabled.value,
                             interactionSource = interactionSource,
                             label = {
-                                Text(
-                                    stringResource(R.string.dtmf),
-                                    style = TextStyle(fontSize = 12.sp)
-                                )
+                                Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp))
                             },
-                            contentPadding = PaddingValues(
-                                start = 4.dp,
-                                end = 4.dp,
-                                top = 8.dp,
-                                bottom = 8.dp
-                            ),
+                            contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -1979,7 +1892,8 @@ private fun CallRow(
                                         "${ctx.getString(R.string.lost)}: ${parts[3]}\n" +
                                         String.format(ctx.getString(R.string.jitter), parts[4])
                             showAlert.value = true
-                        } else {
+                        }
+                        else {
                             alertTitle.value = ctx.getString(R.string.call_info)
                             alertMessage.value = ctx.getString(R.string.call_info_not_available)
                             showAlert.value = true
@@ -1995,12 +1909,9 @@ private fun CallRow(
                 }
 
             if (call.showAnswerRejectButtons.value) {
-
                 IconButton(
                     modifier = Modifier.size(48.dp),
-                    onClick = {
-                        answer(ctx, call)
-                    },
+                    onClick = { answer(ctx, call) },
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Call,
@@ -2009,14 +1920,10 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
-
                 Spacer(Modifier.width(48.dp))
-
                 IconButton(
                     modifier = Modifier.size(48.dp),
-                    onClick = {
-                        reject(call)
-                    },
+                    onClick = { reject(call) },
                 ) {
                     Icon(
                         imageVector = Icons.Filled.CallEnd,
@@ -2039,10 +1946,7 @@ private fun OnHoldNotice() {
             modifier = Modifier.padding(16.dp),
             shape = RoundedCornerShape(20)
         ) {
-            Text(
-                text = stringResource(R.string.call_is_on_hold),
-                fontSize = 18.sp
-            )
+            Text(text = stringResource(R.string.call_is_on_hold), fontSize = 18.sp)
         }
     }
 }
@@ -2252,8 +2156,7 @@ private fun transfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, uriText:
 }
 
 private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCall: Call? = null) {
-    if (ua == null)
-        return
+    if (ua == null) return
     val call = showCall ?: ua.currentCall()
     val aor = ua.account.aor
     val callp = call?.callp ?: 0L
@@ -2278,7 +2181,8 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             BaresipService.isMicMuted = false
             viewModel.updateMicIcon(Icons.Filled.Mic)
         }
-    } else {
+    }
+    else {
         viewModel.dialerState.callUri.value = ""
         pullToRefreshEnabled.value = false
         call.callUriEnabled.value = false
@@ -2323,9 +2227,8 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     call.callUriLabel2.value = ctx.getString(R.string.diverted_by_dots)
                     call.callUri2.value = Utils.friendlyUri(ctx, uri, ua.account)
                 }
-                else {
+                else
                     call.callUri2.value = ""
-                }
                 call.showCallButton.value = false
                 call.showCancelButton.value = false
                 call.showHangupButton.value = false
@@ -2388,13 +2291,10 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         Log.d(TAG, "Handling service event 'started' with URI '$uriString'")
         if (uriString != "")
             callAction(ctx, viewModel, uriString.toUri(), "dial")
-        else {
-            if (viewModel.selectedAor.value == "" && uas.value.isNotEmpty())
-                viewModel.updateSelectedAor(uas.value.first().account.aor)
-        }
-        if (Preferences(ctx).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
+        else if (viewModel.selectedAor.value == "" && uas.value.isNotEmpty())
+            viewModel.updateSelectedAor(uas.value.first().account.aor)
+        if (Preferences(ctx).displayTheme != AppCompatDelegate.getDefaultNightMode())
             AppCompatDelegate.setDefaultNightMode(Preferences(ctx).displayTheme)
-        }
         handleNextEvent()
         return
     }
@@ -2430,8 +2330,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     val aor = ua.account.aor
 
     when (ev[0]) {
-        "call rejected" -> {
-        }
+        "call rejected" -> {}
         "call outgoing" -> {
             val callp = params[1] as Long
             if (!BaresipService.isMainVisible)
@@ -2467,9 +2366,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 secondText.value = ctx.getString(R.string.no)
                 onSecondClicked.value = { }
                 lastText.value = ctx.getString(R.string.yes)
-                onLastClicked.value = {
-                    redirect(ctx, viewModel, ua, redirectUri)
-                }
+                onLastClicked.value = { redirect(ctx, viewModel, ua, redirectUri) }
                 showDialog.value = true
             }
         }
@@ -2483,8 +2380,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     call.dtmfText.value = ""
             }
         }
-        "call update" -> {
-        }
+        "call update" -> {}
         "call verify" -> {
             val callp = params[1] as Long
             val call = Call.ofCallp(callp)
@@ -2508,9 +2404,9 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 call.security = if (Api.cmd_exec("zrtp_verify ${ev[2]}") != 0) {
                     Log.e(TAG, "Command 'zrtp_verify ${ev[2]}' failed")
                     R.color.colorTrafficYellow
-                } else {
-                    R.color.colorTrafficGreen
                 }
+                else
+                    R.color.colorTrafficGreen
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value)
                     call.securityIconTint.value = call.security
@@ -2524,9 +2420,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 handleNextEvent("Call $callp that is verified is not found")
                 return
             }
-            if (aor == viewModel.selectedAor.value) {
+            if (aor == viewModel.selectedAor.value)
                 call.securityIconTint.value = call.security
-            }
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -2594,14 +2489,13 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "mwi notify" -> {
             val lines = ev[1].split("\n")
-            for (line in lines) {
+            for (line in lines)
                 if (line.startsWith("Voice-Message:")) {
                     val counts = (line.split(" ")[1]).split("/")
                     acc.vmNew = counts[0].toInt()
                     acc.vmOld = counts[1].toInt()
                     break
                 }
-            }
         }
         else -> Log.e(TAG, "Unknown event '${ev[0]}'")
     }
@@ -2648,10 +2542,8 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             if (ev[0] == "call answer")
                 answer(ctx, call)
             else
-                BaresipService.postServiceEvent(ServiceEvent(
-                    "call incoming",
-                    arrayListOf(call.ua.uap, callp),
-                    System.nanoTime())
+                BaresipService.postServiceEvent(
+                    ServiceEvent("call incoming", arrayListOf(call.ua.uap, callp), System.nanoTime())
                 )
         }
         "call missed" -> {
@@ -2676,10 +2568,8 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 ev[1]
             else
                 intent.getStringExtra("uri")!!
-            BaresipService.postServiceEvent(ServiceEvent(
-                ev[0] + "," + uri,
-                arrayListOf(call.ua.uap, callp),
-                System.nanoTime())
+            BaresipService.postServiceEvent(
+                ServiceEvent(ev[0] + "," + uri, arrayListOf(call.ua.uap, callp), System.nanoTime())
             )
         }
         "message", "message show", "message reply" -> {
@@ -2690,10 +2580,8 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 return
             }
             spinToAor(viewModel, ua.account.aor)
-            BaresipService.postServiceEvent(ServiceEvent(
-                ev[0],
-                arrayListOf(uap, intent.getStringExtra("peer")!!),
-                System.nanoTime())
+            BaresipService.postServiceEvent(
+                ServiceEvent(ev[0], arrayListOf(uap, intent.getStringExtra("peer")!!), System.nanoTime())
             )
         }
     }
@@ -2710,8 +2598,7 @@ fun handleDialog(ctx: Context, title: String, message: String, action: () -> Uni
 }
 
 fun callAction(ctx: Context, viewModel: ViewModel, uri: Uri?, action: String) {
-    if (Call.inCall() || uas.value.isEmpty())
-        return
+    if (Call.inCall() || uas.value.isEmpty()) return
     Log.d(TAG, "Action $action to $uri")
     if (uri != null) {
         var uriStr: String
@@ -2772,11 +2659,13 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
             if (ua.account.aor != viewModel.selectedAor.value)
                 spinToAor(viewModel, ua.account.aor)
             showCall(ctx, viewModel, ua)
-        } else {
+        }
+        else {
             Log.w(TAG, "call_connect $newCallp failed")
             call.notifySipfrag(500, "Call Error")
         }
-    } else {
+    }
+    else {
         Log.w(TAG, "callAlloc for ua ${ua.uap} call ${call.callp} transfer failed")
         call.notifySipfrag(500, "Call Error")
     }
@@ -2794,8 +2683,10 @@ private fun backup(ctx: Context, password: String) {
     if (!Utils.zip(files, zipFile)) {
         Log.w(TAG, "Failed to write zip file '$zipFile'")
         alertTitle.value = ctx.getString(R.string.error)
-        alertMessage.value = String.format(ctx.getString(R.string.backup_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+        alertMessage.value = String.format(
+            ctx.getString(R.string.backup_failed),
+            Utils.fileNameOfUri(ctx, downloadsOutputUri!!)
+        )
         showAlert.value = true
         downloadsOutputUri = null
         return
@@ -2804,23 +2695,29 @@ private fun backup(ctx: Context, password: String) {
     if (content == null) {
         Log.w(TAG, "Failed to read zip file '$zipFile'")
         alertTitle.value = ctx.getString(R.string.error)
-        alertMessage.value = String.format(ctx.getString(R.string.backup_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+        alertMessage.value = String.format(
+            ctx.getString(R.string.backup_failed),
+            Utils.fileNameOfUri(ctx, downloadsOutputUri!!)
+        )
         showAlert.value = true
         downloadsOutputUri = null
         return
     }
     if (!Utils.encryptToUri(ctx, downloadsOutputUri!!, content, password)) {
         alertTitle.value = ctx.getString(R.string.error)
-        alertMessage.value = String.format(ctx.getString(R.string.backup_failed),
-            Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+        alertMessage.value = String.format(
+            ctx.getString(R.string.backup_failed),
+            Utils.fileNameOfUri(ctx, downloadsOutputUri!!)
+        )
         showAlert.value = true
         downloadsOutputUri = null
         return
     }
     alertTitle.value = ctx.getString(R.string.info)
-    alertMessage.value = String.format(ctx.getString(R.string.backed_up),
-        Utils.fileNameOfUri(ctx, downloadsOutputUri!!))
+    alertMessage.value = String.format(
+        ctx.getString(R.string.backed_up),
+        Utils.fileNameOfUri(ctx, downloadsOutputUri!!)
+    )
     showAlert.value = true
     Utils.deleteFile(File(zipFilePath))
     downloadsInputUri = null
@@ -2832,8 +2729,10 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     val zipData = Utils.decryptFromUri(ctx, downloadsInputUri!!, password)
     if (zipData == null) {
         alertTitle.value = ctx.getString(R.string.error)
-        alertMessage.value = String.format(ctx.getString(R.string.restore_failed),
-            Utils.fileNameOfUri(ctx, downloadsInputUri!!))
+        alertMessage.value = String.format(
+            ctx.getString(R.string.restore_failed),
+            Utils.fileNameOfUri(ctx, downloadsInputUri!!)
+        )
         showAlert.value = true
         downloadsInputUri = null
         return
@@ -2841,8 +2740,10 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     if (!Utils.putFileContents(zipFilePath, zipData)) {
         Log.w(TAG, "Failed to write zip file '$zipFile'")
         alertTitle.value = ctx.getString(R.string.error)
-        alertMessage.value = String.format(ctx.getString(R.string.restore_failed),
-            Utils.fileNameOfUri(ctx, downloadsInputUri!!))
+        alertMessage.value = String.format(
+            ctx.getString(R.string.restore_failed),
+            Utils.fileNameOfUri(ctx, downloadsInputUri!!)
+        )
         showAlert.value = true
         downloadsInputUri = null
         return
@@ -2871,9 +2772,7 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     dialogTitle.value = ctx.getString(R.string.info)
     dialogMessage.value = ctx.getString(R.string.restored)
     firstText.value = ctx.getString(R.string.cancel)
-    onFirstClicked.value = {
-        showDialog.value = false
-    }
+    onFirstClicked.value = { showDialog.value = false }
     secondText.value = ""
     lastText.value = ctx.getString(R.string.restart)
     onLastClicked.value = {

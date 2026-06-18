@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -108,17 +108,11 @@ private fun BlockedScreen(navController: NavController, request: String, aor: St
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(navController, account, request, blocked)
             }
         },
@@ -187,10 +181,7 @@ private fun TopAppBar(
             IconButton(
                 onClick = { expanded = !expanded }
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
-                )
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
             }
             CustomElements.DropdownMenu(
                 expanded,
@@ -237,9 +228,7 @@ private fun BlockedContent(
 private fun Account(account: Account) {
     Text(
         text = stringResource(R.string.account) + " " + account.text(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center
@@ -292,18 +281,17 @@ private fun Blocked(ctx: Context, navController: NavController, blocked: Mutable
                         }
                     )
             ) {
-                Text(text = "\u2022",
+                Text(
+                    text = "\u2022",
                     modifier = Modifier.padding(start = 8.dp, end = 4.dp),
                     fontSize = 18.sp)
-
-                Text(text = peerUri.replace("sip:", ""),
+                Text(
+                    text = peerUri.replace("sip:", ""),
                     fontSize = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
-
                 val calendar = GregorianCalendar()
                 calendar.timeInMillis = blocked.timeStamp
                 Text(
@@ -324,9 +312,8 @@ private fun loadBlocked(request: String, aor: String): MutableList<Blocked> {
     val res = mutableListOf<Blocked>()
     for (i in BaresipService.blocked.indices.reversed()) {
         val b = BaresipService.blocked[i]
-        if (b.aor == aor && b.request == request) {
+        if (b.aor == aor && b.request == request)
             res.add(Blocked("", b.peerUri, "", b.timeStamp))
-        }
     }
     Log.d(TAG, "Loaded ${res.size} blocked $request requests")
     return res

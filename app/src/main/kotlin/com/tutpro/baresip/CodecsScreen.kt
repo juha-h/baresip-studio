@@ -5,13 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -98,16 +99,14 @@ private fun CodecsScreen(
     val codecs = remember { mutableStateListOf<Codec>() }
 
     LaunchedEffect(acc, media) {
-        val allCodecs: List<String> = if (media == "audio") {
+        val allCodecs: List<String> = if (media == "audio")
             Api.audio_codecs().split(",")
-        } else {
+        else
             Api.video_codecs().split(",").distinct()
-        }
-        val accCodecs: List<String> = if (media == "audio") {
+        val accCodecs: List<String> = if (media == "audio")
             acc.audioCodec
-        } else {
+        else
             acc.videoCodec
-        }
         val currentCodecs = mutableListOf<Codec>()
         for (codec in accCodecs)
             currentCodecs.add(Codec(codec, mutableStateOf(true)))
@@ -119,17 +118,11 @@ private fun CodecsScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(
-                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     title = {
                         Text(
@@ -146,7 +139,6 @@ private fun CodecsScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
                         actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
-                    windowInsets = WindowInsets(0, 0, 0, 0),
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(
@@ -155,24 +147,18 @@ private fun CodecsScreen(
                             )
                         }
                     },
+                    windowInsets = WindowInsets(0, 0, 0, 0),
                     actions = {
-                        IconButton(onClick = {
-                            checkOnClick(codecs)
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Check"
-                            )
+                        IconButton(
+                            onClick = { checkOnClick(codecs) }) {
+                            Icon(imageVector = Icons.Filled.Check, contentDescription = "Check")
                         }
                     }
                 )
             }
         },
         content = { contentPadding ->
-            CodecsContent(
-                contentPadding,
-                codecs
-            )
+            CodecsContent(contentPadding, codecs)
         },
     )
 }
@@ -204,9 +190,7 @@ private fun Codecs(codecs: SnapshotStateList<Codec>) {
     )
 
     LazyColumn(
-        modifier = Modifier
-            .padding(end = 4.dp)
-            .verticalScrollbar(state = draggableState.listState),
+        modifier = Modifier.padding(end = 4.dp).verticalScrollbar(state = draggableState.listState),
         state = draggableState.listState,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp),
     ) {
@@ -236,7 +220,8 @@ private fun Codecs(codecs: SnapshotStateList<Codec>) {
                                         val index = codecs.indexOf(item)
                                         codecs.removeAt(index)
                                         codecs.add(0, item)
-                                    } else {
+                                    }
+                                    else {
                                         val index = codecs.indexOf(item)
                                         codecs.removeAt(index)
                                         codecs.add(item)
@@ -247,10 +232,7 @@ private fun Codecs(codecs: SnapshotStateList<Codec>) {
                 },
                 trailingContent = {
                     Icon(
-                        modifier = Modifier.dragHandle(
-                            state = draggableState,
-                            key = item.name
-                        ),
+                        modifier = Modifier.dragHandle(state = draggableState, key = item.name),
                         imageVector =Icons.Filled.Reorder,
                         contentDescription = null
                     )
