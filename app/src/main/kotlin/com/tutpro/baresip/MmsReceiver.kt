@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 
 /**
@@ -25,37 +26,26 @@ class MmsReceiver : BroadcastReceiver() {
         // Query the most recent MMS message
         val uri = "content://mms".toUri()
         val cursor = context.contentResolver.query(uri, null, null, null, "date DESC LIMIT 1")
-        
+
         cursor?.use { c ->
             if (c.moveToFirst()) {
                 val id = c.getString(c.getColumnIndexOrThrow("_id"))
                 val date = c.getLong(c.getColumnIndexOrThrow("date")) * 1000 // mms date is in seconds
-                
+
                 // Get sender address
                 val address = getMmsAddr(context, id) ?: "unknown"
-                
+
                 // Get text parts
                 val body = getMmsText(context, id)
-                
+
                 if (body.isNotEmpty()) {
-                    Log.d(TAG, "Extracted MMS text from $address: $body")
-                    
-                    val mobileUa = BaresipService.uas.value.find { it.account.isMobile }
-                    if (mobileUa != null) {
-                        // Notify Service for history update, notification, and alert sound
-                        if (BaresipService.isServiceRunning) {
-                            BaresipService.instance?.handleIncomingMessage(mobileUa.uap, "tel:$address", body, date)
-                        } else {
-                            // Service not running, at least save to history
-                            val aor = mobileUa.account.aor
-                            // Check if this message was already added (simple deduplication by timestamp)
-                            val lastMsg = Message.messages().lastOrNull { m -> m.aor == aor }
-                            if (lastMsg == null || lastMsg.timeStamp != date || lastMsg.peerUri != "tel:$address") {
-                                Message(aor, "tel:$address", body, date, MESSAGE_DOWN, 0, "", true).add()
-                                mobileUa.account.unreadMessages = true
-                            }
-                        }
-                    }
+                    Log.d(TAG, "Extracted MMS text from $address, starting service")
+                    val serviceIntent = Intent(context, BaresipService::class.java)
+                    serviceIntent.action = "Start"
+                    serviceIntent.putExtra("sender", "tel:$address")
+                    serviceIntent.putExtra("body", body)
+                    serviceIntent.putExtra("time", date)
+                    ContextCompat.startForegroundService(context, serviceIntent)
                 }
             }
         }
@@ -90,11 +80,10 @@ class MmsReceiver : BroadcastReceiver() {
                 val type = it.getString(it.getColumnIndexOrThrow("ct"))
                 if (type == "text/plain") {
                     val data = it.getString(it.getColumnIndexOrThrow("_data"))
-                    val body = if (data != null) {
+                    val body = if (data != null)
                         getPartText(context, it.getString(it.getColumnIndexOrThrow("_id")))
-                    } else {
+                    else
                         it.getString(it.getColumnIndexOrThrow("text"))
-                    }
                     if (body != null) sb.append(body)
                 }
             }
