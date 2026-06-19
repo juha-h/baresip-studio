@@ -23,9 +23,18 @@ class InCallService : InCallService() {
         if (handle == baresipHandle) {
             Log.d(TAG, "InCallService: Identified as SIP call")
             // SIP call is already managed by ConnectionService/BaresipService
-        } else {
+        }
+        else {
             Log.d(TAG, "InCallService: Identified as PSTN call from $handle")
             val aor = call.details.intentExtras?.getString("aor")
+
+            if (BaresipService.instance == null) {
+                Log.i(TAG, "InCallService: BaresipService not running, starting it")
+                val intent = Intent(this, BaresipService::class.java)
+                intent.action = "Start"
+                androidx.core.content.ContextCompat.startForegroundService(this, intent)
+            }
+
             BaresipService.instance?.handleExternalCall(call, aor)
         }
     }

@@ -126,6 +126,9 @@ class BaresipService: Service() {
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
+    private data class PendingMessage(val sender: String, val body: String, val time: Long)
+    private val pendingMessages = mutableListOf<PendingMessage>()
+
     private var vbTimer: Timer? = null
     private var origVolume = mutableMapOf<Int, Int>()
     private var linkAddresses = mutableMapOf<String, String>()
@@ -490,6 +493,29 @@ class BaresipService: Service() {
 
             "Start" -> {
 
+                val sender = intent?.getStringExtra("sender")
+                val body = intent?.getStringExtra("body")
+                val time = intent?.getLongExtra("time", 0L) ?: 0L
+
+                if (sender != null && body != null && time != 0L) {
+                    Handler(Looper.getMainLooper()).post {
+                        if (isNativeReady) {
+                            val mobileUa = uas.value.find { it.account.isMobile }
+                            if (mobileUa != null)
+                                handleIncomingMessage(mobileUa.uap, sender, body, time)
+                            else
+                                synchronized(pendingMessages) {
+                                    pendingMessages.add(PendingMessage(sender, body, time))
+                                }
+                        }
+                        else
+                            synchronized(pendingMessages) {
+                                pendingMessages.add(PendingMessage(sender, body, time))
+                            }
+                    }
+                }
+
+                if (isStartReceived || isServiceRunning) return START_STICKY
                 isStartReceived = true
 
                 if (VERSION.SDK_INT < 31) {
@@ -1769,7 +1795,30 @@ class BaresipService: Service() {
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
         isNativeReady = true
-        addMobileUserAgent()
+
+        Handler(Looper.getMainLooper()).post {
+            addMobileUserAgent()
+
+            val mobileUa = uas.value.find { it.account.isMobile }
+            if (mobileUa != null)
+                synchronized(pendingMessages) {
+                    for (m in pendingMessages)
+                        handleIncomingMessage(mobileUa.uap, m.sender, m.body, m.time)
+                    pendingMessages.clear()
+                }
+
+            // Process any calls that arrived while baresip is starting
+            InCallService.instance?.let { inCallService ->
+                for (call in inCallService.calls) {
+                    val aor = call.details.intentExtras?.getString("aor")
+                    if (Call.ofCallp(call.hashCode().toLong()) == null) {
+                        Log.d(TAG, "Processing pending external call ${call.hashCode()}")
+                        handleExternalCall(call, aor)
+                    }
+                }
+            }
+        }
+
         if (VERSION.SDK_INT >= 31 && !telephonyCallbackRegistered) {
             try {
                 telephonyManager.registerTelephonyCallback(mainExecutor, telephonyCallback)
