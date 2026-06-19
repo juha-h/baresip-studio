@@ -1686,7 +1686,7 @@ class BaresipService: Service() {
 
             // Process any calls that arrived while baresip is starting
             InCallService.instance?.let { inCallService ->
-                for (call in inCallService.getCalls()) {
+                for (call in inCallService.calls) {
                     val aor = call.details.intentExtras?.getString("aor")
                     if (Call.ofCallp(call.hashCode().toLong()) == null) {
                         Log.d(TAG, "Processing pending external call ${call.hashCode()}")
