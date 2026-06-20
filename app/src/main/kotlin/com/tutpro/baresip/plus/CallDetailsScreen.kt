@@ -18,13 +18,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -80,6 +80,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.text.DateFormat
 import java.util.GregorianCalendar
+import kotlin.time.Duration.Companion.milliseconds
 
 fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable("call_details") { _ ->
@@ -93,15 +94,11 @@ fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewMod
 private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
     val detailsState = remember { callRow.details.toMutableStateList() }
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     title = {
                         Text(
@@ -252,22 +249,26 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
     val stopText = if (DateUtils.isToday(stopTime.timeInMillis)) {
         val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
         stringResource(R.string.today) + " " + fmt.format(stopTime.time)
-    } else {
+    }
+    else {
         val fmt = DateFormat.getDateTimeInstance()
         fmt.format(stopTime.time)
     }
     if (startTime == GregorianCalendar(0, 0, 0)) {
         startTimeText = stopText
         durationText = "?"
-    } else {
+    }
+    else {
         if (startTime == null  || detail.direction == CALL_DOWN_BLUE) {
             startTimeText = stopText
             durationText = ""
-        } else {
+        }
+        else {
             val startText = if (DateUtils.isToday(startTime.timeInMillis)) {
                 val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
                 stringResource(R.string.today) + " " + fmt.format(startTime.time)
-            } else {
+            }
+            else {
                 val fmt = DateFormat.getDateTimeInstance()
                 fmt.format(startTime.time)
             }
@@ -294,9 +295,7 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
         text = startTimeText,
         modifier = Modifier.combinedClickable(
             onClick = {},
-            onLongClick = {
-                showDialog.value = true
-            }
+            onLongClick = { showDialog.value = true }
         )
     )
 
@@ -335,12 +334,12 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                        } else {
+                        }
+                        else
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(ctx, "Source file not found", Toast.LENGTH_SHORT)
                                     .show()
                             }
-                        }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to save file: $e")
@@ -381,16 +380,14 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
         )
 
     val hasRecording = detail.recording.isNotEmpty() && detail.recording[0].isNotEmpty()
-    if (hasRecording) {
+    if (hasRecording)
         Text(
             text = durationText,
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier
                 .padding(end = 12.dp)
                 .combinedClickable(
-                    onLongClick = {
-                        showDownloadDialog.value = true
-                    },
+                    onLongClick = { showDownloadDialog.value = true },
                     onClick = {
                         if (!mediaPlayer.isPlaying) {
                             mediaPlayer.reset()
@@ -425,15 +422,15 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                             )
                                             finalFile = fallbackMerged
                                             // Update state to match reality by creating a new List
-                                            detail.recording =
-                                                listOf(fallbackMerged.absolutePath, "")
-                                        } else {
+                                            detail.recording = listOf(fallbackMerged.absolutePath, "")
+                                        }
+                                        else
                                             Log.e(
                                                 TAG,
                                                 "Raw file missing and fallback not found: ${currentRecording[0]}"
                                             )
-                                        }
-                                    } else {
+                                    }
+                                    else {
                                         // Normal Raw processing
                                         val mergedFileName =
                                             "merged_${fileIn.nameWithoutExtension}_${fileOut.nameWithoutExtension}.wav"
@@ -442,20 +439,16 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                             mergedFileName
                                         )
                                         if (mergedFile.exists()) {
-                                            Log.d(
-                                                TAG,
-                                                "Using already merged file: ${mergedFile.name}"
-                                            )
+                                            Log.d(TAG, "Using already merged file: ${mergedFile.name}")
                                             finalFile = mergedFile
-                                        } else {
+                                        }
+                                        else
                                             if (Utils.mergeWavFiles(fileIn, fileOut, mergedFile))
                                                 finalFile = mergedFile
-                                        }
 
                                         // If merge successful, update state and delete originals
                                         if (finalFile != null && finalFile.exists()) {
-                                            detail.recording =
-                                                listOf(finalFile.absolutePath, "")
+                                            detail.recording = listOf(finalFile.absolutePath, "")
                                             try {
                                                 if (fileIn.exists()) fileIn.delete()
                                                 if (fileOut.exists()) fileOut.delete()
@@ -468,21 +461,27 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                             }
                                         }
                                     }
-                                } else if (currentIsMerged) {
-                                    val f = File(currentRecording[0])
-                                    if (f.exists()) {
-                                        Log.d(TAG, "Using already merged file: ${currentRecording[0]}")
-                                        finalFile = f
-                                    } else {
-                                        Log.e(
-                                            TAG,
-                                            "Merged file record exists but file is missing: ${currentRecording[0]}"
-                                        )
+                                }
+                                else {
+                                    if (currentIsMerged) {
+                                        val f = File(currentRecording[0])
+                                        if (f.exists()) {
+                                            Log.d(
+                                                TAG,
+                                                "Using already merged file: ${currentRecording[0]}"
+                                            )
+                                            finalFile = f
+                                        }
+                                        else
+                                            Log.e(
+                                                TAG,
+                                                "Merged file record exists but file is missing: ${currentRecording[0]}"
+                                            )
                                     }
                                 }
 
                                 withContext(Dispatchers.Main) {
-                                    if (finalFile != null && finalFile.exists()) {
+                                    if (finalFile != null && finalFile.exists())
                                         try {
                                             mediaPlayer.apply {
                                                 setAudioAttributes(
@@ -511,15 +510,15 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }
-                                    } else {
+                                    else
                                         Toast.makeText(
                                             ctx, "Failed to process audio file",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                    }
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             mediaPlayer.stop()
                             mediaPlayer.reset()
                             showPlaybackDialog.value = false
@@ -527,9 +526,8 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                     }
                 )
         )
-    } else {
+    else
         Text(text = durationText, modifier = Modifier.padding(end = 12.dp))
-    }
 }
 
 @Composable
@@ -549,24 +547,18 @@ private fun PlaybackDialog(
             if (mediaPlayer.isPlaying) {
                 val duration = mediaPlayer.duration
                 totalDurationText = DateUtils.formatElapsedTime(duration / 1000L)
-
                 while (mediaPlayer.isPlaying) {
                     val current = mediaPlayer.currentPosition
                     currentProgress = if (duration > 0) current.toFloat() / duration.toFloat() else 0f
                     currentPositionText = DateUtils.formatElapsedTime(current / 1000L)
-                    delay(100) // Poll every 100ms
+                    delay(100.milliseconds) // Poll every 100ms
                 }
             }
         }
 
         AlertDialog(
-            onDismissRequest = {
-                // If user clicks outside, stop playback
-                onStop()
-            },
-            title = {
-                Text(text = stringResource(R.string.playing_recording))
-            },
+            onDismissRequest = { onStop() }, // If user clicks outside, stop playback
+            title = { Text(text = stringResource(R.string.playing_recording)) },
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -587,9 +579,7 @@ private fun PlaybackDialog(
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = { onStop() }
-                ) {
+                TextButton(onClick = { onStop() }) {
                     Text(stringResource(R.string.stop))
                 }
             }

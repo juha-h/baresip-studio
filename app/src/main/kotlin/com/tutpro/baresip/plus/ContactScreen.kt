@@ -695,11 +695,8 @@ private fun UrisSection(
             }
         }
     }
-    else {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+    else
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             uris.forEachIndexed { index, contactUri ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val uri = contactUri.uri
@@ -824,13 +821,12 @@ private fun UrisSection(
                     }
                 }
             }
-        }
     }
 }
 
 @Composable
 private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmailChange: (String) -> Unit) {
-    if (isEditing) {
+    if (isEditing)
         OutlinedTextField(
             value = email,
             placeholder = { Text(stringResource(R.string.email)) },
@@ -840,7 +836,7 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
             label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
-    } else if (email.isNotEmpty()) {
+    else if (email.isNotEmpty()) {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,

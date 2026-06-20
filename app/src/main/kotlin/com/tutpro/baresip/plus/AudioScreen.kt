@@ -17,13 +17,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -101,23 +101,14 @@ private fun AudioScreen(
     checkOnClick: () -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(
-                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     title = {
-                        Text(
-                            text = stringResource(R.string.audio_settings),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = stringResource(R.string.audio_settings), fontWeight = FontWeight.Bold)
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -136,10 +127,7 @@ private fun AudioScreen(
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     actions = {
                         IconButton(onClick = checkOnClick) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Check"
-                            )
+                            Icon(imageVector = Icons.Filled.Check, contentDescription = "Check")
                         }
                     },
                 )
@@ -319,9 +307,8 @@ private fun ToneCountry() {
                     isDropDownExpanded.value = false
                 }) {
                 countryNames.forEachIndexed { index, name ->
-                    DropdownMenuItem(text = {
-                        Text(text = name)
-                    },
+                    DropdownMenuItem(
+                        text = { Text(text = name) },
                         onClick = {
                             isDropDownExpanded.value = false
                             itemPosition.intValue = index
@@ -355,8 +342,7 @@ private fun SpeakerPhone() {
         var speakerPhone by remember { mutableStateOf(oldSpeakerPhone) }
         Switch(
             checked = speakerPhone,
-            onCheckedChange = {
-                speakerPhone = it
+            onCheckedChange = { speakerPhone = it
                 newSpeakerPhone = speakerPhone
             }
         )
@@ -409,9 +395,8 @@ private fun CallVolume() {
                     isDropDownExpanded.value = false
                 }) {
                 volNames.forEachIndexed { index, vol ->
-                    DropdownMenuItem(text = {
-                        Text(text = vol)
-                    },
+                    DropdownMenuItem(
+                        text = { Text(text = vol) },
                         onClick = {
                             isDropDownExpanded.value = false
                             itemPosition.intValue = index
@@ -440,8 +425,7 @@ private fun MicGain() {
             OutlinedTextField(
                 value = micGain,
                 placeholder = { Text(microphoneGainTitle) },
-                onValueChange = {
-                    micGain = it
+                onValueChange = { micGain = it
                     newMicGain = micGain
                 },
                 modifier = Modifier
@@ -626,7 +610,8 @@ private fun checkOnClick(ctx: Context): Result {
                 Api.module_unload("augain")
                 Config.removeVariableValue("module", "augain.so")
                 Config.replaceVariable("augain", "1.0")
-            } else {
+            }
+            else {
                 if (oldMicGain == "1.0") {
                     if (Api.module_load("augain") != 0) {
                         alertTitle.value = ctx.getString(R.string.error)

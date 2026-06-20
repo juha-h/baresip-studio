@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -22,7 +21,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -137,14 +136,10 @@ private fun ChatScreen(
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    var areMessagesLoaded by remember(aor, peerUri) {
-        mutableStateOf(false)
-    }
+    var areMessagesLoaded by remember(aor, peerUri) { mutableStateOf(false) }
 
     val reloadMessages = {
         Log.d(TAG, "Reloading messages for $aor peer $peerUri")
@@ -176,16 +171,11 @@ private fun ChatScreen(
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(ctx, navController, viewModel, account, peerUri)
             }
         },
@@ -200,7 +190,8 @@ private fun ChatScreen(
         },
         content = { contentPadding ->
             if (areMessagesLoaded)
-                ChatContent(ctx,
+                ChatContent(
+                    ctx,
                     navController,
                     contentPadding,
                     account, peerUri,
@@ -224,8 +215,7 @@ private fun TopAppBar(
     TopAppBar(
         title = {
             Text(
-                text = format(ctx.getString(R.string.chat_with),
-                    Utils.friendlyUri(ctx, peerUri, account)),
+                text = format(ctx.getString(R.string.chat_with), Utils.friendlyUri(ctx, peerUri, account)),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -238,10 +228,7 @@ private fun TopAppBar(
         ),
         navigationIcon = {
             IconButton(onClick = { backAction(navController, account, peerUri) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                )
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
         windowInsets = WindowInsets(0, 0, 0, 0),
@@ -315,10 +302,7 @@ private fun TopAppBar(
                             Log.w(TAG, "Call button onClick listener did not find UA for $aor")
                     }
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Email,
-                        contentDescription = "Email",
-                    )
+                    Icon(imageVector = Icons.Outlined.Email, contentDescription = "Email")
                 }
         }
     )
@@ -335,9 +319,7 @@ private fun ChatContent(
     onMessageDeleted: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(contentPadding),
+        modifier = Modifier.fillMaxWidth().padding(contentPadding),
         verticalArrangement = Arrangement.Bottom
     ) {
         Account(ctx, account)
@@ -350,9 +332,7 @@ private fun ChatContent(
 private fun Account(ctx: Context, account: Account) {
     Text(
         text = ctx.getString(R.string.account) + " " + account.text(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center
@@ -393,11 +373,8 @@ private fun Messages(
 
     LaunchedEffect(messages) {
         // Scroll to the bottom when new messages are added
-        if (messages.isNotEmpty()) {
-            coroutineScope.launch {
-                lazyListState.scrollToItem(0)
-            }
-        }
+        if (messages.isNotEmpty())
+            coroutineScope.launch { lazyListState.scrollToItem(0) }
     }
 
     LazyColumn(
@@ -445,9 +422,7 @@ private fun Messages(
                                 peerUri
                             )
                             secondButtonText.value = ctx.getString(R.string.add_contact)
-                            secondAction.value = {
-                                navController.navigate("contact/$peerUri/new")
-                            }
+                            secondAction.value = { navController.navigate("contact/$peerUri/new") }
                             lastButtonText.value = ctx.getString(R.string.delete)
                             lastAction.value = {
                                 message.delete()
@@ -613,14 +588,16 @@ private fun NewMessage(
                         if (ua.status != circleGreen.getValue(colorblind)) {
                             dialogMessage.value = ctx.getString(R.string.airplane_mode)
                             showDialog.value = true
-                        } else {
+                        }
+                        else {
                             val destination = Utils.uriUserPart(peerUri)
                             if (Utils.sendSms(ctx, destination, msgText)) {
                                 msg.direction = MESSAGE_UP
                                 newMessage.value = TextFieldValue("")
                                 viewModel.updateAorPeerMessage(aor, peerUri, "")
                                 keyboardController?.hide()
-                            } else {
+                            }
+                            else {
                                 Toast.makeText(
                                     ctx, "${ctx.getString(R.string.message_failed)}!",
                                     Toast.LENGTH_SHORT
@@ -629,38 +606,36 @@ private fun NewMessage(
                                 msg.responseReason = ctx.getString(R.string.message_failed)
                             }
                         }
-                    } else {
-                        if (Utils.isTelUri(peerUri))
+                    }
+                    else {
+                        if (Utils.isTelUri(peerUri)) {
                             if (ua.account.telProvider == "") {
                                 dialogMessage.value = String.format(
                                     ctx.getString(R.string.no_telephony_provider),
                                     Utils.plainAor(aor)
                                 )
                                 showDialog.value = true
-                            } else {
-                                msgUri = Utils.telToSip(peerUri, ua.account)
                             }
+                            else
+                                msgUri = Utils.telToSip(peerUri, ua.account)
+                        }
                         else
                             msgUri = peerUri
-                        if (msgUri != "")
-                            if (Api.message_send(
-                                    ua.uap,
-                                    msgUri,
-                                    msgText,
-                                    time.toString()
-                                ) != 0
-                            ) {
+                        if (msgUri != "") {
+                            if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
                                 Toast.makeText(
                                     ctx, "${ctx.getString(R.string.message_failed)}!",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 msg.direction = MESSAGE_UP_FAIL
                                 msg.responseReason = ctx.getString(R.string.message_failed)
-                            } else {
+                            }
+                            else {
                                 newMessage.value = TextFieldValue("")
                                 viewModel.updateAorPeerMessage(aor, peerUri, "")
                                 keyboardController?.hide()
                             }
+                        }
                     }
                 }
             },

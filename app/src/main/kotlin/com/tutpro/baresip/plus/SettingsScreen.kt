@@ -25,14 +25,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -155,23 +156,14 @@ private fun SettingsScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(
-                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     title = {
-                        Text(
-                            text = stringResource(R.string.configuration),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = stringResource(R.string.configuration), fontWeight = FontWeight.Bold)
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -183,17 +175,14 @@ private fun SettingsScreen(
                         IconButton(onClick = onBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null,
+                                contentDescription = "Back",
                             )
                         }
                     },
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     actions = {
                         IconButton(onClick = checkOnClick) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Check"
-                            )
+                            Icon(imageVector = Icons.Filled.Check, contentDescription = "Check")
                         }
                     },
                 )
@@ -207,13 +196,9 @@ private fun SettingsScreen(
                 title = stringResource(R.string.restart_request),
                 message = stringResource(R.string.config_restart),
                 firstButtonText = stringResource(R.string.cancel),
-                onFirstClicked = {
-                    navController.navigateUp()
-                },
+                onFirstClicked = { navController.navigateUp() },
                 lastButtonText = stringResource(R.string.restart),
-                onLastClicked = {
-                    onRestartApp()
-                },
+                onLastClicked = { onRestartApp() },
             )
         }
 
@@ -366,9 +351,7 @@ private fun SettingsContent(
                     },
                 fontSize = 18.sp
             )
-            val isDropDownExpanded = remember {
-                mutableStateOf(false)
-            }
+            val isDropDownExpanded = remember { mutableStateOf(false) }
             val familyNames = listOf("--",  "IPv4", "IPv6")
             val familyValues = listOf("",  "ipv4", "ipv6")
             val itemPosition = remember { mutableIntStateOf(familyValues.indexOf(addressFamily)) }
@@ -376,9 +359,7 @@ private fun SettingsContent(
                 Row(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
                     Text(text = familyNames[itemPosition.intValue])
                     Icon(
@@ -390,9 +371,8 @@ private fun SettingsContent(
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = {
-                        isDropDownExpanded.value = false
-                    }) {
+                    onDismissRequest = { isDropDownExpanded.value = false }
+                ) {
                     familyNames.forEachIndexed { index, family ->
                         DropdownMenuItem(
                             text = { Text(text = family) },
@@ -422,9 +402,7 @@ private fun SettingsContent(
             OutlinedTextField(
                 value = listenAddress,
                 placeholder = { Text(stringResource(R.string._0_0_0_0_5060)) },
-                onValueChange = {
-                    viewModel.listenAddress.value = it
-                },
+                onValueChange = { viewModel.listenAddress.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -452,9 +430,7 @@ private fun SettingsContent(
             val transportProtocols by viewModel.transportProtocols.collectAsState()
             OutlinedTextField(
                 value = transportProtocols,
-                onValueChange = {
-                    viewModel.transportProtocols.value = it
-                },
+                onValueChange = { viewModel.transportProtocols.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -481,9 +457,7 @@ private fun SettingsContent(
             val dnsServers by viewModel.dnsServers.collectAsState()
             OutlinedTextField(
                 value = dnsServers,
-                onValueChange = {
-                    viewModel.dnsServers.value = it
-                },
+                onValueChange = { viewModel.dnsServers.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -700,7 +674,7 @@ private fun SettingsContent(
                 checked = caFile,
                 onCheckedChange = {
                     viewModel.caFile.value = it
-                    if (it) {
+                    if (it)
                         if (VERSION.SDK_INT < 29) {
                             viewModel.caFile.value = false
                             val permission = Manifest.permission.READ_EXTERNAL_STORAGE
@@ -735,7 +709,6 @@ private fun SettingsContent(
                         }
                         else
                             Utils.selectInputFile(caCertsRequest)
-                    }
                     else {
                         Utils.deleteFile(File(BaresipService.filesPath + "/ca_certs.crt"))
                         restart = true
@@ -778,9 +751,7 @@ private fun SettingsContent(
         val uniqueContactUriTitle = stringResource(R.string.unique_contact_uri)
         val uniqueContactUriHelp = stringResource(R.string.unique_contact_uri_help)
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -811,9 +782,7 @@ private fun SettingsContent(
         ) {
             Text(
                 text = stringResource(R.string.audio_settings),
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { navController.navigate("audio") },
+                modifier = Modifier.weight(1f).clickable { navController.navigate("audio") },
                 fontSize = 18.sp,
                 fontWeight = FontWeight. Bold
             )
@@ -845,16 +814,12 @@ private fun SettingsContent(
             val frameSizes = mutableListOf<String>()
             frameSizes.addAll(Config.videoSizes)
             val sizeCount = frameSizes.size
-            val itemPosition = remember {
-                mutableIntStateOf(frameSizes.indexOf(videoSize))
-            }
+            val itemPosition = remember { mutableIntStateOf(frameSizes.indexOf(videoSize)) }
             Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
                     Text(text = frameSizes[itemPosition.intValue])
                     Icon(
@@ -899,9 +864,7 @@ private fun SettingsContent(
             OutlinedTextField(
                 value = videoFps,
                 placeholder = { Text(videoFpsTitle) },
-                onValueChange = {
-                    viewModel.videoFps.value = it
-                },
+                onValueChange = { viewModel.videoFps.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -1102,14 +1065,13 @@ private fun SettingsContent(
                 val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
                 viewModel.defaultDialer.value = isHeld
                 if (isHeld) {
-                    if (Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS))) {
+                    if (Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS)))
                         BaresipService.instance?.addMobileUserAgent()
-                    } else {
+                    else
                         requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_NUMBERS)
-                    }
-                } else {
-                    BaresipService.instance?.addMobileUserAgent()
                 }
+                else
+                    BaresipService.instance?.addMobileUserAgent()
             }
             Switch(
                 checked = defaultDialer,
@@ -1144,9 +1106,7 @@ private fun SettingsContent(
         val defaultMessagingAppHelp = stringResource(R.string.default_messaging_app_help)
         val messagingRoleNotAvailableMessage = stringResource(R.string.messaging_role_not_available)
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1183,13 +1143,13 @@ private fun SettingsContent(
                         else
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_SMS))
                                 messagingRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS))
-                    } else {
+                    }
+                    else
                         try {
                             messagingRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                         } catch (e: ActivityNotFoundException) {
                             Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
-                    }
                 }
             )
         }
@@ -1277,9 +1237,7 @@ private fun SettingsContent(
                     dialogTitle.value = confirmationText
                     dialogMessage.value = resetConfigAlert
                     firstButtonText.value = cancelButtonText
-                    onFirstClicked.value = {
-                        reset = false
-                    }
+                    onFirstClicked.value = { reset = false }
                     lastButtonText.value = resetButtonText
                     onLastClicked.value = {
                         Config.reset()
@@ -1338,10 +1296,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     val noticeTitle = ctx.getString(R.string.notice)
 
     if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
-        Config.replaceVariable(
-            "auto_start",
-            if (viewModel.autoStart.value) "yes" else "no"
-        )
+        Config.replaceVariable("auto_start", if (viewModel.autoStart.value) "yes" else "no")
         save = true
     }
 
@@ -1401,7 +1356,8 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
                 showAlert.value = true
                 return false
             }
-        } else {
+        }
+        else {
             Config.replaceVariable("dyn_dns", "yes")
             Config.updateDnsServers(BaresipService.dnsServers)
         }
@@ -1410,8 +1366,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     }
 
     if ((Config.variable("sip_verify_server") == "yes") != viewModel.verifyServer.value) {
-        Config.replaceVariable("sip_verify_server",
-            if (viewModel.verifyServer.value) "yes" else "no")
+        Config.replaceVariable("sip_verify_server", if (viewModel.verifyServer.value) "yes" else "no")
         Api.config_verify_server_set(viewModel.verifyServer.value)
         save = true
     }
@@ -1456,8 +1411,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
     }
 
     if ((Config.variable("sip_cuser_random") == "yes") != viewModel.uniqueContactUri.value) {
-        Config.replaceVariable("sip_cuser_random",
-            if (viewModel.uniqueContactUri.value) "yes" else "no")
+        Config.replaceVariable("sip_cuser_random", if (viewModel.uniqueContactUri.value) "yes" else "no")
         save = true
         restart = true
     }
@@ -1471,25 +1425,20 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         Preferences(ctx).displayTheme = newDisplayTheme
         BaresipService.darkTheme.value = darkTheme
         AppCompatDelegate.setDefaultNightMode(newDisplayTheme)
-        Config.replaceVariable("dark_theme",
-            if (darkTheme) "yes" else "no")
+        Config.replaceVariable("dark_theme", if (darkTheme) "yes" else "no")
         save = true
     }
 
     val dynamicColors = viewModel.dynamicColors.value
     if (BaresipService.dynamicColors.value != dynamicColors) {
         BaresipService.dynamicColors.value = dynamicColors
-        Config.replaceVariable("dynamic_colors",
-            if (dynamicColors) "yes" else "no")
+        Config.replaceVariable("dynamic_colors", if (dynamicColors) "yes" else "no")
         save = true
     }
 
     val colorblind = viewModel.colorblind.value
     if ((Config.variable("colorblind") == "yes") != colorblind) {
-        Config.replaceVariable(
-            "colorblind",
-            if (colorblind) "yes" else "no"
-        )
+        Config.replaceVariable("colorblind", if (colorblind) "yes" else "no")
         BaresipService.colorblind = colorblind
         UserAgent.updateColorblindStatus()
         val baresipService = Intent(ctx, BaresipService::class.java)
@@ -1500,10 +1449,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
     val proximitySensing = viewModel.proximitySensing.value
     if ((Config.variable("proximity_sensing") == "yes") != proximitySensing) {
-        Config.replaceVariable(
-            "proximity_sensing",
-            if (proximitySensing) "yes" else "no"
-        )
+        Config.replaceVariable("proximity_sensing", if (proximitySensing) "yes" else "no")
         BaresipService.proximitySensing = proximitySensing
         save = true
     }
@@ -1536,9 +1482,9 @@ private fun addMissingPorts(addressList: String): String {
     if (addressList == "") return ""
     var result = ""
     for (addr in addressList.split(","))
-        result = if (Utils.checkIpPort(addr)) {
+        result = if (Utils.checkIpPort(addr))
             "$result,$addr"
-        } else {
+        else {
             if (Utils.checkIpV4(addr))
                 "$result,$addr:53"
             else
