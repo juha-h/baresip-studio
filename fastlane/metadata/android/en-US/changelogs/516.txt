@@ -1,0 +1,3 @@
+- Improved edge-to-edge implementation on all screens
+- When incoming call or message arrives and baresip is not running, start baresip and show notification
+- New translations (Spanish)
