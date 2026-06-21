@@ -1,0 +1,1 @@
+- வலைப்பக்கத்திலிருந்து புதிய கணக்கை ஓரளவு தானாக உள்ளமைப்பதற்கான வாய்ப்பு சேர்க்கப்பட்டது (விவரங்களுக்கு https://github.com/juha-h/baresip-studio/wiki/Automatic-Account-Configuration ஐப் பார்க்கவும்)

@@ -1,0 +1,2 @@
+- SRTP related security fix இருந்து upstream
+- புதிய செக் மொழிபெயர்ப்புகள்
