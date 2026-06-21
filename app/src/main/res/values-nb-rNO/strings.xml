@@ -30,14 +30,14 @@
     <string name="chat_with">Sludre med %1$s</string>
     <string name="new_message">Ny melding</string>
     <string name="long_message_question">Ønsker du å slette meldingen eller legge til likemannen \"%1$s\" til i kontaktlisten\?</string>
-    <string name="short_message_question">Ønsker du å slette meldingen\?</string>
+    <string name="short_message_question">Ønsker du å slette meldingen?</string>
     <string name="add_contact">Legg til kontakt</string>
     <string name="sending_failed">Meldingsforsendelse mislyktes</string>
     <string name="chats">Sludrehistorikk</string>
     <string name="today">I dag</string>
     <string name="you">Deg</string>
     <string name="new_chat_peer">Ny sludringslikemann</string>
-    <string name="long_chat_question">Ønsker du å slette samtalen med likemannen \"%1$s\" eller legge vedkommende til i kontaktlisten\?</string>
+    <string name="long_chat_question">Ønsker du å slette samtalen med likemannen \"%1$s\" eller legge vedkommende til i kontaktlisten?</string>
     <string name="configuration">Oppsett</string>
     <string name="start_automatically">Start automatisk</string>
     <string name="listen_address">Lytteadresse</string>
