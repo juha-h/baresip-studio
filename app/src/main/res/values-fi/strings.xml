@@ -289,7 +289,6 @@
         puhelu tai viesti estetään.
     </string>
     <string name="blocking_delete_alert">Haluatko poistaa estosäännön \'%1$s\'\?</string>
-
     <!-- Blocked Activity -->
     <string name="blocked">Estetyt</string>
     <string name="blocked_calls">Estetyt puhelut</string>
@@ -327,7 +326,7 @@
     <string name="new_message">Uusi viesti</string>
     <string name="long_message_question">Haluatko poistaa viestin tai
     luoda uuden yhteystiedon \'%1$s\'\?</string>
-    <string name="short_message_question">Haluatko poistaa viestin\?</string>
+    <string name="short_message_question">Haluatko poistaa viestin?</string>
     <string name="add_contact">Lisää yhteystieto</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
     <string name="message_failed">Epäonnistui</string>
