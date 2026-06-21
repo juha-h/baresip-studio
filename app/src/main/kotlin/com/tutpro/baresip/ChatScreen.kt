@@ -37,8 +37,6 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -191,7 +189,6 @@ private fun ChatScreen(
             if (areMessagesLoaded)
                 ChatContent(
                     ctx,
-                    navController,
                     contentPadding,
                     account, peerUri,
                     chatMessages,
@@ -286,7 +283,6 @@ private fun TopAppBar(
 @Composable
 private fun ChatContent(
     ctx: Context,
-    navController: NavController,
     contentPadding: PaddingValues,
     account: Account,
     peerUri: String,
@@ -299,7 +295,7 @@ private fun ChatContent(
     ) {
         Account(ctx, account)
         Spacer(modifier = Modifier.weight(1f))
-        Messages(ctx, navController, account, peerUri, messages, onMessageDeleted)
+        Messages(ctx, account, peerUri, messages, onMessageDeleted)
     }
 }
 
@@ -317,7 +313,6 @@ private fun Account(ctx: Context, account: Account) {
 @Composable
 private fun Messages(
     ctx: Context,
-    navController: NavController,
     account: Account,
     peerUri: String,
     messages: List<Message>,
@@ -389,42 +384,28 @@ private fun Messages(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(end = 12.dp)
             ) {
-                Button(
+                CustomElements.Button(
                     onClick = {
-                        if (Contact.findContact(peerUri) == null) {
-                            dialogMessage.value = String.format(
-                                ctx.getString(R.string.long_message_question),
-                                peerUri
-                            )
-                            secondButtonText.value = ctx.getString(R.string.add_contact)
-                            secondAction.value = { navController.navigate("contact/$peerUri/new") }
-                            lastButtonText.value = ctx.getString(R.string.delete)
-                            lastAction.value = {
-                                message.delete()
-                                onMessageDeleted()
-                            }
-                        } else {
-                            dialogMessage.value = ctx.getString(R.string.short_message_question)
-                            secondButtonText.value = ""
-                            lastButtonText.value = ctx.getString(R.string.delete)
-                            lastAction.value = {
-                                message.delete()
-                                onMessageDeleted()
-                            }
+                        dialogMessage.value = ctx.getString(R.string.short_message_question)
+                        secondButtonText.value = ""
+                        lastButtonText.value = ctx.getString(R.string.delete)
+                        lastAction.value = {
+                            message.delete()
+                            onMessageDeleted()
                         }
                         showDialog.value = true
+                    },
+                    onLongClick = {
                     },
                     shape = if (message.direction == MESSAGE_DOWN)
                         RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
                     else
                         RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                            if (message.direction == MESSAGE_DOWN)
-                                MaterialTheme.colorScheme.secondaryContainer
-                            else
-                                MaterialTheme.colorScheme.primaryContainer
-                    ),
+                    color =
+                        if (message.direction == MESSAGE_DOWN)
+                            MaterialTheme.colorScheme.secondaryContainer
+                        else
+                            MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()

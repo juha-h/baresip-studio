@@ -290,6 +290,7 @@ class MainActivity : ComponentActivity() {
                     callsScreenRoute(navController, viewModel)
                     callDetailsScreenRoute(navController, viewModel)
                     blockedScreenRoute(navController)
+                    blockingScreenRoute(navController)
                     chatsScreenRoute(navController)
                     chatScreenRoute(navController, viewModel)
                 }

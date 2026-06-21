@@ -553,6 +553,7 @@ class BaresipService: Service() {
                 }
 
                 Blocked.restore()
+                BlockRule.restore()
 
                 val recordings = File(filesDir, "recordings")
 
@@ -988,6 +989,11 @@ class BaresipService: Service() {
                             )
                         else if (ua.account.blockHidden && peerUri.contains("anonymous"))
                             getString(R.string.hidden_call_blocked)
+                        else if (isBlocked(peerUri))
+                            String.format(
+                                getString(R.string.call_blocked),
+                                Utils.friendlyUri(this, peerUri, ua.account)
+                            )
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else
@@ -1451,6 +1457,28 @@ class BaresipService: Service() {
         }
 
         val aor = ua.account.aor
+
+        if ((ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) ||
+            (ua.account.blockHidden && peerUri.contains("anonymous")) ||
+            isBlocked(peerUri)) {
+            Log.d(TAG, "Auto-rejecting blocked message from $peerUri")
+            toast(
+                if (ua.account.blockHidden && peerUri.contains("anonymous"))
+                    getString(R.string.hidden_message_blocked)
+                else
+                    String.format(
+                        getString(R.string.message_blocked),
+                        Utils.friendlyUri(this, peerUri, ua.account)
+                    )
+            )
+            Blocked(
+                ua.account.aor,
+                peerUri,
+                "message",
+                GregorianCalendar().timeInMillis
+            ).add()
+            return
+        }
 
         // Check for duplicates
         val lastMsg = messages.lastOrNull { m -> m.aor == aor }
@@ -2958,6 +2986,14 @@ class BaresipService: Service() {
         val calls = ArrayList<Call>()
         var callHistory = ArrayList<CallHistoryNew>()
         var blocked = ArrayList<Blocked>()
+        var blockRules = mutableListOf<BlockRule>()
+
+        fun isBlocked(uri: String): Boolean {
+            for (rule in blockRules) {
+                if (rule.matches(uri)) return true
+            }
+            return false
+        }
 
         var contactsMode by mutableStateOf("baresip")
         var addressFamily = ""

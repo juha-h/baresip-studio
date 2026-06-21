@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -121,7 +120,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -417,8 +416,7 @@ private fun Calls(
                                         peerNameWithLabel, callText
                                     )
                                     secondButtonText.value = ""
-                                    thirdButtonText.value = ctx.getString(R.string.copy_uri)
-                                    thirdAction.value = { Utils.copyToClipboard(ctx, peerUri) }
+                                    thirdButtonText.value = ""
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = { removeFromHistory(callHistory, callRow) }
                                 }
@@ -433,8 +431,12 @@ private fun Calls(
                                         val uri = Utils.sipToTel(peerUri)
                                         navController.navigate("contact/$uri/new")
                                     }
-                                    thirdButtonText.value = ctx.getString(R.string.copy_uri)
-                                    thirdAction.value = { Utils.copyToClipboard(ctx, peerUri)
+                                    thirdButtonText.value = ctx.getString(R.string.block)
+                                    thirdAction.value = {
+                                        if (!BlockRule.exists(peerUri)) {
+                                            BaresipService.blockRules.add(BlockRule(peerUri))
+                                            BlockRule.save()
+                                        }
                                     }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = { removeFromHistory(callHistory, callRow) }

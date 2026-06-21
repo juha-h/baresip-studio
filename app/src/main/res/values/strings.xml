@@ -271,6 +271,15 @@
     <string name="hidden_call_blocked">Auto-rejected call from hidden caller</string>
     <string name="message_blocked">Auto-rejected blocked message from \`%1$s\`</string>
     <string name="hidden_message_blocked">Auto-rejected message from hidden sender</string>
+    <!-- Blocking Activity -->
+    <string name="blocking">Blocking</string>
+    <string name="blocking_list">Blocking List</string>
+    <string name="new_blocking_rule">New Blocking Rule</string>
+    <string name="blocking_rule_help">Blocking rule can be either a string or a regular expression.
+        If the string is included in the peer URI or regular expression matches,
+        the call or message will be blocked.
+    </string>
+    <string name="blocking_delete_alert">Do you want to delete blocking rule \'%1$s\'\?</string>
     <!-- Blocked Activity -->
     <string name="blocked">Blocked</string>
     <string name="blocked_calls">Blocked Calls</string>
@@ -287,10 +296,9 @@
     <string name="direction">Direction</string>
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
-    <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts, copy its URI,
-        or delete this %2$s from call history\?</string>
-    <string name="calls_delete_question">Do you want to copy URI of \'%1$s\' or delete this %2$s
-        from call history\?</string>
+    <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts, block it,
+        or delete %2$s from call history\?</string>
+    <string name="calls_delete_question">Do you want to delete %2$s from call history\?</string>
     <string name="disable_history">Disable</string>
     <string name="enable_history">Enable</string>
     <string name="delete_history_alert">Do you want to delete call history of account \'%1$s\'\?</string>
@@ -308,7 +316,7 @@
     <string name="chat_with">Chat with %1$s</string>
     <string name="new_message">New message</string>
     <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts\?</string>
-    <string name="short_message_question">Do you want to delete message\?</string>
+    <string name="short_message_question">Do you want to delete this message\?</string>
     <string name="add_contact">Add Contact</string>
     <string name="sending_failed">Sending of message failed</string>
     <string name="message_failed">Failed</string>
@@ -317,8 +325,8 @@
     <string name="today">Today</string>
     <string name="you">You</string>
     <string name="new_chat_peer">New Chat Peer</string>
-    <string name="long_chat_question">Do you want to delete chat with peer \'%1$s\' or
-        add peer to contacts\?</string>
+    <string name="long_chat_question">Do you want to add \'%1$s\' to contacts, block it, or
+        delete this chat?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'\?</string>
     <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'\?</string>
     <!-- Codecs Activity -->
@@ -510,6 +518,7 @@
     <string name="deny">Deny</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
+    <string name="block">Block</string>
     <string name="edit">Edit</string>
     <string name="copy_uri">Copy URI</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
