@@ -36,7 +36,7 @@
     <string name="chat_with">Discuție cu %1$s</string>
     <string name="new_message">Mesaj nou</string>
     <string name="long_message_question">Doriți să ștergeți mesajul sau să adăugați \'%1$s\' la contacte\?</string>
-    <string name="short_message_question">Doriți să ștergeți mesajul\?</string>
+    <string name="short_message_question">Doriți să ștergeți mesajul?</string>
     <string name="add_contact">Adaugă contact</string>
     <string name="sending_failed">Trimiterea mesajului a eșuat</string>
     <string name="message_failed">Eșuat</string>
@@ -44,7 +44,7 @@
     <string name="today">Azi</string>
     <string name="you">Tu</string>
     <string name="new_chat_peer">Discuție cu un contact nou</string>
-    <string name="long_chat_question">Doriți să ștergeți discuția cu \'%1$s\' sau să adăugați la contacte\?</string>
+    <string name="long_chat_question">Doriți să ștergeți discuția cu \'%1$s\' sau să adăugați la contacte?</string>
     <string name="short_chat_question">Doriți să ștergeți discuția cu \'%1$s\'\?</string>
     <string name="configuration">Configurație</string>
     <string name="start_automatically">Pornește automat</string>
