@@ -90,8 +90,7 @@
     <string name="today">днес</string>
     <string name="you">Вие</string>
     <string name="new_chat_peer">Нов потребител за чат</string>
-    <string name="long_chat_question">Искате ли да изтриете чата с този потребител \'%1$s\' или
-		да го добавяне в контактите?</string>
+    <string name="long_chat_question">Искате ли да изтриете чата с този потребител \'%1$s\' или да го добавяне в контактите?</string>
     <string name="short_chat_question">Искате ли да изтриете чата с \'%1$s\'?</string>
     <string name="delete_chats_alert">Искате ли да изтриете историята на чата на акаунта \'%1$s\'?</string>
     <!-- Config Activity -->
