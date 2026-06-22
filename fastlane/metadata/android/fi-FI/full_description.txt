@@ -3,7 +3,7 @@ ja mobiili puhelu- ja viestisovellus Androidille.
 
 Tällä hetkellä baresip-sovellus tukee SIP ja mobiili äänipuheluita ja tekstiviestejä.  Niiden lisäksi sovellus tukee konferenssipuheluita, ilmoittaa vastaajaviesteistä sekä mahdollistaa sokeat ja osallistuvat puhelunsiirrot, kun SIP on käytössä. Äänen koodaustapa voidaan valite seuraavista: Opus, AMR, Codec2, G.729, G.722, G.722.1 tai PCMU/PCMA. Turvallisuus saavutetaan TLS tai WSS SIP-signalointikuljetuksella ja ZRTP- tai (DTLS) SRTP-mediakapseloinnilla.
 
-Baresip-sovelluksen kehitystä motivoi tarve turvalliselle, avoimen lähdekoodin SIP-pohjaiselle VoIP-käyttäjäagentille Androidille, joka ei ole riippuvainen kolmannen osapuolen työntöilmoituspalveluista.  Mobiilipuheluiden ja SMS-viestien tuki sekä baresip-sovellukseen sisältyvä yhteystieto-ominaisuus vähentävät tarvittavien Android-sovellusten lukumäärää.
+Baresip-sovelluksen kehitystä motivoi tarve turvalliselle, avoimen lähdekoodin SIP-pohjaiselle VoIP-käyttäjäagentille Androidille, joka ei ole riippuvainen kolmannen osapuolen työntöilmoituspalveluista.  Yhteystiedot sekä mobiilipuheluiden ja SMS-viestien tuki vähentävät tarvittavien Android-sovellusten lukumäärää.
 
 Jos haluat käyttää videopuheluita voit tämän sovelluksen sijaan asentaa sen sisarsovelluksen baresip+.
 
