@@ -977,23 +977,30 @@ class BaresipService: Service() {
                     "incoming call" -> {
                         speakerPhone = speakerPhoneAuto
                         val peerUri = ev[1]
-                    val toastMsg = if (Call.isAnyCallActive(this))
+                        var blockedCall = false
+                        val toastMsg = if (Call.isAnyCallActive(this))
                             String.format(
                                 getString(R.string.call_auto_rejected),
                                 Utils.friendlyUri(this, peerUri, ua.account)
                             )
-                        else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri)
+                        else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
+                            blockedCall = true
                             String.format(
 			                    getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account)
                             )
-                        else if (ua.account.blockHidden && peerUri.contains("anonymous"))
+                        }
+                        else if (ua.account.blockHidden && peerUri.contains("anonymous")) {
+                            blockedCall = true
                             getString(R.string.hidden_call_blocked)
-                        else if (isBlocked(peerUri))
+                        }
+                        else if (isBlocked(peerUri)) {
+                            blockedCall = true
                             String.format(
                                 getString(R.string.call_blocked),
                                 Utils.friendlyUri(this, peerUri, ua.account)
                             )
+                        }
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
                             getString(R.string.no_calls)
                         else
@@ -1003,8 +1010,7 @@ class BaresipService: Service() {
                             Api.sip_treply(callp, 486, "Busy Here")
                             Api.bevent_stop(ev[2].toLong())
                             toast(toastMsg)
-                            if (toastMsg.contains(getString(R.string.call_blocked)) ||
-                                toastMsg.contains(getString(R.string.hidden_call_blocked))) {
+                            if (blockedCall) {
                                 if (ua.account.callHistory)
                                     Blocked(
                                         ua.account.aor,
