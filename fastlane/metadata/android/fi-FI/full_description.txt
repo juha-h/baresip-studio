@@ -5,6 +5,8 @@ Tällä hetkellä baresip-sovellus tukee SIP ja mobiili äänipuheluita ja tekst
 
 Baresip-sovelluksen kehitystä motivoi tarve turvalliselle, avoimen lähdekoodin SIP-pohjaiselle VoIP-käyttäjäagentille Androidille, joka ei ole riippuvainen kolmannen osapuolen työntöilmoituspalveluista.  Yhteystiedot sekä mobiilipuheluiden ja SMS-viestien tuki vähentävät tarvittavien Android-sovellusten lukumäärää.
 
+Tämä sovellus voidaan asentaa Android-laitteille, joiden Android-versio on 9 tai uudempi.  Mobiilipuhelut ja SMS-viestit vaativat vähintään Android-version 10.
+
 Jos haluat käyttää videopuheluita voit tämän sovelluksen sijaan asentaa sen sisarsovelluksen baresip+.
 
 Lähdekoodi on saatavilla <a href="https://github.com/juha-h/baresip-studio">GitHubissa</a>, jossa myös ongelmista voi ilmoittaa.
