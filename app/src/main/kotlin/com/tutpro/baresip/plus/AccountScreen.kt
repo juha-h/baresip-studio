@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -164,7 +163,7 @@ private fun AccountScreen(
         }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -604,55 +603,17 @@ private fun AccountContent(
     }
 
     @Composable
-    fun BlockUnknown() {
-        val blockUnknownTitle = stringResource(R.string.block_unknown)
-        val blockUnknownHelp = stringResource(R.string.block_unknown_help)
-        val block by viewModel.blockUnknown.collectAsState()
+    fun Blocking(navController: NavController, aor: String) {
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = blockUnknownTitle,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        alertTitle.value = blockUnknownTitle
-                        alertMessage.value = blockUnknownHelp
-                        showAlert.value = true
-                    },
-                fontSize = 18.sp
-            )
-            Switch(
-                checked = block,
-                onCheckedChange = { viewModel.blockUnknown.value = it }
-            )
-        }
-    }
-
-    @Composable
-    fun BlockHidden() {
-        val blockHiddenTitle = stringResource(R.string.block_hidden)
-        val blockHiddenHelp = stringResource(R.string.block_hidden_help)
-        val block by viewModel.blockHidden.collectAsState()
-        Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(text = blockHiddenTitle,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        alertTitle.value = blockHiddenTitle
-                        alertMessage.value = blockHiddenHelp
-                        showAlert.value = true
-                    },
-                fontSize = 18.sp
-            )
-            Switch(
-                checked = block,
-                onCheckedChange = { viewModel.blockHidden.value = it }
+            Text(
+                text = stringResource(R.string.blocking),
+                modifier = Modifier.weight(1f).clickable { navController.navigate("blocking/$aor") },
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -660,7 +621,7 @@ private fun AccountContent(
     @Composable
     fun AudioCodecs(navController: NavController, aor: String) {
         Row(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth().padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1363,8 +1324,7 @@ private fun AccountContent(
                 CheckOrigin()
             }
         }
-        BlockUnknown()
-        BlockHidden()
+        Blocking(navController, aor)
         if (!ua.account.isMobile) {
             AudioCodecs(navController, aor)
             VideoCodecs(navController, aor)

@@ -253,6 +253,8 @@ private fun Chats(
     val dialogMessage = remember { mutableStateOf("") }
     val secondButtonText = remember { mutableStateOf("") }
     val secondAction = remember { mutableStateOf({}) }
+    val thirdButtonText = remember { mutableStateOf("") }
+    val thirdAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
@@ -264,6 +266,8 @@ private fun Chats(
             firstButtonText = stringResource(R.string.cancel),
             secondButtonText = secondButtonText.value,
             onSecondClicked = secondAction.value,
+            thirdButtonText = thirdButtonText.value,
+            onThirdClicked = thirdAction.value,
             lastButtonText = lastButtonText.value,
             onLastClicked = lastAction.value,
         )
@@ -344,10 +348,17 @@ private fun Chats(
                                     ctx.getString(R.string.long_chat_question),
                                     peerName
                                 )
-                            secondButtonText.value = ctx.getString(R.string.delete)
-                            secondAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
-                            lastButtonText.value = ctx.getString(R.string.add_contact)
-                            lastAction.value = { navController.navigate("contact/${message.peerUri}/new") }
+                            secondButtonText.value = ctx.getString(R.string.add_contact)
+                            secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
+                            thirdButtonText.value = ctx.getString(R.string.block)
+                            thirdAction.value = {
+                                if (!BlockRule.exists(message.peerUri)) {
+                                    BaresipService.blockRules.add(BlockRule(message.peerUri))
+                                    BlockRule.save()
+                                }
+                            }
+                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
                         }
                         showDialog.value = true
                     },
