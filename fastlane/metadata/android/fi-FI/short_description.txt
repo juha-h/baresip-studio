@@ -1,1 +1,1 @@
-Baresip-kirjastoon perustuva SIP- ja mobiilipuhelusovellus Androidille
+Baresip-kirjastoon perustuva SIP ja mobiili puhelu- ja viestisovellus Androidille
