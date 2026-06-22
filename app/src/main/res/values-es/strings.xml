@@ -118,7 +118,6 @@
     <!-- Chat Activity -->
     <string name="chat_with">Chatear con %1$s</string>
     <string name="new_message">Mensaje nuevo</string>
-    <string name="long_message_question">¿Quiere eliminar el mensaje o añadir el par «%1$s» a los contactos\?</string>
     <string name="short_message_question">¿Quiere eliminar el mensaje?</string>
     <string name="add_contact">Añadir contacto</string>
     <string name="sending_failed">Envío de mensaje fallido</string>

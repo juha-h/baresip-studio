@@ -103,8 +103,7 @@
     <string name="call_rejected">通话遭拒</string>
     <string name="chat_with">与 %1$s 聊天</string>
     <string name="new_message">新消息</string>
-    <string name="long_message_question">您要删除消息还是将对方“%1$s”添加到联系人中？</string>
-    <string name="short_message_question">是否要删除此消息？</string>
+    <string name="short_message_question">是否要删除消息？</string>
     <string name="add_contact">添加联系人</string>
     <string name="sending_failed">消息发送失败</string>
     <string name="message_failed">失败</string>

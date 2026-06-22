@@ -173,7 +173,6 @@
     <string name="chats">Chat-historik</string>
     <string name="message_failed">Misslyckades</string>
     <string name="sending_failed">Kunde inte skicka meddelande</string>
-    <string name="long_message_question">Vill du ta bort meddelandet eller lägga till motparten \'%1$s\' till dina kontakter\?</string>
     <string name="decrypt_password">Lösenord för avkryptering</string>
     <string name="encrypt_password">Lösenord för kryptering</string>
     <string name="accounts_help">SIP URI för nytt konto i formatet &lt;användare&gt;@&lt;domän&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Om &lt;port&gt; anges och transportprotokollet inte anges, är standardtransportprotokollet UDP. Om &lt;port&gt; inte anges och transportprotokollet anges, är standardporten 5060 eller 5061 (TLS). Om varken det ena eller det andra anges och ingen utgående proxy specificeras, bestäms kontots registrator (om sådan finns) enbart utifrån domänens DNS-information.</string>

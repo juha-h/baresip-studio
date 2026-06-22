@@ -116,7 +116,6 @@
     <string name="delete_history_alert">கணக்கின் அழைப்பு வரலாற்றை \'%1$s\' ஐ நீக்க விரும்புகிறீர்களா?</string>
     <string name="chat_with">%1$s உடன் அரட்டையடிக்கவும்</string>
     <string name="new_message">புதிய செய்தி</string>
-    <string name="long_message_question">செய்திகளை நீக்க விரும்புகிறீர்களா அல்லது தொடர்புகளில் \'%1$s\' ஐ சேர்க்க விரும்புகிறீர்களா?</string>
     <string name="short_message_question">செய்தியை நீக்க விரும்புகிறீர்களா?</string>
     <string name="add_contact">தொடர்பைச் சேர்க்கவும்</string>
     <string name="sending_failed">செய்தியை அனுப்புவது தோல்வியடைந்தது</string>

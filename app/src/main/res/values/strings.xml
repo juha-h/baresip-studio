@@ -315,7 +315,6 @@
     <!-- Chat Activity -->
     <string name="chat_with">Chat with %1$s</string>
     <string name="new_message">New message</string>
-    <string name="long_message_question">Do you want to delete message or add peer \'%1$s\' to contacts?</string>
     <string name="short_message_question">Do you want to delete this message?</string>
     <string name="add_contact">Add Contact</string>
     <string name="sending_failed">Sending of message failed</string>

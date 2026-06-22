@@ -324,8 +324,6 @@
     <!-- Chat Activity -->
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
-    <string name="long_message_question">Haluatko poistaa viestin tai
-    luoda uuden yhteystiedon \'%1$s\'\?</string>
     <string name="short_message_question">Haluatko poistaa viestin?</string>
     <string name="add_contact">Lisää yhteystieto</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
