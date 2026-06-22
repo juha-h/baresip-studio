@@ -275,9 +275,9 @@
     <string name="blocking">Blocking</string>
     <string name="blocking_list">Blocking List</string>
     <string name="new_blocking_rule">New Blocking Rule</string>
-    <string name="blocking_rule_help">Blocking rule can be either a string or a regular expression.
-        If the string is included in the peer URI or regular expression matches,
-        the call or message will be blocked.
+    <string name="blocking_rule_help">Blocking rule can be either a plain string or a
+        regular expression string. If plain string is included in the peer URI or if
+        regular expression string matches the peer URI, the call or message will be blocked.
     </string>
     <string name="blocking_delete_alert">Do you want to delete blocking rule \'%1$s\'?</string>
     <!-- Blocked Activity -->
