@@ -94,7 +94,7 @@
     <string name="configuration">Ajustes</string>
     <string name="delete_chats_alert">Você quer excluir o histórico de chat da conta \'%1$s\'\?</string>
     <string name="short_chat_question">Você quer excluir o chat com \'%1$s\'\?</string>
-    <string name="long_chat_question">Você quer excluir o chat com o par \'%1$s\' ou adicionar o par aos contatos\?</string>
+    <string name="long_chat_question">Você quer excluir o chat com o par \'%1$s\' ou adicionar o par aos contatos?</string>
     <string name="new_chat_peer">Novo Par de Chat</string>
     <string name="you">Você</string>
     <string name="today">Hoje</string>
@@ -102,8 +102,7 @@
     <string name="message_failed">Falhou</string>
     <string name="sending_failed">Envio de mensagem falhou</string>
     <string name="add_contact">Adicionar Contato</string>
-    <string name="short_message_question">Você quer excluir a mensagem\?</string>
-    <string name="long_message_question">Você quer excluir a mensagem ou adicionar o ponto \'%1$s\' aos contatos\?</string>
+    <string name="short_message_question">Você quer excluir a mensagem?</string>
     <string name="new_message">Nova mensagem</string>
     <string name="chat_with">Falar com %1$s</string>
     <string name="delete_history_alert">Você quer excluir o histórico de chamadas da conta \'%1$s\'\?</string>

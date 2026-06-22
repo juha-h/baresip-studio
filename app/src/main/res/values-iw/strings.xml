@@ -249,7 +249,6 @@
     <string name="recording_saved">ההקלטה נשמרה</string>
     <string name="chat_with">צ\'אט עם %1$s</string>
     <string name="new_message">הודעה חדשה</string>
-    <string name="long_message_question">האם ברצונך למחוק הודעה או להוסיף צד (peer) \'%1$s\' לאנשי הקשר?</string>
     <string name="short_message_question">האם ברצונך למחוק את ההודעה?</string>
     <string name="add_contact">הוספת איש קשר</string>
     <string name="sending_failed">שליחת ההודעה נכשלה</string>

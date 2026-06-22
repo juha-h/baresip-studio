@@ -279,6 +279,16 @@
     <string name="hidden_call_blocked">Estetty puhelu tuntemattomalta soittajalta</string>
     <string name="message_blocked">Estetty viesti vieraalta lähettäjältä \`%1$s\`</string>
     <string name="hidden_message_blocked">Estetty viesti tuntemattomalta lähettäjältä</string>
+    <!-- Blocking Activity -->
+    <string name="blocking">Estot</string>
+    <string name="blocking_list">Estolista</string>
+    <string name="new_blocking_rule">Uusi estosääntö</string>
+    <string name="blocking_rule_help">Estosääntö voi olla joko merkkijono tai
+        säännöllinen lauseke.  Jos merkkijono löytyy soittajan tai viestin
+        lähettäjän URI:sta tai jos säännöllinen lauseke sopii siihen, niin
+        puhelu tai viesti estetään.
+    </string>
+    <string name="blocking_delete_alert">Haluatko poistaa estosäännön \'%1$s\'\?</string>
     <!-- Blocked Activity -->
     <string name="blocked">Estetyt</string>
     <string name="blocked_calls">Estetyt puhelut</string>
@@ -294,11 +304,10 @@
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
-    <string name="calls_add_delete_question">Haluatko luoda kohteelle \'%1$s\' uuden yhteystiedon,
-        kopioida sen URI:n tai poistaa %2$s puheluhistoriasta\?
+    <string name="calls_add_delete_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai
+        estolistaan tai poistaa %2$s puheluhistoriasta\?
     </string>
-    <string name="calls_delete_question">Haluatko kopioida yhteystiedon \'%1$s\' URI:n tai poistaa
-        %2$s puheluhistoriasta\?</string>
+    <string name="calls_delete_question">Haluatko poistaa %2$s puheluhistoriasta\?</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
@@ -315,9 +324,7 @@
     <!-- Chat Activity -->
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
-    <string name="long_message_question">Haluatko poistaa viestin tai
-    luoda uuden yhteystiedon \'%1$s\'\?</string>
-    <string name="short_message_question">Haluatko poistaa viestin\?</string>
+    <string name="short_message_question">Haluatko poistaa viestin?</string>
     <string name="add_contact">Lisää yhteystieto</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
     <string name="message_failed">Epäonnistui</string>
@@ -326,8 +333,9 @@
     <string name="today">Tänään</string>
     <string name="you">Sinä</string>
     <string name="new_chat_peer">Uusi viestin kohde</string>
-    <string name="long_chat_question">Haluatko poistaa viestiketjun tai
-    luoda uuden yhteystiedon \'%1$s\'\?</string>
+    <string name="long_chat_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai estolistaan
+        tai poistaa tämän viestiketjun?
+    </string>
     <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'\?</string>
     <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian\?</string>
     <!-- Codecs Activity -->
@@ -403,10 +411,10 @@
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
     <string name="no_read_permission">Ei ulkoisen muistin lukuoikeutta</string>
-    <string name="unique_contact_uri">Uniikki Contact URI</string>
-    <string name="unique_contact_uri_help">Jos merkitty, Contact URI:n taataan olevan uniikki.
-        Merkittävä, jos on useammalla tilillä on same SIP URI:n käyttäjäosa, mutta myös
-        suojaa tilejä hyökkäyksiltä.
+    <string name="unique_contact_uri">Uniikki kontakti-URI</string>
+    <string name="unique_contact_uri_help">Jos merkitty, kontakti-URI:n taataan olevan uniikki.
+        Merkittävä, jos on useammalla tilillä on sama SIP URI:n käyttäjäosa, mutta se myös
+        parantaa tilien suojaa hyökkäyksiltä.
     </string>
     <string name="audio_settings">Audio-asetukset</string>
     <string name="speaker_phone">Kaiutin</string>
@@ -531,6 +539,7 @@
     <string name="deny">Estä</string>
     <string name="add">Lisää</string>
     <string name="delete">Poista</string>
+    <string name="block">Estä</string>
     <string name="edit">Muokkaa</string>
     <string name="copy_uri">Kopioi URI</string>
     <string name="copied_to_clipboard">Kopioitu leikepöydälle</string>

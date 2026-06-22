@@ -118,8 +118,7 @@
     <!-- Chat Activity -->
     <string name="chat_with">Chatear con %1$s</string>
     <string name="new_message">Mensaje nuevo</string>
-    <string name="long_message_question">¿Quiere eliminar el mensaje o añadir el par «%1$s» a los contactos\?</string>
-    <string name="short_message_question">¿Quiere eliminar el mensaje\?</string>
+    <string name="short_message_question">¿Quiere eliminar el mensaje?</string>
     <string name="add_contact">Añadir contacto</string>
     <string name="sending_failed">Envío de mensaje fallido</string>
     <string name="message_failed">Ha fallado</string>
@@ -128,8 +127,7 @@
     <string name="today">Hoy</string>
     <string name="you">Usted</string>
     <string name="new_chat_peer">Nuevo compañero de chat</string>
-    <string name="long_chat_question">¿Quieres eliminar el chat con un compañero? \'%1$s\' o
-        agregar pares a los contactos?</string>
+    <string name="long_chat_question">¿Quieres eliminar el chat con un compañero? \'%1$s\' o agregar pares a los contactos?</string>
     <string name="short_chat_question">¿Quiere eliminar el chat con «%1$s»\?</string>
     <string name="delete_chats_alert">¿Quiere eliminar el historial de chat de la cuenta «%1$s»\?</string>
     <!-- Config Activity -->

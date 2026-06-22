@@ -44,11 +44,10 @@
     <string name="calls_add_delete_question">Chcete přidat \'%1$s\' do kontaktů nebo odstranit %2$s z historie hovorů?</string>
     <string name="delete_history_alert">Chcete odstranit historii volání účtu \"%1$s\"\?</string>
     <string name="calls_duration">Trvání</string>
-    <string name="long_chat_question">Chcete smazat chat s účastníkem \'%1$s\' nebo přidat účastníka do kontaktů\?</string>
-    <string name="long_message_question">Chcete odstranit zprávu nebo přidat účastníka \'%1$s\' do kontaktů\?</string>
+    <string name="long_chat_question">Chcete smazat chat s účastníkem \'%1$s\' nebo přidat účastníka do kontaktů?</string>
     <string name="disable_history">Zakázat</string>
     <string name="new_message">Nová zpráva</string>
-    <string name="short_message_question">Chcete zprávu odstranit\?</string>
+    <string name="short_message_question">Chcete zprávu odstranit?</string>
     <string name="calls_delete_question">Chcete odstranit \'%1$s\' %2$s z historie hovorů?</string>
     <string name="chat_with">Chatovat s %1$s</string>
     <string name="sending_failed">Odeslání zprávy se nezdařilo</string>
