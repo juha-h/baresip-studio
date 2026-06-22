@@ -92,8 +92,8 @@
     <string name="time">时间</string>
     <string name="calls_duration">时长</string>
     <string name="playing_recording">正在播放录音…</string>
-    <string name="calls_add_delete_question">您要将“%1$s”添加到联系人中、复制其 URI，还是从通话记录中删除此 %2$s？</string>
-    <string name="calls_delete_question">您要复制“%1$s”的 URI，还是从通话记录中删除此 %2$s？</string>
+    <string name="calls_add_delete_question">您要将“%1$s”添加到联系人，屏蔽它，还是从通话记录中删除 %2$s？</string>
+    <string name="calls_delete_question">是否要从通话记录中删除 %2$s？</string>
     <string name="disable_history">禁用</string>
     <string name="enable_history">启用</string>
     <string name="delete_history_alert">是否要删除账号“%1$s”的通话记录？</string>
@@ -111,7 +111,7 @@
     <string name="today">今天</string>
     <string name="you">您</string>
     <string name="new_chat_peer">新的聊天伙伴</string>
-    <string name="long_chat_question">您要删除与对方“%1$s”的聊天，还是将对方添加到联系人中？</string>
+    <string name="long_chat_question">您要将“%1$s”添加到联系人，屏蔽它，还是删除此聊天？</string>
     <string name="short_chat_question">是否要删除与“%1$s”的聊天？</string>
     <string name="delete_chats_alert">是否要删除账号“%1$s”的聊天记录？</string>
     <string name="audio_codecs">音频编解码器</string>
@@ -415,4 +415,10 @@
     <string name="block_hidden_help">屏蔽来自具有隐藏标识的对等方的来电和消息。</string>
     <string name="hidden_call_blocked">已自动拒绝来自隐藏来电者的来电</string>
     <string name="hidden_message_blocked">已自动拒绝来自隐藏发送者的消息</string>
+    <string name="blocking">屏蔽</string>
+    <string name="blocking_list">屏蔽列表</string>
+    <string name="new_blocking_rule">新建屏蔽规则</string>
+    <string name="blocking_rule_help">屏蔽规则可以是字符串或正则表达式。如果该字符串包含在联系人 URI 中，或者正则表达式匹配，则通话或消息将被屏蔽。</string>
+    <string name="blocking_delete_alert">是否要删除屏蔽规则“%1$s”？</string>
+    <string name="block">屏蔽</string>
 </resources>
