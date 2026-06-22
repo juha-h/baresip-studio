@@ -172,7 +172,6 @@
     <string name="delete_call_alert">Apakah Anda ingin menghapus panggilan ini dari riwayat?</string>
     <string name="chat_with">Obrolan dengan %1$s</string>
     <string name="new_message">Pesan baru</string>
-    <string name="long_message_question">Apakah Anda ingin menghapus pesan atau menambahkan rekan \'%1$s\' ke kontak?</string>
     <string name="short_message_question">Apakah Anda ingin menghapus pesan?</string>
     <string name="add_contact">Tambah Kontak</string>
     <string name="sending_failed">Pengiriman pesan gagal</string>

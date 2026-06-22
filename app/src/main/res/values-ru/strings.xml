@@ -103,7 +103,6 @@
     <string name="restore">Восстановление</string>
     <string name="verify">Запрос на проверку</string>
     <string name="no_calls">baresip требуется разрешение доступа к микрофону для голосовых вызовов.</string>
-    <string name="long_message_question">Хотите удалить сообщения или добавить пользователя \'%1$s\' в контакты?</string>
     <string name="accept">Принять</string>
     <string name="account">Профиль</string>
     <string name="account_allocation_failure">Не могу создать новый аккаунт.</string>

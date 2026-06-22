@@ -29,7 +29,6 @@
     <string name="enable_history">Skru på</string>
     <string name="chat_with">Sludre med %1$s</string>
     <string name="new_message">Ny melding</string>
-    <string name="long_message_question">Ønsker du å slette meldingen eller legge til likemannen \"%1$s\" til i kontaktlisten\?</string>
     <string name="short_message_question">Ønsker du å slette meldingen?</string>
     <string name="add_contact">Legg til kontakt</string>
     <string name="sending_failed">Meldingsforsendelse mislyktes</string>

@@ -35,7 +35,6 @@
     <string name="calls_delete_question">Doriți să ștergeți \'%1$s\' %2$s din istoricul apelurilor?</string>
     <string name="chat_with">Discuție cu %1$s</string>
     <string name="new_message">Mesaj nou</string>
-    <string name="long_message_question">Doriți să ștergeți mesajul sau să adăugați \'%1$s\' la contacte\?</string>
     <string name="short_message_question">Doriți să ștergeți mesajul?</string>
     <string name="add_contact">Adaugă contact</string>
     <string name="sending_failed">Trimiterea mesajului a eșuat</string>
