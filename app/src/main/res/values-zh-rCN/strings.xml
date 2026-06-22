@@ -418,7 +418,7 @@
     <string name="blocking">屏蔽</string>
     <string name="blocking_list">屏蔽列表</string>
     <string name="new_blocking_rule">新建屏蔽规则</string>
-    <string name="blocking_rule_help">屏蔽规则可以是字符串或正则表达式。如果该字符串包含在联系人 URI 中，或者正则表达式匹配，则通话或消息将被屏蔽。</string>
+    <string name="blocking_rule_help">屏蔽规则可以是纯字符串或正则表达式字符串。如果纯字符串包含在联系人 URI 中，或者如果正则表达式与联系人 URI 匹配，则通话或消息将被屏蔽。</string>
     <string name="blocking_delete_alert">是否要删除屏蔽规则“%1$s”？</string>
     <string name="block">屏蔽</string>
 </resources>
