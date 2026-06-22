@@ -283,11 +283,7 @@
     <string name="blocking">Estot</string>
     <string name="blocking_list">Estolista</string>
     <string name="new_blocking_rule">Uusi estosääntö</string>
-    <string name="blocking_rule_help">Estosääntö voi olla joko merkkijono tai
-        säännöllinen lauseke.  Jos merkkijono löytyy soittajan tai viestin
-        lähettäjän URI:sta tai jos säännöllinen lauseke sopii siihen, niin
-        puhelu tai viesti estetään.
-    </string>
+    <string name="blocking_rule_help">Estosääntö voi olla joko tavallinen merkkijono tai säännöllinen lauseke. Jos tavallinen merkkijono löytyy soittajan tai viestin lähettäjän URI:sta tai jos säännöllinen lauseke sopii siihen, niin puhelu tai viesti estetään.</string>
     <string name="blocking_delete_alert">Haluatko poistaa estosäännön \'%1$s\'?</string>
     <!-- Blocked Activity -->
     <string name="blocked">Estetyt</string>
