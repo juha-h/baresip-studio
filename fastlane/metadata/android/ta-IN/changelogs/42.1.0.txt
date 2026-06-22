@@ -1,0 +1,1 @@
+- AppCompat கருப்பொருள் MaterialComponents கருப்பொருள் மூலம் மாற்றப்பட்டது

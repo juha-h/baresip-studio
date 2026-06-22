@@ -1,0 +1,5 @@
+- Fixed Account's ஊடகம் Encoding setting
+- Prevent Google from removing ringback, busy and call waiting tones
+- Ensure that ringback and busy தொனி அரே played in communication mode
+- Improved பிணையம் and DNS சேவையகம் புதுப்பிப்பு management
+- New மொழிபெயர்ப்புகள் (Spanish)

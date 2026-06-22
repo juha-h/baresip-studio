@@ -1,0 +1,2 @@
+- Added notification popup telling why call was closed.
+- Fixed showing of callee யூரி if it contains துறைமுகம் எண் or parameters.

@@ -146,7 +146,7 @@
     <string name="call_answered_elsewhere">Appel répondu ailleurs</string>
     <string name="call_missed">Appel manqué</string>
     <string name="call_rejected">Appel rejeté</string>
-    <string name="short_message_question">Voulez-vous supprimer le message ?</string>
+    <string name="short_message_question">Voulez-vous supprimer le message ?</string>
     <string name="start_automatically_help">Si coché, Baresip démarre automatiquement après le (re)démarrage de l’appareil.</string>
     <string name="battery_optimizations">Optimisations batterie</string>
     <string name="battery_optimizations_help">Désactivez les optimisations de la batterie (recommandé) si vous souhaitez réduire la probabilité qu’Android limite l’accès de Baresip au réseau ou entre en mode veille.</string>
