@@ -103,7 +103,7 @@
     <string name="call_rejected">通话遭拒</string>
     <string name="chat_with">与 %1$s 聊天</string>
     <string name="new_message">新消息</string>
-    <string name="short_message_question">是否要删除消息？</string>
+    <string name="short_message_question">是否要删除此消息？</string>
     <string name="add_contact">添加联系人</string>
     <string name="sending_failed">消息发送失败</string>
     <string name="message_failed">失败</string>
@@ -418,7 +418,7 @@
     <string name="blocking">屏蔽</string>
     <string name="blocking_list">屏蔽列表</string>
     <string name="new_blocking_rule">新建屏蔽规则</string>
-    <string name="blocking_rule_help">屏蔽规则可以是字符串或正则表达式。如果该字符串包含在联系人 URI 中，或者正则表达式匹配，则通话或消息将被屏蔽。</string>
+    <string name="blocking_rule_help">屏蔽规则可以是纯字符串或正则表达式字符串。如果纯字符串包含在联系人 URI 中，或者如果正则表达式与联系人 URI 匹配，则通话或消息将被屏蔽。</string>
     <string name="blocking_delete_alert">是否要删除屏蔽规则“%1$s”？</string>
     <string name="block">屏蔽</string>
 </resources>
