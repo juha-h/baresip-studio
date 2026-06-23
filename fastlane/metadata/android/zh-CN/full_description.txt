@@ -4,7 +4,7 @@
 
 在 SIP 通话中，音频可以使用 Opus、AMR、Codec2、G.729、G.722、G.722.1 或 PCMU/PCMA 编解码器进行编码。通过 TLS 或 WSS SIP 信令传输以及 ZRTP 或（DTLS）SRTP 媒体封装实现安全保障。通过 TLS 或 WSS 信令传输以及 ZRTP 或（DTLS）SRTP 媒体封装实现安全保障。
 
-开发 baresip 的初衷是为 Android 提供一款安全、开源的基于 SIP 的 VoIP 用户代理，且不依赖任何专有的第三方推送通知服务。添加移动通话及消息传递功能是为了减少应用冗余。
+开发 baresip 的初衷是为 Android 提供一款安全、开源的基于 SIP 的 VoIP 用户代理，且不依赖任何专有的第三方推送通知服务。为了减少应用冗余，还添加了联系人、移动通话及 SMS 消息传递功能。
 
 此应用程序可安装在运行 Android 9 或更高版本的 Android 设备上。移动通话及消息传递功能需要 Android 10 或更高版本。
 
