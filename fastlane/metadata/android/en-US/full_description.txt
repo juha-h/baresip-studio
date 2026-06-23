@@ -1,5 +1,4 @@
-This is a <a href="https://github.com/baresip/baresip">baresip</a> based
-SIP and mobile calling and messaging User Agent application for Android.
+This is a <a href="https://github.com/baresip/baresip">baresip</a> based SIP and mobile calling and messaging User Agent application for Android.
 
 Currently baresip supports SIP and mobile based voice calls and messages.  In addition, voice conference calls, voicemail Message Waiting Indication as well as blind and attended call transfers are available when SIP is used. MMS messaging is not supported yet.
 
