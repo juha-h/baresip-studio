@@ -1,6 +1,8 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,6 +88,7 @@ import java.io.StringReader
 import java.net.URL
 import java.util.Locale
 import javax.net.ssl.HttpsURLConnection
+import android.provider.Settings
 import android.telephony.SubscriptionManager
 
 fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
@@ -331,6 +334,35 @@ private fun AccountContent(
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     keyboardType = KeyboardType.Text),
+            )
+        }
+    }
+
+    @Composable
+    fun SimManager() {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.sim_manager),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        try {
+                            val action =
+                                if (Build.VERSION.SDK_INT >= 31)
+                                    Settings.ACTION_MANAGE_ALL_SIM_PROFILES_SETTINGS
+                                else
+                                    Settings.ACTION_WIRELESS_SETTINGS
+                            ctx.startActivity(Intent(action))
+                        } catch (_: Exception) {
+                            ctx.startActivity(Intent(Settings.ACTION_SETTINGS))
+                        }
+                    },
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -1291,6 +1323,8 @@ private fun AccountContent(
     ) {
         AoR(resumeToggle)
         Nickname()
+        if (ua.account.isMobile)
+            SimManager()
         if (!ua.account.isMobile) {
             DisplayName()
             AuthUser()

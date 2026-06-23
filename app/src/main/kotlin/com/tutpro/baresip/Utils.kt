@@ -525,6 +525,7 @@ object Utils {
         return true
     }
 
+    @Suppress("unused")
     fun copyToClipboard(ctx: Context, text: String) {
         val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("text", text)
