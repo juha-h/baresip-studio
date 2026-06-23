@@ -261,7 +261,7 @@ private fun AccountContent(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (ua.account.isMobile && android.os.Build.VERSION.SDK_INT >= 29) {
+            if (ua.account.isMobile && Build.VERSION.SDK_INT >= 29) {
                 val voiceSubId = remember(toggle) { SubscriptionManager.getDefaultVoiceSubscriptionId() }
                 val smsSubId = remember(toggle) { SubscriptionManager.getDefaultSmsSubscriptionId() }
 
