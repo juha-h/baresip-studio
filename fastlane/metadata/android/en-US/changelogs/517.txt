@@ -1,0 +1,6 @@
+- Added Blocking screen to Account settings that includes Blocking list
+- Added capability to add call and message peers to Blocking list
+- Added "SIM Manager" link to mobile account's settings
+- Fixed background color of bottom navigation bar on some screens
+- Fixed removing of incoming call notification when call is declined
+- New translations (Chinese, Finnish)
