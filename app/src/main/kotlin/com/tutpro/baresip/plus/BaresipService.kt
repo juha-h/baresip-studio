@@ -658,6 +658,7 @@ class BaresipService: Service() {
             "Call Reject" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
                 val call = Call.ofCallp(callp)
+                nm.cancel(CALL_NOTIFICATION_ID)
                 stopRinging()
                 stopMediaPlayer()
                 if (call == null)
