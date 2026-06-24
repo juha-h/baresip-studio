@@ -2229,8 +2229,19 @@ class BaresipService: Service() {
         account.telProvider = ""
         val mobileUa = UserAgent(0L, account)
         val isAirplaneModeOn = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
-        mobileUa.status = if (isAirplaneModeOn) R.drawable.circle_white else circleGreen.getValue(colorblind)
-        updateMobileStatus()
+        val sm = getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE) as android.telephony.SubscriptionManager
+        val hasActiveSubscription = if (checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) ==
+                PackageManager.PERMISSION_GRANTED)
+            !sm.activeSubscriptionInfoList.isNullOrEmpty()
+        else
+            false
+        mobileUa.status = if (isAirplaneModeOn)
+            R.drawable.circle_white
+        else if (hasActiveSubscription)
+            circleGreen.getValue(colorblind)
+        else
+            circleRed.getValue(colorblind)
+        updateMobileStatus(mobileUa.status)
 
         val updatedUas = uas.value.toMutableList()
         updatedUas.add(mobileUa)
