@@ -181,7 +181,8 @@ class BaresipService: Service() {
             val vibratorManager = getSystemService(VIBRATOR_MANAGER_SERVICE) as
                     VibratorManager
             vibratorManager.defaultVibrator
-        } else {
+        }
+        else {
             @Suppress("DEPRECATION")
             getSystemService(VIBRATOR_SERVICE) as Vibrator
         }
@@ -261,9 +262,8 @@ class BaresipService: Service() {
                 if ("android.net.wifi.WIFI_AP_STATE_CHANGED" == action) {
                     val state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0)
                     if (WifiManager.WIFI_STATE_ENABLED == state % 10) {
-                        if (hotSpotIsEnabled) {
+                        if (hotSpotIsEnabled)
                             Log.d(TAG, "HotSpot is still enabled")
-                        }
                         else {
                             Log.d(TAG, "HotSpot is enabled")
                             hotSpotIsEnabled = true
@@ -283,16 +283,14 @@ class BaresipService: Service() {
                                             updateNetwork()
                                         }
                                 }
-                                else {
+                                else
                                     Log.w(TAG, "Could not get hotspot addresses")
-                                }
                             }
                         }
                     }
                     else {
-                        if (!hotSpotIsEnabled) {
+                        if (!hotSpotIsEnabled)
                             Log.d(TAG, "HotSpot is still disabled")
-                        }
                         else {
                             Log.d(TAG, "HotSpot is disabled")
                             hotSpotIsEnabled = false
@@ -359,37 +357,34 @@ class BaresipService: Service() {
 
                         }
                     }
-
                     BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED -> {
-                        val state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
-                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED)
+                        val state = intent.getIntExtra(
+                            BluetoothHeadset.EXTRA_STATE,
+                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED
+                        )
                         when (state) {
-                            BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
+                            BluetoothHeadset.STATE_AUDIO_CONNECTED ->
                                 Log.d(TAG, "Bluetooth headset audio is connected")
-                            }
-                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED -> {
+                            BluetoothHeadset.STATE_AUDIO_DISCONNECTED ->
                                 Log.d(TAG, "Bluetooth headset audio is disconnected")
-                            }
                         }
                     }
-
                     AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
-                        val state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE,
-                            AudioManager.SCO_AUDIO_STATE_DISCONNECTED)
+                        val state = intent.getIntExtra(
+                            AudioManager.EXTRA_SCO_AUDIO_STATE,
+                            AudioManager.SCO_AUDIO_STATE_DISCONNECTED
+                        )
                         when (state) {
-                            AudioManager.SCO_AUDIO_STATE_CONNECTING -> {
+                            AudioManager.SCO_AUDIO_STATE_CONNECTING ->
                                 Log.d(TAG, "Bluetooth headset SCO is connecting")
-                            }
-                            AudioManager.SCO_AUDIO_STATE_CONNECTED -> {
+                            AudioManager.SCO_AUDIO_STATE_CONNECTED ->
                                 Log.d(TAG, "Bluetooth headset SCO is connected")
-                            }
                             AudioManager.SCO_AUDIO_STATE_DISCONNECTED -> {
                                 Log.d(TAG, "Bluetooth headset SCO is disconnected")
                                 resetCallVolume()
                             }
-                            AudioManager.SCO_AUDIO_STATE_ERROR -> {
+                            AudioManager.SCO_AUDIO_STATE_ERROR ->
                                 Log.d(TAG, "Bluetooth headset SCO state ERROR")
-                            }
                         }
                     }
                 }
@@ -409,13 +404,13 @@ class BaresipService: Service() {
         bluetoothReceiverRegistered = true
 
         telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
-        if (VERSION.SDK_INT >= 31) {
+        if (VERSION.SDK_INT >= 31)
             telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
                 override fun onServiceStateChanged(serviceState: ServiceState) {
                     updateMobileStatusFromServiceState(serviceState.state)
                 }
             }
-        } else {
+        else {
             @Suppress("DEPRECATION")
             phoneStateListener = object : PhoneStateListener() {
                 @Deprecated("Deprecated in Java")
@@ -430,9 +425,10 @@ class BaresipService: Service() {
             "com.tutpro.baresip.plus:proximity_wakelock"
         )
 
-        wifiLock = if (VERSION.SDK_INT < 29)
+        wifiLock = if (VERSION.SDK_INT < 29) {
             @Suppress("DEPRECATION")
             wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Baresip")
+        }
         else
             wm.createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, "Baresip")
         wifiLock.setReferenceCounted(false)
@@ -557,10 +553,9 @@ class BaresipService: Service() {
                 Contact.contactsUpdate()
 
                 val history = CallHistory.get()
-                if (history.isEmpty()) {
+                if (history.isEmpty())
                     CallHistoryNew.restore()
-                }
-                else {
+                else
                     for (old in history) {
                         val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
                         new.stopTime = old.stopTime
@@ -568,7 +563,6 @@ class BaresipService: Service() {
                         new.recording = old.recording
                         new.add()
                     }
-                }
 
                 Blocked.restore()
                 BlockRule.restore()
@@ -631,17 +625,14 @@ class BaresipService: Service() {
                     toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
             }
 
-            "Notification Dismissed" -> {
+            "Notification Dismissed" ->
                 updateStatusNotification()
-            }
 
-            "Start Content Observer" -> {
+            "Start Content Observer" ->
                 registerAndroidContactsObserver()
-            }
 
-            "Stop Content Observer" -> {
+            "Stop Content Observer" ->
                 unRegisterAndroidContactsObserver()
-            }
 
             "Call Answer" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
@@ -765,9 +756,8 @@ class BaresipService: Service() {
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
-            "Update Notification" -> {
+            "Update Notification" ->
                 updateStatusNotification()
-            }
 
             "Start Call" -> {
                 val uap = intent!!.getLongExtra("uap", 0L)
@@ -790,9 +780,8 @@ class BaresipService: Service() {
                 }
             }
 
-            else -> {
+            else ->
                 Log.e(TAG, "Unknown start action $action")
-            }
         }
 
         return START_STICKY
