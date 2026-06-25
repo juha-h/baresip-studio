@@ -515,6 +515,8 @@ class BaresipService: Service() {
                 }
 
                 if (isStartReceived || isServiceRunning) return START_STICKY
+
+                showStatusNotification()
                 isStartReceived = true
 
                 if (VERSION.SDK_INT < 31) {
@@ -547,76 +549,76 @@ class BaresipService: Service() {
                         Config.initialize(this)
                 }
 
-                if (contactsMode != "android")
-                    Contact.restoreBaresipContacts()
-                if (contactsMode != "baresip") {
-                    Contact.loadAndroidContacts(this)
-                    registerAndroidContactsObserver()
-                }
-                Contact.contactsUpdate()
-
-                val history = CallHistory.get()
-                if (history.isEmpty())
-                    CallHistoryNew.restore()
+                val userAgent = Config.variable("user_agent")
+                val software = if (userAgent != "")
+                    userAgent
                 else
-                    for (old in history) {
-                        val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
-                        new.stopTime = old.stopTime
-                        new.startTime = old.startTime
-                        new.recording = old.recording
-                        new.add()
+                    "baresip v${BuildConfig.VERSION_NAME} " +
+                            "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
+
+                Thread {
+                    if (contactsMode != "android")
+                        Contact.restoreBaresipContacts()
+                    if (contactsMode != "baresip") {
+                        Contact.loadAndroidContacts(this)
+                        registerAndroidContactsObserver()
+                    }
+                    Contact.contactsUpdate()
+
+                    val history = CallHistory.get()
+                    if (history.isEmpty())
+                        CallHistoryNew.restore()
+                    else
+                        for (old in history) {
+                            val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
+                            new.stopTime = old.stopTime
+                            new.startTime = old.startTime
+                            new.recording = old.recording
+                            new.add()
+                        }
+
+                    Blocked.restore()
+                    BlockRule.restore()
+
+                    val recordings = File(filesDir, "recordings")
+
+                    val restored = File(filesPath, "restored")
+                    if (restored.exists()) {
+                        Log.d(TAG, "Clearing recordings")
+                        CallHistoryNew.clearRecordings()
+                        CallHistoryNew.save()
+                        if (recordings.exists())
+                            recordings.deleteRecursively()
+                        restored.delete()
                     }
 
-                Blocked.restore()
-                BlockRule.restore()
+                    File(filesDir, "recordings").mkdir()
+                    File(filesDir, "tmp").mkdir()
 
-                val recordings = File(filesDir, "recordings")
+                    Message.restore()
 
-                val restored = File(filesPath, "restored")
-                if (restored.exists()) {
-                    Log.d(TAG, "Clearing recordings")
-                    CallHistoryNew.clearRecordings()
-                    CallHistoryNew.save()
-                    if (recordings.exists())
-                        recordings.deleteRecursively()
-                    restored.delete()
-                }
+                    hotSpotAddresses = Utils.hotSpotAddresses()
+                    linkAddresses = linkAddresses()
+                    var addresses = ""
+                    for (la in linkAddresses)
+                        addresses = "$addresses;${la.key};${la.value}"
+                    Log.i(TAG, "Link addresses: $addresses")
+                    activeNetwork = cm.activeNetwork
+                    Log.i(TAG, "Active network: $activeNetwork")
 
-                File(filesDir, "recordings").mkdir()
-                File(filesDir, "tmp").mkdir()
+                    registerPhoneAccount()
 
-                Message.restore()
+                    Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
-                hotSpotAddresses = Utils.hotSpotAddresses()
-                linkAddresses = linkAddresses()
-                var addresses = ""
-                for (la in linkAddresses)
-                    addresses = "$addresses;${la.key};${la.value}"
-                Log.i(TAG, "Link addresses: $addresses")
-                activeNetwork = cm.activeNetwork
-                Log.i(TAG, "Active network: $activeNetwork")
-
-                registerPhoneAccount()
-
-                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
-
-                val userAgent = Config.variable("user_agent")
-                Thread {
                     baresipStart(
                         filesPath,
                         addresses.removePrefix(";"),
                         logLevel,
-                        if (userAgent != "")
-                            userAgent
-                        else
-                            "baresip v${BuildConfig.VERSION_NAME} " +
-                                    "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
+                        software
                     )
                 }.start()
 
                 isServiceRunning = true
-
-                showStatusNotification()
 
                 if (linkAddresses.isEmpty())
                     toast(getString(R.string.no_network), Toast.LENGTH_LONG)
@@ -1309,6 +1311,7 @@ class BaresipService: Service() {
 
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
+                        nm.cancel(CALL_NOTIFICATION_ID)
                         val connection = ConnectionService.connections[callp]
                         if (connection != null) {
                             val cause = when {
@@ -2264,6 +2267,7 @@ class BaresipService: Service() {
 
     fun handleExternalCallRemoved(telecomCall: android.telecom.Call) {
         val callp = telecomCall.hashCode().toLong()
+        nm.cancel(CALL_NOTIFICATION_ID)
         val call = calls.find { it.callp == callp }
         if (call != null) {
             val uap = call.ua.uap
