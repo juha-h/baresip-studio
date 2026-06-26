@@ -40,7 +40,7 @@ class SettingsViewModel: ViewModel() {
 
     fun loadSettings(ctx: Context) {
 
-        if (isLoaded) return else isLoaded = true
+        if (isLoaded || !Config.isInitialized()) return else isLoaded = true
 
         autoStart.value = Config.variable("auto_start") == "yes"
 

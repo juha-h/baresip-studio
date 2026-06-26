@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.role.RoleManager
@@ -86,6 +87,7 @@ import com.tutpro.baresip.plus.Utils.copyInputStreamToFile
 import java.io.File
 import java.io.FileInputStream
 import java.util.Locale
+import androidx.core.net.toUri
 
 private var restart = false
 private val showRestartDialog = mutableStateOf(false)
@@ -244,6 +246,9 @@ private fun SettingsContent(
                         Config.save()
                     }
                 }
+                val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
+                viewModel.batteryOptimizations.value =
+                    !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -878,6 +883,7 @@ private fun SettingsContent(
         }
     }
 
+    @SuppressLint("BatteryLife")
     @Composable
     fun BatteryOptimizations() {
         val batteryOptimizationsTitle = stringResource(R.string.battery_optimizations)
@@ -910,8 +916,17 @@ private fun SettingsContent(
                 checked = battery,
                 onCheckedChange = {
                     viewModel.batteryOptimizations.value = it
-                    batterySettingsLauncher.launch(
-                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    if (it)
+                        batterySettingsLauncher.launch(
+                            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                        )
+                    else {
+                        val intent =
+                            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                data = "package:${ctx.packageName}".toUri()
+                            }
+                        batterySettingsLauncher.launch(intent)
+                    }
                 }
             )
         }
@@ -1085,14 +1100,13 @@ private fun SettingsContent(
                         else
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
                                 dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
-                    } else {
-                        viewModel.defaultMessaging.value = false
+                    }
+                    else
                         try {
                             dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                         } catch (e: ActivityNotFoundException) {
                             Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
-                    }
                 }
             )
         }
@@ -1274,11 +1288,14 @@ private fun SettingsContent(
         VideoFps()
         if (VERSION.SDK_INT >= 29) {
             DefaultDialer()
+            DefaultMessaging()
             val defaultDialer by viewModel.defaultDialer.collectAsState()
-            if (defaultDialer)
-                DefaultMessaging()
+            val defaultMessaging by viewModel.defaultMessaging.collectAsState()
+            if (!defaultDialer && !defaultMessaging)
+                BatteryOptimizations()
         }
-        BatteryOptimizations()
+        else
+            BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 31)
             DynamicColors()

@@ -565,18 +565,7 @@ class BaresipService: Service() {
                     }
                     Contact.contactsUpdate()
 
-                    val history = CallHistory.get()
-                    if (history.isEmpty())
-                        CallHistoryNew.restore()
-                    else
-                        for (old in history) {
-                            val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
-                            new.stopTime = old.stopTime
-                            new.startTime = old.startTime
-                            new.recording = old.recording
-                            new.add()
-                        }
-
+                    CallHistoryNew.restore()
                     Blocked.restore()
                     BlockRule.restore()
 
@@ -628,6 +617,12 @@ class BaresipService: Service() {
 
                 if (!supportedCameras)
                     toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
+
+                if (VERSION.SDK_INT >= 29) {
+                    val baresipService = Intent(this, BaresipService::class.java)
+                    baresipService.action = "Check Roles"
+                    startService(baresipService)
+                }
             }
 
             "Notification Dismissed" ->
@@ -762,6 +757,11 @@ class BaresipService: Service() {
 
             "Update Notification" ->
                 updateStatusNotification()
+
+            "Check Roles" -> {
+                if (isNativeReady)
+                    addMobileUserAgent()
+            }
 
             "Start Call" -> {
                 val uap = intent!!.getLongExtra("uap", 0L)
