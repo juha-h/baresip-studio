@@ -557,18 +557,7 @@ class BaresipService: Service() {
                     }
                     Contact.contactsUpdate()
 
-                    val history = CallHistory.get()
-                    if (history.isEmpty())
-                        CallHistoryNew.restore()
-                    else
-                        for (old in history) {
-                            val new = CallHistoryNew(old.aor, old.peerUri, old.direction)
-                            new.stopTime = old.stopTime
-                            new.startTime = old.startTime
-                            new.recording = old.recording
-                            new.add()
-                        }
-
+                    CallHistoryNew.restore()
                     Blocked.restore()
                     BlockRule.restore()
 

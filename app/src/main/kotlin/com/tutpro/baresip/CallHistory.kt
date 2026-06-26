@@ -127,41 +127,4 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                         "${h.stopTime}, ${h.rejected}, ${h.recording}")
         }
     }
-
-}
-
-class CallHistory(val aor: String, val peerUri: String, val direction: String) : Serializable {
-
-    var startTime: GregorianCalendar? = null
-    var stopTime = GregorianCalendar()
-    var recording = arrayOf("", "")
-
-    companion object {
-
-        @Suppress("unused")
-        private const val serialVersionUID: Long = 2
-
-        fun get(): ArrayList<CallHistory> {
-            val file = File(BaresipService.filesPath, "history")
-            var result = ArrayList<CallHistory>()
-            if (file.exists()) {
-                try {
-                    val fis = FileInputStream(file)
-                    val ois = ObjectInputStream(fis)
-                    @Suppress("UNCHECKED_CAST")
-                    val restoredHistory = ois.readObject() as? List<CallHistory>
-                    if (restoredHistory != null)
-                        result = ArrayList(restoredHistory)
-                    ois.close()
-                    fis.close()
-                    Log.d(TAG, "Got history of ${result.size} calls")
-                    file.delete()
-                } catch (e: Exception) {
-                    Log.e(TAG, "InputStream exception", e)
-                }
-            }
-            return result
-        }
-    }
-
 }
