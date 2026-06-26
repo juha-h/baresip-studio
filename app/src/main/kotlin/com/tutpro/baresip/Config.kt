@@ -14,6 +14,11 @@ object Config {
     private lateinit var config: String
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
+    private var initialized = false
+
+    fun isInitialized(): Boolean {
+        return initialized
+    }
 
     fun initialize(ctx: Context) {
 
@@ -26,6 +31,7 @@ object Config {
             previousConfig = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
         }
         previousLines = previousConfig.split("\n")
+        initialized = true
 
         val logLevel = previousVariable("log_level")
         if (logLevel == "") {
@@ -251,6 +257,7 @@ object Config {
     }
 
     fun variable(name: String): String {
+        if (!initialized) return ""
         for (line in config.split("\n")) {
             val nameValue = line.split(" ", limit = 2)
             if (nameValue.size == 2 && nameValue[0] == name)
@@ -261,6 +268,7 @@ object Config {
 
     fun variables(name: String): ArrayList<String> {
         val result = ArrayList<String>()
+        if (!initialized) return result
         for (line in config.split("\n")) {
             val nameValue = line.split(" ", limit = 2)
             if (nameValue.size == 2 && nameValue[0] == name)
@@ -270,14 +278,17 @@ object Config {
     }
 
     fun addVariable(name: String, value: String) {
+        if (!initialized) return
         config += "$name $value\n"
     }
 
     fun removeVariable(variable: String) {
+        if (!initialized) return
         config = Utils.removeLinesStartingWithString(config, "$variable ")
     }
 
     fun removeVariableValue(variable: String, value: String) {
+        if (!initialized) return
         config = Utils.removeLinesStartingWithString(config, "$variable $value")
     }
 
