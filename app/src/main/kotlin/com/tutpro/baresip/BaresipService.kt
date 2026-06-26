@@ -617,6 +617,12 @@ class BaresipService: Service() {
 
                 if (!aecAvailable)
                     toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
+
+                if (VERSION.SDK_INT >= 29) {
+                    val baresipService = Intent(this, BaresipService::class.java)
+                    baresipService.action = "Check Roles"
+                    startService(baresipService)
+                }
             }
 
             "Notification Dismissed" ->
@@ -750,6 +756,11 @@ class BaresipService: Service() {
 
             "Update Notification" ->
                 updateStatusNotification()
+
+            "Check Roles" -> {
+                if (isNativeReady)
+                    addMobileUserAgent()
+            }
 
             "Start Call" -> {
                 val uap = intent!!.getLongExtra("uap", 0L)

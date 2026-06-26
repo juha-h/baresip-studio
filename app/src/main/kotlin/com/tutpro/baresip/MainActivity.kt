@@ -314,6 +314,11 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         Log.d(TAG, "Main onResume")
         nm.cancelAll()
+        if (Build.VERSION.SDK_INT >= 29) {
+            val baresipService = Intent(this, BaresipService::class.java)
+            baresipService.action = "Check Roles"
+            startService(baresipService)
+        }
     }
 
     override fun onPause() {
