@@ -1,0 +1,6 @@
+- Improved detection if SIM card is available
+- Do heavy startup operations in background thread to prevent UI hangs
+- At resume to baresip, check if its default app roles have changed
+- Allow default messaging role without being default calling app
+- Show Battery Optimization setting only when baresip is not default calling or messaging app
+- Removed support for old call history
