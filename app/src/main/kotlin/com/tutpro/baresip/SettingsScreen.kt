@@ -1012,13 +1012,12 @@ private fun SettingsContent(
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
                                 dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
                     }
-                    else {
-                         try {
+                    else
+                        try {
                             dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                         } catch (e: ActivityNotFoundException) {
                             Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
-                    }
                 }
             )
         }
