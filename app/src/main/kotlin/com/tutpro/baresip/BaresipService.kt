@@ -541,13 +541,6 @@ class BaresipService: Service() {
                         Config.initialize(this)
                 }
 
-                val userAgent = Config.variable("user_agent")
-                val software = if (userAgent != "")
-                    userAgent
-                else
-                    "baresip v${BuildConfig.VERSION_NAME} " +
-                            "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
-
                 Thread {
                     if (contactsMode != "android")
                         Contact.restoreBaresipContacts()
@@ -577,20 +570,28 @@ class BaresipService: Service() {
                     File(filesDir, "tmp").mkdir()
 
                     Message.restore()
+                }.start()
 
-                    hotSpotAddresses = Utils.hotSpotAddresses()
-                    linkAddresses = linkAddresses()
-                    var addresses = ""
-                    for (la in linkAddresses)
-                        addresses = "$addresses;${la.key};${la.value}"
-                    Log.i(TAG, "Link addresses: $addresses")
-                    activeNetwork = cm.activeNetwork
-                    Log.i(TAG, "Active network: $activeNetwork")
+                hotSpotAddresses = Utils.hotSpotAddresses()
+                linkAddresses = linkAddresses()
+                var addresses = ""
+                for (la in linkAddresses)
+                    addresses = "$addresses;${la.key};${la.value}"
+                Log.i(TAG, "Link addresses: $addresses")
+                activeNetwork = cm.activeNetwork
+                Log.i(TAG, "Active network: $activeNetwork")
 
-                    registerPhoneAccount()
+                registerPhoneAccount()
 
-                    Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
+                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
+                val userAgent = Config.variable("user_agent")
+                val software = if (userAgent != "")
+                    userAgent
+                else
+                    "baresip v${BuildConfig.VERSION_NAME} " +
+                            "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
+                Thread {
                     baresipStart(
                         filesPath,
                         addresses.removePrefix(";"),
