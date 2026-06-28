@@ -2116,6 +2116,22 @@ class BaresipService: Service() {
                     ).add()
                 return
             }
+            if (isBlocked(uri)) {
+                Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri by block rule")
+                telecomCall.disconnect()
+                toast(
+                    String.format(getString(R.string.call_blocked),
+                        Utils.friendlyUri(this, uri, ua.account))
+                )
+                if (ua.account.callHistory)
+                    Blocked(
+                        ua.account.aor,
+                        uri,
+                        "invite",
+                        GregorianCalendar().timeInMillis
+                    ).add()
+                return
+            }
         }
 
         val call = Call.ExternalCall(
