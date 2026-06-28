@@ -2321,41 +2321,37 @@ class BaresipService: Service() {
     @SuppressLint("MissingPermission")
     private fun sendUssd(ussdCode: String) {
         val uap = uas.value.find { it.account.isMobile }?.uap ?: 0L
-        if (VERSION.SDK_INT >= 26) {
-            val tm = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
-            try {
-                tm.sendUssdRequest(ussdCode, object : TelephonyManager.UssdResponseCallback() {
-                    override fun onReceiveUssdResponse(
-                        telephonyManager: TelephonyManager,
-                        request: String,
-                        response: CharSequence
-                    ) {
-                        super.onReceiveUssdResponse(telephonyManager, request, response)
-                        Log.d(TAG, "USSD response for $request: $response")
-                        postServiceEvent(ServiceEvent("ussd response", arrayListOf(uap, request, response.toString()), System.nanoTime()))
-                    }
+        val tm = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        try {
+            tm.sendUssdRequest(ussdCode, object : TelephonyManager.UssdResponseCallback() {
+                override fun onReceiveUssdResponse(
+                    telephonyManager: TelephonyManager,
+                    request: String,
+                    response: CharSequence
+                ) {
+                    super.onReceiveUssdResponse(telephonyManager, request, response)
+                    Log.d(TAG, "USSD response for $request: $response")
+                    postServiceEvent(ServiceEvent("ussd response", arrayListOf(uap, request, response.toString()), System.nanoTime()))
+                }
 
-                    override fun onReceiveUssdResponseFailed(
-                        telephonyManager: TelephonyManager,
-                        request: String,
-                        failureCode: Int
-                    ) {
-                        super.onReceiveUssdResponseFailed(telephonyManager, request, failureCode)
-                        Log.d(TAG, "USSD response for $request failed with code $failureCode")
-                        val error = when (failureCode) {
-                            TelephonyManager.USSD_RETURN_FAILURE -> getString(R.string.ussd_failed)
-                            TelephonyManager.USSD_ERROR_SERVICE_UNAVAIL -> getString(R.string.ussd_service_unavailable)
-                            else -> getString(R.string.ussd_unknown_error)
-                        }
-                        postServiceEvent(ServiceEvent("ussd fail", arrayListOf(uap, request, error), System.nanoTime()))
+                override fun onReceiveUssdResponseFailed(
+                    telephonyManager: TelephonyManager,
+                    request: String,
+                    failureCode: Int
+                ) {
+                    super.onReceiveUssdResponseFailed(telephonyManager, request, failureCode)
+                    Log.d(TAG, "USSD response for $request failed with code $failureCode")
+                    val error = when (failureCode) {
+                        TelephonyManager.USSD_RETURN_FAILURE -> getString(R.string.ussd_failed)
+                        TelephonyManager.USSD_ERROR_SERVICE_UNAVAIL -> getString(R.string.ussd_service_unavailable)
+                        else -> getString(R.string.ussd_unknown_error)
                     }
-                }, Handler(Looper.getMainLooper()))
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception sending USSD request: ${e.message}")
-                toast(getString(R.string.ussd_failed))
-            }
-        } else {
-            toast(getString(R.string.ussd_not_supported))
+                    postServiceEvent(ServiceEvent("ussd fail", arrayListOf(uap, request, error), System.nanoTime()))
+                }
+            }, Handler(Looper.getMainLooper()))
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception sending USSD request: ${e.message}")
+            toast(getString(R.string.ussd_failed))
         }
     }
 
@@ -3128,7 +3124,8 @@ class BaresipService: Service() {
                 if (serviceEvents.size == 1) {
                     Log.d(TAG, "Posted service event ${event.event} at ${event.timeStamp}")
                     serviceEvent.postValue(Event(event.timeStamp))
-                } else
+                }
+                else
                     Log.d(TAG, "Added service event ${event.event}")
             }
         }

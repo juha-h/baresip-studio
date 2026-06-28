@@ -165,6 +165,7 @@ import kotlinx.coroutines.delay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.GregorianCalendar
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -1533,7 +1534,8 @@ private fun CallRow(
                         if (call.callOnHold.value) {
                             Log.d(TAG, "User requested resume for ${call.callp}")
                             call.resume() // This now automatically holds other calls
-                        } else {
+                        }
+                        else {
                             Log.d(TAG, "User requested hold for ${call.callp}")
                             call.hold()
                         }
@@ -2249,11 +2251,13 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
                     call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
                     call.transferButtonEnabled.value = false
-                } else {
+                }
+                else {
                     if (call.dir == "out") {
                         call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
                         call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                    } else {
+                    }
+                    else {
                         call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
                         call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                     }
@@ -2339,15 +2343,29 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
 
     when (ev[0]) {
         "ussd response" -> {
-            if (aor == viewModel.selectedAor.value)
+            if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true
+                viewModel.dialerState.callUri.value = ""
+            }
+            if (acc.callHistory) {
+                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
+                history.startTime = GregorianCalendar()
+                history.add()
+            }
             handleDialog(ctx, ctx.getString(R.string.info), params[2] as String)
             handleNextEvent()
             return
         }
         "ussd fail" -> {
-            if (aor == viewModel.selectedAor.value)
+            if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true
+                viewModel.dialerState.callUri.value = ""
+            }
+            if (acc.callHistory) {
+                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
+                history.rejected = true
+                history.add()
+            }
             handleDialog(ctx, ctx.getString(R.string.error), params[2] as String)
             handleNextEvent()
             return
