@@ -370,11 +370,16 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}$").matches(no)
+        return no.isNotEmpty() && Regex("^[0-9- (),*#+]{1,32}$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
         return uri.startsWith("tel:") && isTelNumber(uri.substring(4))
+    }
+
+    fun isUssd(uri: String): Boolean {
+        val user = uriUserPart(uri)
+        return user.startsWith("*") && user.endsWith("#")
     }
 
     fun checkUri(uri: String): Boolean {

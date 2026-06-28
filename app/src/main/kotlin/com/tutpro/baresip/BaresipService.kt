@@ -1653,6 +1653,12 @@ class BaresipService: Service() {
 
     fun runCall(uap: Long, uri: String, conferenceCall: Boolean, onHoldCallp: Long) {
 
+        val ua = UserAgent.ofUap(uap)
+        if (ua != null && ua.account.isMobile && Utils.isUssd(uri)) {
+            sendUssd(Utils.uriUserPart(uri))
+            return
+        }
+
         val executeCall = {
             val handler = Handler(Looper.getMainLooper())
             handler.postDelayed({
@@ -2310,6 +2316,47 @@ class BaresipService: Service() {
             circleRed.getValue(colorblind)
         Log.d(TAG, "Mobile service state changed: $state, updating status to $status (Airplane=$isAirplaneModeOn)")
         updateMobileStatus(status)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun sendUssd(ussdCode: String) {
+        val uap = uas.value.find { it.account.isMobile }?.uap ?: 0L
+        if (VERSION.SDK_INT >= 26) {
+            val tm = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+            try {
+                tm.sendUssdRequest(ussdCode, object : TelephonyManager.UssdResponseCallback() {
+                    override fun onReceiveUssdResponse(
+                        telephonyManager: TelephonyManager,
+                        request: String,
+                        response: CharSequence
+                    ) {
+                        super.onReceiveUssdResponse(telephonyManager, request, response)
+                        Log.d(TAG, "USSD response for $request: $response")
+                        postServiceEvent(ServiceEvent("ussd response", arrayListOf(uap, request, response.toString()), System.nanoTime()))
+                    }
+
+                    override fun onReceiveUssdResponseFailed(
+                        telephonyManager: TelephonyManager,
+                        request: String,
+                        failureCode: Int
+                    ) {
+                        super.onReceiveUssdResponseFailed(telephonyManager, request, failureCode)
+                        Log.d(TAG, "USSD response for $request failed with code $failureCode")
+                        val error = when (failureCode) {
+                            TelephonyManager.USSD_RETURN_FAILURE -> getString(R.string.ussd_failed)
+                            TelephonyManager.USSD_ERROR_SERVICE_UNAVAIL -> getString(R.string.ussd_service_unavailable)
+                            else -> getString(R.string.ussd_unknown_error)
+                        }
+                        postServiceEvent(ServiceEvent("ussd fail", arrayListOf(uap, request, error), System.nanoTime()))
+                    }
+                }, Handler(Looper.getMainLooper()))
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception sending USSD request: ${e.message}")
+                toast(getString(R.string.ussd_failed))
+            }
+        } else {
+            toast(getString(R.string.ussd_not_supported))
+        }
     }
 
     @SuppressLint("FullScreenIntentPolicy")
