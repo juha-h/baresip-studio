@@ -177,6 +177,7 @@ import kotlinx.coroutines.delay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.GregorianCalendar
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -2605,6 +2606,14 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
+    else if (ua.account.isMobile && Utils.isUssd(uri)) {
+        viewModel.dialerState.callButtonsEnabled.value = false
+        val baresipService = Intent(ctx, BaresipService::class.java)
+        baresipService.action = "Start Call"
+        baresipService.putExtra("uap", ua.uap)
+        baresipService.putExtra("uri", uri)
+        ContextCompat.startForegroundService(ctx, baresipService)
+    }
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
         var error = ""
@@ -2906,8 +2915,35 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     val aor = ua.account.aor
 
     when (ev[0]) {
-        "call rejected" -> {
+        "ussd response" -> {
+            if (aor == viewModel.selectedAor.value) {
+                viewModel.dialerState.callButtonsEnabled.value = true
+                viewModel.dialerState.callUri.value = ""
+            }
+            if (acc.callHistory) {
+                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
+                history.startTime = GregorianCalendar()
+                history.add()
+            }
+            handleDialog(ctx, ctx.getString(R.string.info), params[2] as String)
+            handleNextEvent()
+            return
         }
+        "ussd fail" -> {
+            if (aor == viewModel.selectedAor.value) {
+                viewModel.dialerState.callButtonsEnabled.value = true
+                viewModel.dialerState.callUri.value = ""
+            }
+            if (acc.callHistory) {
+                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
+                history.rejected = true
+                history.add()
+            }
+            handleDialog(ctx, ctx.getString(R.string.error), params[2] as String)
+            handleNextEvent()
+            return
+        }
+        "call rejected" -> {}
         "call outgoing" -> {
             val callp = params[1] as Long
             if (!BaresipService.isMainVisible)

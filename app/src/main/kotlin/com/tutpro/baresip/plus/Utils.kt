@@ -198,7 +198,7 @@ object Utils {
     fun e164Uri(uri: String, countryCode: String): String {
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
-        return if (userPart.isDigitsOnly()) {
+        return if (userPart.isNotEmpty() && userPart.isDigitsOnly()) {
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
                     scheme + "+" + userPart.substring(2))
@@ -370,11 +370,16 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}$").matches(no)
+        return no.isNotEmpty() && Regex("^[0-9- (),*#+]{1,32}$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
         return uri.startsWith("tel:") && isTelNumber(uri.substring(4))
+    }
+
+    fun isUssd(uri: String): Boolean {
+        val user = uriUserPart(uri)
+        return user.startsWith("*") && user.endsWith("#")
     }
 
     fun checkUri(uri: String): Boolean {

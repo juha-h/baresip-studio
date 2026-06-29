@@ -647,6 +647,9 @@
     <string name="call_details">Puhelutiedot</string>
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audiofokus on evätty!</string>
+    <string name="ussd_failed">USSD-pyyntö epäonnistui</string>
+    <string name="ussd_service_unavailable">USSD-palvelu ei ole käytettävissä</string>
+    <string name="ussd_unknown_error">Tuntematon USSD-virhe</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
     <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten, Lähellä olevat laitteet -luvan
         Bluetooth-mikrofonin/kaiuttimen havaitsemista varten, Ilmoitukset-luvan ilmoitusten lähettämistä varten
