@@ -2253,14 +2253,11 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     call.transferButtonEnabled.value = false
                 }
                 else {
-                    if (call.dir == "out") {
+                    if (call.dir == "out")
                         call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                        call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                    }
-                    else {
+                    else
                         call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                        call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
-                    }
+                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
                     call.transferButtonEnabled.value = !ua.account.isMobile
                 }
                 call.callUri2.value = ""
