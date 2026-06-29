@@ -45,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -133,7 +132,6 @@ fun BlockingContent(
     acc: Account,
     onRuleDeleted: () -> Unit
 ) {
-    val ctx = LocalContext.current
     val alertTitle = remember { mutableStateOf("") }
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
@@ -247,10 +245,6 @@ fun BlockingContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 items(rules) { rule ->
-                    val pattern = if (Utils.checkUri(rule.pattern))
-                        Utils.friendlyUri(ctx, rule.pattern, acc)
-                    else
-                        rule.pattern
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -262,7 +256,7 @@ fun BlockingContent(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = pattern,
+                            text = rule.pattern,
                             fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -273,7 +267,7 @@ fun BlockingContent(
                             onClick = {
                                 message.value = String.format(
                                     deleteRuleMessage,
-                                    pattern
+                                    rule.pattern
                                 )
                                 lastAction.value = {
                                     BaresipService.blockRules.remove(rule)
