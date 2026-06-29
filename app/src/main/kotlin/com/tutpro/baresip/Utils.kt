@@ -1502,4 +1502,14 @@ object Utils {
         }
         Log.e(TAG, "--------------------------------------")
     }
+
+    fun linkPropertiesEqual(p1: android.net.LinkProperties?, p2: android.net.LinkProperties?): Boolean {
+        if (p1 === p2) return true
+        if (p1 == null || p2 == null) return false
+        if (p1.interfaceName != p2.interfaceName) return false
+        if (p1.linkAddresses != p2.linkAddresses) return false
+        if (p1.dnsServers != p2.dnsServers) return false
+        if (p1.routes != p2.routes) return false
+        return true
+    }
 }

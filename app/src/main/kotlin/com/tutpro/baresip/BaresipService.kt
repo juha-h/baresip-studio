@@ -130,6 +130,7 @@ class BaresipService: Service() {
     private var linkAddresses = mutableMapOf<String, String>()
     private var activeNetwork: Network? = null
     private var allNetworks = mutableSetOf<Network>()
+    private var lastLinkProperties = mutableMapOf<Network, LinkProperties>()
     private var hotSpotIsEnabled = false
     private var hotSpotAddresses = mapOf<String, String>()
     private var mediaPlayer: MediaPlayer? = null
@@ -141,6 +142,7 @@ class BaresipService: Service() {
     private var isNotificationInCall = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
+    private var previousMobileServiceState = -1
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -228,6 +230,8 @@ class BaresipService: Service() {
 
             override fun onLinkPropertiesChanged(network: Network, props: LinkProperties) {
                 super.onLinkPropertiesChanged(network, props)
+                if (Utils.linkPropertiesEqual(props, lastLinkProperties[network])) return
+                lastLinkProperties[network] = props
                 Log.d(TAG, "Network $network link properties changed: $props")
                 synchronized(allNetworks) {
                     if (network !in allNetworks)
@@ -2323,6 +2327,8 @@ class BaresipService: Service() {
     }
 
     private fun updateMobileStatusFromServiceState(state: Int) {
+        if (state == previousMobileServiceState) return
+        previousMobileServiceState = state
         val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
         val status = if (state == ServiceState.STATE_IN_SERVICE)
             circleGreen.getValue(colorblind)
