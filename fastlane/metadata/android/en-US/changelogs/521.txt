@@ -1,0 +1,3 @@
+- Added support to mobile account for Unstructured Supplementary Service Data (USSD)
+- Fixed matching of blocking rules to incoming mobile calls
+- New translations (Czech, Indonesian)
