@@ -422,4 +422,7 @@
     <string name="blocking_delete_alert">是否要删除屏蔽规则“%1$s”？</string>
     <string name="block">屏蔽</string>
     <string name="sim_manager">SIM 管理器</string>
+    <string name="ussd_failed">USSD 请求失败</string>
+    <string name="ussd_service_unavailable">USSD 服务不可用</string>
+    <string name="ussd_unknown_error">USSD 未知错误</string>
 </resources>
