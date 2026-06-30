@@ -8,7 +8,7 @@ import com.tutpro.baresip.plus.BaresipService.Companion.uasStatus
 class UserAgent(val uap: Long, virtualAccount: Account? = null) {
 
     val account = virtualAccount ?: Account(Api.ua_account(uap))
-    var status = if (uap != 0L) R.drawable.circle_white else R.drawable.circle_green
+    var status = R.drawable.circle_white
 
     fun callAlloc(xCall: Long, videoMode: Int): Long {
         if (uap == 0L) return 0L

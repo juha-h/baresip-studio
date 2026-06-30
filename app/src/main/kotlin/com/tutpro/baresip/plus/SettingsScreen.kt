@@ -1066,11 +1066,14 @@ private fun SettingsContent(
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
 
             val requestPermissionLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted ->
-                if (isGranted)
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { results ->
+                if (results[Manifest.permission.READ_PHONE_STATE] == true)
+                    Log.d(TAG, "READ_PHONE_STATE permission granted")
+                if (results[Manifest.permission.READ_PHONE_NUMBERS] == true)
                     Log.d(TAG, "READ_PHONE_NUMBERS permission granted")
                 BaresipService.instance?.addMobileUserAgent()
+                restart = true
             }
 
             val dialerRoleRequest = rememberLauncherForActivityResult(
@@ -1079,13 +1082,17 @@ private fun SettingsContent(
                 val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
                 viewModel.defaultDialer.value = isHeld
                 if (isHeld) {
-                    if (Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS)))
+                    val permissions = arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_PHONE_NUMBERS)
+                    if (Utils.checkPermissions(ctx, permissions)) {
                         BaresipService.instance?.addMobileUserAgent()
+                        restart = true
+                    }
                     else
-                        requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_NUMBERS)
+                        requestPermissionLauncher.launch(permissions)
                 }
                 else
                     BaresipService.instance?.addMobileUserAgent()
+                restart = true
             }
             Switch(
                 checked = defaultDialer,

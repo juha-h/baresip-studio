@@ -43,6 +43,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.Uri
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Build.VERSION
 import android.os.CountDownTimer
 import android.os.Handler
@@ -68,6 +69,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -326,7 +328,8 @@ class BaresipService: Service() {
                 if (intent.action == Intent.ACTION_AIRPLANE_MODE_CHANGED) {
                     val isAirplaneModeOn = intent.getBooleanExtra("state", false)
                     Log.d(TAG, "Airplane mode changed: $isAirplaneModeOn")
-                    updateMobileStatus()
+                    if (VERSION.SDK_INT >= 29)
+                        updateMobileStatus()
                 }
             }
         }
@@ -342,7 +345,8 @@ class BaresipService: Service() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 if (intent.action == "android.intent.action.SIM_STATE_CHANGED") {
                     Log.d(TAG, "SIM state changed")
-                    updateMobileStatus()
+                    if (VERSION.SDK_INT >= 29)
+                        updateMobileStatus()
                 }
             }
         }
@@ -849,9 +853,27 @@ class BaresipService: Service() {
         if (ev[0] == "create") {
 
             val ua = UserAgent(uap)
-            ua.status = if (ua.account.isMobile)
-                R.drawable.circle_green
-            else if (ua.account.regint == 0)
+            if (VERSION.SDK_INT < 29 && ua.account.isMobile) {
+                Log.d(TAG, "Removing Mobile account on API < 29")
+                CallHistoryNew.clear(ua.account.aor)
+                Message.clearMessagesOfAor(ua.account.aor)
+                Api.ua_destroy(uap)
+                Account.saveAccounts()
+                return
+            }
+
+            ua.status = if (ua.account.isMobile) {
+                val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+                val isSimReady = isSimReady()
+                if (VERSION.SDK_INT >= 29) {
+                    if (Utils.pstnAccountHandle(this) == null || !isSimReady || isAirplaneModeOn)
+                        R.drawable.circle_white
+                    else
+                        circleRed.getValue(colorblind)
+                } else {
+                    R.drawable.circle_white
+                }
+            } else if (ua.account.regint == 0)
                 R.drawable.circle_white
             else
                 circleYellow.getValue(colorblind)
@@ -1830,7 +1852,8 @@ class BaresipService: Service() {
 
         Handler(Looper.getMainLooper()).post {
             addMobileUserAgent()
-            updateMobileStatus()
+            if (VERSION.SDK_INT >= 29)
+                updateMobileStatus()
 
             val mobileUa = uas.value.find { it.account.isMobile }
             if (mobileUa != null)
@@ -1852,6 +1875,18 @@ class BaresipService: Service() {
             }
         }
 
+        registerTelephony()
+        Api.net_debug()
+        postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
+        callActionUri = ""
+        Log.d(TAG, "Battery optimizations are ignored: " +
+                "${pm.isIgnoringBatteryOptimizations(packageName)}")
+        Log.d(TAG, "Partial wake lock/wifi lock is held: " +
+                "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
+        updateStatusNotification()
+    }
+
+    fun registerTelephony() {
         if (VERSION.SDK_INT >= 31 && !telephonyCallbackRegistered)
             try {
                 telephonyManager.registerTelephonyCallback(mainExecutor, telephonyCallback)
@@ -1866,14 +1901,6 @@ class BaresipService: Service() {
             telephonyCallbackRegistered = true
             Log.d(TAG, "Registered PhoneStateListener")
         }
-        Api.net_debug()
-        postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
-        callActionUri = ""
-        Log.d(TAG, "Battery optimizations are ignored: " +
-                "${pm.isIgnoringBatteryOptimizations(packageName)}")
-        Log.d(TAG, "Partial wake lock/wifi lock is held: " +
-                "${partialWakeLock.isHeld}/${wifiLock.isHeld}")
-        updateStatusNotification()
     }
 
     @Suppress("unused")
@@ -2344,53 +2371,58 @@ class BaresipService: Service() {
     }
 
     fun addMobileUserAgent() {
-        if (VERSION.SDK_INT < 29) return
+        if (VERSION.SDK_INT >= 29) {
 
-        val mobileAccountHandle = Utils.pstnAccountHandle(this)
-        val existingMobileUa = uas.value.find { it.account.isMobile }
+            val mobileAccountHandle = Utils.pstnAccountHandle(this)
+            val existingMobileUa = uas.value.find { it.account.isMobile }
 
-        val mobileAor = "sip:mobile@pstn"
+            if (existingMobileUa == null && mobileAccountHandle == null)
+                return
 
-        val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-        val isSimReady = isSimReady()
-        val status = if (mobileAccountHandle == null || !isSimReady)
-            R.drawable.circle_white
-        else if (existingMobileUa?.status == circleGreen.getValue(colorblind))
-            circleGreen.getValue(colorblind)
-        else if (isAirplaneModeOn)
-            R.drawable.circle_white
-        else
-            circleRed.getValue(colorblind)
+            val mobileAor = "sip:mobile@pstn"
 
-        if (existingMobileUa != null) {
-            if (existingMobileUa.status != status) {
-                Log.d(TAG, "Updating existing Mobile UA status to $status")
-                existingMobileUa.updateStatus(status)
-                updateStatusNotification()
-                if (isMainVisible)
-                    registrationUpdate.postValue(System.currentTimeMillis())
+            val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+            val isSimReady = isSimReady()
+            val status = if (mobileAccountHandle == null || !isSimReady)
+                R.drawable.circle_white
+            else if (existingMobileUa?.status == circleGreen.getValue(colorblind))
+                circleGreen.getValue(colorblind)
+            else if (isAirplaneModeOn)
+                R.drawable.circle_white
+            else
+                circleRed.getValue(colorblind)
+
+            if (existingMobileUa != null) {
+                if (existingMobileUa.status != status) {
+                    Log.d(TAG, "Updating existing Mobile UA status to $status")
+                    existingMobileUa.updateStatus(status)
+                    updateStatusNotification()
+                    if (isMainVisible)
+                        registrationUpdate.postValue(System.currentTimeMillis())
+                }
+                return
             }
-            return
+
+            Log.d(TAG, "Injecting new virtual Mobile account: $mobileAor")
+            val account = Account(0L, mobileAor)
+            account.isMobile = true
+            account.nickName = "Mobile"
+            account.regint = 0
+            account.telProvider = ""
+            val mobileUa = UserAgent(0L, account)
+            mobileUa.status = status
+
+            val updatedUas = uas.value.toMutableList()
+            updatedUas.add(mobileUa)
+            uas.value = updatedUas.toList()
+            uasStatus.value = UserAgent.statusMap()
+
+            registerTelephony()
+            Account.saveAccounts()
+            CallHistoryNew.save()
+            Message.save()
+            updateStatusNotification()
         }
-
-        Log.d(TAG, "Injecting new virtual Mobile account: $mobileAor")
-        val account = Account(0L, mobileAor)
-        account.isMobile = true
-        account.nickName = "Mobile"
-        account.regint = 0
-        account.telProvider = ""
-        val mobileUa = UserAgent(0L, account)
-        mobileUa.status = status
-
-        val updatedUas = uas.value.toMutableList()
-        updatedUas.add(mobileUa)
-        uas.value = updatedUas.toList()
-        uasStatus.value = UserAgent.statusMap()
-
-        Account.saveAccounts()
-        CallHistoryNew.save()
-        Message.save()
-        updateStatusNotification()
     }
 
     private fun toast(message: String, length: Int = Toast.LENGTH_SHORT) {
@@ -2399,11 +2431,13 @@ class BaresipService: Service() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
             val isSimReady = isSimReady()
-            val status = newStatus ?: if (!isSimReady)
+            val mobileAccountHandle = Utils.pstnAccountHandle(this)
+            val status = newStatus ?: if (mobileAccountHandle == null || !isSimReady)
                 R.drawable.circle_white
             else if (ua.status == circleGreen.getValue(colorblind))
                 ua.status
@@ -2427,16 +2461,19 @@ class BaresipService: Service() {
     private fun updateMobileStatusFromServiceState(state: Int) {
         if (state == previousMobileServiceState) return
         previousMobileServiceState = state
-        val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-        val isSimReady = isSimReady()
-        val status = if (state == ServiceState.STATE_IN_SERVICE && isSimReady)
-            circleGreen.getValue(colorblind)
-        else if (isAirplaneModeOn || !isSimReady)
-            R.drawable.circle_white
-        else
-            circleRed.getValue(colorblind)
-        Log.d(TAG, "Mobile service state changed: $state, updating status to $status (Airplane=$isAirplaneModeOn)")
-        updateMobileStatus(status)
+        if (VERSION.SDK_INT >= 29) {
+            val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+            val isSimReady = isSimReady()
+            val mobileAccountHandle = Utils.pstnAccountHandle(this)
+            val status = if (state == ServiceState.STATE_IN_SERVICE && isSimReady && mobileAccountHandle != null)
+                circleGreen.getValue(colorblind)
+            else if (mobileAccountHandle == null || isAirplaneModeOn || !isSimReady)
+                R.drawable.circle_white
+            else
+                circleRed.getValue(colorblind)
+            Log.d(TAG, "Mobile service state changed: $state, updating status to $status (Airplane=$isAirplaneModeOn)")
+            updateMobileStatus(status)
+        }
     }
 
     @SuppressLint("MissingPermission")
