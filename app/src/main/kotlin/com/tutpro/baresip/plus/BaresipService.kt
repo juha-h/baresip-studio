@@ -1,7 +1,6 @@
 @file:Suppress("DEPRECATION")
 package com.tutpro.baresip.plus
 
-import android.Manifest
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
@@ -122,6 +121,7 @@ class BaresipService: Service() {
     private lateinit var bluetoothReceiver: BroadcastReceiver
     private lateinit var hotSpotReceiver: BroadcastReceiver
     private lateinit var airplaneModeReceiver: BroadcastReceiver
+    private lateinit var simStateReceiver: BroadcastReceiver
     private lateinit var androidContactsObserver: ContentObserver
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var stopState: String
@@ -143,6 +143,7 @@ class BaresipService: Service() {
     private var hotSpotReceiverRegistered = false
     private var bluetoothReceiverRegistered = false
     private var airplaneModeReceiverRegistered = false
+    private var simStateReceiverRegistered = false
     private var telephonyCallbackRegistered = false
     private var isNotificationInCall = false
     private var isServiceClean = false
@@ -336,6 +337,22 @@ class BaresipService: Service() {
             ContextCompat.RECEIVER_EXPORTED
         )
         airplaneModeReceiverRegistered = true
+
+        simStateReceiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                if (intent.action == "android.intent.action.SIM_STATE_CHANGED") {
+                    Log.d(TAG, "SIM state changed")
+                    updateMobileStatus()
+                }
+            }
+        }
+        ContextCompat.registerReceiver(
+            this,
+            simStateReceiver,
+            IntentFilter("android.intent.action.SIM_STATE_CHANGED"),
+            ContextCompat.RECEIVER_EXPORTED
+        )
+        simStateReceiverRegistered = true
 
         tm = getSystemService(TELECOM_SERVICE) as TelecomManager
 
@@ -1813,6 +1830,7 @@ class BaresipService: Service() {
 
         Handler(Looper.getMainLooper()).post {
             addMobileUserAgent()
+            updateMobileStatus()
 
             val mobileUa = uas.value.find { it.account.isMobile }
             if (mobileUa != null)
@@ -2331,22 +2349,27 @@ class BaresipService: Service() {
         val mobileAccountHandle = Utils.pstnAccountHandle(this)
         val existingMobileUa = uas.value.find { it.account.isMobile }
 
-        // If mobile account should not exist (role lost or no SIM), remove it if it exists
-        if (mobileAccountHandle == null) {
-            if (existingMobileUa != null) {
-                Log.d(TAG, "Removing Mobile account (role lost or SIM missing)")
-                existingMobileUa.remove()
-                Account.saveAccounts()
-                CallHistoryNew.save()
-                Message.save()
-                updateStatusNotification()
-            }
-            return
-        }
-
         val mobileAor = "sip:mobile@pstn"
 
+        val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+        val isSimReady = isSimReady()
+        val status = if (mobileAccountHandle == null || !isSimReady)
+            R.drawable.circle_white
+        else if (existingMobileUa?.status == circleGreen.getValue(colorblind))
+            circleGreen.getValue(colorblind)
+        else if (isAirplaneModeOn)
+            R.drawable.circle_white
+        else
+            circleRed.getValue(colorblind)
+
         if (existingMobileUa != null) {
+            if (existingMobileUa.status != status) {
+                Log.d(TAG, "Updating existing Mobile UA status to $status")
+                existingMobileUa.updateStatus(status)
+                updateStatusNotification()
+                if (isMainVisible)
+                    registrationUpdate.postValue(System.currentTimeMillis())
+            }
             return
         }
 
@@ -2357,20 +2380,7 @@ class BaresipService: Service() {
         account.regint = 0
         account.telProvider = ""
         val mobileUa = UserAgent(0L, account)
-        val isAirplaneModeOn = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
-        val sm = getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE) as android.telephony.SubscriptionManager
-        val hasActiveSubscription = if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
-                PackageManager.PERMISSION_GRANTED)
-            !sm.activeSubscriptionInfoList.isNullOrEmpty()
-        else
-            false
-        mobileUa.status = if (isAirplaneModeOn)
-            R.drawable.circle_white
-        else if (hasActiveSubscription)
-            circleGreen.getValue(colorblind)
-        else
-            circleRed.getValue(colorblind)
-        updateMobileStatus(mobileUa.status)
+        mobileUa.status = status
 
         val updatedUas = uas.value.toMutableList()
         updatedUas.add(mobileUa)
@@ -2392,12 +2402,13 @@ class BaresipService: Service() {
     private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus ?: if (isAirplaneModeOn) {
-                if (ua.status == circleGreen.getValue(colorblind))
-                    ua.status
-                else
-                    R.drawable.circle_white
-            }
+            val isSimReady = isSimReady()
+            val status = newStatus ?: if (!isSimReady)
+                R.drawable.circle_white
+            else if (ua.status == circleGreen.getValue(colorblind))
+                ua.status
+            else if (isAirplaneModeOn)
+                R.drawable.circle_white
             else if (ua.status == R.drawable.circle_white)
                 // Show "Red" (not yet in service)
                 circleRed.getValue(colorblind)
@@ -2417,9 +2428,10 @@ class BaresipService: Service() {
         if (state == previousMobileServiceState) return
         previousMobileServiceState = state
         val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-        val status = if (state == ServiceState.STATE_IN_SERVICE)
+        val isSimReady = isSimReady()
+        val status = if (state == ServiceState.STATE_IN_SERVICE && isSimReady)
             circleGreen.getValue(colorblind)
-        else if (isAirplaneModeOn)
+        else if (isAirplaneModeOn || !isSimReady)
             R.drawable.circle_white
         else
             circleRed.getValue(colorblind)
@@ -3031,73 +3043,83 @@ class BaresipService: Service() {
         tm.registerPhoneAccount(phoneAccount)
     }
 
+    fun isSimReady(): Boolean {
+        val tm = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        return tm.simState == TelephonyManager.SIM_STATE_READY
+    }
+
     private fun cleanService() {
-        if (!isServiceClean) {
-            if (hotSpotReceiverRegistered) {
-                try {
-                    unregisterReceiver(hotSpotReceiver)
-                } catch (_: IllegalArgumentException) {}
-                hotSpotReceiverRegistered = false
-            }
-            if (bluetoothReceiverRegistered) {
-                try {
-                    unregisterReceiver(bluetoothReceiver)
-                } catch (_: IllegalArgumentException) {}
-                bluetoothReceiverRegistered = false
-            }
-            if (airplaneModeReceiverRegistered) {
-                try {
-                    unregisterReceiver(airplaneModeReceiver)
-                } catch (_: IllegalArgumentException) {}
-                airplaneModeReceiverRegistered = false
-            }
-            if (telephonyCallbackRegistered) {
-                if (VERSION.SDK_INT >= 31)
-                    try {
-                        telephonyManager.unregisterTelephonyCallback(telephonyCallback)
-                    } catch (_: Exception) {}
-                else {
-                    @Suppress("DEPRECATION")
-                    telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
-                }
-                telephonyCallbackRegistered = false
-            }
-            val callps = ConnectionService.connections.keys.toList()
-            for (callp in callps)
-                ConnectionService.onCallClosed(callp)
-            ConnectionService.pendingOutgoingConnection?.let {
-                it.setDisconnected(DisconnectCause(DisconnectCause.CANCELED))
-                it.destroy()
-                ConnectionService.pendingOutgoingConnection = null
-            }
-            stopRinging()
-            stopMediaPlayer()
-            abandonAudioFocus(this)
-            uas.value = emptyList()
-            uasStatus.value = emptyMap()
-            callHistory.clear()
-            messages = emptyList()
-            if (this::nm.isInitialized)
-                nm.cancelAll()
-            if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
-                partialWakeLock.release()
-            if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
-                proximityWakeLock.release()
-            if (this::wifiLock.isInitialized)
-                wifiLock.release()
-            if (this::networkCallback.isInitialized)
-                try {
-                    cm.unregisterNetworkCallback(networkCallback)
-                } catch (_: Exception) {}
-            if (androidContactsObserverRegistered) {
-                try {
-                    contentResolver.unregisterContentObserver(androidContactsObserver)
-                } catch (_: Exception) {}
-                androidContactsObserverRegistered = false
-            }
-            releaseAudioEffects()
-            isServiceClean = true
+        if (isServiceClean) return
+        if (simStateReceiverRegistered) {
+            try {
+                unregisterReceiver(simStateReceiver)
+            } catch (_: IllegalArgumentException) {}
+            simStateReceiverRegistered = false
         }
+        if (hotSpotReceiverRegistered) {
+            try {
+                unregisterReceiver(hotSpotReceiver)
+            } catch (_: IllegalArgumentException) {}
+            hotSpotReceiverRegistered = false
+        }
+        if (bluetoothReceiverRegistered) {
+            try {
+                unregisterReceiver(bluetoothReceiver)
+            } catch (_: IllegalArgumentException) {}
+            bluetoothReceiverRegistered = false
+        }
+        if (airplaneModeReceiverRegistered) {
+            try {
+                unregisterReceiver(airplaneModeReceiver)
+            } catch (_: IllegalArgumentException) {}
+            airplaneModeReceiverRegistered = false
+        }
+        if (telephonyCallbackRegistered) {
+            if (VERSION.SDK_INT >= 31)
+                try {
+                    telephonyManager.unregisterTelephonyCallback(telephonyCallback)
+                } catch (_: Exception) {}
+            else {
+                @Suppress("DEPRECATION")
+                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
+            }
+            telephonyCallbackRegistered = false
+        }
+        val callps = ConnectionService.connections.keys.toList()
+        for (callp in callps)
+            ConnectionService.onCallClosed(callp)
+        ConnectionService.pendingOutgoingConnection?.let {
+            it.setDisconnected(DisconnectCause(DisconnectCause.CANCELED))
+            it.destroy()
+            ConnectionService.pendingOutgoingConnection = null
+        }
+        stopRinging()
+        stopMediaPlayer()
+        abandonAudioFocus(this)
+        uas.value = emptyList()
+        uasStatus.value = emptyMap()
+        callHistory.clear()
+        messages = emptyList()
+        if (this::nm.isInitialized)
+            nm.cancelAll()
+        if (this::partialWakeLock.isInitialized && partialWakeLock.isHeld)
+            partialWakeLock.release()
+        if (this::proximityWakeLock.isInitialized && proximityWakeLock.isHeld)
+            proximityWakeLock.release()
+        if (this::wifiLock.isInitialized)
+            wifiLock.release()
+        if (this::networkCallback.isInitialized)
+            try {
+                cm.unregisterNetworkCallback(networkCallback)
+            } catch (_: Exception) {}
+        if (androidContactsObserverRegistered) {
+            try {
+                contentResolver.unregisterContentObserver(androidContactsObserver)
+            } catch (_: Exception) {}
+            androidContactsObserverRegistered = false
+        }
+        releaseAudioEffects()
+        isServiceClean = true
     }
 
     private external fun baresipStart(
