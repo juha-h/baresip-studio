@@ -2265,10 +2265,13 @@ class BaresipService: Service() {
         val mobileAor = "sip:mobile@pstn"
 
         val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-        val status = if (mobileAccountHandle == null || isAirplaneModeOn || !isSimReady())
+        val isSimReady = isSimReady()
+        val status = if (mobileAccountHandle == null || !isSimReady)
             R.drawable.circle_white
         else if (existingMobileUa?.status == circleGreen.getValue(colorblind))
             circleGreen.getValue(colorblind)
+        else if (isAirplaneModeOn)
+            R.drawable.circle_white
         else
             circleRed.getValue(colorblind)
 
@@ -2312,9 +2315,13 @@ class BaresipService: Service() {
     private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus ?: if (isAirplaneModeOn || !isSimReady()) {
+            val isSimReady = isSimReady()
+            val status = newStatus ?: if (!isSimReady)
                 R.drawable.circle_white
-            }
+            else if (ua.status == circleGreen.getValue(colorblind))
+                ua.status
+            else if (isAirplaneModeOn)
+                R.drawable.circle_white
             else if (ua.status == R.drawable.circle_white)
                 // Show "Red" (not yet in service)
                 circleRed.getValue(colorblind)
@@ -2337,7 +2344,7 @@ class BaresipService: Service() {
         val isSimReady = isSimReady()
         val status = if (state == ServiceState.STATE_IN_SERVICE && isSimReady)
             circleGreen.getValue(colorblind)
-        else if (isAirplaneModeOn || !isSimReady())
+        else if (isAirplaneModeOn || !isSimReady)
             R.drawable.circle_white
         else
             circleRed.getValue(colorblind)
