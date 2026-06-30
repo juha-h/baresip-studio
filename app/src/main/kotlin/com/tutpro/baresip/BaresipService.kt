@@ -2270,17 +2270,10 @@ class BaresipService: Service() {
         account.regint = 0
         account.telProvider = ""
         val mobileUa = UserAgent(0L, account)
-        val isAirplaneModeOn = Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
-        val sm = getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE) as android.telephony.SubscriptionManager
-        val hasActiveSubscription = if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
-                PackageManager.PERMISSION_GRANTED)
-            !sm.activeSubscriptionInfoList.isNullOrEmpty()
-        else
-            false
-        mobileUa.status = if (isAirplaneModeOn)
+        val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+        val hasSimCard = hasSimCard()
+        mobileUa.status = if (isAirplaneModeOn || !hasSimCard)
             R.drawable.circle_white
-        else if (hasActiveSubscription)
-            circleGreen.getValue(colorblind)
         else
             circleRed.getValue(colorblind)
         updateMobileStatus(mobileUa.status)
@@ -2305,7 +2298,8 @@ class BaresipService: Service() {
     private fun updateMobileStatus(newStatus: Int? = null) {
         uas.value.find { it.account.isMobile }?.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus ?: if (isAirplaneModeOn) {
+            val hasSimCard = hasSimCard()
+            val status = newStatus ?: if (isAirplaneModeOn || !hasSimCard) {
                 if (ua.status == circleGreen.getValue(colorblind))
                     ua.status
                 else
@@ -2330,9 +2324,10 @@ class BaresipService: Service() {
         if (state == previousMobileServiceState) return
         previousMobileServiceState = state
         val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
+        val hasSimCard = hasSimCard()
         val status = if (state == ServiceState.STATE_IN_SERVICE)
             circleGreen.getValue(colorblind)
-        else if (isAirplaneModeOn)
+        else if (isAirplaneModeOn || !hasSimCard)
             R.drawable.circle_white
         else
             circleRed.getValue(colorblind)
@@ -3021,6 +3016,13 @@ class BaresipService: Service() {
     )
 
     external fun baresipStop(force: Boolean)
+
+    private fun hasSimCard(): Boolean {
+        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+            return false
+        val sm = getSystemService(TELEPHONY_SUBSCRIPTION_SERVICE) as android.telephony.SubscriptionManager
+        return sm.activeSubscriptionInfoList?.isNotEmpty() ?: false
+    }
 
     @SuppressLint("MutableCollectionMutableState")
     companion object {
