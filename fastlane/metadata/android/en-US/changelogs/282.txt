@@ -1,0 +1,3 @@
+- Improved SIM card and airplane mode detection
+- Do not remove mobile account when role changes
+- New translations (Chinese)
