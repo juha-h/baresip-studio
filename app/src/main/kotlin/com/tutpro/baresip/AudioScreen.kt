@@ -74,9 +74,7 @@ fun NavGraphBuilder.audioScreenRoute(
     composable("audio") {
         val ctx = LocalContext.current
         AudioScreen(
-            onBack = {
-                navController.navigateUp()
-            },
+            onBack = { navController.navigateUp() },
             checkOnClick = {
                 when (checkOnClick(ctx)) {
                     Result.OK -> navController.navigateUp()
@@ -95,10 +93,7 @@ fun NavGraphBuilder.audioScreenRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AudioScreen(
-    onBack: () -> Unit,
-    checkOnClick: () -> Unit,
-) {
+private fun AudioScreen(onBack: () -> Unit, checkOnClick: () -> Unit) {
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -164,19 +159,20 @@ private fun AudioContent(contentPadding: PaddingValues) {
     oldSpeakerPhone = Config.variable("speaker_phone") == "yes"
     newSpeakerPhone = oldSpeakerPhone
     oldAudioModules = Config.variables("module")
+    for (module in Config.audioModules)
+        newAudioModules[module] = oldAudioModules.contains("${module}.so")
     oldOpusBitrate = Config.variable("opus_bitrate")
     oldOpusPacketLoss = Config.variable("opus_packet_loss")
     if (!BaresipService.agcAvailable)
         oldMicGain = Config.variable("augain")
 
-    if (showAlert.value) {
+    if (showAlert.value)
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
             lastButtonText = stringResource(R.string.ok),
         )
-    }
 
     val scrollState = rememberScrollState()
 
@@ -270,20 +266,23 @@ private fun ToneCountry() {
         val toneCountryTitle = stringResource(R.string.tone_country)
         val toneCountryHelp = stringResource(R.string.tone_country_help)
         Text(text = toneCountryTitle,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
                 .clickable {
                     alertTitle.value = toneCountryTitle
                     alertMessage.value = toneCountryHelp
                     showAlert.value = true
                 },
-            fontSize = 18.sp)
+            fontSize = 18.sp
+        )
         val isDropDownExpanded = remember {
             mutableStateOf(false)
         }
         val countryNames = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
         val countryValues = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
         val itemPosition = remember {
-            mutableIntStateOf(countryValues.indexOf(BaresipService.toneCountry))
+            val index = countryValues.indexOf(BaresipService.toneCountry)
+            mutableIntStateOf(if (index != -1) index else countryValues.indexOf("us"))
         }
         Box {
             Row(
@@ -302,9 +301,8 @@ private fun ToneCountry() {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
+                onDismissRequest = { isDropDownExpanded.value = false }
+            ) {
                 countryNames.forEachIndexed { index, name ->
                     DropdownMenuItem(
                         text = { Text(text = name) },
@@ -312,7 +310,8 @@ private fun ToneCountry() {
                             isDropDownExpanded.value = false
                             itemPosition.intValue = index
                             newToneCountry = countryValues[index]
-                        })
+                        }
+                    )
                     if (index < 10)
                         HorizontalDivider(thickness = 1.dp)
                 }
@@ -331,17 +330,20 @@ private fun SpeakerPhone() {
         val speakerPhoneTitle = stringResource(R.string.speaker_phone)
         val speakerPhoneHelp = stringResource(R.string.speaker_phone_help)
         Text(text = speakerPhoneTitle,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
                 .clickable {
                     alertTitle.value = speakerPhoneTitle
                     alertMessage.value = speakerPhoneHelp
                     showAlert.value = true
                 },
-            fontSize = 18.sp)
+            fontSize = 18.sp
+        )
         var speakerPhone by remember { mutableStateOf(oldSpeakerPhone) }
         Switch(
             checked = speakerPhone,
-            onCheckedChange = { speakerPhone = it
+            onCheckedChange = {
+                speakerPhone = it
                 newSpeakerPhone = speakerPhone
             }
         )
@@ -364,14 +366,14 @@ private fun CallVolume() {
                     alertMessage.value = defaultCallVolumeHelp
                     showAlert.value = true
                 },
-            fontSize = 18.sp)
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
+            fontSize = 18.sp
+        )
+        val isDropDownExpanded = remember { mutableStateOf(false) }
         val volNames = listOf("--",  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
         val volValues = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
         val itemPosition = remember {
-            mutableIntStateOf(volValues.indexOf(BaresipService.callVolume))
+            val index = volValues.indexOf(BaresipService.callVolume)
+            mutableIntStateOf(if (index != -1) index else 0)
         }
         Box {
             Row(
@@ -390,9 +392,8 @@ private fun CallVolume() {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
-                }) {
+                onDismissRequest = { isDropDownExpanded.value = false }
+            ) {
                 volNames.forEachIndexed { index, vol ->
                     DropdownMenuItem(
                         text = { Text(text = vol) },
@@ -424,7 +425,8 @@ private fun MicGain() {
             OutlinedTextField(
                 value = micGain,
                 placeholder = { Text(microphoneGainTitle) },
-                onValueChange = { micGain = it
+                onValueChange = {
+                    micGain = it
                     newMicGain = micGain
                 },
                 modifier = Modifier
@@ -575,6 +577,7 @@ private fun AudioDelay() {
 private fun checkOnClick(ctx: Context): Result {
 
     var restart = false
+    save = false
 
     if (Preferences(ctx).ringtoneUri != newRingtoneUri) {
         Preferences(ctx).ringtoneUri = newRingtoneUri
@@ -646,7 +649,8 @@ private fun checkOnClick(ctx: Context): Result {
                     Config.addVariable("module", "${module}.so")
                     save = true
                 }
-            } else if (oldAudioModules.contains("${module}.so")) {
+            }
+            else if (oldAudioModules.contains("${module}.so")) {
                 Api.module_unload("${module}.so")
                 Config.removeVariableValue("module", "${module}.so")
                 for (ua in BaresipService.uas.value)
@@ -701,11 +705,11 @@ private fun checkOnClick(ctx: Context): Result {
 
 private fun checkMicGain(micGain: String): Boolean {
     val number =
-            try {
-                micGain.toDouble()
-            } catch (_: NumberFormatException) {
-                return false
-            }
+        try {
+            micGain.toDouble()
+        } catch (_: NumberFormatException) {
+            return false
+        }
     return number >= 1.0
 }
 
