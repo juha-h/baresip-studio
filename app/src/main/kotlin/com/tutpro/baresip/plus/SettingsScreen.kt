@@ -152,6 +152,8 @@ private fun SettingsScreen(
     }
 
     LaunchedEffect(null) {
+        save = false
+        restart = false
         settingsViewModel.loadSettings(ctx)
         areSettingsLoaded = true
     }
@@ -191,7 +193,7 @@ private fun SettingsScreen(
         }
     ) { contentPadding ->
 
-        if (showRestartDialog.value) {
+        if (showRestartDialog.value)
             AlertDialog(
                 showDialog = showRestartDialog,
                 title = stringResource(R.string.restart_request),
@@ -201,7 +203,6 @@ private fun SettingsScreen(
                 lastButtonText = stringResource(R.string.restart),
                 onLastClicked = { onRestartApp() },
             )
-        }
 
         if (areSettingsLoaded && activity != null)
             SettingsContent(settingsViewModel, contentPadding, navController, activity, onRestartApp)
@@ -264,7 +265,7 @@ private fun SettingsContent(
     val okButtonText = stringResource(R.string.ok)
     val cancelButtonText = stringResource(R.string.cancel)
 
-    if (showAlert.value) {
+    if (showAlert.value)
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
@@ -272,7 +273,6 @@ private fun SettingsContent(
             firstButtonText = "",
             lastButtonText = okButtonText,
         )
-    }
 
     if (showDialog.value)
         AlertDialog(
