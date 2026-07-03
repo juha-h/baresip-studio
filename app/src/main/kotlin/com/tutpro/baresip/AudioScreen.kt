@@ -44,7 +44,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -69,11 +68,15 @@ enum class Result {
     OK, ERROR, RESTART
 }
 
-fun NavGraphBuilder.audioScreenRoute(navController: NavController) {
+fun NavGraphBuilder.audioScreenRoute(
+    navController: NavController,
+) {
     composable("audio") {
         val ctx = LocalContext.current
         AudioScreen(
-            onBack = { navController.navigateUp() },
+            onBack = {
+                navController.navigateUp()
+            },
             checkOnClick = {
                 when (checkOnClick(ctx)) {
                     Result.OK -> navController.navigateUp()
@@ -92,7 +95,10 @@ fun NavGraphBuilder.audioScreenRoute(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AudioScreen(onBack: () -> Unit, checkOnClick: () -> Unit) {
+private fun AudioScreen(
+    onBack: () -> Unit,
+    checkOnClick: () -> Unit,
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -122,7 +128,7 @@ private fun AudioScreen(onBack: () -> Unit, checkOnClick: () -> Unit) {
                         IconButton(onClick = checkOnClick) {
                             Icon(imageVector = Icons.Filled.Check, contentDescription = "Check")
                         }
-                    }
+                    },
                 )
             }
         }
@@ -131,19 +137,19 @@ private fun AudioScreen(onBack: () -> Unit, checkOnClick: () -> Unit) {
     }
 }
 
-private var newCallVolume = 0
+private var newCallVolume = BaresipService.callVolume
 private var oldMicGain = ""
 private var newMicGain = ""
-private var oldSpeakerPhone = false
-private var newSpeakerPhone = false
+private var oldSpeakerPhone = BaresipService.speakerPhone
+private var newSpeakerPhone = oldSpeakerPhone
 private var oldAudioModules = ArrayList<String>()
 private var newAudioModules = mutableMapOf<String, Boolean>()
 private var oldOpusBitrate = ""
-private var newOpusBitrate = ""
+private var newOpusBitrate = oldOpusBitrate
 private var oldOpusPacketLoss = ""
-private var newOpusPacketLoss = ""
-private var newAudioDelay = ""
-private var newToneCountry = ""
+private var newOpusPacketLoss = oldOpusPacketLoss
+private var newAudioDelay = BaresipService.audioDelay.toString()
+private var newToneCountry = BaresipService.toneCountry
 private var newRingtoneUri = ""
 
 private var save = false
@@ -155,37 +161,22 @@ private val showAlert = mutableStateOf(false)
 @Composable
 private fun AudioContent(contentPadding: PaddingValues) {
 
-    val ctx = LocalContext.current
+    oldSpeakerPhone = Config.variable("speaker_phone") == "yes"
+    newSpeakerPhone = oldSpeakerPhone
+    oldAudioModules = Config.variables("module")
+    oldOpusBitrate = Config.variable("opus_bitrate")
+    oldOpusPacketLoss = Config.variable("opus_packet_loss")
+    if (!BaresipService.agcAvailable)
+        oldMicGain = Config.variable("augain")
 
-    LaunchedEffect(Unit) {
-        save = false
-        oldSpeakerPhone = Config.variable("speaker_phone") == "yes"
-        newSpeakerPhone = oldSpeakerPhone
-        oldAudioModules = Config.variables("module")
-        newAudioModules.clear()
-        oldOpusBitrate = Config.variable("opus_bitrate")
-        newOpusBitrate = oldOpusBitrate
-        oldOpusPacketLoss = Config.variable("opus_packet_loss")
-        newOpusPacketLoss = oldOpusPacketLoss
-        if (!BaresipService.agcAvailable)
-            oldMicGain = Config.variable("augain")
-        newMicGain = oldMicGain
-        newCallVolume = BaresipService.callVolume
-        newAudioDelay = BaresipService.audioDelay.toString()
-        newToneCountry = BaresipService.toneCountry
-        newRingtoneUri = if (Preferences(ctx).ringtoneUri == "")
-            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
-        else
-            Preferences(ctx).ringtoneUri!!
-    }
-
-    if (showAlert.value)
+    if (showAlert.value) {
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
             lastButtonText = stringResource(R.string.ok),
         )
+    }
 
     val scrollState = rememberScrollState()
 
@@ -214,8 +205,12 @@ private fun AudioContent(contentPadding: PaddingValues) {
 private fun Ringtone() {
     val ringToneTitle = stringResource(R.string.ringtone)
     val selectRingToneMessage = stringResource(R.string.select_ringtone)
-    var ringtoneUri by remember(newRingtoneUri) {
-        mutableStateOf(newRingtoneUri)
+    val ctx = LocalContext.current
+    var ringtoneUri by remember {
+        mutableStateOf(if (Preferences(ctx).ringtoneUri == "")
+            RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
+        else
+            Preferences(ctx).ringtoneUri!!)
     }
     newRingtoneUri = ringtoneUri
     val launcher = rememberLauncherForActivityResult(
@@ -282,11 +277,13 @@ private fun ToneCountry() {
                     showAlert.value = true
                 },
             fontSize = 18.sp)
-        val isDropDownExpanded = remember { mutableStateOf(false) }
+        val isDropDownExpanded = remember {
+            mutableStateOf(false)
+        }
         val countryNames = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
         val countryValues = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
-        val itemPosition = remember(newToneCountry) {
-            mutableIntStateOf(countryValues.indexOf(newToneCountry))
+        val itemPosition = remember {
+            mutableIntStateOf(countryValues.indexOf(BaresipService.toneCountry))
         }
         Box {
             Row(
@@ -305,8 +302,9 @@ private fun ToneCountry() {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = { isDropDownExpanded.value = false }
-            ) {
+                onDismissRequest = {
+                    isDropDownExpanded.value = false
+                }) {
                 countryNames.forEachIndexed { index, name ->
                     DropdownMenuItem(
                         text = { Text(text = name) },
@@ -333,19 +331,17 @@ private fun SpeakerPhone() {
         val speakerPhoneTitle = stringResource(R.string.speaker_phone)
         val speakerPhoneHelp = stringResource(R.string.speaker_phone_help)
         Text(text = speakerPhoneTitle,
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
                 .clickable {
                     alertTitle.value = speakerPhoneTitle
                     alertMessage.value = speakerPhoneHelp
                     showAlert.value = true
                 },
             fontSize = 18.sp)
-        var speakerPhone by remember(oldSpeakerPhone) { mutableStateOf(oldSpeakerPhone) }
+        var speakerPhone by remember { mutableStateOf(oldSpeakerPhone) }
         Switch(
             checked = speakerPhone,
-            onCheckedChange = {
-                speakerPhone = it
+            onCheckedChange = { speakerPhone = it
                 newSpeakerPhone = speakerPhone
             }
         )
@@ -369,17 +365,21 @@ private fun CallVolume() {
                     showAlert.value = true
                 },
             fontSize = 18.sp)
-        val isDropDownExpanded = remember { mutableStateOf(false) }
+        val isDropDownExpanded = remember {
+            mutableStateOf(false)
+        }
         val volNames = listOf("--",  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
         val volValues = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        val itemPosition = remember(newCallVolume) {
-            mutableIntStateOf(volValues.indexOf(newCallVolume))
+        val itemPosition = remember {
+            mutableIntStateOf(volValues.indexOf(BaresipService.callVolume))
         }
         Box {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { isDropDownExpanded.value = true }
+                modifier = Modifier.clickable {
+                    isDropDownExpanded.value = true
+                }
             ) {
                 Text(text = volNames[itemPosition.intValue])
                 Icon(
@@ -390,8 +390,9 @@ private fun CallVolume() {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = { isDropDownExpanded.value = false }
-            ) {
+                onDismissRequest = {
+                    isDropDownExpanded.value = false
+                }) {
                 volNames.forEachIndexed { index, vol ->
                     DropdownMenuItem(
                         text = { Text(text = vol) },
@@ -418,13 +419,12 @@ private fun MicGain() {
         ) {
             val microphoneGainTitle = stringResource(R.string.microphone_gain)
             val microphoneGainHelp = stringResource(R.string.microphone_gain_help)
-            var micGain by remember(oldMicGain) { mutableStateOf(oldMicGain) }
+            var micGain by remember { mutableStateOf(oldMicGain) }
             newMicGain = micGain
             OutlinedTextField(
                 value = micGain,
                 placeholder = { Text(microphoneGainTitle) },
-                onValueChange = {
-                    micGain = it
+                onValueChange = { micGain = it
                     newMicGain = micGain
                 },
                 modifier = Modifier
@@ -463,7 +463,7 @@ private fun AudioModules() {
             ) {
                 Text(text = String.format(stringResource(R.string.bullet_item), module), fontSize = 18.sp)
                 Spacer(modifier = Modifier.weight(1f))
-                var checked by remember(oldAudioModules) { mutableStateOf(oldAudioModules.contains("${module}.so")) }
+                var checked by remember { mutableStateOf(oldAudioModules.contains("${module}.so")) }
                 Switch(
                     checked = checked,
                     onCheckedChange = {
@@ -485,7 +485,7 @@ private fun OpusBitRate() {
     ) {
         val opusBitRateTitle = stringResource(R.string.opus_bit_rate)
         val opusBitRateHelp = stringResource(R.string.opus_bit_rate_help)
-        var opusBitrate by remember(oldOpusBitrate) { mutableStateOf(oldOpusBitrate) }
+        var opusBitrate by remember { mutableStateOf(oldOpusBitrate) }
         newOpusBitrate = opusBitrate
         OutlinedTextField(
             value = opusBitrate,
@@ -517,7 +517,7 @@ private fun OpusPacketLoss() {
     ) {
         val opusPacketLossTitle = stringResource(R.string.opus_packet_loss)
         val opusPacketLossHelp = stringResource(R.string.opus_packet_loss_help)
-        var opusPacketLoss by remember(oldOpusPacketLoss) { mutableStateOf(oldOpusPacketLoss) }
+        var opusPacketLoss by remember { mutableStateOf(oldOpusPacketLoss) }
         newOpusPacketLoss = opusPacketLoss
         OutlinedTextField(
             value = opusPacketLoss,
@@ -549,7 +549,7 @@ private fun AudioDelay() {
     ) {
         val audioDelayTitle = stringResource(R.string.audio_delay)
         val audioDelayHelp = stringResource(R.string.audio_delay_help)
-        var audioDelay by remember(newAudioDelay) { mutableStateOf(newAudioDelay) }
+        var audioDelay by remember { mutableStateOf(BaresipService.audioDelay.toString()) }
         newAudioDelay = audioDelay
         OutlinedTextField(
             value = audioDelay,
@@ -580,6 +580,7 @@ private fun checkOnClick(ctx: Context): Result {
         Preferences(ctx).ringtoneUri = newRingtoneUri
         BaresipService.rt = RingtoneManager.getRingtone(ctx, newRingtoneUri.toUri())
     }
+
 
     if (BaresipService.toneCountry != newToneCountry) {
         BaresipService.toneCountry = newToneCountry
@@ -645,8 +646,7 @@ private fun checkOnClick(ctx: Context): Result {
                     Config.addVariable("module", "${module}.so")
                     save = true
                 }
-            }
-            else if (oldAudioModules.contains("${module}.so")) {
+            } else if (oldAudioModules.contains("${module}.so")) {
                 Api.module_unload("${module}.so")
                 Config.removeVariableValue("module", "${module}.so")
                 for (ua in BaresipService.uas.value)
@@ -701,11 +701,11 @@ private fun checkOnClick(ctx: Context): Result {
 
 private fun checkMicGain(micGain: String): Boolean {
     val number =
-        try {
-            micGain.toDouble()
-        } catch (_: NumberFormatException) {
-            return false
-        }
+            try {
+                micGain.toDouble()
+            } catch (_: NumberFormatException) {
+                return false
+            }
     return number >= 1.0
 }
 
@@ -723,4 +723,3 @@ private fun checkAudioDelay(audioDelay: String): Boolean {
     val number = audioDelay.toIntOrNull() ?: return false
     return (number >= 100) && (number <= 3000)
 }
-
