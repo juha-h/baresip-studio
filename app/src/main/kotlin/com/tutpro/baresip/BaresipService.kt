@@ -1699,13 +1699,6 @@ class BaresipService: Service() {
         val ua = UserAgent.ofUap(uap)
         if (ua != null && ua.account.isMobile) {
             val user = Utils.uriUserPart(uri)
-            if (user.startsWith("*#*#") && user.endsWith("#*#*")) {
-                val code = user.substring(4, user.length - 4)
-                val intent = Intent("android.provider.Telephony.SECRET_CODE", "android_secret_code://$code".toUri())
-                sendBroadcast(intent)
-                postServiceEvent(ServiceEvent("ussd response", arrayListOf(uap, user, ""), System.nanoTime()))
-                return
-            }
             if (user == "*#06#") {
                 val imei = getDeviceId(this)
                 postServiceEvent(ServiceEvent("imei", arrayListOf(uap, user, imei), System.nanoTime()))
@@ -2359,7 +2352,7 @@ class BaresipService: Service() {
         return try {
             tm.imei ?: tm.meid ?: "N/A"
         } catch (_: SecurityException) {
-            "N/A"
+            getString(R.string.permission_denied)
         }
     }
 

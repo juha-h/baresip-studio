@@ -2083,7 +2083,11 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
                 extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
                 try {
                     Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
-                    tm.placeCall(uri.toUri(), extras)
+                    val telecomUri = if (uri.startsWith("tel:"))
+                        Uri.fromParts("tel", uri.substring(4), null)
+                    else
+                        uri.toUri()
+                    tm.placeCall(telecomUri, extras)
                 } catch (e: SecurityException) {
                     error = "placeCall failed: ${e.message}"
                 }
