@@ -1,0 +1,4 @@
+- USSD and MMI code handling improvements
+- Prevent unnecessary re-registration when checking out from account screen
+- Prevent unnecessary config save and restart alert when checking out settings screen
+- New translations (Chinese, Spanish)
