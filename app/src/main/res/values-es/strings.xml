@@ -474,4 +474,5 @@
     <string name="ussd_failed">Solicitud de USSD incorrecta</string>
     <string name="ussd_service_unavailable">Servicio USSD no disponible</string>
     <string name="ussd_unknown_error">USSD con error desconocido</string>
+    <string name="permission_denied">Permiso denegado</string>
 </resources>
