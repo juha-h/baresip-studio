@@ -2339,6 +2339,15 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     val aor = ua.account.aor
 
     when (ev[0]) {
+        "imei" -> {
+            if (aor == viewModel.selectedAor.value) {
+                viewModel.dialerState.callButtonsEnabled.value = true
+                viewModel.dialerState.callUri.value = ""
+            }
+            handleDialog(ctx, ctx.getString(R.string.info), "IMEI: " + (params[2] as String))
+            handleNextEvent()
+            return
+        }
         "ussd response" -> {
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true

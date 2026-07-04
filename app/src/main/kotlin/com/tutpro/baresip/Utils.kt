@@ -378,8 +378,9 @@ object Utils {
     }
 
     fun isUssd(uri: String): Boolean {
-        val user = uriUserPart(uri)
-        return user.startsWith("*") && user.endsWith("#")
+        val u = uriUserPart(uri)
+        // Must start with * or # and must end with #, but exclude "Secret Code" pattern (*#*#...#*#*)
+        return (u.startsWith("*") || u.startsWith("#")) && u.endsWith("#") && !u.startsWith("*#*#")
     }
 
     fun checkUri(uri: String): Boolean {
