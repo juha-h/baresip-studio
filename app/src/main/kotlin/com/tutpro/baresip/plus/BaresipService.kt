@@ -1762,9 +1762,17 @@ class BaresipService: Service() {
     fun runCall(uap: Long, uri: String, conferenceCall: Boolean, videoCall: Boolean, onHoldCallp: Long) {
 
         val ua = UserAgent.ofUap(uap)
-        if (ua != null && ua.account.isMobile && Utils.isUssd(uri)) {
-            sendUssd(Utils.uriUserPart(uri))
-            return
+        if (ua != null && ua.account.isMobile) {
+            val user = Utils.uriUserPart(uri)
+            if (user == "*#06#") {
+                val imei = getDeviceId(this)
+                postServiceEvent(ServiceEvent("imei", arrayListOf(uap, user, imei), System.nanoTime()))
+                return
+            }
+            if (Utils.isUssd(uri)) {
+                sendUssd(user)
+                return
+            }
         }
 
         val executeCall = {
@@ -2422,6 +2430,16 @@ class BaresipService: Service() {
             CallHistoryNew.save()
             Message.save()
             updateStatusNotification()
+        }
+    }
+
+    @SuppressLint("HardwareIds", "MissingPermission")
+    private fun getDeviceId(context: Context): String {
+        val tm = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        return try {
+            tm.imei ?: tm.meid ?: "N/A"
+        } catch (_: SecurityException) {
+            getString(R.string.permission_denied)
         }
     }
 

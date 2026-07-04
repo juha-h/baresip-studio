@@ -2630,7 +2630,11 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
                 extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
                 try {
                     Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
-                    tm.placeCall(uri.toUri(), extras)
+                    val telecomUri = if (uri.startsWith("tel:"))
+                        Uri.fromParts("tel", uri.substring(4), null)
+                    else
+                        uri.toUri()
+                    tm.placeCall(telecomUri, extras)
                 } catch (e: SecurityException) {
                     error = "placeCall failed: ${e.message}"
                 }
@@ -2915,6 +2919,15 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     val aor = ua.account.aor
 
     when (ev[0]) {
+        "imei" -> {
+            if (aor == viewModel.selectedAor.value) {
+                viewModel.dialerState.callButtonsEnabled.value = true
+                viewModel.dialerState.callUri.value = ""
+            }
+            handleDialog(ctx, ctx.getString(R.string.info), "IMEI: " + (params[2] as String))
+            handleNextEvent()
+            return
+        }
         "ussd response" -> {
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true

@@ -136,11 +136,10 @@ object Utils {
     fun uriUserPart(uri: String): String {
         return if (uri.contains("@"))
             uri.substringAfter(":").substringBefore("@")
+        else if (uri.startsWith("tel:"))
+            uri.substringAfter(":").substringBefore(";")
         else
-            if (isTelUri(uri))
-                uri.substringAfter(":").substringBefore(";")
-            else
-                ""
+            ""
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
@@ -220,7 +219,8 @@ object Utils {
             pairs.fold(this) { acc, (old, new) -> acc.replace(old, new, ignoreCase = true) }
 
     fun uriUnescape(uri: String): String {
-        return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=")
+        return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=",
+            "%23" to "#", "%2A" to "*")
     }
 
     fun aorDomain(aor: String): String {
@@ -378,8 +378,9 @@ object Utils {
     }
 
     fun isUssd(uri: String): Boolean {
-        val user = uriUserPart(uri)
-        return user.startsWith("*") && user.endsWith("#")
+        val u = uriUserPart(uri)
+        // Must start with * or # and must end with #, but exclude "Secret Code" pattern (*#*#...#*#*)
+        return (u.startsWith("*") || u.startsWith("#")) && u.endsWith("#") && !u.startsWith("*#*#")
     }
 
     fun checkUri(uri: String): Boolean {
