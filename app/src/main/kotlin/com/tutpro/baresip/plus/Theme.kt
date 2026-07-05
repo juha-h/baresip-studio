@@ -1,6 +1,5 @@
 package com.tutpro.baresip.plus
 
-import android.app.Activity
 import android.os.Build.VERSION
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -15,11 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.core.graphics.ColorUtils
-import androidx.core.view.WindowCompat
 
 @Composable
 fun AppTheme(
@@ -33,12 +29,11 @@ fun AppTheme(
     val isDark = useDarkTheme || isSystemInDarkTheme()
 
     val colorScheme = when {
-        useActualDynamicColors -> {
+        useActualDynamicColors ->
             if (isDark)
                 dynamicDarkColorScheme(context)
             else
                 dynamicLightColorScheme(context)
-        }
         isDark -> darkColorScheme(
             primary = PrimaryDark,
             onPrimary = OnPrimaryDark,
@@ -120,19 +115,6 @@ fun AppTheme(
                 )
                 if (VERSION.SDK_INT >= 29)
                     activity.window.isNavigationBarContrastEnforced = false
-            }
-            else {
-                val window = (view.context as Activity).window
-                val insetsController = WindowCompat.getInsetsController(window, view)
-                if (VERSION.SDK_INT < 35)
-                    @Suppress("DEPRECATION")
-                    window.navigationBarColor = android.graphics.Color.TRANSPARENT
-                if (VERSION.SDK_INT >= 29)
-                    window.isNavigationBarContrastEnforced = false
-                val isBackgroundEffectivelyLight =
-                    ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
-                insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
-                insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
             }
         }
 
