@@ -180,7 +180,12 @@ class MainActivity : ComponentActivity() {
         when (intent?.action) {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 if (BaresipService.isServiceRunning)
-                    callAction(applicationContext, viewModel, intent.data, if (intent?.action == ACTION_CALL) "call" else "dial")
+                    callAction(
+                        applicationContext,
+                        viewModel,
+                        intent.data,
+                        if (intent?.action == ACTION_CALL) "call" else "dial"
+                    )
                 else
                     BaresipService.callActionUri = intent.data
                         .toString().replace("%2B", "+")
