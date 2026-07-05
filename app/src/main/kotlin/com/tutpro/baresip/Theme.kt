@@ -29,12 +29,11 @@ fun AppTheme(
     val isDark = useDarkTheme || isSystemInDarkTheme()
 
     val colorScheme = when {
-        useActualDynamicColors -> {
+        useActualDynamicColors ->
             if (isDark)
                 dynamicDarkColorScheme(context)
             else
                 dynamicLightColorScheme(context)
-        }
         isDark -> darkColorScheme(
             primary = PrimaryDark,
             onPrimary = OnPrimaryDark,
