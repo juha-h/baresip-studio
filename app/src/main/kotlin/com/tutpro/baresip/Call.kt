@@ -78,12 +78,11 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     open fun resume(): Boolean {
         if (!onhold && !held) return true
         // 1. Hold other calls first
-        for (c in BaresipService.calls) {
+        for (c in BaresipService.calls)
             if (c.callp != this.callp && !c.onhold && !c.held) {
                 Log.d("Baresip", "Auto-holding active call ${c.callp}")
                 c.hold()
             }
-        }
         val connection = ConnectionService.connections[callp]
         // 2. SIP Signaling
         if (Api.call_hold(callp, false)) {
