@@ -100,10 +100,9 @@ object Utils {
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
         val result = ArrayList<String>()
-        for (line in lines) {
+        for (line in lines)
             if (line.startsWith(name))
                 result.add((line.substring(name.length).trim()).split(" \t")[0])
-        }
         return result
     }
 
@@ -117,10 +116,10 @@ object Utils {
     fun uriHostPart(uri: String): String {
         return if (uri.contains("@")) {
             uri.substringAfter("@")
-                    .substringBefore(":")
-                    .substringBefore(";")
-                    .substringBefore("?")
-                    .substringBefore(">")
+                .substringBefore(":")
+                .substringBefore(";")
+                .substringBefore("?")
+                .substringBefore(">")
         } else {
             val parts = uri.split(":")
             when (parts.size) {
@@ -178,11 +177,10 @@ object Utils {
                 ctx.getString(R.string.anonymous)
             else if (host == "unknown.invalid")
                 ctx.getString(R.string.unknown)
+            else if (params.isEmpty())
+                "$user@$host"
             else
-                if (params.isEmpty())
-                    "$user@$host"
-                else
-                    "$user@$host;" + params.joinToString(";")
+                "$user@$host;" + params.joinToString(";")
         }
         if (u.startsWith("<") && u.endsWith(">"))
             u = u.substring(1).substringBeforeLast(">")
@@ -750,7 +748,7 @@ object Utils {
     }
 
     fun encryptToUri(ctx: Context, uri: Uri, content: ByteArray, password: String): Boolean {
-        val obj = encrypt(content, password.toCharArray())
+        val obj = if (password == "") content else encrypt(content, password.toCharArray())
         try {
             val stream = ctx.contentResolver.openOutputStream(uri)
             if (stream != null)
@@ -781,7 +779,7 @@ object Utils {
         try {
             ObjectInputStream(stream).use {
                 val content = it.readObject() as ByteArray
-                plainData = decrypt(content, password.toCharArray())
+                plainData = if (password == "") content else decrypt(content, password.toCharArray())
             }
         } catch (e: Exception) {
             Log.w(TAG, "decryptFromUri as ByteArray failed: $e")
