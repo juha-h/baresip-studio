@@ -657,6 +657,17 @@ object Utils {
             Environment.DIRECTORY_DOWNLOADS).path + "/$fileName"
     }
 
+    fun screenshotsPath(fileName: String): String {
+        val dcimPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).path + "/Screenshots"
+        if (File(dcimPath).exists()) return "$dcimPath/$fileName"
+        val picturesPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).path + "/Screenshots"
+        if (File(picturesPath).exists()) return "$picturesPath/$fileName"
+        // Default to DCIM/Screenshots and ensure it exists
+        val dir = File(dcimPath)
+        if (!dir.exists()) dir.mkdirs()
+        return "$dcimPath/$fileName"
+    }
+
     fun fileNameOfUri(ctx: Context, uri: Uri): String {
         val cursor = ctx.contentResolver.query(uri, null, null, null, null)
         var name = ""

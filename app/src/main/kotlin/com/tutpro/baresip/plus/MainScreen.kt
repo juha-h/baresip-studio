@@ -2253,19 +2253,19 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 }
 
                 // Snapshot Button
-                if (VERSION.SDK_INT >= 29 ||
-                    Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))
-                ) {
+                if (VERSION.SDK_INT >= 29 || Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
                     Spacer(modifier = Modifier.height(16.dp)) // Gap between buttons
                     IconButton(
                         onClick = {
                             val sdf = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
                             val fileName = "IMG_" + sdf.format(Date()) + ".png"
-                            val filePath = Utils.downloadsPath(fileName)
+                            val filePath = Utils.screenshotsPath(fileName)
                             if (Api.cmd_exec("snapshot_recv $filePath") != 0)
                                 Log.e(TAG, "Command 'snapshot_recv $filePath' failed")
-                            else
+                            else {
                                 MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
+                                android.media.MediaScannerConnection.scanFile(ctx, arrayOf(filePath), null, null)
+                            }
                         }
                     ) {
                         Icon(
