@@ -487,9 +487,7 @@ private fun AvatarSection(
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             if (uri != null) {
                 try {
-                    val inputStream = ctx.contentResolver.openInputStream(uri)
-                    val avatarBitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream?.close()
+                    val avatarBitmap = Utils.decodeSampledBitmapFromUri(ctx, uri, 192, 192)
 
                     if (avatarBitmap == null) {
                         Log.e(TAG, "Failed to decode bitmap from URI: $uri")

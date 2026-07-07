@@ -962,9 +962,13 @@ class BaresipService: Service() {
                     if (file.length() > 0) {
                         val fileName = ev[2].split("/").last()
                         try {
-                            val bitmap = BitmapFactory.decodeStream(file.inputStream())
-                            Utils.savePicture(this, bitmap, fileName)
-                            Log.d(TAG, "Saved snapshot to $fileName")
+                            val bitmap = Utils.decodeSampledBitmapFromFile(file.absolutePath, 1280, 720)
+                            if (bitmap != null) {
+                                Utils.savePicture(this, bitmap, fileName)
+                                Log.d(TAG, "Saved snapshot to $fileName")
+                            } else {
+                                Log.e(TAG, "Failed to decode snapshot from ${file.absolutePath}")
+                            }
                         } catch (e: IOException) {
                             Log.e(TAG, "Failed to save snapshot to $fileName: ${e.message}")
                         }
