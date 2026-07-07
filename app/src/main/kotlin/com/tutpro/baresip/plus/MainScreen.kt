@@ -311,16 +311,15 @@ private fun MainScreen(
             ctx = ctx,
             showPasswordDialog = showPasswordDialog,
             password = password,
+            emptyOk = true,
             keyboardController = keyboardController,
             title = passwordTitle.value,
             okAction = {
-                if (password.value != "") {
-                    if (passwordTitle.value == encryptPasswordTitle)
-                        backup(ctx, password.value)
-                    else
-                        restore(ctx, password.value, onRestartClick)
-                    password.value = ""
-                }
+                if (passwordTitle.value == encryptPasswordTitle)
+                    backup(ctx, password.value)
+                else
+                    restore(ctx, password.value, onRestartClick)
+                password.value = ""
             },
             cancelAction = {
                 if (downloadsOutputUri != null) {

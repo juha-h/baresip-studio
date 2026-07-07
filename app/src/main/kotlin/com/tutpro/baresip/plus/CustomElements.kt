@@ -533,6 +533,7 @@ object CustomElements {
         ctx: Context,
         showPasswordDialog: MutableState<Boolean>,
         password: MutableState<String>,
+        emptyOk: Boolean = false,
         keyboardController: SoftwareKeyboardController?,
         title: String,
         message: String = "",
@@ -639,7 +640,7 @@ object CustomElements {
                                     keyboardController?.hide()
                                     showPasswordDialog.value = false
                                     password.value = password.value.trim()
-                                    if (!Account.checkAuthPass(password.value)) {
+                                    if (!(emptyOk && password.value.isEmpty()) && !Account.checkAuthPass(password.value)) {
                                         Toast.makeText(
                                             ctx,
                                             String.format(
