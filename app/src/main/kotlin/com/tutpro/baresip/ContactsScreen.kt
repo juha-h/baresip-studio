@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import androidx.core.graphics.scale
 import android.provider.ContactsContract
 import android.util.Base64
 import android.util.Log
@@ -243,11 +243,17 @@ private fun ContactsScreen(navController: NavController) {
                                     if (photoBase64.isNotEmpty())
                                         try {
                                             val decodedString = Base64.decode(photoBase64, Base64.DEFAULT)
-                                            val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                                            val decodedByte = Utils.decodeSampledBitmapFromByteArray(decodedString, 192, 192)
                                             if (decodedByte != null) {
+                                                val scaledByte = decodedByte.scale(192, 192)
                                                 val avatarFile = File(BaresipService.filesPath, "$contactId.png")
-                                                FileOutputStream(avatarFile).use { out ->
-                                                    decodedByte.compress(Bitmap.CompressFormat.PNG, 100, out)
+                                                try {
+                                                    val out = FileOutputStream(avatarFile)
+                                                    scaledByte.compress(Bitmap.CompressFormat.PNG, 100, out)
+                                                    out.flush()
+                                                    out.close()
+                                                } catch (e: Exception) {
+                                                    Log.e(TAG, "Failed to save photo for $name: ${e.message}")
                                                 }
                                             }
                                         } catch (e: Exception) {

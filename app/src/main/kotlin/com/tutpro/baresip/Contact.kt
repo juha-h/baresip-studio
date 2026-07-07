@@ -3,7 +3,6 @@ package com.tutpro.baresip
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.core.net.toUri
@@ -302,7 +301,7 @@ sealed class Contact {
                     val avatarFilePath = BaresipService.filesPath + "/$id.png"
                     if (File(avatarFilePath).exists()) {
                         try {
-                            contact.avatarImage = BitmapFactory.decodeFile(avatarFilePath)
+                            contact.avatarImage = Utils.decodeSampledBitmapFromFile(avatarFilePath, 192, 192)
                             Log.d(TAG, "Set avatarImage")
                             if (contact.avatarImage == null)
                                 Log.d(TAG, "Contact $id avatarImage is null")
