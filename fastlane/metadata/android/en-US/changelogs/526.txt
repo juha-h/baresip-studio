@@ -1,0 +1,3 @@
+- Allow empty backup/restore password
+- Improved edge-to-edge compatibility
+- Optimized decoding of avatar bitmaps
