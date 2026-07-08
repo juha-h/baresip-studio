@@ -1,0 +1,4 @@
+- Allow empty backup/restore password
+- Stored screenshots to DCIM/Screenshots or Pictures/Screenshots directory
+- Improved edge-to-edge compatibility
+- Optimized decoding of avatar bitmaps
