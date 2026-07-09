@@ -172,6 +172,13 @@ object Config {
         config = "${config}contacts_mode $contactsMode\n"
         BaresipService.contactsMode = contactsMode
 
+        val contactAction = previousVariable("contact_action")
+        config = if (contactAction != "")
+            "${config}contact_action $contactAction\n"
+        else
+            "${config}contact_action call\n"
+        BaresipService.contactAction = if (contactAction != "") contactAction else "call"
+
         config = "${config}snd_path ${BaresipService.filesPath}/recordings\n"
 
         val callVolume = previousVariable("call_volume")

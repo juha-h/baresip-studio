@@ -3156,6 +3156,7 @@ class BaresipService: Service() {
         }
 
         var contactsMode by mutableStateOf("baresip")
+        var contactAction by mutableStateOf("call")
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
 

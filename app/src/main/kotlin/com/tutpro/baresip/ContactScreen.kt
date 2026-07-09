@@ -740,7 +740,7 @@ private fun UrisSection(
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
-                                    handleIntent(ctx, viewModel, intent, "call")
+                                    handleIntent(ctx, viewModel, intent, BaresipService.contactAction)
                                     navController.navigate("main") {
                                         popUpTo("main") { inclusive = false }
                                         launchSingleTop = true
