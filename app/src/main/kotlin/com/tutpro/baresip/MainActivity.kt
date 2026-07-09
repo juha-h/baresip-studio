@@ -102,7 +102,8 @@ class MainActivity : ComponentActivity() {
                                 else
                                     exitProcess(0)
                             }
-                        } else
+                        }
+                        else
                             handleServiceEvent(this, viewModel, first.event, first.params)
                     }
                 }
@@ -254,6 +255,9 @@ class MainActivity : ComponentActivity() {
                                 val route = "calls/${command.aor}"
                                 navController.navigate(route)
                             }
+                            is NavigationCommand.NavigateToChats -> {
+                                navController.navigate("chats")
+                            }
                             is NavigationCommand.NavigateToHome ->
                                 navController.navigate("main") {
                                     popUpTo("main") { inclusive = true }
@@ -301,6 +305,21 @@ class MainActivity : ComponentActivity() {
             // MainActivity was not visible when call, message, or transfer request came in
             intent.removeExtra("action")
             handleIntent(applicationContext, viewModel, intent, action)
+        }
+        else if (intent.action == Intent.ACTION_MAIN && !atStartup) {
+            val activeNotifications = nm.activeNotifications
+            if (activeNotifications.any { it.id == CALL_MISSED_NOTIFICATION_ID }) {
+                val ua = BaresipService.uas.value.find { it.account.missedCalls }
+                if (ua != null)
+                    viewModel.navigateToCalls(ua.account.aor)
+            }
+            else if (activeNotifications.any { it.id == MESSAGE_NOTIFICATION_ID }) {
+                val lastUnread = BaresipService.messages.lastOrNull { it.new }
+                if (lastUnread != null)
+                    viewModel.onNewMessageReceived(lastUnread.aor, lastUnread.peerUri)
+                else
+                    viewModel.navigateToChats()
+            }
         }
     }
 
