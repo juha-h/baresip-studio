@@ -1,0 +1,4 @@
+- Added Call/Show Dial option to contacts screen menu
+- Open automatically chat or call history screen when baresip icon with notification dot is touched
+- Tried to avoid color changes in top system bar and bottom navigation bar
+- New translations (Chinese)
