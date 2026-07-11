@@ -295,6 +295,7 @@
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
+    <string name="show_call">Näytä</string>
     <string name="calls_calls">puhelut</string>
     <string name="calls_call">puhelun</string>
     <string name="direction">Suunta</string>

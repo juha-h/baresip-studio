@@ -3178,7 +3178,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
     Log.d(TAG, "Handling intent '$action'")
     val ev = action.split(",")
     when (ev[0]) {
-        "call", "video call", "dial" -> {
+        "call", "video call", "dial", "video dial" -> {
             if (Call.inCall()) {
                 Toast.makeText(ctx, ctx.getString(R.string.call_already_active),
                     Toast.LENGTH_SHORT).show()
@@ -3191,7 +3191,9 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 return
             }
             viewModel.navigateToHome()
-            viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
+            val peer = intent.getStringExtra("peer")!!
+            viewModel.dialerState.callUri.value = Utils.friendlyUri(ctx, peer, ua.account)
+            viewModel.dialerState.redialUri = peer
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {
                 viewModel.dialerState.showCallConferenceButton.value = false

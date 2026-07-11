@@ -307,6 +307,13 @@ private fun ContactsScreen(navController: NavController) {
         }
     }
 
+    val call = stringResource(R.string.call)
+    val showCall = stringResource(R.string.show_call)
+
+    val contactActionName = remember(BaresipService.contactAction) {
+        listOf(if (BaresipService.contactAction == "call") call else showCall)
+    }
+
     val contactNames = remember(BaresipService.contactsMode) {
         val names = mutableListOf("baresip", "Android", both)
         val values = listOf("baresip", "android", "both")
@@ -447,9 +454,16 @@ private fun ContactsScreen(navController: NavController) {
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames + import + export + delete,
+                            items = contactNames + contactActionName + import + export + delete,
                             onItemClick = { name ->
                                 expanded = false
+                                if (name == call || name == showCall) {
+                                    val newAction = if (BaresipService.contactAction == "call") "dial" else "call"
+                                    BaresipService.contactAction = newAction
+                                    Config.replaceVariable("contact_action", newAction)
+                                    Config.save()
+                                    return@DropdownMenu
+                                }
                                 if (name == import) {
                                     vcfImportLauncher.launch(arrayOf("text/vcard", "text/x-vcard"))
                                     return@DropdownMenu

@@ -20,7 +20,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.database.ContentObserver
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.hardware.camera2.CameraManager
 import android.media.AudioAttributes
@@ -3250,6 +3249,7 @@ class BaresipService: Service() {
         }
 
         var contactsMode by mutableStateOf("baresip")
+        var contactAction by mutableStateOf("call")
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
 
