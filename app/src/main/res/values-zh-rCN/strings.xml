@@ -426,4 +426,5 @@
     <string name="ussd_service_unavailable">USSD 服务不可用</string>
     <string name="ussd_unknown_error">USSD 未知错误</string>
     <string name="permission_denied">权限被拒绝</string>
+    <string name="show_call">显示通话</string>
 </resources>
