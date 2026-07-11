@@ -2571,7 +2571,9 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 return
             }
             viewModel.navigateToHome()
-            viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
+            val peer = intent.getStringExtra("peer")!!
+            viewModel.dialerState.callUri.value = Utils.friendlyUri(ctx, peer, ua.account)
+            viewModel.dialerState.redialUri = peer
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {
                 viewModel.dialerState.showCallConferenceButton.value = false
