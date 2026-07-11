@@ -293,10 +293,10 @@ private fun ContactsScreen(navController: NavController) {
     }
 
     val call = stringResource(R.string.call)
-    val dial = stringResource(R.string.dial)
+    val showCall = stringResource(R.string.show_call)
 
     val contactActionName = remember(BaresipService.contactAction) {
-        listOf(if (BaresipService.contactAction == "call") call else dial)
+        listOf(if (BaresipService.contactAction == "call") call else showCall)
     }
 
     val contactNames = remember(BaresipService.contactsMode) {
@@ -423,7 +423,7 @@ private fun ContactsScreen(navController: NavController) {
                             items = contactNames + contactActionName + import + export + delete,
                             onItemClick = { name ->
                                 expanded = false
-                                if (name == call || name == dial) {
+                                if (name == call || name == showCall) {
                                     val newAction = if (BaresipService.contactAction == "call") "dial" else "call"
                                     BaresipService.contactAction = newAction
                                     Config.replaceVariable("contact_action", newAction)
