@@ -11,7 +11,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -100,22 +100,24 @@ fun AppTheme(
 
     val view = LocalView.current
     if (!view.isInEditMode)
-        SideEffect {
-            val activity = view.context as? ComponentActivity
+        DisposableEffect(isDark) {
+            val activity = context as? ComponentActivity
             if (activity != null) {
+                val barStyle = if (isDark)
+                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                else
+                    SystemBarStyle.light(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    )
                 activity.enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.auto(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
-                    ) { isDark },
-                    navigationBarStyle = SystemBarStyle.auto(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
-                    ) { isDark }
+                    statusBarStyle = barStyle,
+                    navigationBarStyle = barStyle
                 )
                 if (VERSION.SDK_INT >= 29)
                     activity.window.isNavigationBarContrastEnforced = false
             }
+            onDispose {}
         }
 
     MaterialTheme(colorScheme = colorScheme, content = content)
