@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.provider.ContactsContract
@@ -686,10 +685,11 @@ private fun UrisSection(
                     val ua = UserAgent.ofAor(selectedAor)
 
                     // Chat Button
-                    if (ua != null && (if (uri.startsWith("tel:"))
-                            ua.account.isMobile || ua.account.telProvider != ""
-                        else
-                            !ua.account.isMobile))
+                    if (ua != null &&
+                            if (uri.startsWith("tel:"))
+                                ua.account.isMobile || ua.account.telProvider != ""
+                            else
+                                !ua.account.isMobile)
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
@@ -727,8 +727,7 @@ private fun UrisSection(
                         if (uri.startsWith("tel:"))
                             ua.account.isMobile || ua.account.telProvider != ""
                         else
-                            !ua.account.isMobile
-                        )
+                            !ua.account.isMobile)
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
@@ -922,7 +921,7 @@ private fun checkOnClick(
 
     if (currentState.avatarImageUri != null && (currentState.tmpAvatarFile != null || !currentState.new)) {
         val imageFilePath = BaresipService.filesPath + "/${idToUse}.png"
-        contact.avatarImage = BitmapFactory.decodeFile(imageFilePath)
+        contact.avatarImage = Utils.decodeSampledBitmapFromFile(imageFilePath, 192, 192)
     }
 
     if (currentState.android) {
