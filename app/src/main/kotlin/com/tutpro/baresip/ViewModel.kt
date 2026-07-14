@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -79,7 +80,7 @@ class ViewModel: ViewModel() {
     private val _hideKeyboard = MutableStateFlow(0)
     val hideKeyboard = _hideKeyboard.asStateFlow()
 
-    private val _navigationCommand = MutableSharedFlow<NavigationCommand>()
+    private val _navigationCommand = MutableSharedFlow<NavigationCommand>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val navigationCommand = _navigationCommand.asSharedFlow()
 
     private var lastRenderedAor = ""
