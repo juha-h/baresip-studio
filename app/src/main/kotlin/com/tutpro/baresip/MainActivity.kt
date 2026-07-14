@@ -356,6 +356,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
+        setIntent(intent)
 
         this.setShowWhenLocked(true)
         this.setTurnScreenOn(true)

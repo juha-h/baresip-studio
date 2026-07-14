@@ -1406,44 +1406,8 @@ class BaresipService: Service() {
                                 }
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
-                            if (missed) {
-                                val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                                val caller = Utils.friendlyUri(this, call.peerUri, ua.account)
-                                val intent = Intent(this, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                                intent.putExtra("action", "call missed").putExtra("uap", uap)
-                                val pi = PendingIntent.getActivity(
-                                    this,
-                                    CALL_REQ_CODE,
-                                    intent,
-                                    piFlags
-                                )
-                                val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                                nb.setSmallIcon(R.drawable.ic_notification_call_missed)
-                                    .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                                    .setContentIntent(pi)
-                                    .setCategory(Notification.CATEGORY_CALL)
-                                    .setAutoCancel(true)
-                                var missedCalls = 0
-                                for (notification in nm.activeNotifications)
-                                    if (notification.id == CALL_MISSED_NOTIFICATION_ID)
-                                        missedCalls++
-                                if (missedCalls == 0) {
-                                    nb.setContentTitle(getString(R.string.missed_call_from))
-                                    nb.setContentText(caller)
-                                }
-                                else {
-                                    nb.setContentTitle(getString(R.string.missed_calls))
-                                    nb.setContentText(
-                                        String.format(
-                                            getString(R.string.missed_calls_count),
-                                            missedCalls + 1
-                                        )
-                                    )
-                                }
-                                nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
-                            }
+                            if (missed)
+                                showMissedCallNotification(uap, call.peerUri, aor)
                             if (!Utils.isVisible())
                                 return
                         }
@@ -1606,6 +1570,14 @@ class BaresipService: Service() {
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .addPerson(sender)
+
+            var unreadMessages = 0
+            for (notification in nm.activeNotifications)
+                if (notification.id == MESSAGE_NOTIFICATION_ID) {
+                    unreadMessages = notification.notification.number
+                    break
+                }
+            nb.setNumber(unreadMessages + 1)
 
             val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
                 .setLabel(getString(R.string.reply))
@@ -1855,6 +1827,7 @@ class BaresipService: Service() {
         )
         lowChannel.description = "Background status notifications"
         lowChannel.enableVibration(false)
+        lowChannel.setShowBadge(false)
         lowChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         nm.createNotificationChannel(lowChannel)
         val ringAttributes = AudioAttributes.Builder()
@@ -1869,6 +1842,7 @@ class BaresipService: Service() {
         highChannel.description = "Incoming calls and important alerts"
         highChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         highChannel.enableVibration(true)
+        highChannel.setShowBadge(true)
         highChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI, ringAttributes)
         nm.createNotificationChannel(highChannel)
         val mediumChannel = NotificationChannel(
@@ -1879,6 +1853,7 @@ class BaresipService: Service() {
         mediumChannel.description = "Incoming messages"
         mediumChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         mediumChannel.enableVibration(false)
+        mediumChannel.setShowBadge(true)
         mediumChannel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI, ringAttributes)
         nm.createNotificationChannel(mediumChannel)
     }
@@ -2273,8 +2248,10 @@ class BaresipService: Service() {
                 history.startTime = call.startTime
                 history.rejected = call.rejected
                 history.add()
-                if (call.dir == "in" && call.startTime == null && !call.rejected)
+                if (call.dir == "in" && call.startTime == null && !call.rejected) {
                     call.ua.account.missedCalls = true
+                    showMissedCallNotification(uap, call.peerUri, call.ua.account.aor)
+                }
             }
             synchronized(calls) {
                 calls.remove(call)
@@ -3088,6 +3065,50 @@ class BaresipService: Service() {
         }
         releaseAudioEffects()
         isServiceClean = true
+    }
+
+    private fun showMissedCallNotification(uap: Long, peerUri: String, aor: String) {
+        val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        val caller = Utils.friendlyUri(this, peerUri, Account.ofAor(aor)!!)
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.putExtra("action", "call missed").putExtra("uap", uap)
+        val pi = PendingIntent.getActivity(
+            this,
+            CALL_REQ_CODE,
+            intent,
+            piFlags
+        )
+        val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+        nb.setSmallIcon(R.drawable.ic_notification_call_missed)
+            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setContentIntent(pi)
+            .setCategory(NotificationCompat.CATEGORY_MISSED_CALL)
+            .setAutoCancel(true)
+
+        var missedCalls = 0
+        for (notification in nm.activeNotifications)
+            if (notification.id == CALL_MISSED_NOTIFICATION_ID) {
+                missedCalls = notification.notification.number
+                break
+            }
+
+        if (missedCalls == 0) {
+            nb.setContentTitle(getString(R.string.missed_call_from))
+            nb.setContentText(caller)
+            nb.setNumber(1)
+        } else {
+            nb.setContentTitle(getString(R.string.missed_calls))
+            nb.setContentText(
+                String.format(
+                    getString(R.string.missed_calls_count),
+                    missedCalls + 1
+                )
+            )
+            nb.setNumber(missedCalls + 1)
+        }
+        nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
     }
 
     private external fun baresipStart(
