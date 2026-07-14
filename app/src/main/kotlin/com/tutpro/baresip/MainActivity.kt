@@ -20,6 +20,7 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.CallLog
 import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -299,12 +300,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.i(TAG, "Main onStart")
+        Log.i(TAG, "Main onStart action/type/data: ${intent.action}/${intent.type}/${intent.data}")
         val action = intent.getStringExtra("action")
         if (action != null) {
             // MainActivity was not visible when call, message, or transfer request came in
             intent.removeExtra("action")
             handleIntent(applicationContext, viewModel, intent, action)
+        }
+        else if (intent.action == ACTION_VIEW && (intent.type == CallLog.Calls.CONTENT_TYPE ||
+                        intent.data?.toString()?.contains("calls") == true)) {
+            Log.d(TAG, "onStart: Handling Call Log intent")
+            val ua = BaresipService.uas.value.find { it.account.isMobile }
+                ?: BaresipService.uas.value.firstOrNull()
+            if (ua != null)
+                viewModel.navigateToCalls(ua.account.aor)
         }
         else if (intent.action == Intent.ACTION_MAIN && !atStartup) {
             val activeNotifications = nm.activeNotifications
@@ -361,16 +370,25 @@ class MainActivity : ComponentActivity() {
         this.setShowWhenLocked(true)
         this.setTurnScreenOn(true)
 
-        Log.d(TAG, "onNewIntent with action/data '${intent.action}/${intent.data}'")
+        Log.d(TAG, "onNewIntent action/type/data: ${intent.action}/${intent.type}/${intent.data}")
 
-        when (intent.action) {
-            ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
+        when {
+            intent.action == ACTION_VIEW && (intent.type == CallLog.Calls.CONTENT_TYPE ||
+                    intent.data?.toString()?.contains("calls") == true) -> {
+                Log.d(TAG, "onNewIntent: Handling Call Log intent")
+                val ua = BaresipService.uas.value.find { it.account.isMobile }
+                    ?: BaresipService.uas.value.firstOrNull()
+                if (ua != null)
+                    viewModel.navigateToCalls(ua.account.aor)
+            }
+            intent.action in listOf(ACTION_DIAL, ACTION_CALL, ACTION_VIEW) -> {
                 callAction(
                     applicationContext,
                     viewModel,
                     intent.data,
                     if (intent.action == ACTION_CALL) "call" else "dial"
                 )
+            }
             else -> {
                 val action = intent.getStringExtra("action")
                 if (action != null) {
