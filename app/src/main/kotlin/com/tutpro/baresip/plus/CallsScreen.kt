@@ -1,7 +1,9 @@
 package com.tutpro.baresip.plus
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.telecom.TelecomManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -98,7 +100,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     var refreshTrigger by remember { mutableIntStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(aor, refreshTrigger) {
+    val ctx = LocalContext.current
+
+    LaunchedEffect(ua, refreshTrigger) {
+        if (ua.account.isMobile)
+            clearSystemMissedCalls(ctx)
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }
@@ -115,7 +121,10 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     BackHandler(enabled = true) {
-        ua.account.missedCalls = false
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Missed"
+        serviceIntent.putExtra("uap", ua.uap)
+        ctx.startService(serviceIntent)
         navController.navigateUp()
     }
 
@@ -185,9 +194,13 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
+            val ctx = LocalContext.current
             IconButton(
                 onClick = {
-                    account.missedCalls = false
+                    val serviceIntent = Intent(ctx, BaresipService::class.java)
+                    serviceIntent.action = "Clear Missed"
+                    serviceIntent.putExtra("uap", ua.uap)
+                    ctx.startService(serviceIntent)
                     navController.navigateUp()
                 }
             ) {
@@ -513,7 +526,7 @@ private fun Calls(
                             count++
                         }
                         if (count > 3)
-                            Text("...", color = MaterialTheme.colorScheme.onBackground)
+                            Text(ctx.getString(R.string.dots), color = MaterialTheme.colorScheme.onBackground)
                         Text(
                             text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
@@ -601,5 +614,18 @@ fun callTint(direction: Int): Int {
         CALL_UP_RED, CALL_DOWN_RED -> R.color.colorTrafficRed
         CALL_DOWN_BLUE -> R.color.colorPrimary
         else -> R.color.colorTrafficYellow
+    }
+}
+
+@SuppressLint("MissingPermission")
+private fun clearSystemMissedCalls(ctx: Context) {
+    val telecom = ctx.getSystemService(TelecomManager::class.java)
+    try {
+        telecom.cancelMissedCallsNotification()
+        Log.d(TAG, "cancelMissedCallsNotification() succeeded")
+    } catch (e: SecurityException) {
+        Log.w(TAG, "Cannot clear missed call notification: $e")
+    } catch (e: Exception) {
+        Log.e(TAG, "Unexpected failure clearing missed call notification", e)
     }
 }

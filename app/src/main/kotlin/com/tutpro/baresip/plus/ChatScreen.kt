@@ -1,8 +1,8 @@
 package com.tutpro.baresip.plus
 
-import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils.isToday
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -103,7 +103,6 @@ fun NavGraphBuilder.chatScreenRoute(navController: NavController, viewModel: Vie
         val aor = backStackEntry.arguments?.getString("aor")!!
         val peerUri = backStackEntry.arguments?.getString("peer")!!
         ChatScreen(
-            ctx = LocalContext.current,
             navController = navController,
             viewModel = viewModel,
             account = Account.ofAor(aor)!!,
@@ -114,13 +113,13 @@ fun NavGraphBuilder.chatScreenRoute(navController: NavController, viewModel: Vie
 
 @Composable
 private fun ChatScreen(
-    ctx: Context,
     navController: NavController,
     viewModel: ViewModel,
     account: Account,
     peerUri: String
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val ctx = LocalContext.current
 
     val aor = account.aor
 
@@ -165,6 +164,11 @@ private fun ChatScreen(
     }
 
     BackHandler(enabled = true) {
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Unread"
+        serviceIntent.putExtra("uap", account.accp)
+        serviceIntent.putExtra("peer", peerUri)
+        ctx.startService(serviceIntent)
         backAction(navController, account, peerUri)
     }
 
@@ -174,12 +178,11 @@ private fun ChatScreen(
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
-                TopAppBar(ctx, navController, viewModel, account, peerUri)
+                TopAppBar(navController, viewModel, account, peerUri)
             }
         },
         bottomBar = {
             NewMessage(
-                ctx = ctx,
                 viewModel,
                 account = account,
                 peerUri = peerUri,
@@ -189,7 +192,6 @@ private fun ChatScreen(
         content = { contentPadding ->
             if (areMessagesLoaded)
                 ChatContent(
-                    ctx,
                     contentPadding,
                     account, peerUri,
                     chatMessages,
@@ -202,12 +204,12 @@ private fun ChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopAppBar(
-    ctx: Context,
     navController: NavController,
     viewModel: ViewModel,
     account: Account,
     peerUri: String
 ) {
+    val ctx = LocalContext.current
     val aor = account.aor
     TopAppBar(
         title = {
@@ -224,7 +226,17 @@ private fun TopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
-            IconButton(onClick = { backAction(navController, account, peerUri) }) {
+            val ctx = LocalContext.current
+            IconButton(
+                onClick = {
+                    val serviceIntent = Intent(ctx, BaresipService::class.java)
+                    serviceIntent.action = "Clear Unread"
+                    serviceIntent.putExtra("uap", account.accp)
+                    serviceIntent.putExtra("peer", peerUri)
+                    ctx.startService(serviceIntent)
+                    backAction(navController, account, peerUri)
+                }
+            ) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
@@ -307,7 +319,6 @@ private fun TopAppBar(
 
 @Composable
 private fun ChatContent(
-    ctx: Context,
     contentPadding: PaddingValues,
     account: Account,
     peerUri: String,
@@ -318,14 +329,15 @@ private fun ChatContent(
         modifier = Modifier.fillMaxWidth().padding(contentPadding),
         verticalArrangement = Arrangement.Bottom
     ) {
-        Account(ctx, account)
+        Account(account)
         Spacer(modifier = Modifier.weight(1f))
-        Messages(ctx, account, peerUri, messages, onMessageDeleted)
+        Messages(account, peerUri, messages, onMessageDeleted)
     }
 }
 
 @Composable
-private fun Account(ctx: Context, account: Account) {
+private fun Account(account: Account) {
+    val ctx = LocalContext.current
     Text(
         text = ctx.getString(R.string.account) + " " + account.text(),
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
@@ -337,12 +349,12 @@ private fun Account(ctx: Context, account: Account) {
 
 @Composable
 private fun Messages(
-    ctx: Context,
     account: Account,
     peerUri: String,
     messages: List<Message>,
     onMessageDeleted: () -> Unit
 ) {
+    val ctx = LocalContext.current
     val peerName = Utils.friendlyUri(ctx, peerUri, account)
 
     val showDialog = remember { mutableStateOf(false) }
@@ -469,13 +481,12 @@ private fun Messages(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NewMessage(
-    ctx: Context,
     viewModel: ViewModel,
     account: Account,
     peerUri: String,
     addMessage: (message: Message) -> Unit
 ) {
-
+    val ctx = LocalContext.current
     val aor = account.aor
     val ua = UserAgent.ofAor(aor)!!
 
