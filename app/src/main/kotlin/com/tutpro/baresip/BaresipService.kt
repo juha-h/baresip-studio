@@ -3120,6 +3120,8 @@ class BaresipService: Service() {
             .setDeleteIntent(dpi)
             .setCategory(NotificationCompat.CATEGORY_MISSED_CALL)
             .setAutoCancel(true)
+            .setContentTitle(getString(R.string.missed_call_from))
+            .setContentText(caller)
 
         var missedCalls = 0
         for (notification in nm.activeNotifications)
@@ -3128,20 +3130,7 @@ class BaresipService: Service() {
                 break
             }
 
-        if (missedCalls == 0) {
-            nb.setContentTitle(getString(R.string.missed_call_from))
-            nb.setContentText(caller)
-            nb.setNumber(1)
-        } else {
-            nb.setContentTitle(getString(R.string.missed_calls))
-            nb.setContentText(
-                String.format(
-                    getString(R.string.missed_calls_count),
-                    missedCalls + 1
-                )
-            )
-            nb.setNumber(missedCalls + 1)
-        }
+        nb.setNumber(missedCalls + 1)
         nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
     }
 
