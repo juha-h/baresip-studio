@@ -307,13 +307,8 @@ class MainActivity : ComponentActivity() {
             intent.removeExtra("action")
             handleIntent(applicationContext, viewModel, intent, action)
         }
-        else if (intent.action == ACTION_VIEW && (intent.type == CallLog.Calls.CONTENT_TYPE ||
-                        intent.data?.toString()?.contains("calls") == true)) {
-            Log.d(TAG, "onStart: Handling Call Log intent")
-            val ua = BaresipService.uas.value.find { it.account.isMobile }
-                ?: BaresipService.uas.value.firstOrNull()
-            if (ua != null)
-                viewModel.navigateToCalls(ua.account.aor)
+        else if (isCallLogIntent(intent)) {
+            handleCallLogIntent()
         }
         else if (intent.action == Intent.ACTION_MAIN && !atStartup) {
             val activeNotifications = nm.activeNotifications
@@ -373,13 +368,8 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onNewIntent action/type/data: ${intent.action}/${intent.type}/${intent.data}")
 
         when {
-            intent.action == ACTION_VIEW && (intent.type == CallLog.Calls.CONTENT_TYPE ||
-                    intent.data?.toString()?.contains("calls") == true) -> {
-                Log.d(TAG, "onNewIntent: Handling Call Log intent")
-                val ua = BaresipService.uas.value.find { it.account.isMobile }
-                    ?: BaresipService.uas.value.firstOrNull()
-                if (ua != null)
-                    viewModel.navigateToCalls(ua.account.aor)
+            isCallLogIntent(intent) -> {
+                handleCallLogIntent()
             }
             intent.action in listOf(ACTION_DIAL, ACTION_CALL, ACTION_VIEW) -> {
                 callAction(
@@ -416,6 +406,19 @@ class MainActivity : ComponentActivity() {
             }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    private fun isCallLogIntent(intent: Intent?): Boolean {
+        return intent?.action == ACTION_VIEW && (intent.type == CallLog.Calls.CONTENT_TYPE ||
+                intent.data?.toString()?.contains("calls") == true)
+    }
+
+    private fun handleCallLogIntent() {
+        Log.d(TAG, "Handling Call Log intent")
+        val ua = BaresipService.uas.value.find { it.account.isMobile }
+            ?: BaresipService.uas.value.firstOrNull()
+        if (ua != null)
+            viewModel.navigateToCalls(ua.account.aor)
     }
 
     private fun quitRestart(reStart: Boolean) {
