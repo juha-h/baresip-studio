@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
-import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.BackHandler
 import android.text.format.DateUtils.isToday
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -13,11 +14,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -129,8 +128,15 @@ private fun ChatsScreen(navController: NavController, aor: String) {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
+    BackHandler(enabled = true) {
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Unread"
+        serviceIntent.putExtra("uap", account.accp)
+        ctx.startService(serviceIntent)
+        navController.navigateUp()
+    }
+
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -138,10 +144,10 @@ private fun ChatsScreen(navController: NavController, aor: String) {
                 TopAppBar(navController, account, uaMessages)
             }
         },
-        bottomBar = { NewChatPeer(ctx, navController, account) },
+        bottomBar = { NewChatPeer(navController, account) },
         content = { contentPadding ->
             if (areMessagesLoaded)
-                ChatsContent(LocalContext.current, navController, contentPadding, account, uaMessages)
+                ChatsContent(navController, contentPadding, account, uaMessages)
         },
     )
 }
@@ -178,7 +184,16 @@ private fun TopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
+            val ctx = LocalContext.current
+            IconButton(
+                onClick = {
+                    val serviceIntent = Intent(ctx, BaresipService::class.java)
+                    serviceIntent.action = "Clear Unread"
+                    serviceIntent.putExtra("uap", account.accp)
+                    ctx.startService(serviceIntent)
+                    navController.navigateUp()
+                }
+            ) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         },
@@ -214,7 +229,6 @@ private fun TopAppBar(
 
 @Composable
 private fun ChatsContent(
-    ctx: Context,
     navController: NavController,
     contentPadding: PaddingValues,
     account: Account,
@@ -225,7 +239,7 @@ private fun ChatsContent(
         verticalArrangement = Arrangement.Top
     ) {
         Account(account)
-        Chats(ctx, navController, account, uaMessages)
+        Chats(navController, account, uaMessages)
     }
 }
 
@@ -242,11 +256,11 @@ private fun Account(account: Account) {
 
 @Composable
 private fun Chats(
-    ctx: Context,
     navController: NavController,
     account: Account,
     uaMessages: MutableState<List<Message>>
 ) {
+    val ctx = LocalContext.current
     val aor = account.aor
 
     val showDialog = remember { mutableStateOf(false) }
@@ -409,13 +423,14 @@ private fun Chats(
 }
 
 @Composable
-private fun NewChatPeer(ctx: Context, navController: NavController, account: Account) {
+private fun NewChatPeer(navController: NavController, account: Account) {
+    val ctx = LocalContext.current
 
     val alertTitle = remember { mutableStateOf("") }
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
 
-    fun makeChat(ctx: Context, navController: NavController, account: Account, chatPeer: String) {
+    fun makeChat(navController: NavController, account: Account, chatPeer: String) {
         val peerUri = if (Utils.isTelNumber(chatPeer))
             "tel:$chatPeer"
         else
@@ -587,15 +602,15 @@ private fun NewChatPeer(ctx: Context, navController: NavController, account: Acc
                                 String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), peerText)
                             showAlert.value = true
                         } else {
-                            makeChat(ctx, navController, account, peerText)
+                            makeChat(navController, account, peerText)
                         }
                     }
                     else if (uris.size == 1)
-                        makeChat(ctx, navController, account, uris[0].uri)
+                        makeChat(navController, account, uris[0].uri)
                     else {
                         items.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
                         itemAction.value = { index ->
-                            makeChat(ctx, navController, account, uris[index].uri)
+                            makeChat(navController, account, uris[index].uri)
                         }
                         showDialog.value = true
                     }

@@ -24,8 +24,8 @@ import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_IN_CALL
+import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.AudioManager.MODE_NORMAL
 import android.media.MediaPlayer
 import android.media.Ringtone
@@ -80,6 +80,10 @@ import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.tutpro.baresip.Utils.e164Uri
 import com.tutpro.baresip.Utils.toCircle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.net.InetAddress
 import java.nio.charset.Charset
@@ -90,10 +94,6 @@ import java.util.TimerTask
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class BaresipService: Service() {
 
@@ -723,6 +723,24 @@ class BaresipService: Service() {
                 nm.cancel(MESSAGE_NOTIFICATION_ID)
             }
 
+            "Clear Unread" -> {
+                val uap = intent!!.getLongExtra("uap", 0L)
+                val ua = UserAgent.ofUap(uap)
+                if (ua != null) {
+                    val peerUri = intent.getStringExtra("peer")
+                    if (peerUri != null)
+                        Message.updateMessagesFromPearRead(ua.account.aor, peerUri)
+                    else {
+                        for (m in messages)
+                            if (m.aor == ua.account.aor)
+                                m.new = false
+                        Message.save()
+                    }
+                    ua.account.unreadMessages = Message.unreadMessages(ua.account.aor)
+                }
+                nm.cancel(MESSAGE_NOTIFICATION_ID)
+            }
+
             "Message Inline Reply" -> {
                 val remoteInputResults = RemoteInput.getResultsFromIntent(intent!!)
                 if (remoteInputResults != null) {
@@ -775,6 +793,14 @@ class BaresipService: Service() {
             "Check Roles" -> {
                 if (isNativeReady)
                     addMobileUserAgent()
+            }
+
+            "Clear Missed" -> {
+                val uap = intent!!.getLongExtra("uap", 0L)
+                val ua = UserAgent.ofUap(uap)
+                if (ua != null)
+                    ua.account.missedCalls = false
+                nm.cancel(CALL_MISSED_NOTIFICATION_ID)
             }
 
             "Start Call" -> {
@@ -1560,10 +1586,16 @@ class BaresipService: Service() {
                 .setGroupConversation(false)
                 .addMessage(text, timeStamp, sender)
 
+            val clearIntent = Intent(this, BaresipService::class.java)
+            clearIntent.action = "Clear Unread"
+            clearIntent.putExtra("uap", uap).putExtra("peer", peerUri)
+            val dpi = PendingIntent.getService(this, MESSAGE_NOTIFICATION_ID, clearIntent, piFlags)
+
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_message)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentIntent(pi)
+                .setDeleteIntent(dpi)
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setAutoCancel(true)
                 .setStyle(messagingStyle)
@@ -1579,9 +1611,7 @@ class BaresipService: Service() {
                 }
             nb.setNumber(unreadMessages + 1)
 
-            val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
-                .setLabel(getString(R.string.reply))
-                .build()
+            val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY).setLabel(getString(R.string.reply)).build()
             val directReplyIntent = Intent(this, BaresipService::class.java)
             directReplyIntent.action = "Message Inline Reply"
             directReplyIntent.putExtra("uap", uap).putExtra("peer", peerUri).putExtra("time", timeStamp)
@@ -1602,10 +1632,8 @@ class BaresipService: Service() {
 
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
-            saveIntent.putExtra("uap", uap)
-                .putExtra("time", timeStamp.toString())
-            val savePendingIntent = PendingIntent
-                .getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
+            saveIntent.putExtra("uap", uap).putExtra("time", timeStamp.toString())
+            val savePendingIntent = PendingIntent.getService(this, SAVE_REQ_CODE, saveIntent, piFlags)
             val saveAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_notification_save,
                 getString(R.string.save),
@@ -1614,10 +1642,8 @@ class BaresipService: Service() {
 
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
-            deleteIntent.putExtra("uap", uap)
-                .putExtra("time", timeStamp.toString())
-            val deletePendingIntent = PendingIntent
-                .getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
+            deleteIntent.putExtra("uap", uap).putExtra("time", timeStamp.toString())
+            val deletePendingIntent = PendingIntent.getService(this, DELETE_REQ_CODE, deleteIntent, piFlags)
             val deleteAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_notification_delete,
                 getString(R.string.delete),
@@ -2250,7 +2276,8 @@ class BaresipService: Service() {
                 history.add()
                 if (call.dir == "in" && call.startTime == null && !call.rejected) {
                     call.ua.account.missedCalls = true
-                    showMissedCallNotification(uap, call.peerUri, call.ua.account.aor)
+                    if (!call.ua.account.isMobile)
+                        showMissedCallNotification(uap, call.peerUri, call.ua.account.aor)
                 }
             }
             synchronized(calls) {
@@ -3080,10 +3107,17 @@ class BaresipService: Service() {
             intent,
             piFlags
         )
+
+        val deleteIntent = Intent(this, BaresipService::class.java)
+        deleteIntent.action = "Clear Missed"
+        deleteIntent.putExtra("uap", uap)
+        val dpi = PendingIntent.getService(this, CALL_MISSED_NOTIFICATION_ID, deleteIntent, piFlags)
+
         val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
         nb.setSmallIcon(R.drawable.ic_notification_call_missed)
             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
             .setContentIntent(pi)
+            .setDeleteIntent(dpi)
             .setCategory(NotificationCompat.CATEGORY_MISSED_CALL)
             .setAutoCancel(true)
 

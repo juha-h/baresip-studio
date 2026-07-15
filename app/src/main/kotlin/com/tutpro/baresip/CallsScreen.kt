@@ -114,8 +114,13 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
         }
     }
 
+    val ctx = LocalContext.current
+
     BackHandler(enabled = true) {
-        ua.account.missedCalls = false
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Missed"
+        serviceIntent.putExtra("uap", ua.uap)
+        ctx.startService(serviceIntent)
         navController.navigateUp()
     }
 
@@ -182,9 +187,13 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
+            val ctx = LocalContext.current
             IconButton(
                 onClick = {
-                    account.missedCalls = false
+                    val serviceIntent = Intent(ctx, BaresipService::class.java)
+                    serviceIntent.action = "Clear Missed"
+                    serviceIntent.putExtra("uap", ua.uap)
+                    ctx.startService(serviceIntent)
                     navController.navigateUp()
                 }
             ) {
@@ -495,7 +504,7 @@ private fun Calls(
                             count++
                         }
                         if (count > 3)
-                            Text("...", color = MaterialTheme.colorScheme.onBackground)
+                            Text(ctx.getString(R.string.dots), color = MaterialTheme.colorScheme.onBackground)
                         Text(
                             text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
