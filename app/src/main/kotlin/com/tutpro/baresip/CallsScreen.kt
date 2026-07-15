@@ -1,7 +1,9 @@
 package com.tutpro.baresip
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.telecom.TelecomManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -98,7 +100,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     var refreshTrigger by remember { mutableIntStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(aor, refreshTrigger) {
+    val ctx = LocalContext.current
+
+    LaunchedEffect(ua, refreshTrigger) {
+        if (ua.account.isMobile)
+            clearSystemMissedCalls(ctx)
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }
@@ -113,8 +119,6 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
-    val ctx = LocalContext.current
 
     BackHandler(enabled = true) {
         val serviceIntent = Intent(ctx, BaresipService::class.java)
@@ -592,5 +596,18 @@ fun callTint(direction: Int): Int {
         CALL_UP_RED, CALL_DOWN_RED -> R.color.colorTrafficRed
         CALL_DOWN_BLUE -> R.color.colorPrimary
         else -> R.color.colorTrafficYellow
+    }
+}
+
+@SuppressLint("MissingPermission")
+private fun clearSystemMissedCalls(ctx: Context) {
+    val telecom = ctx.getSystemService(TelecomManager::class.java)
+    try {
+        telecom.cancelMissedCallsNotification()
+        Log.d(TAG, "cancelMissedCallsNotification() succeeded")
+    } catch (e: SecurityException) {
+        Log.w(TAG, "Cannot clear missed call notification: $e")
+    } catch (e: Exception) {
+        Log.e(TAG, "Unexpected failure clearing missed call notification", e)
     }
 }
