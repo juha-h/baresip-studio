@@ -106,6 +106,24 @@ sealed class Contact {
             return null
         }
 
+        fun baresipContact(id: Long): BaresipContact? {
+            synchronized(BaresipService.baresipContacts) {
+                for (c in BaresipService.baresipContacts.value)
+                    if (c.id == id)
+                        return c
+            }
+            return null
+        }
+
+        fun androidContact(id: Long): AndroidContact? {
+            synchronized(BaresipService.androidContacts) {
+                for (c in BaresipService.androidContacts.value)
+                    if (c.id == id)
+                        return c
+            }
+            return null
+        }
+
         fun contactContactUris(name: String, tel: Boolean = false): List<ContactUri> {
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts)

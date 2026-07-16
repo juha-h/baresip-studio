@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.content.ContentProviderOperation
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -61,6 +62,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -76,9 +78,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -148,10 +153,26 @@ private fun ContactScreen(
 
     val title = when {
         screenState.new -> stringResource(R.string.new_contact)
-        else -> uriOrNameArg
+        else -> screenState.name.ifEmpty { uriOrNameArg }
     }
 
-    LaunchedEffect(key1 = uriOrNameArg, key2 = kindArg) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME)
+                if (!screenState.isBaresipContact && !screenState.new) {
+                    Contact.loadAndroidContacts(ctx)
+                    Contact.contactsUpdate()
+                }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    LaunchedEffect(uriOrNameArg, kindArg, BaresipService.androidContacts.value, BaresipService.baresipContacts.value) {
+        if (screenState.isEditing && !screenState.new) return@LaunchedEffect
         val isNew = kindArg == "new"
         if (isNew) {
             val time = System.currentTimeMillis()
@@ -171,8 +192,8 @@ private fun ContactScreen(
             )
         }
         else {
-            val baresipContact = Contact.baresipContact(uriOrNameArg)
-            val androidContact = Contact.androidContact(uriOrNameArg)
+            val baresipContact = if (screenState.id != 0L) Contact.baresipContact(screenState.id) else Contact.baresipContact(uriOrNameArg)
+            val androidContact = if (screenState.id != 0L) Contact.androidContact(screenState.id) else Contact.androidContact(uriOrNameArg)
             val contact = baresipContact ?: androidContact
 
             if (contact == null) {
@@ -268,7 +289,18 @@ private fun ContactScreen(
         }
     }
 
-    val onEdit: () -> Unit = { screenState = screenState.copy(isEditing = true) }
+    val onEdit: () -> Unit = {
+        if (screenState.isBaresipContact)
+            screenState = screenState.copy(isEditing = true)
+        else {
+            val intent = Intent(Intent.ACTION_EDIT).apply {
+                val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, screenState.id)
+                setDataAndType(contactUri, ContactsContract.Contacts.CONTENT_ITEM_TYPE)
+                putExtra("finishActivityOnSaveCompleted", true)
+            }
+            ctx.startActivity(intent)
+        }
+    }
 
     BackHandler(enabled = true) { onBack() }
 
@@ -281,7 +313,6 @@ private fun ContactScreen(
                 TopAppBar(
                     title = title,
                     isEditing = screenState.isEditing,
-                    isBaresipContact = screenState.isBaresipContact,
                     onBack = onBack,
                     onCheck = onCheck,
                     onEdit = onEdit
@@ -311,7 +342,6 @@ private fun ContactScreen(
 private fun TopAppBar(
     title: String,
     isEditing: Boolean,
-    isBaresipContact: Boolean,
     onBack: () -> Unit,
     onCheck: () -> Unit,
     onEdit: () -> Unit
@@ -335,7 +365,7 @@ private fun TopAppBar(
                 IconButton(onClick = onCheck) {
                     Icon(imageVector = Icons.Filled.Check, contentDescription = "Save")
                 }
-            else if (isBaresipContact)
+            else
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
