@@ -2276,8 +2276,7 @@ class BaresipService: Service() {
                 history.add()
                 if (call.dir == "in" && call.startTime == null && !call.rejected) {
                     call.ua.account.missedCalls = true
-                    if (!call.ua.account.isMobile)
-                        showMissedCallNotification(uap, call.peerUri, call.ua.account.aor)
+                    showMissedCallNotification(uap, call.peerUri, call.ua.account.aor)
                 }
             }
             synchronized(calls) {
@@ -3095,6 +3094,11 @@ class BaresipService: Service() {
     }
 
     private fun showMissedCallNotification(uap: Long, peerUri: String, aor: String) {
+        Utils.cancelMissedCallsNotification(this)
+        Handler(Looper.getMainLooper()).postDelayed({
+            Utils.cancelMissedCallsNotification(this)
+        }, 1000)
+
         val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val caller = Utils.friendlyUri(this, peerUri, Account.ofAor(aor)!!)
         val intent = Intent(this, MainActivity::class.java)

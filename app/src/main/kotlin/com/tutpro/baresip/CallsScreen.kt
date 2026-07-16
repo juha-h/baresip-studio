@@ -1,9 +1,7 @@
 package com.tutpro.baresip
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.telecom.TelecomManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -104,7 +102,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     LaunchedEffect(ua, refreshTrigger) {
         if (ua.account.isMobile)
-            clearSystemMissedCalls(ctx)
+            Utils.cancelMissedCallsNotification(ctx)
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }
@@ -599,15 +597,3 @@ fun callTint(direction: Int): Int {
     }
 }
 
-@SuppressLint("MissingPermission")
-private fun clearSystemMissedCalls(ctx: Context) {
-    val telecom = ctx.getSystemService(TelecomManager::class.java)
-    try {
-        telecom.cancelMissedCallsNotification()
-        Log.d(TAG, "cancelMissedCallsNotification() succeeded")
-    } catch (e: SecurityException) {
-        Log.w(TAG, "Cannot clear missed call notification: $e")
-    } catch (e: Exception) {
-        Log.e(TAG, "Unexpected failure clearing missed call notification", e)
-    }
-}

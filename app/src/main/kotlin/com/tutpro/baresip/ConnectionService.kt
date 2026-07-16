@@ -80,6 +80,10 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
+            val contactName = Utils.friendlyUri(this, peerUri, ua.account)
+            if (contactName != peerUri)
+                connection.setCallerDisplayName(contactName, TelecomManager.PRESENTATION_ALLOWED)
+
             connection.setRinging()
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering call $callp")
@@ -126,6 +130,15 @@ class ConnectionService : ConnectionService() {
         pendingOutgoingConnection = connection
 
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
+
+        val ua = UserAgent.ofUap(uap)
+        if (ua != null) {
+            val address = request?.address?.toString() ?: ""
+            val contactName = Utils.friendlyUri(this, address, ua.account)
+            if (contactName != address)
+                connection.setCallerDisplayName(contactName, TelecomManager.PRESENTATION_ALLOWED)
+        }
+
         connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or

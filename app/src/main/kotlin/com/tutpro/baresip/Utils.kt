@@ -1368,6 +1368,19 @@ object Utils {
         return file
     }
 
+    @SuppressLint("MissingPermission")
+    fun cancelMissedCallsNotification(ctx: Context) {
+        val telecom = ctx.getSystemService(TelecomManager::class.java)
+        try {
+            telecom.cancelMissedCallsNotification()
+            Log.d(TAG, "cancelMissedCallsNotification() succeeded")
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Cannot clear missed call notification: $e")
+        } catch (e: Exception) {
+            Log.e(TAG, "Unexpected failure clearing missed call notification", e)
+        }
+    }
+
     @RequiresApi(29)
     fun pstnAccountHandle(ctx: Context):  PhoneAccountHandle? {
         val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
