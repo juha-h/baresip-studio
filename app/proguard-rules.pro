@@ -9,11 +9,13 @@
 
 # Add any project specific keep options here:
 -keepattributes LineNumberTable,SourceFile
--dontobfuscate
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep classes and members accessed via JNI
+-keep class com.tutpro.baresip.Api {
+    native <methods>;
+}
+
+-keep class com.tutpro.baresip.BaresipService {
+    native <methods>;
+    @androidx.annotation.Keep <methods>;
+}
