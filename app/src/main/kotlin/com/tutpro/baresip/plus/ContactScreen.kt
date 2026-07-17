@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.content.ContentProviderOperation
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -62,6 +63,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -77,9 +79,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -149,10 +154,24 @@ private fun ContactScreen(
 
     val title = when {
         screenState.new -> stringResource(R.string.new_contact)
-        else -> uriOrNameArg
+        else -> screenState.name.ifEmpty { uriOrNameArg }
     }
 
-    LaunchedEffect(key1 = uriOrNameArg, key2 = kindArg) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME)
+                if (!screenState.isBaresipContact && !screenState.new) {
+                    Contact.loadAndroidContacts(ctx)
+                    Contact.contactsUpdate()
+                }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    LaunchedEffect(uriOrNameArg, kindArg, BaresipService.androidContacts.value, BaresipService.baresipContacts.value) {
+        if (screenState.isEditing && !screenState.new) return@LaunchedEffect
         val isNew = kindArg == "new"
         if (isNew) {
             val time = System.currentTimeMillis()
@@ -170,9 +189,10 @@ private fun ContactScreen(
                 isLoading = false,
                 isBaresipContact = true
             )
-        } else {
-            val baresipContact = Contact.baresipContact(uriOrNameArg)
-            val androidContact = Contact.androidContact(uriOrNameArg)
+        }
+        else {
+            val baresipContact = if (screenState.id != 0L) Contact.baresipContact(screenState.id) else Contact.baresipContact(uriOrNameArg)
+            val androidContact = if (screenState.id != 0L) Contact.androidContact(screenState.id) else Contact.androidContact(uriOrNameArg)
             val contact = baresipContact ?: androidContact
 
             if (contact == null) {
@@ -227,7 +247,8 @@ private fun ContactScreen(
                     null,
                 tmpAvatarFile = null
             )
-        } else {
+        }
+        else {
             screenState.tmpAvatarFile?.let { tempFile ->
                 if (tempFile.exists()) {
                     Log.d(TAG, "Back pressed, deleting temp avatar: ${tempFile.name}")
@@ -248,7 +269,8 @@ private fun ContactScreen(
             if (screenState.new) {
                 navController.previousBackStackEntry?.savedStateHandle?.set("scrollToContact", screenState.name)
                 navController.navigateUp()
-            } else {
+            }
+            else {
                 // Update UI state with saved values
                 val contact = Contact.baresipContact(screenState.name)!!
                 val avatarFile = File(BaresipService.filesPath, "${contact.id}.png")
@@ -272,12 +294,19 @@ private fun ContactScreen(
     }
 
     val onEdit: () -> Unit = {
-        screenState = screenState.copy(isEditing = true)
+        if (screenState.isBaresipContact)
+            screenState = screenState.copy(isEditing = true)
+        else {
+            val intent = Intent(Intent.ACTION_EDIT).apply {
+                val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, screenState.id)
+                setDataAndType(contactUri, ContactsContract.Contacts.CONTENT_ITEM_TYPE)
+                putExtra("finishActivityOnSaveCompleted", true)
+            }
+            ctx.startActivity(intent)
+        }
     }
 
-    BackHandler(enabled = true) {
-        onBack()
-    }
+    BackHandler(enabled = true) { onBack() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -292,7 +321,6 @@ private fun ContactScreen(
                 TopAppBar(
                     title = title,
                     isEditing = screenState.isEditing,
-                    isBaresipContact = screenState.isBaresipContact,
                     onBack = onBack,
                     onCheck = onCheck,
                     onEdit = onEdit
@@ -323,7 +351,6 @@ private fun ContactScreen(
 private fun TopAppBar(
     title: String,
     isEditing: Boolean,
-    isBaresipContact: Boolean,
     onBack: () -> Unit,
     onCheck: () -> Unit,
     onEdit: () -> Unit
@@ -346,21 +373,20 @@ private fun TopAppBar(
             }
         },
         actions = {
-            if (isEditing) {
+            if (isEditing)
                 IconButton(onClick = onCheck) {
                     Icon(
                         imageVector = Icons.Filled.Check,
                         contentDescription = "Save"
                     )
                 }
-            } else if (isBaresipContact) {
+            else
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "Edit"
                     )
                 }
-            }
         }
     )
 }
@@ -507,9 +533,9 @@ private fun AvatarSection(
                     val newImageId = System.currentTimeMillis()
                     val tempNewImageFile = File(BaresipService.filesPath, "${newImageId}.png")
 
-                    if (saveBitmap(rotatedBitmap, tempNewImageFile)) {
+                    if (saveBitmap(rotatedBitmap, tempNewImageFile))
                         onNewAvatarChosen(tempNewImageFile, newImageId)
-                    } else {
+                    else {
                         Log.e(TAG, "Failed to save processed avatar image")
                         if (tempNewImageFile.exists()) Utils.deleteFile(tempNewImageFile)
                     }
@@ -531,35 +557,28 @@ private fun AvatarSection(
                 .clip(CircleShape)
                 .background(if (currentAvatarUri == null) Color(color) else Color.Transparent)
                 .let { modifier ->
-                    if (isEditing) {
+                    if (isEditing)
                         modifier.combinedClickable(
                             onClick = { avatarImagePicker.launch("image/*") },
                             onLongClick = { onAvatarColorChange(Utils.randomColor()) }
                         )
-                    } else {
+                    else
                         modifier
-                    }
                 }
         ) {
-            if (currentAvatarUri == null) {
-                Box(
-                    modifier = Modifier.size(avatarSize.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-                        drawCircle(SolidColor(Color(color)))
-                    }
+            if (currentAvatarUri == null)
+                Box(modifier = Modifier.size(avatarSize.dp), contentAlignment = Alignment.Center) {
+                    Canvas(modifier = Modifier.fillMaxSize()) { drawCircle(SolidColor(Color(color))) }
                     val text = if (name.isNotBlank()) name.take(1).uppercase() else "?"
                     Text(text, fontSize = 72.sp, color = Color.White)
                 }
-            } else {
+            else
                 Image(
                     painter = rememberAsyncImagePainter(model = currentAvatarUri),
                     contentDescription = stringResource(R.string.avatar_image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(avatarSize.dp).clip(CircleShape)
                 )
-            }
         }
     }
 }
@@ -572,9 +591,7 @@ private fun ContactNameSection(name: String, isEditing: Boolean, new: Boolean, o
             value = name,
             placeholder = { Text(stringResource(R.string.contact_name)) },
             onValueChange = onNameChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
             label = { Text(stringResource(R.string.contact_name)) },
             keyboardOptions = KeyboardOptions(
@@ -585,7 +602,8 @@ private fun ContactNameSection(name: String, isEditing: Boolean, new: Boolean, o
         LaunchedEffect(new) {
             if (new) focusRequester.requestFocus()
         }
-    } else {
+    }
+    else
         Row(
             Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -598,7 +616,6 @@ private fun ContactNameSection(name: String, isEditing: Boolean, new: Boolean, o
                 textAlign = TextAlign.Center
             )
         }
-    }
 }
 
 @Composable
@@ -612,7 +629,7 @@ private fun UrisSection(
 ) {
     val selectedAor by viewModel.selectedAor.collectAsState()
 
-    if (isEditing) {
+    if (isEditing)
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -653,7 +670,7 @@ private fun UrisSection(
                             )
                         )
                     }
-                    if (uris.size > 1) {
+                    if (uris.size > 1)
                         CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
                             IconButton(
                                 onClick = {
@@ -671,7 +688,6 @@ private fun UrisSection(
                                 )
                             }
                         }
-                    }
                 }
             }
             IconButton(
@@ -689,7 +705,6 @@ private fun UrisSection(
                 )
             }
         }
-    }
     else
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             uris.forEachIndexed { index, contactUri ->
@@ -768,7 +783,8 @@ private fun UrisSection(
                                     alertTitle.value = ctx.getString(R.string.notice)
                                     alertMessage.value = ctx.getString(R.string.airplane_mode)
                                     showAlert.value = true
-                                } else {
+                                }
+                                else {
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
@@ -832,7 +848,7 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
             label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
-    else if (email.isNotEmpty()) {
+    else if (email.isNotEmpty())
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -871,7 +887,6 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
                 )
             }
         }
-    }
 }
 
 @Composable
@@ -913,10 +928,7 @@ private fun AndroidSection(ctx: Context, android: Boolean, onAndroidChange: (Boo
                     showAlert.value = true
                 },
         )
-        Switch(
-            checked = android,
-            onCheckedChange = onAndroidChange
-        )
+        Switch(checked = android, onCheckedChange = onAndroidChange)
     }
 }
 
@@ -949,7 +961,8 @@ private fun checkOnClick(
     }
 
     var newName = currentState.name.trim()
-    if (newName == "") newName = if (newUris.isNotEmpty()) newUris[0].uri.substringAfter(":") else currentState.email
+    if (newName == "")
+        newName = if (newUris.isNotEmpty()) newUris[0].uri.substringAfter(":") else currentState.email
     if (!Utils.checkName(newName)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_contact), newName)
@@ -959,9 +972,8 @@ private fun checkOnClick(
 
     val alert: Boolean = if (currentState.new)
         Contact.nameExists(newName, BaresipService.contacts, true)
-    else {
+    else
         (uriOrNameArg != newName) && Contact.nameExists(newName, BaresipService.contacts, false)
-    }
     if (alert) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.contact_already_exists), newName)
@@ -976,7 +988,8 @@ private fun checkOnClick(
             if (oldAvatar.exists()) Utils.deleteFile(oldAvatar)
             idToUse = currentState.newId
         }
-    } else if (currentState.avatarImageUri == null) {
+    }
+    else if (currentState.avatarImageUri == null) {
         val avatarFile = File(BaresipService.filesPath, "$idToUse.png")
         if (avatarFile.exists()) Utils.deleteFile(avatarFile)
     }
@@ -1004,12 +1017,12 @@ private fun checkOnClick(
                 Log.e(TAG, "Update of Android favorite failed: ${e.message}")
             }
         }
-    } else {
+    }
+    else
         if (currentState.new)
             Contact.addBaresipContact(contact)
         else
             Contact.updateBaresipContact(currentState.id, contact)
-    }
     return true
 }
 
@@ -1061,11 +1074,10 @@ private fun addOrUpdateAndroidContact(ctx: Context, contact: Contact.BaresipCont
             CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE + "' AND " +
             CommonDataKinds.StructuredName.DISPLAY_NAME + "='" + contact.name + "'"
     val c: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection, selection, null, null)
-    if (c != null && c.moveToFirst()) {
+    if (c != null && c.moveToFirst())
         updateAndroidContact(ctx, c.getLong(0), contact)
-    } else {
+    else
         addAndroidContact(ctx, contact)
-    }
     c?.close()
 }
 
@@ -1078,17 +1090,19 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
         .withValueBackReference(Data.RAW_CONTACT_ID, 0)
         .withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
         .withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, contact.name).build())
-    if (contact.email.isNotEmpty()) {
+    if (contact.email.isNotEmpty())
         ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
             .withValueBackReference(Data.RAW_CONTACT_ID, 0)
             .withValue(Data.MIMETYPE, CommonDataKinds.Email.CONTENT_ITEM_TYPE)
             .withValue(CommonDataKinds.Email.ADDRESS, contact.email)
             .withValue(CommonDataKinds.Email.TYPE, CommonDataKinds.Email.TYPE_HOME).build())
-    }
     for (contactUri in contact.uris) {
         val uri = contactUri.uri
         val label = contactUri.label
-        val mimeType = if (uri.startsWith("sip:")) CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE else CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+        val mimeType = if (uri.startsWith("sip:"))
+            CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+        else
+            CommonDataKinds.Phone.CONTENT_ITEM_TYPE
         val builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
             .withValueBackReference(Data.RAW_CONTACT_ID, 0)
             .withValue(Data.MIMETYPE, mimeType)
@@ -1103,12 +1117,11 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
     }
     if (contact.avatarImage != null) {
         val photoData = bitmapToPNGByteArray(contact.avatarImage!!)
-        if (photoData != null) {
+        if (photoData != null)
             ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(Data.RAW_CONTACT_ID, 0)
                 .withValue(Data.MIMETYPE, CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
                 .withValue(CommonDataKinds.Photo.PHOTO, photoData).build())
-        }
     }
     try {
         ctx.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
@@ -1120,17 +1133,24 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
 }
 
 private fun updateAndroidContact(ctx: Context, rawContactId: Long, contact: Contact.BaresipContact) {
-    if (contact.email.isNotEmpty()) {
-        if (updateAndroidEmail(ctx, rawContactId, contact.email) == 0) addAndroidEmail(ctx, rawContactId, contact.email)
-    }
-    for (contactUri in contact.uris) if (updateAndroidUri(ctx, rawContactId, contactUri) == 0) addAndroidUri(ctx, rawContactId, contactUri)
-    if (updateAndroidPhoto(ctx, rawContactId, contact.avatarImage) == 0) if (contact.avatarImage != null) addAndroidPhoto(ctx, rawContactId, contact.avatarImage!!)
+    if (contact.email.isNotEmpty())
+        if (updateAndroidEmail(ctx, rawContactId, contact.email) == 0)
+            addAndroidEmail(ctx, rawContactId, contact.email)
+    for (contactUri in contact.uris)
+        if (updateAndroidUri(ctx, rawContactId, contactUri) == 0)
+            addAndroidUri(ctx, rawContactId, contactUri)
+    if (updateAndroidPhoto(ctx, rawContactId, contact.avatarImage) == 0)
+        if (contact.avatarImage != null)
+            addAndroidPhoto(ctx, rawContactId, contact.avatarImage!!)
 }
 
 private fun addAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.ContactUri) {
     val uri = contactUri.uri
     val label = contactUri.label
-    val mimeType = if (uri.startsWith("sip:")) CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE else CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+    val mimeType = if (uri.startsWith("sip:"))
+        CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+    else
+        CommonDataKinds.Phone.CONTENT_ITEM_TYPE
     val builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         .withValue(Data.RAW_CONTACT_ID, rawContactId)
         .withValue(Data.MIMETYPE, mimeType)
@@ -1153,7 +1173,10 @@ private fun addAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.
 private fun updateAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.ContactUri): Int {
     val uri = contactUri.uri
     val label = contactUri.label
-    val mimeType = if (uri.startsWith("sip:")) CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE else CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+    val mimeType = if (uri.startsWith("sip:"))
+        CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
+    else
+        CommonDataKinds.Phone.CONTENT_ITEM_TYPE
     val contentValues = ContentValues()
     contentValues.put(ContactsContract.Data.DATA1, uri.substringAfter(":"))
     if (mimeType == CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
@@ -1162,7 +1185,8 @@ private fun updateAndroidUri(ctx: Context, rawContactId: Long, contactUri: Conta
         if (type == CommonDataKinds.Phone.TYPE_CUSTOM)
             contentValues.put(CommonDataKinds.Phone.LABEL, label)
     }
-    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and ${ContactsContract.Data.MIMETYPE}='$mimeType'"
+    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+            "${ContactsContract.Data.MIMETYPE}='$mimeType'"
     return try {
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
     } catch (e: Exception) {
@@ -1204,7 +1228,8 @@ private fun addAndroidEmail(ctx: Context, rawContactId: Long, email: String) {
 private fun updateAndroidEmail(ctx: Context, rawContactId: Long, email: String): Int {
     val contentValues = ContentValues()
     contentValues.put(CommonDataKinds.Email.ADDRESS, email)
-    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and ${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Email.CONTENT_ITEM_TYPE}'"
+    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+            "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Email.CONTENT_ITEM_TYPE}'"
     return try {
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
     } catch (_: Exception) {
@@ -1216,7 +1241,8 @@ private fun updateAndroidPhoto(ctx: Context, rawContactId: Long, photoBits: Bitm
     val photoBytes = if (photoBits == null) null else bitmapToPNGByteArray(photoBits)
     val contentValues = ContentValues()
     contentValues.put(CommonDataKinds.Photo.PHOTO, photoBytes)
-    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and ${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Photo.CONTENT_ITEM_TYPE}'"
+    val where = "${ContactsContract.Data.RAW_CONTACT_ID}=$rawContactId and " +
+            "${ContactsContract.Data.MIMETYPE}='${CommonDataKinds.Photo.CONTENT_ITEM_TYPE}'"
     return try {
         ctx.contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, null)
     } catch (_: Exception) {
