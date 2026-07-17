@@ -789,7 +789,7 @@ private fun UrisSection(
                         }
 
                     // Video Call Button
-                    if (ua != null && !ua.account.isMobile)
+                    if (ua != null && !ua.account.isMobile && BaresipService.contactAction != "dial")
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && Utils.isAirplaneModeOn(ctx)) {
