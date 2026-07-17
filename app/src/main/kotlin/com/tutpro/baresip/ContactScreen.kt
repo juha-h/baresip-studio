@@ -166,9 +166,7 @@ private fun ContactScreen(
                 }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     LaunchedEffect(uriOrNameArg, kindArg, BaresipService.androidContacts.value, BaresipService.baresipContacts.value) {
@@ -495,7 +493,7 @@ private fun AvatarSection(
 ) {
     val avatarImagePicker =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            if (uri != null) {
+            if (uri != null)
                 try {
                     val avatarBitmap = Utils.decodeSampledBitmapFromUri(ctx, uri, 192, 192)
 
@@ -527,7 +525,6 @@ private fun AvatarSection(
                 } catch (e: Exception) {
                     Log.e(TAG, "Could not process avatar image: ${e.message}")
                 }
-            }
         }
 
     Row(
@@ -551,20 +548,19 @@ private fun AvatarSection(
                         modifier
                 }
         ) {
-            if (currentAvatarUri == null) {
+            if (currentAvatarUri == null)
                 Box(modifier = Modifier.size(avatarSize.dp), contentAlignment = Alignment.Center) {
                     Canvas(modifier = Modifier.fillMaxSize()) { drawCircle(SolidColor(Color(color))) }
                     val text = if (name.isNotBlank()) name.take(1).uppercase() else "?"
                     Text(text, fontSize = 72.sp, color = Color.White)
                 }
-            } else {
+            else
                 Image(
                     painter = rememberAsyncImagePainter(model = currentAvatarUri),
                     contentDescription = stringResource(R.string.avatar_image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(avatarSize.dp).clip(CircleShape)
                 )
-            }
         }
     }
 }
@@ -910,10 +906,8 @@ private fun checkOnClick(
     }
 
     var newName = currentState.name.trim()
-    if (newName == "") newName = if (newUris.isNotEmpty())
-        newUris[0].uri.substringAfter(":")
-    else
-        currentState.email
+    if (newName == "")
+        newName = if (newUris.isNotEmpty()) newUris[0].uri.substringAfter(":") else currentState.email
     if (!Utils.checkName(newName)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_contact), newName)
@@ -999,15 +993,7 @@ private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
         ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
         else -> return bitmap
     }
-    val rotatedBitmap = Bitmap.createBitmap(
-        bitmap,
-        0,
-        0,
-        bitmap.width,
-        bitmap.height,
-        matrix,
-        true
-    )
+    val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     bitmap.recycle()
     return rotatedBitmap
 }
