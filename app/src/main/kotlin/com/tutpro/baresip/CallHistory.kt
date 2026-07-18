@@ -33,7 +33,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
     companion object {
 
         @Suppress("unused")
-        private const val serialVersionUID: Long = 3
+        const val serialVersionUID: Long = 3L
         private const val CALL_HISTORY_SIZE = 256
 
         fun aorLatestPeerUri(aor: String): String? {

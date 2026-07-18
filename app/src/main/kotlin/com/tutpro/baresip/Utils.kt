@@ -669,7 +669,7 @@ object Utils {
     class Crypto(val salt: ByteArray, val iter: Int, val iv: ByteArray, val data: ByteArray): Serializable {
         companion object {
             @Suppress("unused")
-            private const val serialVersionUID: Long = -29238082928391L
+            const val serialVersionUID: Long = -29238082928391L
         }
     }
 
