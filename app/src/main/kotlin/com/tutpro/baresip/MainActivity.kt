@@ -20,7 +20,6 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.CallLog
 import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -89,7 +88,10 @@ class MainActivity : ComponentActivity() {
                         recreate()
                     else {
                         if (first.event == "stopped") {
-                            Log.d(TAG, "Handling service event 'stopped' with start error '${first.params[0]}'")
+                            Log.d(
+                                TAG,
+                                "Handling service event 'stopped' with start error '${first.params[0]}'"
+                            )
                             if (first.params[0] != "")
                                 handleDialog(
                                     ctx = applicationContext,
@@ -103,8 +105,7 @@ class MainActivity : ComponentActivity() {
                                 else
                                     exitProcess(0)
                             }
-                        }
-                        else
+                        } else
                             handleServiceEvent(this, viewModel, first.event, first.params)
                     }
                 }
@@ -124,12 +125,15 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        this.registerReceiver(screenEventReceiver, IntentFilter().apply { addAction(Intent.ACTION_SCREEN_ON) })
+        this.registerReceiver(screenEventReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
 
         if (Build.VERSION.SDK_INT >= 31) {
             comDevChangedListener = AudioManager.OnCommunicationDeviceChangedListener { device ->
-                if (device != null)
+                if (device != null) {
                     Log.d(TAG, "Com device changed to type ${device.type} in mode ${am.mode}")
+                }
             }
             am.addOnCommunicationDeviceChangedListener(mainExecutor, comDevChangedListener)
         }
@@ -144,29 +148,28 @@ class MainActivity : ComponentActivity() {
                 restart = true
                 baresipService.action = "Stop"
                 ContextCompat.startForegroundService(this, baresipService)
-            }
-            else {
+            } else {
                 finishAndRemoveTask()
                 val pm = applicationContext.packageManager
                 val intent = pm.getLaunchIntentForPackage(applicationContext.packageName)
                 if (intent != null) {
                     applicationContext.startActivity(intent)
                     exitProcess(0)
-                }
-                else
+                } else {
                     Log.e(TAG, "Failed to restart: Launch intent is null")
+                }
             }
         }
 
         val quitApp = {
             Log.i(TAG, "Quiting baresip")
-            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             if (BaresipService.isServiceRunning) {
                 restart = false
                 baresipService.action = "Stop"
                 ContextCompat.startForegroundService(this, baresipService)
-            }
-            else {
+            } else {
                 finishAndRemoveTask()
                 exitProcess(0)
             }
@@ -179,27 +182,21 @@ class MainActivity : ComponentActivity() {
         when (intent?.action) {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 if (BaresipService.isServiceRunning)
-                    callAction(
-                        applicationContext,
-                        viewModel,
-                        intent.data,
-                        if (intent?.action == ACTION_CALL) "call" else "dial"
-                    )
+                    callAction(applicationContext, viewModel, intent.data, if (intent?.action == ACTION_CALL) "call" else "dial")
                 else
-                    BaresipService.callActionUri = intent.data
-                        .toString().replace("%2B", "+")
-                        .replace("%20", "")
-                        .filterNot{setOf('-', ' ', '(', ')').contains(it)}
+                    BaresipService.callActionUri = intent.data.toString().replace("%2B", "+")
+                        .replace("%20", "").filterNot{setOf('-', ' ', '(', ')').contains(it)}
         }
 
         val permissions = if (Build.VERSION.SDK_INT >= 33)
             arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
         else if (Build.VERSION.SDK_INT >= 31)
             arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
-        else if (Build.VERSION.SDK_INT < 29)
-            arrayOf(RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
         else
-            arrayOf(RECORD_AUDIO)
+            if (Build.VERSION.SDK_INT < 29)
+                arrayOf(RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+            else
+                arrayOf(RECORD_AUDIO)
 
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -217,24 +214,30 @@ class MainActivity : ComponentActivity() {
                             shouldShow.add(permission.key)
                     }
                 }
-                if (denied.contains(POST_NOTIFICATIONS) && !shouldShow.contains(POST_NOTIFICATIONS))
+                if (denied.contains(POST_NOTIFICATIONS) && !shouldShow.contains(POST_NOTIFICATIONS)) {
                     handleDialog(
                         ctx = applicationContext,
                         title = getString(R.string.notice),
                         message = getString(R.string.no_notifications),
                         action = { quitRestart(false) }
                     )
-                else if (shouldShow.isNotEmpty())
-                    handleDialog(
-                        ctx = applicationContext,
-                        title = getString(R.string.permissions_rationale),
-                        message = getString(R.string.audio_permissions),
-                        action = { requestPermissionsLauncher.launch(permissions) }
-                    )
-                else if (!BaresipService.isStartReceived) {
-                    baresipService.action = "Start"
-                    ContextCompat.startForegroundService(this, baresipService)
-                    if (atStartup) moveTaskToBack(true)
+                } else {
+                    if (shouldShow.isNotEmpty()) {
+                        handleDialog(
+                            ctx = applicationContext,
+                            title = getString(R.string.permissions_rationale),
+                            message = getString(R.string.audio_permissions),
+                            action = { requestPermissionsLauncher.launch(permissions) }
+                        )
+                    }
+                    else {
+                        if (!BaresipService.isStartReceived) {
+                            baresipService.action = "Start"
+                            ContextCompat.startForegroundService(this, baresipService)
+                            if (atStartup)
+                                moveTaskToBack(true)
+                        }
+                    }
                 }
             }
 
@@ -256,13 +259,14 @@ class MainActivity : ComponentActivity() {
                                 val route = "calls/${command.aor}"
                                 navController.navigate(route)
                             }
-                            is NavigationCommand.NavigateToChats -> {
-                                navController.navigate("chats")
-                            }
-                            is NavigationCommand.NavigateToHome ->
+                            is NavigationCommand.NavigateToHome -> {
                                 navController.navigate("main") {
                                     popUpTo("main") { inclusive = true }
                                 }
+                            }
+                            is NavigationCommand.NavigateToCall -> {
+                                navController.navigate("call")
+                            }
                         }
                     }
                 }
@@ -275,6 +279,7 @@ class MainActivity : ComponentActivity() {
                         onRestartApp = { restartApp() },
                         onQuitApp = { quitApp() }
                     )
+                    callScreenRoute(navController, viewModel)
                     aboutScreenRoute(navController)
                     settingsScreenRoute(
                         navController = navController,
@@ -284,13 +289,12 @@ class MainActivity : ComponentActivity() {
                     audioScreenRoute(navController)
                     accountScreenRoute(navController)
                     codecsScreenRoute(navController)
-                    contactsScreenRoute(navController)
+                    contactsScreenRoute(navController, viewModel)
                     contactScreenRoute(navController, viewModel)
                     callsScreenRoute(navController, viewModel)
                     callDetailsScreenRoute(navController, viewModel)
                     blockedScreenRoute(navController)
-                    blockingScreenRoute(navController)
-                    chatsScreenRoute(navController)
+                    chatsScreenRoute(navController, viewModel)
                     chatScreenRoute(navController, viewModel)
                 }
             }
@@ -300,30 +304,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.i(TAG, "Main onStart action/type/data: ${intent.action}/${intent.type}/${intent.data}")
+        Log.i(TAG, "Main onStart")
         val action = intent.getStringExtra("action")
         if (action != null) {
             // MainActivity was not visible when call, message, or transfer request came in
             intent.removeExtra("action")
             handleIntent(applicationContext, viewModel, intent, action)
-        }
-        else if (isCallLogIntent(intent)) {
-            handleCallLogIntent()
-        }
-        else if (intent.action == Intent.ACTION_MAIN && !atStartup) {
-            val activeNotifications = nm.activeNotifications
-            if (activeNotifications.any { it.id == CALL_MISSED_NOTIFICATION_ID }) {
-                val ua = BaresipService.uas.value.find { it.account.missedCalls }
-                if (ua != null)
-                    viewModel.navigateToCalls(ua.account.aor)
-            }
-            else if (activeNotifications.any { it.id == MESSAGE_NOTIFICATION_ID }) {
-                val lastUnread = BaresipService.messages.lastOrNull { it.new }
-                if (lastUnread != null)
-                    viewModel.onNewMessageReceived(lastUnread.aor, lastUnread.peerUri)
-                else
-                    viewModel.navigateToChats()
-            }
         }
     }
 
@@ -331,11 +317,6 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         Log.d(TAG, "Main onResume")
         nm.cancelAll()
-        if (Build.VERSION.SDK_INT >= 29) {
-            val baresipService = Intent(this, BaresipService::class.java)
-            baresipService.action = "Check Roles"
-            startService(baresipService)
-        }
     }
 
     override fun onPause() {
@@ -360,25 +341,20 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         // Called when MainActivity already exists at the top of current task
         super.onNewIntent(intent)
-        setIntent(intent)
 
         this.setShowWhenLocked(true)
         this.setTurnScreenOn(true)
 
-        Log.d(TAG, "onNewIntent action/type/data: ${intent.action}/${intent.type}/${intent.data}")
+        Log.d(TAG, "onNewIntent with action/data '${intent.action}/${intent.data}'")
 
-        when {
-            isCallLogIntent(intent) -> {
-                handleCallLogIntent()
-            }
-            intent.action in listOf(ACTION_DIAL, ACTION_CALL, ACTION_VIEW) -> {
+        when (intent.action) {
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 callAction(
                     applicationContext,
                     viewModel,
                     intent.data,
                     if (intent.action == ACTION_CALL) "call" else "dial"
                 )
-            }
             else -> {
                 val action = intent.getStringExtra("action")
                 if (action != null) {
@@ -408,19 +384,6 @@ class MainActivity : ComponentActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun isCallLogIntent(intent: Intent?): Boolean {
-        return intent?.action == ACTION_VIEW && (intent.type == CallLog.Calls.CONTENT_TYPE ||
-                intent.data?.toString()?.contains("calls") == true)
-    }
-
-    private fun handleCallLogIntent() {
-        Log.d(TAG, "Handling Call Log intent")
-        val ua = BaresipService.uas.value.find { it.account.isMobile }
-            ?: BaresipService.uas.value.firstOrNull()
-        if (ua != null)
-            viewModel.navigateToCalls(ua.account.aor)
-    }
-
     private fun quitRestart(reStart: Boolean) {
         Log.i(TAG, "quitRestart Restart = $reStart")
         window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
@@ -429,8 +392,7 @@ class MainActivity : ComponentActivity() {
             restart = reStart
             baresipService.action = "Stop"
             ContextCompat.startForegroundService(this, baresipService)
-        }
-        else {
+        } else {
             finishAndRemoveTask()
             if (reStart)
                 quitRestart(true)

@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.role.RoleManager
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -87,7 +87,6 @@ import com.tutpro.baresip.Utils.copyInputStreamToFile
 import java.io.File
 import java.io.FileInputStream
 import java.util.Locale
-import androidx.core.net.toUri
 
 private var restart = false
 private val showRestartDialog = mutableStateOf(false)
@@ -152,14 +151,12 @@ private fun SettingsScreen(
     }
 
     LaunchedEffect(null) {
-        save = false
-        restart = false
         settingsViewModel.loadSettings(ctx)
         areSettingsLoaded = true
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -193,7 +190,7 @@ private fun SettingsScreen(
         }
     ) { contentPadding ->
 
-        if (showRestartDialog.value)
+        if (showRestartDialog.value) {
             AlertDialog(
                 showDialog = showRestartDialog,
                 title = stringResource(R.string.restart_request),
@@ -203,6 +200,7 @@ private fun SettingsScreen(
                 lastButtonText = stringResource(R.string.restart),
                 onLastClicked = { onRestartApp() },
             )
+        }
 
         if (areSettingsLoaded && activity != null)
             SettingsContent(settingsViewModel, contentPadding, navController, activity, onRestartApp)
@@ -247,9 +245,6 @@ private fun SettingsContent(
                         Config.save()
                     }
                 }
-                val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
-                viewModel.batteryOptimizations.value =
-                    !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -265,7 +260,7 @@ private fun SettingsContent(
     val okButtonText = stringResource(R.string.ok)
     val cancelButtonText = stringResource(R.string.cancel)
 
-    if (showAlert.value)
+    if (showAlert.value) {
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
@@ -273,6 +268,7 @@ private fun SettingsContent(
             firstButtonText = "",
             lastButtonText = okButtonText,
         )
+    }
 
     if (showDialog.value)
         AlertDialog(
@@ -794,7 +790,6 @@ private fun SettingsContent(
         }
     }
 
-    @SuppressLint("BatteryLife")
     @Composable
     fun BatteryOptimizations() {
         val batteryOptimizationsTitle = stringResource(R.string.battery_optimizations)
@@ -827,17 +822,8 @@ private fun SettingsContent(
                 checked = battery,
                 onCheckedChange = {
                     viewModel.batteryOptimizations.value = it
-                    if (it)
-                        batterySettingsLauncher.launch(
-                            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                        )
-                    else {
-                        val intent =
-                            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                                data = "package:${ctx.packageName}".toUri()
-                            }
-                        batterySettingsLauncher.launch(intent)
-                    }
+                    batterySettingsLauncher.launch(
+                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
                 }
             )
         }
@@ -977,14 +963,11 @@ private fun SettingsContent(
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
 
             val requestPermissionLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.RequestMultiplePermissions()
-            ) { results ->
-                if (results[Manifest.permission.READ_PHONE_STATE] == true)
-                    Log.d(TAG, "READ_PHONE_STATE permission granted")
-                if (results[Manifest.permission.READ_PHONE_NUMBERS] == true)
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted)
                     Log.d(TAG, "READ_PHONE_NUMBERS permission granted")
                 BaresipService.instance?.addMobileUserAgent()
-                restart = true
             }
 
             val dialerRoleRequest = rememberLauncherForActivityResult(
@@ -993,17 +976,13 @@ private fun SettingsContent(
                 val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
                 viewModel.defaultDialer.value = isHeld
                 if (isHeld) {
-                    val permissions = arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_PHONE_NUMBERS)
-                    if (Utils.checkPermissions(ctx, permissions)) {
+                    if (Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_PHONE_NUMBERS)))
                         BaresipService.instance?.addMobileUserAgent()
-                        restart = true
-                    }
                     else
-                        requestPermissionLauncher.launch(permissions)
+                        requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_NUMBERS)
                 }
                 else
                     BaresipService.instance?.addMobileUserAgent()
-                restart = true
             }
             Switch(
                 checked = defaultDialer,
@@ -1019,12 +998,14 @@ private fun SettingsContent(
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_DIALER))
                                 dialerRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
                     }
-                    else
+                    else {
+                        viewModel.defaultMessaging.value = false
                         try {
                             dialerRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                         } catch (e: ActivityNotFoundException) {
                             Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
+                    }
                 }
             )
         }
@@ -1204,14 +1185,11 @@ private fun SettingsContent(
         AudioSettings(navController)
         if (VERSION.SDK_INT >= 29) {
             DefaultDialer()
-            DefaultMessaging()
             val defaultDialer by viewModel.defaultDialer.collectAsState()
-            val defaultMessaging by viewModel.defaultMessaging.collectAsState()
-            if (!defaultDialer && !defaultMessaging)
-                BatteryOptimizations()
+            if (defaultDialer)
+                DefaultMessaging()
         }
-        else
-            BatteryOptimizations()
+        BatteryOptimizations()
         DarkTheme()
         if (VERSION.SDK_INT >= 31)
             DynamicColors()

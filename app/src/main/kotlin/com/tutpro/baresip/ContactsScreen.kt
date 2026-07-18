@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import androidx.core.graphics.scale
+import android.graphics.BitmapFactory
 import android.provider.ContactsContract
 import android.util.Base64
 import android.util.Log
@@ -19,6 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -91,17 +92,32 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.draw.shadow
+import com.tutpro.baresip.BaresipService.Companion.uas
+import androidx.compose.runtime.collectAsState
+
 const val avatarSize: Int = 96
 
-fun NavGraphBuilder.contactsScreenRoute(navController: NavController) {
+fun NavGraphBuilder.contactsScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable("contacts") { _ ->
-        ContactsScreen(navController = navController)
+        ContactsScreen(navController = navController, viewModel = viewModel)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-private fun ContactsScreen(navController: NavController) {
+private fun ContactsScreen(navController: NavController, viewModel: ViewModel) {
 
     val ctx = LocalContext.current
     val activity = LocalActivity.current!!
@@ -243,17 +259,11 @@ private fun ContactsScreen(navController: NavController) {
                                     if (photoBase64.isNotEmpty())
                                         try {
                                             val decodedString = Base64.decode(photoBase64, Base64.DEFAULT)
-                                            val decodedByte = Utils.decodeSampledBitmapFromByteArray(decodedString, 192, 192)
+                                            val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                                             if (decodedByte != null) {
-                                                val scaledByte = decodedByte.scale(192, 192)
                                                 val avatarFile = File(BaresipService.filesPath, "$contactId.png")
-                                                try {
-                                                    val out = FileOutputStream(avatarFile)
-                                                    scaledByte.compress(Bitmap.CompressFormat.PNG, 100, out)
-                                                    out.flush()
-                                                    out.close()
-                                                } catch (e: Exception) {
-                                                    Log.e(TAG, "Failed to save photo for $name: ${e.message}")
+                                                FileOutputStream(avatarFile).use { out ->
+                                                    decodedByte.compress(Bitmap.CompressFormat.PNG, 100, out)
                                                 }
                                             }
                                         } catch (e: Exception) {
@@ -290,13 +300,6 @@ private fun ContactsScreen(navController: NavController) {
                 Log.e(TAG, "Failed to import VCF: ${e.message}")
                 Toast.makeText(ctx, R.string.contact_import_failure, Toast.LENGTH_SHORT).show()
             }
-    }
-
-    val call = stringResource(R.string.call)
-    val showCall = stringResource(R.string.show_call)
-
-    val contactActionName = remember(BaresipService.contactAction) {
-        listOf(if (BaresipService.contactAction == "call") call else showCall)
     }
 
     val contactNames = remember(BaresipService.contactsMode) {
@@ -420,16 +423,9 @@ private fun ContactsScreen(navController: NavController) {
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames + contactActionName + import + export + delete,
+                            items = contactNames + import + export + delete,
                             onItemClick = { name ->
                                 expanded = false
-                                if (name == call || name == showCall) {
-                                    val newAction = if (BaresipService.contactAction == "call") "dial" else "call"
-                                    BaresipService.contactAction = newAction
-                                    Config.replaceVariable("contact_action", newAction)
-                                    Config.save()
-                                    return@DropdownMenu
-                                }
                                 if (name == import) {
                                     vcfImportLauncher.launch(arrayOf("text/vcard", "text/x-vcard"))
                                     return@DropdownMenu
@@ -512,90 +508,36 @@ private fun ContactsScreen(navController: NavController) {
                 )
             }
         },
-        bottomBar = {
-            BottomBar(
-                navController = navController,
-                searchContactName = searchContactName,
-                onSearchContactNameChange = { searchContactName = it }
-            )
-        },
         content = { contentPadding ->
-            ContactsContent(
-                ctx,
-                navController,
-                contentPadding,
-                searchContactName,
-                showDialog,
-                title,
-                message,
-                firstButtonText,
-                onFirstClicked,
-                lastButtonText,
-                onLastClicked,
-                confirmation,
-                cancel,
-                delete,
-                contactDeleteQuestion
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                ContactsContent(
+                    ctx,
+                    navController,
+                    contentPadding,
+                    searchContactName,
+                    { searchContactName = it },
+                    showDialog,
+                    title,
+                    message,
+                    firstButtonText,
+                    onFirstClicked,
+                    lastButtonText,
+                    onLastClicked,
+                    confirmation,
+                    cancel,
+                    delete,
+                    contactDeleteQuestion,
+                    viewModel
+                )
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    BottomNavigationBar(ctx, viewModel, navController)
+                }
+            }
         }
     )
 }
 
-@Composable
-private fun BottomBar(
-    navController: NavController,
-    searchContactName: String,
-    onSearchContactNameChange: (String) -> Unit
-) {
-    val keyboardController = LocalSoftwareKeyboardController.current
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        OutlinedTextField(
-            value = searchContactName,
-            onValueChange = {
-                onSearchContactNameChange(it)
-                if (it.isBlank()) {
-                    keyboardController?.hide()
-                }
-            },
-            modifier = Modifier.weight(1f),
-            singleLine = true,
-            trailingIcon = {
-                if (searchContactName.isNotEmpty())
-                    Icon(
-                        Icons.Outlined.Clear,
-                        contentDescription = null,
-                        modifier = Modifier.clickable {
-                            onSearchContactNameChange("")
-                            keyboardController?.hide()
-                        },
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-            },
-            label = { Text(stringResource(R.string.search)) },
-            textStyle = TextStyle(fontSize = 18.sp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
-        )
-        SmallFloatingActionButton(
-            onClick = { navController.navigate("contact//new") },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                modifier = Modifier.size(36.dp),
-                contentDescription = stringResource(R.string.add)
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -604,6 +546,7 @@ private fun ContactsContent(
     navController: NavController,
     contentPadding: PaddingValues,
     searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     showDialog: androidx.compose.runtime.MutableState<Boolean>,
     title: androidx.compose.runtime.MutableState<String>,
     message: androidx.compose.runtime.MutableState<String>,
@@ -614,7 +557,8 @@ private fun ContactsContent(
     confirmationText: String,
     cancelText: String,
     deleteText: String,
-    contactDeleteQuestion: String
+    contactDeleteQuestion: String,
+    viewModel: ViewModel
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -656,23 +600,107 @@ private fun ContactsContent(
         }
     }
 
-    LazyColumn(
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 10.dp)
-            .verticalScrollbar(state = lazyListState),
-        state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        // Search Bar (full width, pill shaped)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = {
+                    onSearchQueryChange(it)
+                    if (it.isBlank()) {
+                        keyboardController?.hide()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray
+                    )
+                },
+                trailingIcon = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (searchQuery.isNotEmpty()) {
+                            Icon(
+                                Icons.Outlined.Clear,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clickable {
+                                        onSearchQueryChange("")
+                                        keyboardController?.hide()
+                                    }
+                                    .padding(end = 8.dp),
+                                tint = Color.Gray
+                            )
+                        }
+                        IconButton(
+                            onClick = { navController.navigate("contact//new") },
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                                .size(40.dp)
+                                .background(Color.White, shape = CircleShape)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_plus_svg),
+                                modifier = Modifier.size(20.dp),
+                                contentDescription = stringResource(R.string.add),
+                                tint = Color(0xFF00C853) // Green matching screenshot
+                            )
+                        }
+                    }
+                },
+                placeholder = { Text("Search contacts", color = Color.Gray) },
+                shape = RoundedCornerShape(50), // Pill shaped
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
+                ),
+                textStyle = TextStyle(fontSize = 16.sp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
+            )
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(start = 16.dp, end = 16.dp)
+                .verticalScrollbar(state = lazyListState),
+            state = lazyListState,
+            contentPadding = PaddingValues(bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
         itemsIndexed(
             filteredContacts, key = { index, (contact, _) -> "${contact.id()}_$index" }
         ) { _, (contact, annotatedName) ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
                 when (contact) {
                     is Contact.BaresipContact -> {
                         val avatarImage = contact.avatarImage
@@ -682,7 +710,7 @@ private fun ContactsContent(
                                 contentDescription = "Avatar",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
                             )
                         else
@@ -696,75 +724,130 @@ private fun ContactsContent(
                                 contentDescription = "Avatar",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape),
                             )
                         else
                             TextAvatar(contact.name(), contact.color)
                     }
                 }
-                when (contact) {
-                    is Contact.BaresipContact -> {
-                        Text(
-                            text = annotatedName,
-                            fontSize = 20.sp,
-                            fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 10.dp)
-                                .combinedClickable(
-                                    onClick = { navController.navigate("contact/${contact.name()}/old") },
-                                    onLongClick = {
-                                        title.value = confirmationText
-                                        message.value = String.format(contactDeleteQuestion, contact.name())
-                                        firstButtonText.value = cancelText
-                                        onFirstClicked.value = { }
-                                        lastButtonText.value = deleteText
-                                        onLastClicked.value = {
-                                            val id = contact.id
-                                            val avatarFile = File(BaresipService.filesPath, "$id.png")
-                                            if (avatarFile.exists())
-                                                try {
-                                                    avatarFile.delete()
-                                                } catch (e: IOException) {
-                                                    Log.e(TAG, "Could not delete file $id.png: ${e.message}")
-                                                }
-                                            Contact.removeBaresipContact(contact)
-                                        }
-                                        showDialog.value = true
+
+                val targetUri = contact.uris().firstOrNull()?.uri
+                val subtitle = targetUri?.let { uri ->
+                    if (uri.startsWith("tel:")) "Mobile • ${uri.removePrefix("tel:")}"
+                    else "SIP • ${uri.removePrefix("sip:")}"
+                } ?: ""
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp)
+                        .combinedClickable(
+                            onClick = { navController.navigate("contact/${contact.name()}/old") },
+                            onLongClick = {
+                                title.value = confirmationText
+                                message.value = String.format(contactDeleteQuestion, contact.name())
+                                firstButtonText.value = cancelText
+                                onFirstClicked.value = { }
+                                lastButtonText.value = deleteText
+                                onLastClicked.value = {
+                                    if (contact is Contact.BaresipContact) {
+                                        val id = contact.id
+                                        val avatarFile = File(BaresipService.filesPath, "$id.png")
+                                        if (avatarFile.exists())
+                                            try {
+                                                avatarFile.delete()
+                                            } catch (e: IOException) {
+                                                Log.e(TAG, "Could not delete file $id.png: ${e.message}")
+                                            }
+                                        Contact.removeBaresipContact(contact)
+                                    } else if (contact is Contact.AndroidContact) {
+                                        ctx.contentResolver.delete(
+                                            ContactsContract.RawContacts.CONTENT_URI,
+                                            ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
+                                            null
+                                        )
                                     }
-                                )
+                                }
+                                showDialog.value = true
+                            }
+                        )
+                ) {
+                    Text(
+                        text = annotatedName,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B2A47), // Dark blue matching screenshot
+                        fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal
+                    )
+                    if (subtitle.isNotEmpty()) {
+                        Text(
+                            text = subtitle,
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
-                    is Contact.AndroidContact -> {
-                        Text(text = annotatedName,
-                            fontSize = 20.sp,
-                            fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
-                                .combinedClickable(
-                                    onClick = { navController.navigate("contact/${contact.name()}/old") },
-                                    onLongClick = {
-                                        title.value = confirmationText
-                                        message.value = String.format(contactDeleteQuestion, contact.name())
-                                        firstButtonText.value = cancelText
-                                        onFirstClicked.value = { }
-                                        lastButtonText.value = deleteText
-                                        onLastClicked.value = {
-                                            ctx.contentResolver.delete(
-                                                ContactsContract.RawContacts.CONTENT_URI,
-                                                ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
-                                                null
-                                            )
-                                        }
-                                        showDialog.value = true
+                }
+
+                // Action buttons: Message and Call
+                if (targetUri != null) {
+                    val ua = UserAgent.ofAor(viewModel.selectedAor.value)
+                    if (ua != null) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            // Message Button
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable {
+                                        val intent = Intent(ctx, MainActivity::class.java)
+                                        intent.putExtra("uap", ua.uap)
+                                        intent.putExtra("peer", targetUri)
+                                        handleIntent(ctx, viewModel, intent, "message")
+                                        navController.navigate("chat/${ua.account.aor}/${targetUri}")
                                     }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_message_svg),
+                                    contentDescription = "Message",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color(0xFF6B7280) // Gray icon
                                 )
-                        )
+                            }
+                            // Call Button
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable {
+                                        val intent = Intent(ctx, MainActivity::class.java)
+                                        intent.putExtra("uap", ua.uap)
+                                        intent.putExtra("peer", targetUri)
+                                        handleIntent(ctx, viewModel, intent, "call")
+                                    }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_call_svg),
+                                    contentDescription = "Call",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color(0xFF6B7280) // Gray icon
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
+    }
+}
 }

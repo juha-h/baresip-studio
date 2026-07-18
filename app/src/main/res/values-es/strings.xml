@@ -2,7 +2,53 @@
 <resources>
     <!-- About Activity -->
     <string name="about_title">Acerca de Baresip</string>
-    <string name="about_text"><![CDATA["<h1> Agente de Usuario SIP basado en la biblioteca <a href=\"https://github.com/baresip/baresip\">baresip</a> </h1>\n        <br>\n        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>\n        <p> Versión %1$s </p>\n         <br>\n        <h2> Consejos de uso </h2>\n        <ul>\n            <li> Compruebe que los valores predeterminados en la configuración de baresip se ajusten a sus necesidades\n                (toque los títulos de los elementos para obtener ayuda). </li>\n            <li> Luego, en Cuentas, crea una o más cuentas (nuevamente toca los títulos de los elementos para obtener ayuda). </li>\n            <li> El estado de registro de una cuenta se muestra con un punto de color: verde (registro logrado),\n                amarillo (el registro está en proceso), rojo (el registro falló), blanco (el registro está en progreso)\n                no ha sido activado). </li>\n            <li> Al tocar el punto de estado se accede directamente a la configuración de la cuenta. </li>\n            <li> Mantén pulsado un icono de la barra de baresip para ver información sobre dicho icono.</li>\n            <li> El gesto de deslizar hacia abajo provoca el registro nuevo de la cuenta mostrada actualmente. </li>\n            <li> Al mantener pulsada la cuenta que se muestra actualmente, se habilita o deshabilita el registro de la cuenta. </li>\n            <li> El gesto de deslizar hacia la izquierda o hacia la derecha alterna entre las cuentas. </li>\n            <li> Se puede volver a seleccionar la persona con la que se llamó anteriormente tocando el icono de llamada cuando el campo Destinatario esté vacío.</li>\n            <li> Las parejas de llamadas y mensajes se pueden agregar a los contactos mediante toques prolongados. </li>\n            <li> Los toques prolongados también se pueden utilizar para eliminar llamadas, chats, mensajes y contactos. </li>\n            <li> Se puede utilizar el toque o toque prolongado del icono de contacto para instalar o desinstalar la imagen del avatar.</li>\n            <li> Mantener pulsado un códice de audio permite activarlo o desactivarlo.</li>\n            <li> Consulte el <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> para obtener más información.</li>\n        </ul>\n        <h2> Directiva de privacidad </h2>\n            <p>La directiva de privacidad está disponible <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">aquí </a> .</p>\n        <br>\n        <h2> Código Fuente</h2>\n            <p>El código fuente está disponible en <a href=\"https://github.com/juha-h/baresip-studio\"> GitHub </a> ,\n            donde también se pueden reportar problemas.</p>\n          <br>\n        <h2>Traducciones de Idioma</h2>\n            <p>Las traducciones de idioma son gestionadas por baresip en el proyecto\n                <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>.</p>\n        <br>\n        <h2> Licencias </h2>\n        <ul>\n            <li> <b> Cláusula BSD-3 </b> excepto lo siguiente: </li>\n            <li> <b> Codecs AMR y seguridad TLS de Apache 2.0 </b>\n            <li> <b> AGPLv4 </b> Cifrado de medios ZRTP </li>\n            <li> <b> GNU LGPL 2.1</b> codec Codec2</li>\n            <li> <b> Libre</b> G.722 codec</li>\n            <li> <b> GNU GPLv3 </b> Codec G.729 </li>\n        </ul>"]]></string>
+    <string name="about_text"><![CDATA[
+        <h1> Agente de Usuario SIP basado en la biblioteca <a href="https://github.com/baresip/baresip">baresip</a> </h1>
+        <br>
+        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>
+        <p> Versión %1$s </p>
+         <br>
+        <h2> Consejos de uso </h2>
+        <ul>
+            <li> Compruebe que los valores predeterminados en la configuración de baresip se ajusten a sus necesidades
+                (toque los títulos de los elementos para obtener ayuda). </li>
+            <li> Luego, en Cuentas, crea una o más cuentas (nuevamente toca los títulos de los elementos para obtener ayuda). </li>
+            <li> El estado de registro de una cuenta se muestra con un punto de color: verde (registro logrado),
+                amarillo (el registro está en proceso), rojo (el registro falló), blanco (el registro está en progreso)
+                no ha sido activado). </li>
+            <li> Al tocar el punto de estado se accede directamente a la configuración de la cuenta. </li>
+            <li> Mantén pulsado un icono de la barra de baresip para ver información sobre dicho icono.</li>
+            <li> El gesto de deslizar hacia abajo provoca el registro nuevo de la cuenta mostrada actualmente. </li>
+            <li> Al mantener pulsada la cuenta que se muestra actualmente, se habilita o deshabilita el registro de la cuenta. </li>
+            <li> El gesto de deslizar hacia la izquierda o hacia la derecha alterna entre las cuentas. </li>
+            <li> Se puede volver a seleccionar la persona con la que se llamó anteriormente tocando el icono de llamada cuando el campo Destinatario esté vacío.</li>
+            <li> Las parejas de llamadas y mensajes se pueden agregar a los contactos mediante toques prolongados. </li>
+            <li> Los toques prolongados también se pueden utilizar para eliminar llamadas, chats, mensajes y contactos. </li>
+            <li> Se puede utilizar el toque o toque prolongado del icono de contacto para instalar o desinstalar la imagen del avatar.</li>
+            <li> Mantener pulsado un códice de audio permite activarlo o desactivarlo.</li>
+            <li> Consulte el <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para obtener más información.</li>
+        </ul>
+        <h2> Directiva de privacidad </h2>
+            <p>La directiva de privacidad está disponible <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">aquí </a> .</p>
+        <br>
+        <h2> Código Fuente</h2>
+            <p>El código fuente está disponible en <a href="https://github.com/juha-h/baresip-studio"> GitHub </a> ,
+            donde también se pueden reportar problemas.</p>
+          <br>
+        <h2>Traducciones de Idioma</h2>
+            <p>Las traducciones de idioma son gestionadas por baresip en el proyecto
+                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>.</p>
+        <br>
+        <h2> Licencias </h2>
+        <ul>
+            <li> <b> Cláusula BSD-3 </b> excepto lo siguiente: </li>
+            <li> <b> Codecs AMR y seguridad TLS de Apache 2.0 </b>
+            <li> <b> AGPLv4 </b> Cifrado de medios ZRTP </li>
+            <li> <b> GNU LGPL 2.1</b> codec Codec2</li>
+            <li> <b> Libre</b> G.722 codec</li>
+            <li> <b> GNU GPLv3 </b> Codec G.729 </li>
+        </ul>
+       ]]></string>
     <!-- Account Activity -->
     <string name="account">Cuenta</string>
     <string name="display_name">Nombre para mostrar</string>
@@ -64,15 +110,16 @@
     <string name="call">Llamada</string>
     <string name="calls_calls">llamadas</string>
     <string name="calls_call">llamar</string>
-    <string name="calls_add_delete_question">¿Quiere añadir a «%1$s» a los contactos, bloquearlo, o eliminar %2$s desde el historial de llamadas?</string>
-    <string name="calls_delete_question">¿Quiere borrar la %2$s desde el historial de llamada?</string>
+    <string name="calls_add_delete_question">¿Quiere añadir a «%1$s» a los contactos, copiar su URL, o eliminar este %2$s del historial de llamadas?</string>
+    <string name="calls_delete_question">¿Quiere copiar la URI de «%1$s» o borrar este %2$s desde el historial de llamadas?</string>
     <string name="disable_history">Desactivar</string>
     <string name="enable_history">Activar</string>
     <string name="delete_history_alert">¿Quiere eliminar el historial de llamadas de la cuenta «%1$s»\?</string>
     <!-- Chat Activity -->
     <string name="chat_with">Chatear con %1$s</string>
     <string name="new_message">Mensaje nuevo</string>
-    <string name="short_message_question">¿Quiere eliminar este mensaje?</string>
+    <string name="long_message_question">¿Quiere eliminar el mensaje o añadir el par «%1$s» a los contactos\?</string>
+    <string name="short_message_question">¿Quiere eliminar el mensaje\?</string>
     <string name="add_contact">Añadir contacto</string>
     <string name="sending_failed">Envío de mensaje fallido</string>
     <string name="message_failed">Ha fallado</string>
@@ -81,7 +128,8 @@
     <string name="today">Hoy</string>
     <string name="you">Usted</string>
     <string name="new_chat_peer">Nuevo compañero de chat</string>
-    <string name="long_chat_question">¿Quiere agregar \'%1$s\' a los contactos, bloquearlo, o borrar esta charla?</string>
+    <string name="long_chat_question">¿Quieres eliminar el chat con un compañero? \'%1$s\' o
+        agregar pares a los contactos?</string>
     <string name="short_chat_question">¿Quiere eliminar el chat con «%1$s»\?</string>
     <string name="delete_chats_alert">¿Quiere eliminar el historial de chat de la cuenta «%1$s»\?</string>
     <!-- Config Activity -->
@@ -234,61 +282,7 @@
     <string name="video_codecs">Codecs de vídeo</string>
     <string name="invalid_proxy_server_uri">URI del servidor proxy inválido \'%1$s\'</string>
     <string name="invalid_display_name">Nombre de pantalla inválido \'%1$s\'</string>
-    <string name="about_text_plus"><![CDATA[
-        <h1>Agente de usuario SIP basado en biblioteca Baresip con video‐llamadas</h1>
-        <br>
-        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>
-        <p>Versión %1$s</p>
-        <br>
-        <h2>Consejos de uso</h2>
-        <ul>
-            <li>Comprobar que los valores por defecto en la configuración de baresip+ se ajustan a sus necesidades
-                (Toque los títulos de los elementos para obtener ayuda). </li>
-            <li>Luego, en Cuentas, cree una o más cuentas (otra vez toque los títulos de los elementos para obtener ayuda). </li>
-            <li>El estado de registro de una cuenta se muestra con un punto de color: verde (registro
-                Ha sido aprobado), amarillo (el registro está en curso), rojo (el registro falló), blanco (el registro está en curso
-                no se ha activado).</li>
-            <li>Tocar el punto lleva directamente a la configuración de la cuenta. </li>
-            <li>Toque largo en iconos de barra bareship muestra información sobre los iconos.</li>
-            <li>El gesto de deslizar hacia abajo provoca el registro de nuevo de la cuenta que se muestra actualmente.</li>
-            <li>El toque largo en la cuenta mostrada actualmente activa o desactiva el registro de la cuenta.</li>
-            <li>El gesto de deslizar hacia la izquierda/derecha alterna entre las cuentas. </li>
-            <li>La llamada anterior puede ser re‐seleccionada tocando el icono de llamada cuando Callee está vacío.<</li>
-            <li>Las parejas de llamadas y mensajes se pueden agregar a contactos con toques largos.</li>
-            <li>Los toques, toques largos también se pueden usar para eliminar llamadas, charlas, mensajes y contactos.</li>
-            <li>El icono de contacto puede utilizarse para instalar/eliminar el avatar de la imagen. </li>
-            <li>Toque largo en un códice de sonido o vídeo puede ser utilizado para habilitar/inhabilitar el códice.</li>
-            <li>Consulte el <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> para más
-                información.</li>
-        </ul>
-        <h2>Asuntos conocidos</h2>
-        <ul>
-            <li>La vista en primera persona no se muestra correctamente cuando la transmisión de vídeo es de solo envío.</li>
-        </ul>
-        <h2>Normativa de privacidad</h2>
-        <p>La normativa de privacidad está disponible
-            <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt">aquí</a>.</p>
-        <br>
-        <h2>Código fuente</h2>
-        <p>El código fuente está disponible en <a href="https://github.com/juha-h/baresip-studio">GitHub</a>,
-          También se pueden comunicar problemas.</p>
-        <br>
-        <h2>Traducciones de idiomas</h2>
-        <p>La traducciones de idiomas es gestionada por medio del proyecto
-            <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>.</p>
-        <br>
-        <h2>Licencias</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> excepto lo siguiente:</li>
-            <li>Los códices <b>Apache 2.0</b> de AMR y seguridad TLS</li>
-            <li>Cifrado de medios ZRTP bajo <b>AGPLv4</b></li>
-            <li>Códice Codec2 de <b>GNU LGPL 2.1</b></li>
-            <li>Códice <b>Free</b> G.722</li>
-            <li>Códice <b>GNU GPLv3</b> G.729</li>
-            <li>Códice H.264 y H.265 de <b>GNU GPLv2</b> </li>
-            <li>Códice AV1 de <b>AOMedia</b></li>
-        </ul>"
-     ]]></string>
+    <string name="about_text_plus"><![CDATA["<h1>Agente de usuario SIP basado en biblioteca Baresip con video‐llamadas</h1>\n        <br>\n        <p> Juha Heinanen &lt;jh@tutpro.com&gt; </p>\n        <p>Versión %1$s</p>\n        <br>\n        <h2>Consejos de uso</h2>\n        <ul>\n            <li>Comprobar que los valores por defecto en la configuración de baresip+ se ajustan a sus necesidades\n                (Toque los títulos de los elementos para obtener ayuda). </li>\n            <li>Luego, en Cuentas, cree una o más cuentas (otra vez toque los títulos de los elementos para obtener ayuda). </li>\n            <li>El estado de registro de una cuenta se muestra con un punto de color: verde (registro\n                Ha sido aprobado), amarillo (el registro está en curso), rojo (el registro falló), blanco (el registro está en curso\n                no se ha activado).</li>\n            <li>Tocar el punto lleva directamente a la configuración de la cuenta. </li>\n            <li>Toque largo en iconos de barra bareship muestra información sobre los iconos.</li>\n            <li>El gesto de deslizar hacia abajo provoca el registro de nuevo de la cuenta que se muestra actualmente.</li>\n            <li>El toque largo en la cuenta mostrada actualmente activa o desactiva el registro de la cuenta.</li>\n            <li>El gesto de deslizar hacia la izquierda/derecha alterna entre las cuentas. </li>\n            <li>La llamada anterior puede ser re‐seleccionada tocando el icono de llamada cuando Callee está vacío.<</li>\n            <li>Las parejas de llamadas y mensajes se pueden agregar a contactos con toques largos.</li>\n            <li>Los toques, toques largos también se pueden usar para eliminar llamadas, charlas, mensajes y contactos.</li>\n            <li>El icono de contacto puede utilizarse para instalar/eliminar el avatar de la imagen. </li>\n            <li>Toque largo en un códice de sonido o vídeo puede ser utilizado para habilitar/inhabilitar el códice.</li>\n            <li>Consulte el <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> para más\n                información.</li>\n        </ul>\n        <h2>Asuntos conocidos</h2>\n        <ul>\n            <li>La vista en primera persona no se muestra correctamente cuando la transmisión de vídeo es de solo envío.</li>\n        </ul>\n        <h2>Normativa de privacidad</h2>\n        <p>La normativa de privacidad está disponible\n            <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt\">aquí</a>.</p>\n        <br>\n        <h2>Código fuente</h2>\n        <p>El código fuente está disponible en <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\n          También se pueden comunicar problemas.</p>\n        <br>\n        <h2>Traducciones de idiomas</h2>\n        <p>La traducciones de idiomas es gestionada por medio del proyecto\n            <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>.</p>\n        <br>\n        <h2>Licencias</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b> excepto lo siguiente:</li>\n            <li>Los códices <b>Apache 2.0</b> de AMR y seguridad TLS</li>\n            <li>Cifrado de medios ZRTP bajo <b>AGPLv4</b></li>\n            <li>Códice Codec2 de <b>GNU LGPL 2.1</b></li>\n            <li>Códice <b>Free</b> G.722</li>\n            <li>Códice <b>GNU GPLv3</b> G.729</li>\n            <li>Códice H.264 y H.265 de <b>GNU GPLv2</b> </li>\n            <li>Códice AV1 de <b>AOMedia</b></li>\n        </ul>"]]></string>
     <string name="about_title_plus">Acerca de baresip+</string>
     <string name="reg_int">Intervalo de inscripción</string>
     <string name="invalid_reg_int">Intervalo de registro no válido \'%1$s\'</string>
@@ -464,16 +458,4 @@
     <string name="block_hidden_help">Bloquear llamadas y mensajes de compañeros con identificación oculta.</string>
     <string name="hidden_call_blocked">Llamada de auto-rechazada de llamante oculto</string>
     <string name="hidden_message_blocked">Mensaje auto‐rechazado del remitente oculto</string>
-    <string name="sim_manager">Gestor SIM</string>
-    <string name="blocking">Bloqueando</string>
-    <string name="blocking_list">Listado de bloqueos</string>
-    <string name="new_blocking_rule">Nueva regla de bloqueo</string>
-    <string name="blocking_rule_help">Regla de bloqueo puede ser una cadena simple o una expresión regular. Si la cadena simple es incluida en la URI emparejada o si la cadena de exp. reg. coincide con la pareja URL, la llamada o el mensaje será bloqueado.</string>
-    <string name="blocking_delete_alert">¿Desea borrar regla de bloqueo \'%1$s\'?</string>
-    <string name="block">Bloquear</string>
-    <string name="ussd_failed">Solicitud de USSD incorrecta</string>
-    <string name="ussd_service_unavailable">Servicio USSD no disponible</string>
-    <string name="ussd_unknown_error">USSD con error desconocido</string>
-    <string name="permission_denied">Permiso denegado</string>
-    <string name="show_call">Mostrar llamada</string>
 </resources>

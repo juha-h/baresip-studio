@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.media.AudioManager
+import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Bundle
@@ -132,8 +133,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -151,6 +160,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tutpro.baresip.BaresipService.Companion.circleGreen
 import com.tutpro.baresip.BaresipService.Companion.colorblind
 import com.tutpro.baresip.BaresipService.Companion.contactNames
@@ -165,9 +175,24 @@ import kotlinx.coroutines.delay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.GregorianCalendar
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
+
+import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Restore
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.RestartAlt
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 private val dialpadButtonEnabled = mutableStateOf(true)
 private var pullToRefreshEnabled = mutableStateOf(true)
@@ -216,6 +241,8 @@ private fun MainScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val configuration = LocalConfiguration.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
     val selectedAor by viewModel.selectedAor.collectAsState()
     val ua = uas.value.find { it.account.aor == selectedAor }
@@ -223,6 +250,15 @@ private fun MainScreen(
 
     val showKeyboard by viewModel.showKeyboard.collectAsState()
     val hideKeyboard by viewModel.hideKeyboard.collectAsState()
+
+    val about = stringResource(R.string.about)
+    val settings = stringResource(R.string.configuration)
+    val accounts = stringResource(R.string.accounts)
+    val backup = stringResource(R.string.backup)
+    val restore = stringResource(R.string.restore)
+    val logcat = stringResource(R.string.logcat)
+    val restart = stringResource(R.string.restart)
+    val quit = stringResource(R.string.quit)
 
     LaunchedEffect(showKeyboard) {
         if (showKeyboard > 0)
@@ -287,7 +323,7 @@ private fun MainScreen(
     val noBackupMessage = stringResource(R.string.no_backup)
     fun launchBackupRequest() {
         if (VERSION.SDK_INT < 29) {
-            if (!Utils.checkPermissions(ctx, arrayOf(WRITE_EXTERNAL_STORAGE))) {
+            if (!Utils.checkPermissions(ctx, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = noBackupMessage
                 showAlert.value = true
@@ -332,7 +368,7 @@ private fun MainScreen(
     val noRestoreMessage = stringResource(R.string.no_restore)
     fun launchRestoreRequest() {
         if (VERSION.SDK_INT < 29) {
-            if (!Utils.checkPermissions(ctx, arrayOf(READ_EXTERNAL_STORAGE))) {
+            if (!Utils.checkPermissions(ctx, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))) {
                 alertTitle.value = noticeTitle
                 alertMessage.value = noRestoreMessage
                 showAlert.value = true
@@ -410,15 +446,16 @@ private fun MainScreen(
             ctx = ctx,
             showPasswordDialog = showPasswordDialog,
             password = password,
-            emptyOk = true,
             keyboardController = keyboardController,
             title = passwordTitle.value,
             okAction = {
-                if (passwordTitle.value == encryptPasswordTitle)
-                    backup(ctx, password.value)
-                else
-                    restore(ctx, password.value, onRestartClick)
-                password.value = ""
+                if (password.value != "") {
+                    if (passwordTitle.value == encryptPasswordTitle)
+                        backup(ctx, password.value)
+                    else
+                        restore(ctx, password.value, onRestartClick)
+                    password.value = ""
+                }
             },
             cancelAction = {
                 if (downloadsOutputUri != null) {
@@ -476,28 +513,121 @@ private fun MainScreen(
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(
-                    viewModel = viewModel,
-                    navController = navController,
-                    onBackupClick = { launchBackupRequest() },
-                    onRestoreClick = { launchRestoreRequest() },
-                    onLogcatClick = { launchLogcatRequest() },
-                    onRestartClick = onRestartClick,
-                    onQuitClick = onQuitClick
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp * 0.75f),
+                drawerContainerColor = MaterialTheme.colorScheme.surface,
+                drawerTonalElevation = 4.dp
+            ) {
+                Spacer(Modifier.height(12.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "baresip",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                
+                NavigationDrawerItem(
+                    label = { Text(text = about) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; navController.navigate("about") },
+                    icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = settings) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; navController.navigate("settings") },
+                    icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = accounts) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; navController.navigate("accounts") },
+                    icon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = backup) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; launchBackupRequest() },
+                    icon = { Icon(Icons.Outlined.Backup, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = restore) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; launchRestoreRequest() },
+                    icon = { Icon(Icons.Outlined.Restore, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                if (VERSION.SDK_INT >= 29) {
+                    NavigationDrawerItem(
+                        label = { Text(text = logcat) },
+                        selected = false,
+                        onClick = { scope.launch { drawerState.close() }; launchLogcatRequest() },
+                        icon = { Icon(Icons.Outlined.Description, contentDescription = null) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
+                NavigationDrawerItem(
+                    label = { Text(text = restart) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; onRestartClick() },
+                    icon = { Icon(Icons.Outlined.RestartAlt, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = quit) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; onQuitClick() },
+                    icon = { Icon(Icons.Outlined.ExitToApp, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
-        },
-        bottomBar = { BottomBar(ctx, viewModel, navController) },
-        content = { contentPadding ->
-            MainContent(navController, viewModel, contentPadding)
         }
-    )
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize().imePadding(),
+                containerColor = MaterialTheme.colorScheme.background,
+                topBar = {
+                    Column(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
+                        Spacer(Modifier.statusBarsPadding())
+                        TopAppBar(
+                            viewModel = viewModel,
+                            navController = navController,
+                            onMenuClick = { scope.launch { drawerState.open() } }
+                        )
+                    }
+                },
+                content = { contentPadding ->
+                    MainContent(navController, viewModel, contentPadding)
+                }
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+            ) {
+                BottomNavigationBar(ctx, viewModel, navController)
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -505,338 +635,38 @@ private fun MainScreen(
 private fun TopAppBar(
     viewModel: ViewModel,
     navController: NavController,
-    onBackupClick: () -> Unit,
-    onRestoreClick: () -> Unit,
-    onLogcatClick: () -> Unit,
-    onRestartClick: () -> Unit,
-    onQuitClick: () -> Unit
+    onMenuClick: () -> Unit
 ) {
-    val ctx = LocalContext.current
-    val currentMicIcon by viewModel.micIcon.collectAsState()
-
-    val recOffImage = Icons.Filled.VoiceOverOff
-    val recOnImage = Icons.Filled.RecordVoiceOver
-    var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
-    val isSpeakerOn by viewModel.isSpeakerOn.collectAsState()
-    var menuExpanded by remember { mutableStateOf(false) }
-
-    val about = stringResource(R.string.about)
-    val settings = stringResource(R.string.configuration)
-    val accounts = stringResource(R.string.accounts)
-    val backup = stringResource(R.string.backup)
-    val restore = stringResource(R.string.restore)
-    val logcat = stringResource(R.string.logcat)
-    val restart = stringResource(R.string.restart)
-    val quit = stringResource(R.string.quit)
-
     TopAppBar(
         title = {
-            Text(text = stringResource(R.string.baresip), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(end = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "baresip", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
+
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_menu_new),
+                    contentDescription = "Menu",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
-        windowInsets = WindowInsets(0, 0, 0, 0),
-        actions = {
-
-            val selectedAor by viewModel.selectedAor.collectAsState()
-            val uas by uas
-            val isMobile = uas.find { it.account.aor == selectedAor }?.account?.isMobile ?: false
-
-            if (!isMobile) {
-                Spacer(modifier = Modifier.width(8.dp))
-
-                val callRecordingTitle = stringResource(R.string.call_recording_title)
-                val callRecordingMessage = stringResource(R.string.call_recording_tip)
-                Box(contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .combinedClickable(
-                            onClick = {
-                                if (Call.call("connected") == null) {
-                                    BaresipService.isRecOn = !BaresipService.isRecOn
-                                    if (BaresipService.isRecOn)
-                                        Api.module_load("sndfile")
-                                    else
-                                        Api.module_unload("sndfile")
-                                    isRecOn = BaresipService.isRecOn
-                                }
-                                else
-                                    Toast.makeText(
-                                        ctx,
-                                        R.string.rec_in_call,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                            },
-                            onLongClick = {
-                                alertTitle.value = callRecordingTitle
-                                alertMessage.value = callRecordingMessage
-                                showAlert.value = true
-                            }
-                        )
-                ) {
-                    Icon(
-                        imageVector = if (isRecOn) recOnImage else recOffImage,
-                        contentDescription = null,
-                        tint = if (isRecOn)
-                            MaterialTheme.colorScheme.error
-                        else
-                            MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(22.dp))
-
-            val microPhoneTitle = stringResource(R.string.microphone_title)
-            val microPhoneMessage = stringResource(R.string.microphone_tip)
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .combinedClickable(
-                        onClick = {
-                            if (Call.call("connected") != null) {
-                                val newMuteState = !BaresipService.isMicMuted
-                                BaresipService.setMicMute(newMuteState)
-                                if (newMuteState)
-                                    viewModel.updateMicIcon(Icons.Filled.MicOff)
-                                else
-                                    viewModel.updateMicIcon(Icons.Filled.Mic)
-                            }
-                        },
-                        onLongClick = {
-                            alertTitle.value = microPhoneTitle
-                            alertMessage.value = microPhoneMessage
-                            showAlert.value = true
-                        }
-                    )
-            ) {
-                Icon(
-                    imageVector = currentMicIcon,
-                    contentDescription = null,
-                    tint = if (BaresipService.isMicMuted)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            val speakerPhoneTitle = stringResource(R.string.speakerphone_title)
-            val speakerPhoneMessage = stringResource(R.string.speakerphone_tip)
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .combinedClickable(
-                        onClick = {
-                            // Unified toggle via BaresipService
-                            BaresipService.instance?.toggleSpeakerphone()
-                        },
-                        onLongClick = {
-                            alertTitle.value = speakerPhoneTitle
-                            alertMessage.value = speakerPhoneMessage
-                            showAlert.value = true
-                        }
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.SpeakerPhone,
-                    contentDescription = null,
-                    tint = if (isSpeakerOn)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-
-            IconButton(
-                onClick = { menuExpanded = !menuExpanded }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-
-            DropdownMenu(
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-                items = if (VERSION.SDK_INT >= 29)
-                    listOf(about, settings, accounts, backup, restore, logcat, restart, quit)
-                else
-                    listOf(about, settings, accounts, backup, restore, restart, quit),
-                onItemClick = { selectedItem ->
-                    menuExpanded = false
-                    when (selectedItem) {
-                        about -> { navController.navigate("about") }
-                        settings -> { navController.navigate("settings") }
-                        accounts -> { navController.navigate("accounts") }
-                        backup -> onBackupClick()
-                        restore -> onRestoreClick()
-                        logcat -> onLogcatClick()
-                        restart -> onRestartClick()
-                        quit -> onQuitClick()
-                    }
-                }
-            )
-        }
+        windowInsets = WindowInsets(0, 0, 0, 0)
     )
 }
 
-@Composable
-private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
-    val aor by viewModel.selectedAor.collectAsState()
-    val accountUpdate by viewModel.accountUpdate.collectAsState()
-
-    val showVmIcon = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.vmUri?.isNotEmpty() ?: false else false
-    }
-    val hasNewVoicemail = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
-    }
-    val isMobile = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.isMobile ?: false else false
-    }
-    val hasUnreadMessages = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
-    }
-    val hasMissedCalls = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.missedCalls ?: false else false
-    }
-
-    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
-
-    val buttonSize = 48.dp
-
-    Row(
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        if (showVmIcon)
-            IconButton(
-                // Disable the button if no account is selected
-                enabled = aor.isNotEmpty(),
-                onClick = {
-                    val ua = UserAgent.ofAor(aor)!!
-                    val acc = ua.account
-                    if (acc.vmUri.isNotEmpty()) {
-                        if (isMobile) {
-                            val intent = Intent(ctx, MainActivity::class.java)
-                            intent.putExtra("uap", ua.uap)
-                            intent.putExtra("peer", acc.vmUri)
-                            handleIntent(ctx, viewModel, intent, "call")
-                        }
-                        else {
-                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                            dialogMessage.value = acc.vmMessages(ctx)
-                            firstText.value = ctx.getString(R.string.cancel)
-                            onFirstClicked.value = {}
-                            secondText.value = ""
-                            lastText.value = ctx.getString(R.string.listen)
-                            onLastClicked.value = {
-                                val intent = Intent(ctx, MainActivity::class.java)
-                                intent.putExtra("uap", ua.uap)
-                                intent.putExtra("peer", acc.vmUri)
-                                handleIntent(ctx, viewModel, intent, "call")
-                            }
-                            showDialog.value = true
-                        }
-                    }
-                },
-                modifier = Modifier.weight(1f).size(buttonSize)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Voicemail,
-                    contentDescription = null,
-                    Modifier.size(buttonSize),
-                    tint = if (hasNewVoicemail)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.secondary
-                )
-            }
-
-        IconButton(
-            onClick = { navController.navigate("contacts") },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = {
-                if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
-                    alertTitle.value = ctx.getString(R.string.notice)
-                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                    showAlert.value = true
-                    return@IconButton
-                }
-                navController.navigate("chats/$aor")
-            },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasUnreadMessages)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = { navController.navigate("calls/$aor") },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.History,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        IconButton(
-            onClick = { viewModel.toggleDialpadVisibility() },
-            modifier = Modifier.weight(1f).size(buttonSize),
-            enabled = dialpadButtonEnabled.value
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Dialpad,
-                contentDescription = null,
-                modifier = Modifier.size(buttonSize),
-                tint = if (isDialpadVisible)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
-}
 
 private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
@@ -852,6 +682,234 @@ private val onSecondClicked = mutableStateOf({})
 private val lastText = mutableStateOf("")
 private val onLastClicked = mutableStateOf({})
 private val showDialog = mutableStateOf(false)
+@Composable
+private fun NewDialerCard(ctx: Context, viewModel: ViewModel, dialerState: ViewModel.DialerState) {
+    var textFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = dialerState.callUri.value,
+                selection = TextRange(dialerState.callUri.value.length)
+            )
+        )
+    }
+
+    LaunchedEffect(dialerState.callUri.value) {
+        if (dialerState.callUri.value != textFieldValue.text) {
+            textFieldValue = textFieldValue.copy(
+                text = dialerState.callUri.value,
+                selection = TextRange(dialerState.callUri.value.length)
+            )
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 4.dp)
+            .shadow(16.dp, RoundedCornerShape(40.dp)),
+        shape = RoundedCornerShape(40.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Column(
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 20.dp, end = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Number Display with Backspace
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(30.dp))
+                    .padding(horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CompositionLocalProvider(LocalTextInputService provides null) {
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = { newValue ->
+                            textFieldValue = newValue
+                            dialerState.callUri.value = newValue.text
+                            dialerState.showSuggestions.value = newValue.text.length > 1
+                        },
+                        readOnly = true,
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            fontSize = 28.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                if (dialerState.callUri.value.isNotEmpty()) {
+                    val am = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_backspace_new),
+                        contentDescription = "Backspace",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .combinedClickable(
+                                onClick = {
+                                    am.playSoundEffect(AudioManager.FX_KEYPRESS_DELETE, 1.0f)
+                                    val text = textFieldValue.text
+                                    val selection = textFieldValue.selection
+                                    if (selection.min > 0) {
+                                        val newText = text.substring(0, selection.min - 1) + text.substring(selection.max)
+                                        val newSelection = TextRange(selection.min - 1)
+                                        textFieldValue = TextFieldValue(newText, newSelection)
+                                        dialerState.callUri.value = newText
+                                        dialerState.showSuggestions.value = newText.length > 1
+                                    } else if (selection.min != selection.max) {
+                                        val newText = text.substring(0, selection.min) + text.substring(selection.max)
+                                        val newSelection = TextRange(selection.min)
+                                        textFieldValue = TextFieldValue(newText, newSelection)
+                                        dialerState.callUri.value = newText
+                                        dialerState.showSuggestions.value = newText.length > 1
+                                    }
+                                },
+                                onLongClick = {
+                                    am.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD, 1.0f)
+                                    textFieldValue = TextFieldValue("")
+                                    dialerState.callUri.value = ""
+                                    dialerState.showSuggestions.value = false
+                                }
+                            )
+                    )
+                } else {
+                    Spacer(modifier = Modifier.width(32.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val toneGenerator = remember {
+                try {
+                    ToneGenerator(AudioManager.STREAM_DTMF, 80)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            DisposableEffect(Unit) {
+                onDispose {
+                    toneGenerator?.release()
+                }
+            }
+
+            val playDtmf = { key: String ->
+                val tone = when (key) {
+                    "1" -> ToneGenerator.TONE_DTMF_1
+                    "2" -> ToneGenerator.TONE_DTMF_2
+                    "3" -> ToneGenerator.TONE_DTMF_3
+                    "4" -> ToneGenerator.TONE_DTMF_4
+                    "5" -> ToneGenerator.TONE_DTMF_5
+                    "6" -> ToneGenerator.TONE_DTMF_6
+                    "7" -> ToneGenerator.TONE_DTMF_7
+                    "8" -> ToneGenerator.TONE_DTMF_8
+                    "9" -> ToneGenerator.TONE_DTMF_9
+                    "0" -> ToneGenerator.TONE_DTMF_0
+                    "*" -> ToneGenerator.TONE_DTMF_S
+                    "#" -> ToneGenerator.TONE_DTMF_P
+                    else -> -1
+                }
+                if (tone != -1) {
+                    try {
+                        toneGenerator?.startTone(tone, 150)
+                    } catch (e: Exception) {
+                        // Ignore
+                    }
+                }
+            }
+
+            // Keypad Grid - Stretched and Scaled
+            val keys = listOf(
+                listOf("1", "2", "3"),
+                listOf("4", "5", "6"),
+                listOf("7", "8", "9"),
+                listOf("*", "0", "#")
+            )
+
+            keys.forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    row.forEach { key ->
+                        NewKeypadButton(key) {
+                            playDtmf(key)
+                            val text = textFieldValue.text
+                            val selection = textFieldValue.selection
+                            val newText = text.substring(0, selection.min) + key + text.substring(selection.max)
+                            val newSelection = TextRange(selection.min + 1)
+                            textFieldValue = TextFieldValue(newText, newSelection)
+                            dialerState.callUri.value = newText
+                            dialerState.showSuggestions.value = newText.length > 1
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Call Button
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(MaterialTheme.colorScheme.secondary, shape = CircleShape)
+                    .clip(CircleShape)
+                    .clickable {
+                        if (dialerState.callUri.value.isNotEmpty()) {
+                            callClick(ctx, viewModel, dialerState)
+                        } else {
+                            // Redial logic if URI is empty
+                            val ua = UserAgent.ofAor(viewModel.selectedAor.value)
+                            if (ua != null) {
+                                val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
+                                if (latestPeerUri != null) {
+                                    dialerState.redialUri = latestPeerUri
+                                    dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
+                                }
+                            }
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_call_new),
+                    contentDescription = "Call",
+                    tint = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.size(38.dp)
+                )
+            }
+        }
+    }
+}
+
+
+
+@Composable
+private fun NewKeypadButton(text: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), CircleShape)
+            .clip(CircleShape)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
 @Composable
 private fun CallCard(
@@ -880,6 +938,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
 
     val calls by viewModel.calls.collectAsState()
     val selectedAor by viewModel.selectedAor.collectAsState()
+    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
     val ua = uas.value.find { it.account.aor == selectedAor }
     val aorCalls = calls.filter { it.ua.account.aor == selectedAor }
     val hasActiveCalls = aorCalls.any { !it.callOnHold.value }
@@ -926,7 +985,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
         modifier = Modifier
             .fillMaxWidth()
             .padding(contentPadding)
-            .padding(top = 18.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
+            .padding(start = 12.dp, end = 12.dp, bottom = 90.dp)
             .fillMaxSize()
             .pullToRefresh(
                 state = refreshState,
@@ -950,10 +1009,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                         if (offset < -swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
-                                val newPos = if (curPos == null)
-                                    0
-                                else
-                                    (curPos + 1) % uas.value.size
+                                val newPos = if (curPos == null) 0 else (curPos + 1) % uas.value.size
                                 if (curPos != newPos) {
                                     val ua = uas.value[newPos]
                                     spinToAor(viewModel, ua.account.aor)
@@ -980,17 +1036,16 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                 ) { _, dragAmount ->
                     offset += dragAmount
                 }
-            }
-            .verticalScroll(rememberScrollState()),
+            },
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         AccountSpinner(ctx, viewModel, navController)
 
-        aorCalls.forEach { call ->
-            key(call.callp) {
-                CallCard(ctx = ctx, viewModel = viewModel, call = call, dialerState = null)
-            }
+        aorCalls.forEach { _ ->
+            // Active calls are now handled by CallScreen
         }
 
         val showEmptyCard = if (ua?.account?.isMobile == true)
@@ -998,8 +1053,12 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
         else
             !hasActiveCalls || conferenceCall
 
-        if (showEmptyCard)
-            CallCard(ctx = ctx, viewModel = viewModel, call = null, dialerState = viewModel.dialerState)
+        if (showEmptyCard && isDialpadVisible) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.weight(1f))
+            NewDialerCard(ctx = ctx, viewModel = viewModel, dialerState = viewModel.dialerState)
+            Spacer(modifier = Modifier.height(8.dp)) // Small distance to bottom bar
+        }
 
         Indicator(
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -1033,17 +1092,20 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
     if (selected == "") {
         OutlinedButton(
             onClick = { navController.navigate("accounts") },
-            modifier = Modifier.padding(horizontal = 4.dp).height(50.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 4.dp, vertical = 4.dp)
+                .height(44.dp)
+                .width(260.dp),
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            shape = RoundedCornerShape(12.dp),
-            contentPadding = PaddingValues(horizontal = 10.dp)
+            shape = RoundedCornerShape(22.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
-            Text(text = "")
+            Text(text = stringResource(R.string.accounts), fontWeight = FontWeight.Bold)
         }
     }
     else
@@ -1051,8 +1113,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             onClick = { expanded = !expanded },
             enabled = true,
             modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .height(50.dp)
+                .padding(horizontal = 4.dp, vertical = 4.dp)
+                .height(44.dp)
+                .width(260.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = { expanded = true },
@@ -1077,13 +1140,14 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     )
                 },
             colors = ButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                disabledContentColor = MaterialTheme.colorScheme.onSurface
             ),
-            shape = RoundedCornerShape(12.dp),
-            contentPadding = PaddingValues(horizontal = 10.dp)
+            shape = RoundedCornerShape(25.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(
@@ -1093,13 +1157,15 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 tint = Color.Unspecified,
                 modifier = Modifier
                     .padding(end = 10.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
                     .clickable(onClick = {
                         navController.navigate("account/$selected/old")
                     })
             )
             Text(
                 text = Account.ofAor(selected)?.text() ?: "",
-                fontSize = 17.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -1135,7 +1201,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     Icons.Filled.KeyboardArrowUp
                 else
                     Icons.Filled.KeyboardArrowDown,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
             )
             androidx.compose.material3.DropdownMenu(
                 expanded = expanded,
@@ -1157,6 +1224,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                 imageVector = ImageVector.vectorResource(uasStatus.value[acc.aor]!!),
                                 contentDescription = null,
                                 tint = Color.Unspecified,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     )
@@ -1390,7 +1458,7 @@ private fun CallUriRow(
 }
 
 @Composable
-private fun CallTimer(initialDurationSeconds: Long, modifier: Modifier = Modifier) {
+fun CallTimer(initialDurationSeconds: Long, modifier: Modifier = Modifier) {
     val startTime = remember(initialDurationSeconds) {
         SystemClock.elapsedRealtime() - (initialDurationSeconds * 1000L)
     }
@@ -1533,8 +1601,7 @@ private fun CallRow(
                         if (call.callOnHold.value) {
                             Log.d(TAG, "User requested resume for ${call.callp}")
                             call.resume() // This now automatically holds other calls
-                        }
-                        else {
+                        } else {
                             Log.d(TAG, "User requested hold for ${call.callp}")
                             call.hold()
                         }
@@ -2058,14 +2125,6 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()
-    else if (ua.account.isMobile && Utils.isUssd(uri)) {
-        viewModel.dialerState.callButtonsEnabled.value = false
-        val baresipService = Intent(ctx, BaresipService::class.java)
-        baresipService.action = "Start Call"
-        baresipService.putExtra("uap", ua.uap)
-        baresipService.putExtra("uri", uri)
-        ContextCompat.startForegroundService(ctx, baresipService)
-    }
     else {
         viewModel.dialerState.callButtonsEnabled.value = false
         var error = ""
@@ -2082,11 +2141,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
                 extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
                 try {
                     Log.i(TAG, "Placing Telecom PSTN call to $uri with uap=${ua.uap}")
-                    val telecomUri = if (uri.startsWith("tel:"))
-                        Uri.fromParts("tel", uri.substring(4), null)
-                    else
-                        uri.toUri()
-                    tm.placeCall(telecomUri, extras)
+                    tm.placeCall(uri.toUri(), extras)
                 } catch (e: SecurityException) {
                     error = "placeCall failed: ${e.message}"
                 }
@@ -2120,7 +2175,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     }
 }
 
-private fun answer(ctx: Context, call: Call) {
+fun answer(ctx: Context, call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} answering call from ${call.callUri.value}")
     val intent = Intent(ctx, BaresipService::class.java)
     intent.action = "Call Answer"
@@ -2129,7 +2184,7 @@ private fun answer(ctx: Context, call: Call) {
     ContextCompat.startForegroundService(ctx, intent)
 }
 
-private fun reject(call: Call) {
+fun reject(call: Call) {
     Log.d(TAG, "AoR ${call.ua.account.aor} rejecting call ${call.callp} from ${call.callUri.value}")
     call.reject()
 }
@@ -2254,13 +2309,14 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
                     call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
                     call.transferButtonEnabled.value = false
-                }
-                else {
-                    if (call.dir == "out")
+                } else {
+                    if (call.dir == "out") {
                         call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                    else
+                        call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    } else {
                         call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                        call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    }
                     call.transferButtonEnabled.value = !ua.account.isMobile
                 }
                 call.callUri2.value = ""
@@ -2342,60 +2398,20 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
     val aor = ua.account.aor
 
     when (ev[0]) {
-        "imei" -> {
-            if (aor == viewModel.selectedAor.value) {
-                viewModel.dialerState.callButtonsEnabled.value = true
-                viewModel.dialerState.callUri.value = ""
-            }
-            handleDialog(ctx, ctx.getString(R.string.info), "IMEI: " + (params[2] as String))
-            handleNextEvent()
-            return
-        }
-        "ussd response" -> {
-            if (aor == viewModel.selectedAor.value) {
-                viewModel.dialerState.callButtonsEnabled.value = true
-                viewModel.dialerState.callUri.value = ""
-            }
-            if (acc.callHistory) {
-                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
-                history.startTime = GregorianCalendar()
-                history.add()
-            }
-            handleDialog(ctx, ctx.getString(R.string.info), params[2] as String)
-            handleNextEvent()
-            return
-        }
-        "ussd fail" -> {
-            if (aor == viewModel.selectedAor.value) {
-                viewModel.dialerState.callButtonsEnabled.value = true
-                viewModel.dialerState.callUri.value = ""
-            }
-            if (acc.callHistory) {
-                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
-                history.rejected = true
-                history.add()
-            }
-            handleDialog(ctx, ctx.getString(R.string.error), params[2] as String)
-            handleNextEvent()
-            return
-        }
         "call rejected" -> {}
         "call outgoing" -> {
             val callp = params[1] as Long
-            if (!BaresipService.isMainVisible)
-                viewModel.navigateToHome()
+            viewModel.navigateToCall()
             spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call incoming" -> {
             val callp = params[1] as Long
-            if (!BaresipService.isMainVisible)
-                viewModel.navigateToHome()
+            viewModel.navigateToCall()
             spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call answered" -> {
             val callp = params[1] as Long
-            if (!BaresipService.isMainVisible)
-                viewModel.navigateToHome()
+            viewModel.navigateToCall()
             spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call redirect" -> {
@@ -2421,6 +2437,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "call established" -> {
             (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            viewModel.navigateToCall()
             if (aor == viewModel.selectedAor.value) {
                 viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
@@ -2570,10 +2587,10 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent 'call' did not find ua $uap")
                 return
             }
-            viewModel.navigateToHome()
-            val peer = intent.getStringExtra("peer")!!
-            viewModel.dialerState.callUri.value = Utils.friendlyUri(ctx, peer, ua.account)
-            viewModel.dialerState.redialUri = peer
+            if (ev[0] == "dial") {
+                viewModel.navigateToHome()
+            }
+            viewModel.dialerState.callUri.value = intent.getStringExtra("peer")!!
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {
                 viewModel.dialerState.showCallConferenceButton.value = false
@@ -2587,7 +2604,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
                 Log.w(TAG, "handleIntent '$action' did not find call $callp")
                 return
             }
-            viewModel.navigateToHome()
+            viewModel.navigateToCall()
             val ua = call.ua
             spinToAor(viewModel, ua.account.aor, call)
             if (ev[0] == "call answer")

@@ -1,24 +1,25 @@
 package com.tutpro.baresip
 
+import android.app.Activity
 import android.os.Build.VERSION
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.WindowCompat
 
 @Composable
 fun AppTheme(
@@ -32,11 +33,12 @@ fun AppTheme(
     val isDark = useDarkTheme || isSystemInDarkTheme()
 
     val colorScheme = when {
-        useActualDynamicColors ->
+        useActualDynamicColors -> {
             if (isDark)
                 dynamicDarkColorScheme(context)
             else
                 dynamicLightColorScheme(context)
+        }
         isDark -> darkColorScheme(
             primary = PrimaryDark,
             onPrimary = OnPrimaryDark,
@@ -103,31 +105,36 @@ fun AppTheme(
 
     val view = LocalView.current
     if (!view.isInEditMode)
-        DisposableEffect(isDark) {
-            val activity = context as? ComponentActivity
+        SideEffect {
+            val activity = view.context as? ComponentActivity
             if (activity != null) {
-                val barStyle = if (isDark)
-                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-                else
-                    SystemBarStyle.light(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
-                    )
                 activity.enableEdgeToEdge(
-                    statusBarStyle = barStyle,
-                    navigationBarStyle = barStyle
+                    statusBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { isDark },
+                    navigationBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { isDark }
                 )
                 if (VERSION.SDK_INT >= 29)
                     activity.window.isNavigationBarContrastEnforced = false
             }
-            onDispose {}
+            else {
+                val window = (view.context as Activity).window
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                if (VERSION.SDK_INT < 35)
+                    @Suppress("DEPRECATION")
+                    window.navigationBarColor = android.graphics.Color.TRANSPARENT
+                if (VERSION.SDK_INT >= 29)
+                    window.isNavigationBarContrastEnforced = false
+                val isBackgroundEffectivelyLight =
+                    ColorUtils.calculateLuminance(colorScheme.background.toArgb()) > 0.5
+                insetsController.isAppearanceLightStatusBars = isBackgroundEffectivelyLight
+                insetsController.isAppearanceLightNavigationBars = isBackgroundEffectivelyLight
+            }
         }
 
-    MaterialTheme(colorScheme = colorScheme) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
-            content = content
-        )
-    }
+    MaterialTheme(colorScheme = colorScheme, content = content)
 }

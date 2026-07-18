@@ -108,7 +108,7 @@
     <string name="redirect_mode_help">Memilih apakah permintaan pengalihan panggilan diikuti secara otomatis atau apakah konfirmasi diminta.</string>
     <string name="manual">Manual</string>
     <string name="auto">Otomatis</string>
-    <string name="block_unknown">Blokir Orang Asing</string>
+    <string name="block_unknown">Blokir yang Tidak Dikenal</string>
     <string name="block_unknown_help">Memblokir panggilan dan pesan dari rekan yang tidak ditemukan dalam kontak.</string>
     <string name="voicemail_uri">URI Pesan Suara</string>
     <string name="voicemain_uri_help">URI SIP untuk pemeriksaan pesan suara. Jika dikosongkan, pesan suara (Indikasi Menunggu Pesan) tidak berlangganan.</string>
@@ -156,8 +156,8 @@
     <string name="direction">Arah</string>
     <string name="time">Waktu</string>
     <string name="calls_duration">Durasi</string>
-    <string name="calls_add_delete_question">Apakah Anda ingin menambahkan \'%1$s\' ke kontak, memblokirnya, atau menghapus %2$s dari riwayat panggilan?</string>
-    <string name="calls_delete_question">Apakah Anda ingin menghapus %2$s dari riwayat panggilan?</string>
+    <string name="calls_add_delete_question">Apakah Anda ingin menambahkan \'%1$s\' ke kontak atau menghapus %2$s dari riwayat panggilan?</string>
+    <string name="calls_delete_question">Apakah Anda ingin menghapus \'%1$s\' %2$s dari riwayat panggilan?</string>
     <string name="disable_history">Nonaktifkan</string>
     <string name="enable_history">Aktifkan</string>
     <string name="delete_history_alert">Apakah Anda ingin menghapus riwayat panggilan akun \'%1$s\'?</string>
@@ -172,7 +172,8 @@
     <string name="delete_call_alert">Apakah Anda ingin menghapus panggilan ini dari riwayat?</string>
     <string name="chat_with">Obrolan dengan %1$s</string>
     <string name="new_message">Pesan baru</string>
-    <string name="short_message_question">Apakah Anda ingin menghapus pesan ini?</string>
+    <string name="long_message_question">Apakah Anda ingin menghapus pesan atau menambahkan rekan \'%1$s\' ke kontak?</string>
+    <string name="short_message_question">Apakah Anda ingin menghapus pesan?</string>
     <string name="add_contact">Tambah Kontak</string>
     <string name="sending_failed">Pengiriman pesan gagal</string>
     <string name="message_failed">Gagal</string>
@@ -180,7 +181,7 @@
     <string name="today">Hari ini</string>
     <string name="you">Anda</string>
     <string name="new_chat_peer">Rekan Obrolan Baru</string>
-    <string name="long_chat_question">Apakah Anda ingin menambahkan \'%1$s\' ke kontak, memblokirnya, atau menghapus chat ini?</string>
+    <string name="long_chat_question">Apakah Anda ingin menghapus obrolan dengan rekan \'%1$s\' atau menambahkan rekan ke kontak?</string>
     <string name="short_chat_question">Apakah Anda ingin menghapus obrolan dengan \'%1$s\'?</string>
     <string name="delete_chats_alert">Apakah Anda ingin menghapus riwayat obrolan akun \'%1$s\'?</string>
     <string name="audio_codecs">Kodek Audio</string>
@@ -406,27 +407,4 @@
     <string name="microphone_tip">Jika diaktifkan selama panggilan, mikrofon dimatikan.</string>
     <string name="speakerphone_title">Loudspeaker</string>
     <string name="speakerphone_tip">Jika diaktifkan, audio diputar melalui loudspeaker perangkat.</string>
-    <string name="tel_uri_calls">URI TEL untuk Panggilan</string>
-    <string name="tel_uri_messages">URI TEL untuk Pesan</string>
-    <string name="sim_manager">Manajer SIM</string>
-    <string name="block_hidden">Blokir Tersembunyi</string>
-    <string name="block_hidden_help">Blokir panggilan dan pesan dari pihak dengan identitas tersembunyi.</string>
-    <string name="hidden_call_blocked">Panggilan dari penelepon tersembunyi ditolak otomatis</string>
-    <string name="hidden_message_blocked">Pesan dari pengirim tersembunyi ditolak otomatis</string>
-    <string name="blocking">Pemblokiran</string>
-    <string name="blocking_list">Daftar Blokir</string>
-    <string name="new_blocking_rule">Aturan Blokir Baru</string>
-    <string name="blocking_rule_help">Aturan blokir dapat berupa string biasa atau string regular expression. Jika string biasa terdapat dalam URI pihak terkait atau string regular expression cocok dengan URI pihak terkait, panggilan atau pesan akan diblokir.</string>
-    <string name="blocking_delete_alert">Apakah Anda ingin menghapus aturan blokir \'%1$s\'?</string>
-    <string name="label">Label</string>
-    <string name="contact_no_sip_or_tel_uri">Kontak \'%1$s\' tidak memiliki URI SIP atau TEL</string>
-    <string name="contact_no_tel_uri">Kontak \'%1$s\' tidak memiliki URI TEL</string>
-    <string name="contacts_delete_question">Apakah Anda ingin menghapus semua kontak?</string>
-    <string name="export_contacts">Ekspor</string>
-    <string name="contact_export_success">Kontak berhasil diekspor</string>
-    <string name="contact_export_failure">Gagal mengekspor kontak</string>
-    <string name="block">Blokir</string>
-    <string name="copy_uri">Salin URI</string>
-    <string name="copied_to_clipboard">Disalin ke clipboard</string>
-    <string name="airplane_mode">Mode pesawat AKTIF. Nonaktifkan untuk menggunakan akun seluler.</string>
 </resources>

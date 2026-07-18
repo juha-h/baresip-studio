@@ -1,12 +1,12 @@
 package com.tutpro.baresip
 
 import android.content.ContentProviderOperation
-import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.provider.ContactsContract
@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -62,7 +63,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,12 +78,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -153,24 +150,10 @@ private fun ContactScreen(
 
     val title = when {
         screenState.new -> stringResource(R.string.new_contact)
-        else -> screenState.name.ifEmpty { uriOrNameArg }
+        else -> uriOrNameArg
     }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME)
-                if (!screenState.isBaresipContact && !screenState.new) {
-                    Contact.loadAndroidContacts(ctx)
-                    Contact.contactsUpdate()
-                }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
-
-    LaunchedEffect(uriOrNameArg, kindArg, BaresipService.androidContacts.value, BaresipService.baresipContacts.value) {
-        if (screenState.isEditing && !screenState.new) return@LaunchedEffect
+    LaunchedEffect(key1 = uriOrNameArg, key2 = kindArg) {
         val isNew = kindArg == "new"
         if (isNew) {
             val time = System.currentTimeMillis()
@@ -190,8 +173,8 @@ private fun ContactScreen(
             )
         }
         else {
-            val baresipContact = if (screenState.id != 0L) Contact.baresipContact(screenState.id) else Contact.baresipContact(uriOrNameArg)
-            val androidContact = if (screenState.id != 0L) Contact.androidContact(screenState.id) else Contact.androidContact(uriOrNameArg)
+            val baresipContact = Contact.baresipContact(uriOrNameArg)
+            val androidContact = Contact.androidContact(uriOrNameArg)
             val contact = baresipContact ?: androidContact
 
             if (contact == null) {
@@ -287,23 +270,12 @@ private fun ContactScreen(
         }
     }
 
-    val onEdit: () -> Unit = {
-        if (screenState.isBaresipContact)
-            screenState = screenState.copy(isEditing = true)
-        else {
-            val intent = Intent(Intent.ACTION_EDIT).apply {
-                val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, screenState.id)
-                setDataAndType(contactUri, ContactsContract.Contacts.CONTENT_ITEM_TYPE)
-                putExtra("finishActivityOnSaveCompleted", true)
-            }
-            ctx.startActivity(intent)
-        }
-    }
+    val onEdit: () -> Unit = { screenState = screenState.copy(isEditing = true) }
 
     BackHandler(enabled = true) { onBack() }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -311,6 +283,7 @@ private fun ContactScreen(
                 TopAppBar(
                     title = title,
                     isEditing = screenState.isEditing,
+                    isBaresipContact = screenState.isBaresipContact,
                     onBack = onBack,
                     onCheck = onCheck,
                     onEdit = onEdit
@@ -340,6 +313,7 @@ private fun ContactScreen(
 private fun TopAppBar(
     title: String,
     isEditing: Boolean,
+    isBaresipContact: Boolean,
     onBack: () -> Unit,
     onCheck: () -> Unit,
     onEdit: () -> Unit
@@ -363,7 +337,7 @@ private fun TopAppBar(
                 IconButton(onClick = onCheck) {
                     Icon(imageVector = Icons.Filled.Check, contentDescription = "Save")
                 }
-            else
+            else if (isBaresipContact)
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
@@ -493,9 +467,11 @@ private fun AvatarSection(
 ) {
     val avatarImagePicker =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            if (uri != null)
+            if (uri != null) {
                 try {
-                    val avatarBitmap = Utils.decodeSampledBitmapFromUri(ctx, uri, 192, 192)
+                    val inputStream = ctx.contentResolver.openInputStream(uri)
+                    val avatarBitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
 
                     if (avatarBitmap == null) {
                         Log.e(TAG, "Failed to decode bitmap from URI: $uri")
@@ -525,6 +501,7 @@ private fun AvatarSection(
                 } catch (e: Exception) {
                     Log.e(TAG, "Could not process avatar image: ${e.message}")
                 }
+            }
         }
 
     Row(
@@ -548,19 +525,20 @@ private fun AvatarSection(
                         modifier
                 }
         ) {
-            if (currentAvatarUri == null)
+            if (currentAvatarUri == null) {
                 Box(modifier = Modifier.size(avatarSize.dp), contentAlignment = Alignment.Center) {
                     Canvas(modifier = Modifier.fillMaxSize()) { drawCircle(SolidColor(Color(color))) }
                     val text = if (name.isNotBlank()) name.take(1).uppercase() else "?"
                     Text(text, fontSize = 72.sp, color = Color.White)
                 }
-            else
+            } else {
                 Image(
                     painter = rememberAsyncImagePainter(model = currentAvatarUri),
                     contentDescription = stringResource(R.string.avatar_image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(avatarSize.dp).clip(CircleShape)
                 )
+            }
         }
     }
 }
@@ -711,11 +689,10 @@ private fun UrisSection(
                     val ua = UserAgent.ofAor(selectedAor)
 
                     // Chat Button
-                    if (ua != null &&
-                            if (uri.startsWith("tel:"))
-                                ua.account.isMobile || ua.account.telProvider != ""
-                            else
-                                !ua.account.isMobile)
+                    if (ua != null && (if (uri.startsWith("tel:"))
+                            ua.account.isMobile || ua.account.telProvider != ""
+                        else
+                            !ua.account.isMobile))
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
@@ -733,10 +710,7 @@ private fun UrisSection(
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
                                     handleIntent(ctx, viewModel, intent, "message")
-                                    navController.navigate("main") {
-                                        popUpTo("main") { inclusive = false }
-                                        launchSingleTop = true
-                                    }
+                                    navController.navigate("chat/${ua.account.aor}/${uri}")
                                 }
                             }
                         ) {
@@ -753,7 +727,8 @@ private fun UrisSection(
                         if (uri.startsWith("tel:"))
                             ua.account.isMobile || ua.account.telProvider != ""
                         else
-                            !ua.account.isMobile)
+                            !ua.account.isMobile
+                        )
                         IconButton(
                             onClick = {
                                 if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
@@ -765,11 +740,7 @@ private fun UrisSection(
                                     val intent = Intent(ctx, MainActivity::class.java)
                                     intent.putExtra("uap", ua.uap)
                                     intent.putExtra("peer", uri)
-                                    handleIntent(ctx, viewModel, intent, BaresipService.contactAction)
-                                    navController.navigate("main") {
-                                        popUpTo("main") { inclusive = false }
-                                        launchSingleTop = true
-                                    }
+                                    handleIntent(ctx, viewModel, intent, "call")
                                 }
                             }
                         ) {
@@ -906,8 +877,10 @@ private fun checkOnClick(
     }
 
     var newName = currentState.name.trim()
-    if (newName == "")
-        newName = if (newUris.isNotEmpty()) newUris[0].uri.substringAfter(":") else currentState.email
+    if (newName == "") newName = if (newUris.isNotEmpty())
+        newUris[0].uri.substringAfter(":")
+    else
+        currentState.email
     if (!Utils.checkName(newName)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_contact), newName)
@@ -945,7 +918,7 @@ private fun checkOnClick(
 
     if (currentState.avatarImageUri != null && (currentState.tmpAvatarFile != null || !currentState.new)) {
         val imageFilePath = BaresipService.filesPath + "/${idToUse}.png"
-        contact.avatarImage = Utils.decodeSampledBitmapFromFile(imageFilePath, 192, 192)
+        contact.avatarImage = BitmapFactory.decodeFile(imageFilePath)
     }
 
     if (currentState.android) {
@@ -993,7 +966,15 @@ private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
         ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
         else -> return bitmap
     }
-    val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    val rotatedBitmap = Bitmap.createBitmap(
+        bitmap,
+        0,
+        0,
+        bitmap.width,
+        bitmap.height,
+        matrix,
+        true
+    )
     bitmap.recycle()
     return rotatedBitmap
 }

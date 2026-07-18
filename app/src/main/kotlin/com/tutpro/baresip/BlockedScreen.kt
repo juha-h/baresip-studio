@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -107,7 +108,7 @@ private fun BlockedScreen(navController: NavController, request: String, aor: St
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -219,7 +220,7 @@ private fun BlockedContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Account(account)
-        Blocked(ctx, navController, account, blocked)
+        Blocked(ctx, navController, blocked)
     }
 }
 
@@ -236,12 +237,7 @@ private fun Account(account: Account) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Blocked(
-    ctx: Context,
-    navController: NavController,
-    acc: Account,
-    blocked: MutableState<List<Blocked>>
-) {
+private fun Blocked(ctx: Context, navController: NavController, blocked: MutableState<List<Blocked>>) {
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
     val lastButtonText = remember { mutableStateOf("") }
@@ -290,7 +286,7 @@ private fun Blocked(
                     modifier = Modifier.padding(start = 8.dp, end = 4.dp),
                     fontSize = 18.sp)
                 Text(
-                    text = Utils.friendlyUri(ctx, peerUri, acc),
+                    text = peerUri.replace("sip:", ""),
                     fontSize = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

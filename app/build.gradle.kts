@@ -8,17 +8,17 @@ plugins {
 
 configure<ApplicationExtension> {
     compileSdk = 37
-    ndkVersion = "29.0.14206865"
+    ndkVersion = "27.3.13750724"
     defaultConfig {
         applicationId = "com.tutpro.baresip"
         minSdk = 28
         targetSdk = 36
-        versionCode = 529
-        versionName = "87.0.0"
+        versionCode = 516
+        versionName = "84.0.0"
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
-                cFlags += "-DHAVE_INTTYPES_H -lstdc++"
+                cFlags += "-DHAVE_INTTYPES_H"
                 arguments.addAll(listOf("-DANDROID_STL=c++_shared"))
             }
         }
@@ -51,7 +51,6 @@ configure<ApplicationExtension> {
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.31.6"
         }
     }
     namespace = "com.tutpro.baresip"

@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
-import android.content.Intent
-import androidx.activity.compose.BackHandler
+import android.content.Context
 import android.text.format.DateUtils.isToday
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -14,9 +13,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -42,11 +43,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -91,19 +97,19 @@ import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.text.DateFormat
 import java.util.GregorianCalendar
 
-fun NavGraphBuilder.chatsScreenRoute(navController: NavController) {
+fun NavGraphBuilder.chatsScreenRoute(navController: NavController, viewModel: com.tutpro.baresip.ViewModel) {
     composable(
         route = "chats/{aor}",
         arguments = listOf(navArgument("aor") { type = NavType.StringType })
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
-        ChatsScreen(navController, aor)
+        ChatsScreen(navController, aor, viewModel)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChatsScreen(navController: NavController, aor: String) {
+private fun ChatsScreen(navController: NavController, aor: String, viewModel: com.tutpro.baresip.ViewModel) {
 
     val ctx = LocalContext.current
 
@@ -124,30 +130,35 @@ private fun ChatsScreen(navController: NavController, aor: String) {
             if (event == Lifecycle.Event.ON_RESUME)
                 refreshTrigger++
         }
+        val messageObserver = androidx.lifecycle.Observer<Long> {
+            refreshTrigger++
+        }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
-
-    BackHandler(enabled = true) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Unread"
-        serviceIntent.putExtra("uap", account.accp)
-        ctx.startService(serviceIntent)
-        navController.navigateUp()
+        BaresipService.messageUpdate.observe(lifecycleOwner, messageObserver)
+        onDispose { 
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            BaresipService.messageUpdate.removeObserver(messageObserver)
+        }
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier.fillMaxSize().imePadding(),
+        containerColor = Color.White,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
                 TopAppBar(navController, account, uaMessages)
             }
         },
-        bottomBar = { NewChatPeer(navController, account) },
         content = { contentPadding ->
-            if (areMessagesLoaded)
-                ChatsContent(navController, contentPadding, account, uaMessages)
+            if (areMessagesLoaded) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ChatsContent(LocalContext.current, navController, contentPadding, account, uaMessages)
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        BottomNavigationBar(ctx, viewModel, navController)
+                    }
+                }
+            }
         },
     )
 }
@@ -176,7 +187,7 @@ private fun TopAppBar(
     )
 
     TopAppBar(
-        title = { Text(text = stringResource(R.string.chats), fontWeight = FontWeight.Bold) },
+        title = { Text(text = "Messages", fontWeight = FontWeight.Bold) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -184,16 +195,7 @@ private fun TopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
-            val ctx = LocalContext.current
-            IconButton(
-                onClick = {
-                    val serviceIntent = Intent(ctx, BaresipService::class.java)
-                    serviceIntent.action = "Clear Unread"
-                    serviceIntent.putExtra("uap", account.accp)
-                    ctx.startService(serviceIntent)
-                    navController.navigateUp()
-                }
-            ) {
+            IconButton(onClick = { navController.navigateUp() }) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         },
@@ -227,48 +229,81 @@ private fun TopAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChatsContent(
+    ctx: Context,
     navController: NavController,
     contentPadding: PaddingValues,
     account: Account,
     uaMessages: MutableState<List<Message>>
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+
     Column(
-        modifier = Modifier.fillMaxWidth().padding(contentPadding),
+        modifier = Modifier.fillMaxSize().padding(contentPadding).background(Color.White),
         verticalArrangement = Arrangement.Top
     ) {
-        Account(account)
-        Chats(navController, account, uaMessages)
+        // Search Bar (full width, pill shaped)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray
+                    )
+                },
+                placeholder = { Text("Search contacts or messages", color = Color.Gray) },
+                shape = RoundedCornerShape(50), // Pill shaped
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
+                ),
+                textStyle = TextStyle(fontSize = 16.sp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
+            )
+        }
+        val filteredMessages = remember(searchQuery, uaMessages.value) {
+            if (searchQuery.isBlank()) {
+                uaMessages.value
+            } else {
+                val query = searchQuery.lowercase()
+                uaMessages.value.filter { message ->
+                    val peerName = com.tutpro.baresip.Utils.friendlyUri(ctx, message.peerUri, account, includeLabel = false).lowercase()
+                    peerName.contains(query) || message.message.lowercase().contains(query)
+                }
+            }
+        }
+
+        Chats(ctx, navController, account, filteredMessages)
     }
 }
 
 @Composable
-private fun Account(account: Account) {
-    Text(
-        text = stringResource(R.string.account) + " " + account.text(),
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center
-    )
-}
-
-@Composable
 private fun Chats(
+    ctx: Context,
     navController: NavController,
     account: Account,
-    uaMessages: MutableState<List<Message>>
+    messages: List<Message>
 ) {
-    val ctx = LocalContext.current
     val aor = account.aor
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val secondButtonText = remember { mutableStateOf("") }
     val secondAction = remember { mutableStateOf({}) }
-    val thirdButtonText = remember { mutableStateOf("") }
-    val thirdAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
 
@@ -280,8 +315,6 @@ private fun Chats(
             firstButtonText = stringResource(R.string.cancel),
             secondButtonText = secondButtonText.value,
             onSecondClicked = secondAction.value,
-            thirdButtonText = thirdButtonText.value,
-            onThirdClicked = thirdAction.value,
             lastButtonText = lastButtonText.value,
             onLastClicked = lastAction.value,
         )
@@ -291,344 +324,143 @@ private fun Chats(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 4.dp)
-            .verticalScrollbar(state = lazyListState)
-            .background(MaterialTheme.colorScheme.background),
-        reverseLayout = true,
+            .padding(horizontal = 16.dp)
+            .verticalScrollbar(state = lazyListState),
         state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(bottom = 80.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(items = uaMessages.value, key = { message -> message.timeStamp }) { message ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                when (val contact = Contact.findContact(message.peerUri)) {
-                    is Contact.BaresipContact -> {
-                        val avatarImage = contact.avatarImage
-                        if (avatarImage != null)
-                            CustomElements.ImageAvatar(avatarImage)
-                        else
-                            CustomElements.TextAvatar(contact.name, contact.color)
-                    }
-                    is Contact.AndroidContact -> {
-                        val thumbNailUri = contact.thumbnailUri
-                        if (thumbNailUri != null)
-                            AsyncImage(
-                                model = thumbNailUri,
-                                contentDescription = "Avatar",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.size(36.dp).clip(CircleShape),
-                            )
-                        else
-                            CustomElements.TextAvatar(contact.name, contact.color)
-                    }
-                    null -> {
-                        Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = "Avatar",
-                            modifier = Modifier.size(36.dp).scale(1.2f),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                val buttonShape = if (message.direction == MESSAGE_DOWN)
-                    RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
-                else
-                    RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp)
-                val borderStroke = if (account.unreadMessages && Message.unreadMessagesFromPeer(aor, message.peerUri))
-                    BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.error)
-                else
-                    null
-                CustomElements.Button(
-                    onClick = { navController.navigate("chat/${aor}/${message.peerUri}") },
-                    onLongClick = {
-                        val peerName = Utils.friendlyUri(ctx, message.peerUri, account, includeLabel = false)
-                        val peerNameWithLabel = Utils.friendlyUri(ctx, message.peerUri, account)
-                        val contactExists =
-                            Contact.nameExists(peerName, BaresipService.contacts, false)
-                        if (contactExists) {
-                            dialogMessage.value = String.format(
-                                ctx.getString(R.string.short_chat_question),
-                                peerNameWithLabel
-                            )
-                            secondButtonText.value = ""
-                            lastButtonText.value = ctx.getString(R.string.delete)
-                            lastAction.value = {
-                                deleteMessages(uaMessages, account, message.peerUri)
-                            }
-                        }
-                        else {
-                            dialogMessage.value =
-                                String.format(
-                                    ctx.getString(R.string.long_chat_question),
-                                    peerName
-                                )
-                            secondButtonText.value = ctx.getString(R.string.add_contact)
-                            secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
-                            thirdButtonText.value = ctx.getString(R.string.block)
-                            thirdAction.value = {
-                                if (!BlockRule.exists(message.peerUri)) {
-                                    BaresipService.blockRules.add(BlockRule(message.peerUri))
-                                    BlockRule.save()
-                                }
-                            }
-                            lastButtonText.value = ctx.getString(R.string.delete)
-                            lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
-                        }
-                        showDialog.value = true
-                    },
-                    modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(end = 6.dp),
-                    shape = buttonShape,
-                    border = borderStroke,
-                    color = if (message.direction == MESSAGE_DOWN)
-                        MaterialTheme.colorScheme.secondaryContainer
-                    else
-                        MaterialTheme.colorScheme.primaryContainer
+        items(items = messages, key = { message -> message.timeStamp }) { message ->
+            val peerName = Utils.friendlyUri(ctx, message.peerUri, account, includeLabel = false)
+            val cal = GregorianCalendar()
+            cal.timeInMillis = message.timeStamp
+            val fmt: DateFormat = if (isToday(message.timeStamp))
+                DateFormat.getTimeInstance(DateFormat.SHORT)
+            else
+                DateFormat.getDateInstance(DateFormat.SHORT)
+            val info = fmt.format(cal.time)
+
+            // Unread Count Logic
+            val unreadCount = BaresipService.messages.count { it.aor == aor && it.peerUri == message.peerUri && it.new }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { navController.navigate("chat/${aor}/${message.peerUri}") },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = BorderStroke(1.dp, Color(0xFFF3F4F6)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val peerName = Utils.friendlyUri(ctx, message.peerUri, account)
-                    val cal = GregorianCalendar()
-                    cal.timeInMillis = message.timeStamp
-                    val fmt: DateFormat = if (isToday(message.timeStamp))
-                        DateFormat.getTimeInstance(DateFormat.SHORT)
-                    else
-                        DateFormat.getDateInstance(DateFormat.SHORT)
-                    val info = fmt.format(cal.time)
-                    Column {
-                        val textColor = if (message.direction == MESSAGE_DOWN)
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                        else
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        Row {
-                            Text(text = peerName, color = textColor, fontSize = 12.sp)
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(text = info, color = textColor, fontSize = 12.sp)
+                    // Avatar
+                    when (val contact = Contact.findContact(message.peerUri)) {
+                        is Contact.BaresipContact -> {
+                            val avatarImage = contact.avatarImage
+                            if (avatarImage != null)
+                                CustomElements.ImageAvatar(avatarImage)
+                            else
+                                CustomElements.TextAvatar(contact.name, contact.color)
                         }
-                        Row {
-                            BasicText(
+                        is Contact.AndroidContact -> {
+                            val thumbNailUri = contact.thumbnailUri
+                            if (thumbNailUri != null)
+                                AsyncImage(
+                                    model = thumbNailUri,
+                                    contentDescription = "Avatar",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.size(40.dp).clip(CircleShape),
+                                )
+                            else
+                                CustomElements.TextAvatar(contact.name, contact.color)
+                        }
+                        null -> {
+                            Icon(
+                                imageVector = Icons.Filled.AccountCircle,
+                                contentDescription = "Avatar",
+                                modifier = Modifier.size(40.dp),
+                                tint = Color.LightGray
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Text Details
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = peerName,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF111827),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = info,
+                                fontSize = 12.sp,
+                                color = Color(0xFF6B7280)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
                                 text = message.message,
+                                fontSize = 14.sp,
+                                color = Color(0xFF6B7280),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = TextStyle(
-                                    color = textColor,
-                                    fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
-                                        FontWeight.Bold else FontWeight.Normal,
-                                    fontSize = 16.sp
-                                )
+                                modifier = Modifier.weight(1f).padding(end = 8.dp)
                             )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun NewChatPeer(navController: NavController, account: Account) {
-    val ctx = LocalContext.current
-
-    val alertTitle = remember { mutableStateOf("") }
-    val alertMessage = remember { mutableStateOf("") }
-    val showAlert = remember { mutableStateOf(false) }
-
-    fun makeChat(navController: NavController, account: Account, chatPeer: String) {
-        val peerUri = if (Utils.isTelNumber(chatPeer))
-            "tel:$chatPeer"
-        else
-            chatPeer
-        val uri = if (Utils.isTelUri(peerUri)) {
-            if (account.isMobile)
-                peerUri
-            else
-                if (account.telProvider == "") {
-                    alertTitle.value = ctx.getString(R.string.notice)
-                    alertMessage.value =
-                        String.format(ctx.getString(R.string.no_telephony_provider), account.aor)
-                    showAlert.value = true
-                    ""
-                } else
-                    Utils.telToSip(peerUri, account)
-        }
-        else
-            Utils.uriComplete(peerUri, account.aor)
-        if (alertMessage.value.isEmpty()) {
-            if (!Utils.checkUri(uri)) {
-                alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
-                showAlert.value = true
-            }
-            else
-                navController.navigate("chat/${account.aor}/${uri}")
-        }
-    }
-
-    if (showAlert.value) {
-        AlertDialog(
-            showDialog = showAlert,
-            title = alertTitle.value,
-            message = alertMessage.value,
-            lastButtonText = stringResource(R.string.ok),
-        )
-    }
-
-    val showDialog = remember { mutableStateOf(false) }
-    val items = remember { mutableStateOf(listOf<String>()) }
-    val itemAction = remember { mutableStateOf<(Int) -> Unit>({ _ -> run {} }) }
-
-    SelectableAlertDialog(
-        openDialog = showDialog,
-        title = stringResource(R.string.choose_destination_uri),
-        items = items.value,
-        onItemClicked = itemAction.value,
-        neutralButtonText = stringResource(R.string.cancel),
-        onNeutralClicked = {}
-    )
-
-    val suggestions by remember { contactNames }
-    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
-    var showSuggestions by remember { mutableStateOf(false) }
-    val lazyListState = rememberLazyListState()
-    val focusManager = LocalFocusManager.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        var newPeer by remember { mutableStateOf("") }
-        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
-            if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .shadow(8.dp, RoundedCornerShape(8.dp))
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .animateContentSize()
-                ) {
-                    Box(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = 180.dp)
-                                .verticalScrollbar(state = lazyListState, width = 6.dp),
-                            horizontalAlignment = Alignment.Start,
-                            state = lazyListState
-                        ) {
-                            items(
-                                items = filteredSuggestions,
-                                key = { suggestion -> suggestion.toString() }
-                            ) { suggestion ->
+                            if (unreadCount > 0) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            newPeer = suggestion.toString()
-                                            showSuggestions = false
-                                        }
-                                        .padding(12.dp)
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF10B981)),
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = suggestion,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 18.sp
+                                        text = unreadCount.toString(),
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFD1D5DB))
+                                )
                             }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
-            OutlinedTextField(
-                value = newPeer,
-                placeholder = { Text(stringResource(R.string.new_chat_peer)) },
-                onValueChange = {
-                    newPeer = it
-                    showSuggestions = newPeer.length > 1
-                    filteredSuggestions = if (it.isEmpty())
-                        emptyList()
-                    else {
-                        val normalizedInput = Utils.unaccent(it)
-                        suggestions
-                            .filter { suggestion ->
-                                it.length > 1 &&
-                                    Utils.unaccent(suggestion).contains(normalizedInput, ignoreCase = true)
-                            }
-                            .map { suggestion ->
-                                Utils.buildAnnotatedStringWithHighlight(suggestion, it)
-                            }
-                    }
-                },
-                modifier = Modifier.padding(end = 6.dp).fillMaxWidth(),
-                singleLine = true,
-                trailingIcon = {
-                    if (newPeer.isNotEmpty())
-                        Icon(
-                            Icons.Outlined.Clear,
-                            contentDescription = null,
-                            modifier = Modifier.clickable {
-                                if (showSuggestions)
-                                    showSuggestions = false
-                                newPeer = ""
-                            },
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                },
-                label = { Text(stringResource(R.string.new_chat_peer)) },
-                textStyle = TextStyle(fontSize = 18.sp),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                )
-            )
         }
-        Spacer(Modifier.width(4.dp))
-        SmallFloatingActionButton(
-            modifier = Modifier.padding(end = 4.dp).offset(y = 2.dp),
-            onClick = {
-                showSuggestions = false
-                val peerText = newPeer.trim()
-                if (peerText.isNotEmpty()) {
-                    val uris = Contact.contactContactUris(peerText, account.isMobile)
-                    if (uris.isEmpty()) {
-                        if (Contact.nameExists(peerText, BaresipService.contacts, true)) {
-                            alertTitle.value = ctx.getString(R.string.notice)
-                            alertMessage.value = if (account.isMobile)
-                                String.format(ctx.getString(R.string.contact_no_tel_uri), peerText)
-                            else
-                                String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), peerText)
-                            showAlert.value = true
-                        } else {
-                            makeChat(navController, account, peerText)
-                        }
-                    }
-                    else if (uris.size == 1)
-                        makeChat(navController, account, uris[0].uri)
-                    else {
-                        items.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
-                        itemAction.value = { index ->
-                            makeChat(navController, account, uris[index].uri)
-                        }
-                        showDialog.value = true
-                    }
-                }
-                newPeer = ""
-                focusManager.clearFocus()
-            },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                modifier = Modifier.size(36.dp),
-                contentDescription = stringResource(R.string.add)
-            )
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
+
+// Removed NewChatPeer
 
 private fun loadMessages(account: Account) : List<Message> {
     val res = mutableListOf<Message>()

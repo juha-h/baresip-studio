@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -98,11 +99,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     var refreshTrigger by remember { mutableIntStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val ctx = LocalContext.current
-
-    LaunchedEffect(ua, refreshTrigger) {
-        if (ua.account.isMobile)
-            Utils.cancelMissedCallsNotification(ctx)
+    LaunchedEffect(aor, refreshTrigger) {
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }
@@ -119,15 +116,12 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     BackHandler(enabled = true) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Missed"
-        serviceIntent.putExtra("uap", ua.uap)
-        ctx.startService(serviceIntent)
+        ua.account.missedCalls = false
         navController.navigateUp()
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -136,15 +130,21 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
             }
         },
         content = { contentPadding ->
-            if (isHistoryLoaded)
-                CallsContent(
-                    LocalContext.current,
-                    navController,
-                    viewModel,
-                    contentPadding,
-                    ua,
-                    callHistory
-                )
+            if (isHistoryLoaded) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CallsContent(
+                        LocalContext.current,
+                        navController,
+                        viewModel,
+                        contentPadding,
+                        ua,
+                        callHistory
+                    )
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        BottomNavigationBar(LocalContext.current, viewModel, navController)
+                    }
+                }
+            }
         },
     )
 }
@@ -189,13 +189,9 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
-            val ctx = LocalContext.current
             IconButton(
                 onClick = {
-                    val serviceIntent = Intent(ctx, BaresipService::class.java)
-                    serviceIntent.action = "Clear Missed"
-                    serviceIntent.putExtra("uap", ua.uap)
-                    ctx.startService(serviceIntent)
+                    account.missedCalls = false
                     navController.navigateUp()
                 }
             ) {
@@ -252,8 +248,7 @@ private fun CallsContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(contentPadding)
-            .padding(bottom = 16.dp),
+            .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Account(ua.account)
@@ -324,6 +319,7 @@ private fun Calls(
             .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
         state = lazyListState,
+        contentPadding = PaddingValues(bottom = 80.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(items = callHistory.value, key = { callRow -> callRow.stopTime }) { callRow ->
@@ -363,10 +359,6 @@ private fun Calls(
                                         }
                                         else {
                                             handleIntent(ctx, viewModel, intent, "call")
-                                            navController.navigate("main") {
-                                                popUpTo("main")
-                                                launchSingleTop = true
-                                            }
                                         }
                                     }
                                     thirdButtonText.value = ctx.getString(R.string.send_message)
@@ -387,12 +379,12 @@ private fun Calls(
                                                 }
                                                 else {
                                                 handleIntent(ctx, viewModel, intent, "message")
-                                                navController.navigateUp()
+                                                navController.navigate("chat/${ua.account.aor}/${peerUri}")
                                             }
                                         }
                                         else {
                                             handleIntent(ctx, viewModel, intent, "message")
-                                            navController.navigateUp()
+                                            navController.navigate("chat/${ua.account.aor}/${peerUri}")
                                         }
                                     }
                                     if (contact is Contact.BaresipContact && contact.email.isNotEmpty()) {
@@ -427,7 +419,8 @@ private fun Calls(
                                         peerNameWithLabel, callText
                                     )
                                     secondButtonText.value = ""
-                                    thirdButtonText.value = ""
+                                    thirdButtonText.value = ctx.getString(R.string.copy_uri)
+                                    thirdAction.value = { Utils.copyToClipboard(ctx, peerUri) }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = { removeFromHistory(callHistory, callRow) }
                                 }
@@ -442,12 +435,8 @@ private fun Calls(
                                         val uri = Utils.sipToTel(peerUri)
                                         navController.navigate("contact/$uri/new")
                                     }
-                                    thirdButtonText.value = ctx.getString(R.string.block)
-                                    thirdAction.value = {
-                                        if (!BlockRule.exists(peerUri)) {
-                                            BaresipService.blockRules.add(BlockRule(peerUri))
-                                            BlockRule.save()
-                                        }
+                                    thirdButtonText.value = ctx.getString(R.string.copy_uri)
+                                    thirdAction.value = { Utils.copyToClipboard(ctx, peerUri)
                                     }
                                     lastButtonText.value = ctx.getString(R.string.delete)
                                     lastAction.value = { removeFromHistory(callHistory, callRow) }
@@ -506,7 +495,7 @@ private fun Calls(
                             count++
                         }
                         if (count > 3)
-                            Text(ctx.getString(R.string.dots), color = MaterialTheme.colorScheme.onBackground)
+                            Text("...", color = MaterialTheme.colorScheme.onBackground)
                         Text(
                             text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
@@ -596,4 +585,3 @@ fun callTint(direction: Int): Int {
         else -> R.color.colorTrafficYellow
     }
 }
-

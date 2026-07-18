@@ -69,7 +69,7 @@ fun NavGraphBuilder.accountsScreenRoute(navController: NavController) {
 @Composable
 fun AccountsScreen(navController: NavController) {
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {

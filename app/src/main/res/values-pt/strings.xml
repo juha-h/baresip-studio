@@ -46,6 +46,7 @@
     <string name="status">Estado</string>
     <string name="peer_not_verified">A chama é SEGURA, porém o par NÃO é verificado!</string>
     <string name="disable_history">Desativar</string>
+    <string name="long_message_question">Quer apagar a mensagem ou adicionar o ponto \'%1$s\' aos contatos\?</string>
     <string name="voicemain_uri_help">URI SIP para verificar mensagens de correio de voz. Se deixado em branco, as mensagens do correio de voz (Indicação de Mensagem em Espera) não serão assinadas.</string>
     <string name="register_help">Se marcado, o registo é ativado e as solicitações de REGISTO são enviadas no intervalo determinado pelo Intervalo de registo.</string>
     <string name="rate">Taxa atual: %1$s (Kbits/s)</string>
@@ -54,7 +55,7 @@
     <string name="no_video_calls">Conceda permissão à \"Câmara\" para fazer ou atender chamadas de vídeo.</string>
     <string name="failed_to_set_dns_servers">Falha ao definir servidores DNS</string>
     <string name="stun_password_help">Palavra-passe, caso seja necessário pelo servidor STUN/TURN</string>
-    <string name="long_chat_question">Quer apagar o chat com o par \'%1$s\' ou adicionar o par aos contatos?</string>
+    <string name="long_chat_question">Quer apagar o chat com o par \'%1$s\' ou adicionar o par aos contatos\?</string>
     <string name="media_nat">NAT Transversal de Mídia</string>
     <string name="voicemail_messages">Mensagens do Correio de Voz</string>
     <string name="video_call">Chamada de vídeo</string>
@@ -88,7 +89,7 @@
     <string name="manual">Manual</string>
     <string name="new_chat_peer">Novo Par de Chat</string>
     <string name="delete">Apagar</string>
-    <string name="short_message_question">Quer apagar a mensagem?</string>
+    <string name="short_message_question">Quer apagar a mensagem\?</string>
     <string name="confirmation">Confirmação</string>
     <string name="config_restart">Precisa reiniciar o baresip para aplicar as novas configurações. Reiniciar agora\?</string>
     <string name="call">Chamada</string>

@@ -117,7 +117,6 @@
     <string name="account_nickname_help">Lempinimi (jos annettu) millä tämä tili identifioidaan
         baresip sovelluksessa.</string>
     <string name="nickname">Lempinimi</string>
-    <string name="sim_manager">SIM-kortin hallinta</string>
     <string name="invalid_account_nickname">Virheellinen tilin lempinimi \'%1$s\'</string>
     <string name="non_unique_account_nickname">Lempinimi \'%1$s\' on jo olemassa</string>
     <string name="display_name">Tilin käyttäjän nimi</string>
@@ -173,7 +172,7 @@
         for NAT, RFC 5389) ja ICE (Interactive Connectivity Establishment, RFC 5245).
     </string>
     <string name="stun_server">STUN/TURN-palvelin</string>
-    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][?transport=udp|tcp]\'
+    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][\?transport=udp|tcp]\'
         oleva URI, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletus STUN-palvelin
         STUN- ja ICE-protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
         julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.
@@ -268,7 +267,7 @@
     <string name="account_allocation_failure">Uuden tilin luonti epäonnistui.</string>
     <string name="encrypt_password">Tallenna salasanalla</string>
     <string name="decrypt_password">Palauta salasanalla</string>
-    <string name="delete_account">Haluatko poistaa tilin \'%1$s\'?</string>
+    <string name="delete_account">Haluatko poistaa tilin \'%1$s\'\?</string>
     <!-- Baresip Service -->
     <string name="is_calling">soittaa</string>
     <string name="missed_call_from">Vastaamaton puhelu soittajalta</string>
@@ -280,35 +279,29 @@
     <string name="hidden_call_blocked">Estetty puhelu tuntemattomalta soittajalta</string>
     <string name="message_blocked">Estetty viesti vieraalta lähettäjältä \`%1$s\`</string>
     <string name="hidden_message_blocked">Estetty viesti tuntemattomalta lähettäjältä</string>
-    <!-- Blocking Activity -->
-    <string name="blocking">Estot</string>
-    <string name="blocking_list">Estolista</string>
-    <string name="new_blocking_rule">Uusi estosääntö</string>
-    <string name="blocking_rule_help">Estosääntö voi olla joko tavallinen merkkijono tai säännöllinen lauseke. Jos tavallinen merkkijono löytyy soittajan tai viestin lähettäjän URI:sta tai jos säännöllinen lauseke sopii siihen, niin puhelu tai viesti estetään.</string>
-    <string name="blocking_delete_alert">Haluatko poistaa estosäännön \'%1$s\'?</string>
     <!-- Blocked Activity -->
     <string name="blocked">Estetyt</string>
     <string name="blocked_calls">Estetyt puhelut</string>
     <string name="blocked_messages">Estetyt viestit</string>
-    <string name="blocked_delete_alert">Haluatko poistaa tilin \'%1$s\' estetyt pyynnöt?</string>
-    <string name="blocked_contact_question">Haluatko lisätä osoitteen \'%1$s\' yhteystietoihin?</string>
+    <string name="blocked_delete_alert">Haluatko poistaa tilin \'%1$s\' estetyt pyynnöt\?</string>
+    <string name="blocked_contact_question">Haluatko lisätä osoitteen \'%1$s\' yhteystietoihin\?</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
-    <string name="show_call">Näytä</string>
     <string name="calls_calls">puhelut</string>
     <string name="calls_call">puhelun</string>
     <string name="direction">Suunta</string>
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
-    <string name="calls_add_delete_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai
-        estolistaan tai poistaa %2$s puheluhistoriasta?
+    <string name="calls_add_delete_question">Haluatko luoda kohteelle \'%1$s\' uuden yhteystiedon,
+        kopioida sen URI:n tai poistaa %2$s puheluhistoriasta\?
     </string>
-    <string name="calls_delete_question">Haluatko poistaa %2$s puheluhistoriasta?</string>
+    <string name="calls_delete_question">Haluatko kopioida yhteystiedon \'%1$s\' URI:n tai poistaa
+        %2$s puheluhistoriasta\?</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
-    <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian?</string>
+    <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian\?</string>
     <string name="call_answered">Puheluun vastattu</string>
     <string name="call_answered_elsewhere">Puheluun vastattu muualla</string>
     <string name="call_missed">Puheluun ei vastattu</string>
@@ -322,7 +315,9 @@
     <!-- Chat Activity -->
     <string name="chat_with">Viestiketju %1$s</string>
     <string name="new_message">Uusi viesti</string>
-    <string name="short_message_question">Haluatko poistaa viestin?</string>
+    <string name="long_message_question">Haluatko poistaa viestin tai
+    luoda uuden yhteystiedon \'%1$s\'\?</string>
+    <string name="short_message_question">Haluatko poistaa viestin\?</string>
     <string name="add_contact">Lisää yhteystieto</string>
     <string name="sending_failed">Viestin lähetys epäonnistui</string>
     <string name="message_failed">Epäonnistui</string>
@@ -331,11 +326,10 @@
     <string name="today">Tänään</string>
     <string name="you">Sinä</string>
     <string name="new_chat_peer">Uusi viestin kohde</string>
-    <string name="long_chat_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai estolistaan
-        tai poistaa tämän viestiketjun?
-    </string>
-    <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'?</string>
-    <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian?</string>
+    <string name="long_chat_question">Haluatko poistaa viestiketjun tai
+    luoda uuden yhteystiedon \'%1$s\'\?</string>
+    <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'\?</string>
+    <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian\?</string>
     <!-- Codecs Activity -->
     <string name="audio_codecs">Audion koodausmenetelmät</string>
     <string name="video_codecs">Videon koodausmenetelmät</string>
@@ -409,10 +403,10 @@
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
     <string name="no_read_permission">Ei ulkoisen muistin lukuoikeutta</string>
-    <string name="unique_contact_uri">Uniikki kontakti-URI</string>
-    <string name="unique_contact_uri_help">Jos merkitty, kontakti-URI:n taataan olevan uniikki.
-        Merkittävä, jos on useammalla tilillä on sama SIP URI:n käyttäjäosa, mutta se myös
-        parantaa tilien suojaa hyökkäyksiltä.
+    <string name="unique_contact_uri">Uniikki Contact URI</string>
+    <string name="unique_contact_uri_help">Jos merkitty, Contact URI:n taataan olevan uniikki.
+        Merkittävä, jos on useammalla tilillä on same SIP URI:n käyttäjäosa, mutta myös
+        suojaa tilejä hyökkäyksiltä.
     </string>
     <string name="audio_settings">Audio-asetukset</string>
     <string name="speaker_phone">Kaiutin</string>
@@ -482,12 +476,12 @@
     <string name="reset_config_help">Jos merkitty, oletusasetukset palautetaan, kun
         baresip seuraavan kerran käynnistetään.
     </string>
-    <string name="reset_config_alert">Oletko varma, että haluat palauttaa oletusasetukset?</string>
+    <string name="reset_config_alert">Oletko varma, että haluat palauttaa oletusasetukset\?</string>
     <string name="reset">Palauta</string>
     <string name="read_cert_error">Tiedoston \'cert.pem\' luku epäonnistui.</string>
     <string name="read_ca_certs_error">Tiedoston \'ca_certs.crt\' epäonnistui.</string>
     <string name="config_restart">baresip täytyy käynnistää uudelleen, jotta saat uudet asetukset
-        käyttöön. Käynnistä nyt?
+        käyttöön. Käynnistä nyt\?
     </string>
     <string name="consent_request">Suostumuspyyntö</string>
     <string name="contacts_consent">Jos Androidin yhteystiedot on valittu, voit käyttää niitä puheluissa ja viesteissä SIP ja tel URI:en ohella. Baresip ei talleta Androidin yhteystietoja eikä jaa niitä kenellekään. Jotta Baresip saisi käyttöönsä Androidin yhteystiedot, Google vaatii, että annat siihen suostumuksen hyväksymällä Baresip-sovelluksen <a href="https://github.com/juha-h/baresip-studio/blob/master/PrivacyPolicy.txt">yksityisyyskäytännöt</a>.</string>
@@ -510,12 +504,12 @@
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää viestin
-        osoitteeseen \'%1$s\'?</string>
+        osoitteeseen \'%1$s\'\?</string>
     <string name="contact_email_action_question">Haluatko soittaa tai lähettää viestin tai sähköpostin
-        osoitteeseen \'%1$s\'?</string>
+        osoitteeseen \'%1$s\'\?</string>
     <string name="send_message">Lähetä viesti</string>
     <string name="send_email">Lähetä sähköposti</string>
-    <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'?</string>
+    <string name="contact_delete_question">Haluatko poistaa yhteystiedon \'%1$s\'\?</string>
     <string name="search">Etsi</string>
     <string name="import_contacts">Tuo</string>
     <string name="contact_import_success">Yhteystietojen tuonti onnistui</string>
@@ -537,7 +531,6 @@
     <string name="deny">Estä</string>
     <string name="add">Lisää</string>
     <string name="delete">Poista</string>
-    <string name="block">Estä</string>
     <string name="edit">Muokkaa</string>
     <string name="copy_uri">Kopioi URI</string>
     <string name="copied_to_clipboard">Kopioitu leikepöydälle</string>
@@ -547,7 +540,6 @@
     <string name="anonymous">Anonyymi</string>
     <string name="unknown">Tuntematon</string>
     <string name="invalid_sip_or_tel_uri">Virheellinen SIP tai puh. URI \'%1$s\'</string>
-    <string name="permission_denied">Lupa evätty</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>
@@ -563,9 +555,9 @@
     <string name="no_telephone_number">Mobiilipuhelu voidaan tehdä vain puhelinnumeroon</string>
     <string name="video_call">Videopuhelu</string>
     <string name="video_request">Videopyyntö</string>
-    <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'?</string>
-    <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'?</string>
-    <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'?</string>
+    <string name="allow_video">Salli video videon lähetys ja vastaanotto puhelussa \'%1$s\'\?</string>
+    <string name="allow_video_send">Salli video videon lähetys puhelussa \'%1$s\'\?</string>
+    <string name="allow_video_recv">Salli video videon vastaanotto puhelussa \'%1$s\'\?</string>
     <string name="call_is_ringing">Puhelu soi</string>
     <string name="call_is_on_hold">Puhelu on pidossa</string>
     <string name="call_is_connected">Puhelu on yhdistetty</string>
@@ -604,21 +596,21 @@
         Sen jälkeen käynnistä baresip uudelleen.</string>
     <string name="registering_failed">Tilin \'%1$s\' rekisteröinti epäonnistui.</string>
     <string name="verify">Todennuspyyntö</string>
-    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;?</string>
+    <string name="verify_sas">Todennatko SAS:n &lt;%1$s&gt;\?</string>
     <string name="transfer_request">Siirtopyyntö</string>
-    <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'?</string>
+    <string name="transfer_request_query">Hyväksytkö tämän puhelun siirron kohteeseen \'%1$s\'\?</string>
     <string name="call_request">Soittopyyntö</string>
-    <string name="call_request_query">Hyväksytkö pyynnön soittaa kohteeseen \'%1$s\'?</string>
+    <string name="call_request_query">Hyväksytkö pyynnön soittaa kohteeseen \'%1$s\'\?</string>
     <string name="redirect_notice">Automaattinen uudelleenohjaus kohteeseen \'%1$s\'</string>
     <string name="redirect_request">Uudelleenohjauspyyntö</string>
-    <string name="redirect_request_query">Hyväksytkö puhelun uudelleenohjauksen kohteeseen \'%1$s\'?</string>
+    <string name="redirect_request_query">Hyväksytkö puhelun uudelleenohjauksen kohteeseen \'%1$s\'\?</string>
     <string name="call_failed">Puhelu epäonnistui</string>
     <string name="call_closed">Puhelu on päättynyt</string>
     <string name="call_not_secure">Tämä puhelu EI ole turvallinen!</string>
     <string name="peer_not_verified">Tämä puhelu on turvallinen, mutta puhelun toista osapuolta ei ole
         todennettu!</string>
     <string name="call_is_secure">Tämä puhelu on turvallinen ja puhelun toinen osapuoli on
-    todennettu! Haluatko poistaa todennuksen?</string>
+    todennettu! Haluatko poistaa todennuksen\?</string>
     <string name="unverify">Poista todennus</string>
     <string name="backed_up">Sovelluksen tiedot (äänityksiä lukuunottamatta)
         talletettiin tiedostoon \'%1$s\'. Android versiossa 9 tiedosto löytyy
@@ -628,7 +620,7 @@
         Asetukset → Sovellukset → baresip → Käyttöluvat → Tallennustila.</string>
     <string name="restart_request">Uudelleenkäynnistyspyyntö</string>
     <string name="restored">Sovelluksen tiedot palautettiin. baresip pitää käynnistää
-        uudelleen. Käynnistä uudelleen nyt?</string>
+        uudelleen. Käynnistä uudelleen nyt\?</string>
     <string name="restore_failed">Sovelluksen tietojen palauttaminen epäonnistui. Tarkista, että
         annoit oikean salasanan ja että palautustiedosto kuuluu tällä sovellukselle.
         Android versiossa 9 tarkista myös Asetukset → Sovellukset → baresip → Käyttöluvat →
@@ -649,9 +641,6 @@
     <string name="call_details">Puhelutiedot</string>
     <string name="no_android_contacts">Et voi käyttää Androidin yhteystietoja ilman Yhteystiedot-lupaa.</string>
     <string name="audio_focus_denied">Audiofokus on evätty!</string>
-    <string name="ussd_failed">USSD-pyyntö epäonnistui</string>
-    <string name="ussd_service_unavailable">USSD-palvelu ei ole käytettävissä</string>
-    <string name="ussd_unknown_error">Tuntematon USSD-virhe</string>
     <string name="permissions_rationale">Tarvittavat luvat</string>
     <string name="audio_permissions">baresip tarvitsee Mikrofoni-luvan puheluita varten, Lähellä olevat laitteet -luvan
         Bluetooth-mikrofonin/kaiuttimen havaitsemista varten, Ilmoitukset-luvan ilmoitusten lähettämistä varten

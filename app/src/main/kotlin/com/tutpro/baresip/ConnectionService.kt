@@ -80,10 +80,6 @@ class ConnectionService : ConnectionService() {
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
-            val contactName = Utils.friendlyUri(this, peerUri, ua.account)
-            if (contactName != peerUri)
-                connection.setCallerDisplayName(contactName, TelecomManager.PRESENTATION_ALLOWED)
-
             connection.setRinging()
             if (ua.account.answerMode == Api.ANSWERMODE_AUTO) {
                 Log.d(TAG, "Auto-answering call $callp")
@@ -130,15 +126,6 @@ class ConnectionService : ConnectionService() {
         pendingOutgoingConnection = connection
 
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
-
-        val ua = UserAgent.ofUap(uap)
-        if (ua != null) {
-            val address = request?.address?.toString() ?: ""
-            val contactName = Utils.friendlyUri(this, address, ua.account)
-            if (contactName != address)
-                connection.setCallerDisplayName(contactName, TelecomManager.PRESENTATION_ALLOWED)
-        }
-
         connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
@@ -240,7 +227,8 @@ class ConnectionService : ConnectionService() {
             Log.d(TAG, "onCallAudioStateChanged: $state")
             state.let {
                 if (BaresipService.isMicMuted != it.isMuted) {
-                    BaresipService.setMicMute(it.isMuted)
+                    Log.d(TAG, "Syncing mic mute from hardware: ${it.isMuted}")
+                    BaresipService.isMicMuted = it.isMuted
                     BaresipService.postServiceEvent(
                         ServiceEvent("mic muted,${it.isMuted}", arrayListOf(uap, callp),
                             System.nanoTime())
@@ -249,23 +237,22 @@ class ConnectionService : ConnectionService() {
                 val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
                 val call = Call.ofCallp(callp)
                 val status = call?.status?.value ?: "idle"
-                val hasPendingOrActiveConnection = connections.isNotEmpty() || pendingOutgoingConnection != null
-                if (isSpeaker != BaresipService.speakerPhone && (status != "connected" || hasPendingOrActiveConnection)) {
-                    if (status != "connected") {
-                        Log.d(TAG, "Suppressing speaker update,$isSpeaker during call setup (status=$status, intent=${BaresipService.speakerPhone})")
-                        return@let
+
+                if (status == "connected" && !BaresipService.muteGuard) {
+                    if (BaresipService.speakerPhone != isSpeaker) {
+                        Log.d(TAG, "Hardware route changed: $isSpeaker (intent: ${BaresipService.speakerPhone})")
+                        BaresipService.speakerPhone = isSpeaker
                     }
                 }
-                if (status == "connected" && BaresipService.speakerPhone != isSpeaker) {
-                    Log.d(TAG, "Syncing speakerPhone variable to hardware state: $isSpeaker")
-                    BaresipService.speakerPhone = isSpeaker
-                }
-                BaresipService.postServiceEvent(
-                    ServiceEvent("speaker update,$isSpeaker",
-                        arrayListOf(uap, callp),
-                        System.nanoTime()
+
+                if (!BaresipService.muteGuard) {
+                    BaresipService.postServiceEvent(
+                        ServiceEvent("speaker update,$isSpeaker",
+                            arrayListOf(uap, callp),
+                            System.nanoTime()
+                        )
                     )
-                )
+                }
             }
         }
 

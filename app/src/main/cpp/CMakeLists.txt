@@ -63,6 +63,7 @@ set_target_properties(lib_baresip PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/baresip/lib/${ANDROID_ABI}/libbaresip.a)
 
 add_library(baresip SHARED ${CMAKE_SOURCE_DIR}/baresip.c)
+set_target_properties(baresip PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(baresip PRIVATE
         ${distribution_DIR}/openssl/include

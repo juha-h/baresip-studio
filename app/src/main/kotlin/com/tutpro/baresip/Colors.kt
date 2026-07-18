@@ -31,7 +31,6 @@ val SurfaceContainerHigh = Color(0xFFE6E8EE)
 val SurfaceContainerHighest = Color(0xFFE0E2E8)
 val Outline = Color(0xFF7c8e99)
 val OutlineVariant = Color(0xFFC2C7CF)
-
 val PrimaryDark = Color(0xFF84C1E6)
 val OnPrimaryDark = Color(0xFF04314C)
 val PrimaryContainerDark = Color(0xFF054166)

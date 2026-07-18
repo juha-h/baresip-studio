@@ -15,7 +15,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
@@ -101,9 +100,10 @@ object Utils {
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
         val result = ArrayList<String>()
-        for (line in lines)
+        for (line in lines) {
             if (line.startsWith(name))
                 result.add((line.substring(name.length).trim()).split(" \t")[0])
+        }
         return result
     }
 
@@ -117,10 +117,10 @@ object Utils {
     fun uriHostPart(uri: String): String {
         return if (uri.contains("@")) {
             uri.substringAfter("@")
-                .substringBefore(":")
-                .substringBefore(";")
-                .substringBefore("?")
-                .substringBefore(">")
+                    .substringBefore(":")
+                    .substringBefore(";")
+                    .substringBefore("?")
+                    .substringBefore(">")
         } else {
             val parts = uri.split(":")
             when (parts.size) {
@@ -136,10 +136,11 @@ object Utils {
     fun uriUserPart(uri: String): String {
         return if (uri.contains("@"))
             uri.substringAfter(":").substringBefore("@")
-        else if (uri.startsWith("tel:"))
-            uri.substringAfter(":").substringBefore(";")
         else
-            ""
+            if (isTelUri(uri))
+                uri.substringAfter(":").substringBefore(";")
+            else
+                ""
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
@@ -178,10 +179,11 @@ object Utils {
                 ctx.getString(R.string.anonymous)
             else if (host == "unknown.invalid")
                 ctx.getString(R.string.unknown)
-            else if (params.isEmpty())
-                "$user@$host"
             else
-                "$user@$host;" + params.joinToString(";")
+                if (params.isEmpty())
+                    "$user@$host"
+                else
+                    "$user@$host;" + params.joinToString(";")
         }
         if (u.startsWith("<") && u.endsWith(">"))
             u = u.substring(1).substringBeforeLast(">")
@@ -196,7 +198,7 @@ object Utils {
     fun e164Uri(uri: String, countryCode: String): String {
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
-        return if (userPart.isNotEmpty() && userPart.isDigitsOnly()) {
+        return if (userPart.isDigitsOnly()) {
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
                         scheme + "+" + userPart.substring(2))
@@ -218,8 +220,7 @@ object Utils {
             pairs.fold(this) { acc, (old, new) -> acc.replace(old, new, ignoreCase = true) }
 
     fun uriUnescape(uri: String): String {
-        return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=",
-            "%23" to "#", "%2A" to "*")
+        return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=")
     }
 
     fun aorDomain(aor: String): String {
@@ -369,17 +370,11 @@ object Utils {
     }
 
     fun isTelNumber(no: String): Boolean {
-        return no.isNotEmpty() && Regex("^[0-9- (),*#+]{1,32}$").matches(no)
+        return no.isNotEmpty() && Regex("^([+][1-9])?[0-9- (),*#]{0,24}$").matches(no)
     }
 
     fun isTelUri(uri: String): Boolean {
         return uri.startsWith("tel:") && isTelNumber(uri.substring(4))
-    }
-
-    fun isUssd(uri: String): Boolean {
-        val u = uriUserPart(uri)
-        // Must start with * or # and must end with #, but exclude "Secret Code" pattern (*#*#...#*#*)
-        return (u.startsWith("*") || u.startsWith("#")) && u.endsWith("#") && !u.startsWith("*#*#")
     }
 
     fun checkUri(uri: String): Boolean {
@@ -530,7 +525,6 @@ object Utils {
         return true
     }
 
-    @Suppress("unused")
     fun copyToClipboard(ctx: Context, text: String) {
         val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("text", text)
@@ -749,7 +743,7 @@ object Utils {
     }
 
     fun encryptToUri(ctx: Context, uri: Uri, content: ByteArray, password: String): Boolean {
-        val obj = if (password == "") content else encrypt(content, password.toCharArray())
+        val obj = encrypt(content, password.toCharArray())
         try {
             val stream = ctx.contentResolver.openOutputStream(uri)
             if (stream != null)
@@ -780,7 +774,7 @@ object Utils {
         try {
             ObjectInputStream(stream).use {
                 val content = it.readObject() as ByteArray
-                plainData = if (password == "") content else decrypt(content, password.toCharArray())
+                plainData = decrypt(content, password.toCharArray())
             }
         } catch (e: Exception) {
             Log.w(TAG, "decryptFromUri as ByteArray failed: $e")
@@ -1368,19 +1362,6 @@ object Utils {
         return file
     }
 
-    @SuppressLint("MissingPermission")
-    fun cancelMissedCallsNotification(ctx: Context) {
-        val telecom = ctx.getSystemService(TelecomManager::class.java)
-        try {
-            telecom.cancelMissedCallsNotification()
-            Log.d(TAG, "cancelMissedCallsNotification() succeeded")
-        } catch (e: SecurityException) {
-            Log.w(TAG, "Cannot clear missed call notification: $e")
-        } catch (e: Exception) {
-            Log.e(TAG, "Unexpected failure clearing missed call notification", e)
-        }
-    }
-
     @RequiresApi(29)
     fun pstnAccountHandle(ctx: Context):  PhoneAccountHandle? {
         val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
@@ -1401,57 +1382,6 @@ object Utils {
         else {
             Log.d(TAG, "READ_PHONE_STATE permission not granted")
             return null
-        }
-    }
-
-    fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-        val (height: Int, width: Int) = options.outHeight to options.outWidth
-        var inSampleSize = 1
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight = height / 2
-            val halfWidth = width / 2
-            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth)
-                inSampleSize *= 2
-        }
-        return inSampleSize
-    }
-
-    fun decodeSampledBitmapFromUri(ctx: Context, uri: Uri, reqWidth: Int, reqHeight: Int): Bitmap? {
-        return try {
-            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            ctx.contentResolver.openInputStream(uri).use { BitmapFactory.decodeStream(it, null, options) }
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-            options.inJustDecodeBounds = false
-            ctx.contentResolver.openInputStream(uri).use { BitmapFactory.decodeStream(it, null, options) }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to decode sampled bitmap from URI: ${e.message}")
-            null
-        }
-    }
-
-    fun decodeSampledBitmapFromByteArray(data: ByteArray, reqWidth: Int, reqHeight: Int): Bitmap? {
-        return try {
-            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            BitmapFactory.decodeByteArray(data, 0, data.size, options)
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-            options.inJustDecodeBounds = false
-            BitmapFactory.decodeByteArray(data, 0, data.size, options)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to decode sampled bitmap from ByteArray: ${e.message}")
-            null
-        }
-    }
-
-    fun decodeSampledBitmapFromFile(path: String, reqWidth: Int, reqHeight: Int): Bitmap? {
-        return try {
-            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            BitmapFactory.decodeFile(path, options)
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-            options.inJustDecodeBounds = false
-            BitmapFactory.decodeFile(path, options)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to decode sampled bitmap from file: ${e.message}")
-            null
         }
     }
 
@@ -1565,15 +1495,5 @@ object Utils {
             Log.e(TAG, "$index: Route='${route}', Args=[$arguments], ID=${navBackStackEntry.id}")
         }
         Log.e(TAG, "--------------------------------------")
-    }
-
-    fun linkPropertiesEqual(p1: android.net.LinkProperties?, p2: android.net.LinkProperties?): Boolean {
-        if (p1 === p2) return true
-        if (p1 == null || p2 == null) return false
-        if (p1.interfaceName != p2.interfaceName) return false
-        if (p1.linkAddresses != p2.linkAddresses) return false
-        if (p1.dnsServers != p2.dnsServers) return false
-        if (p1.routes != p2.routes) return false
-        return true
     }
 }

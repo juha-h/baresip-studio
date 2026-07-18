@@ -90,6 +90,7 @@
     <string name="calls_add_delete_question">Möchten Sie \'%1$s\' zu Kontakten hinzufügen oder %2$s aus der Anrufliste löschen?</string>
     <string name="calls_delete_question">Möchten Sie \'%1$s\' %2$s aus der Anrufliste löschen?</string>
     <string name="delete_history_alert">Möchten Sie den Anrufverlauf des Kontos \'%1$s löschen?</string>
+    <string name="long_message_question">Möchten Sie die Nachricht löschen oder Gesprächspartner \'%1$s\' zu Kontakten hinzufügen?</string>
     <string name="message_failed">Fehlgeschlagen</string>
     <string name="configuration">Einstellungen</string>
     <string name="start_automatically_help">Wenn angeklickt wird Baresip automatisch ausgeführt nach dem Gerät (Neu)Start.</string>

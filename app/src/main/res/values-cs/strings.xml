@@ -17,7 +17,7 @@
     <string name="sip_uri_of_another_proxy_server">SIP URI dalšího proxy serveru</string>
     <string name="reg_int_help">Udává, jak často (v sekundách) baresip odesílá požadavky REGISTER. Platné hodnoty jsou od 60 do 3600.</string>
     <string name="invalid_reg_int">Neplatný interval registrace \'%1$s\'</string>
-    <string name="register_help">Při zapnutí této volby budou požadavky REGISTER odesílány v intervalu nastaveném v položce Interval registrace.</string>
+    <string name="register_help">Pokud je zatrženo, registrace je povolena a požadavky REGISTER jsou odesílány v intervalu určeném parametrem Interval registrace.</string>
     <string name="reg_int">Interval registrace</string>
     <string name="answer_mode_help">Vybírá způsob přijímání příchozích hovorů.</string>
     <string name="media_nat">Průchod médií skrze NAT</string>
@@ -30,7 +30,7 @@
     <string name="stun_password_help">Heslo, pokud ho server STUN/TURN vyžaduje</string>
     <string name="invalid_stun_password">Neplatné heslo \'%1$s\'</string>
     <string name="media_encryption">Šifrování médií</string>
-    <string name="rtcp_mux_help">Při zapnutí této volby jsou pakety RTP a RTCP multiplexovány na jednom portu (RFC 5761).</string>
+    <string name="rtcp_mux_help">Pokud je zatrženo, pakety RTP a RTCP jsou multiplexovány na jednom portu (RFC 5761).</string>
     <string name="rtcp_mux">Multiplexování RTCP</string>
     <string name="authentication_username_help">Uživatelské jméno pro ověřování, pokud je vyžadováno ověřování požadavků SIP. Výchozí hodnotou je uživatelské jméno účtu.</string>
     <string name="telephony_provider">Poskytovatel telefonních služeb</string>
@@ -41,14 +41,15 @@
     <string name="authentication_password_help">Ověřovací heslo až 64 znaků. Pokud je zadáno Uživatelské jméno pro ověřování, ale není zadáno Heslo, bude po spuštění baresipu požadováno.</string>
     <string name="peer">Účastník</string>
     <string name="direction">Směr</string>
-    <string name="calls_add_delete_question">Chcete přidat \'%1$s\' do kontaktů, zablokovat jej nebo odstranit %2$s z historie hovorů?</string>
+    <string name="calls_add_delete_question">Chcete přidat \'%1$s\' do kontaktů nebo odstranit %2$s z historie hovorů?</string>
     <string name="delete_history_alert">Chcete odstranit historii volání účtu \"%1$s\"\?</string>
     <string name="calls_duration">Trvání</string>
-    <string name="long_chat_question">Chcete přidat \'%1$s\' do kontaktů, zablokovat jej nebo odstranit tento chat?</string>
+    <string name="long_chat_question">Chcete smazat chat s účastníkem \'%1$s\' nebo přidat účastníka do kontaktů\?</string>
+    <string name="long_message_question">Chcete odstranit zprávu nebo přidat účastníka \'%1$s\' do kontaktů\?</string>
     <string name="disable_history">Zakázat</string>
     <string name="new_message">Nová zpráva</string>
-    <string name="short_message_question">Chcete tuto zprávu odstranit?</string>
-    <string name="calls_delete_question">Chcete odstranit %2$s z historie hovorů?</string>
+    <string name="short_message_question">Chcete zprávu odstranit\?</string>
+    <string name="calls_delete_question">Chcete odstranit \'%1$s\' %2$s z historie hovorů?</string>
     <string name="chat_with">Chatovat s %1$s</string>
     <string name="sending_failed">Odeslání zprávy se nezdařilo</string>
     <string name="you">Vy</string>
@@ -61,13 +62,13 @@
     <string name="invalid_dns_servers">Neplatné servery DNS</string>
     <string name="delete_chats_alert">Chcete odstranit historii chatu účtu \'%1$s\'\?</string>
     <string name="audio_codecs">Zvukové kodeky</string>
-    <string name="tls_certificate_file_help">Pokud je tato volba zapnutá, byl nebo bude načten soubor obsahující certifikát TLS a soukromý klíč této instance baresipu. Ve verzi systému Android 9 se soubor s názvem \'cert.pem\' načte ze složky Download. Z bezpečnostních důvodů tento soubor po načtení odstraňte.</string>
+    <string name="tls_certificate_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikát TLS a soukromý klíč této instance baresipu. Ve verzi systému Android 9 se soubor s názvem \'cert.pem\' načte ze složky Download. Z bezpečnostních důvodů tento soubor po načtení odstraňte.</string>
     <string name="invalid_listen_address">Neplatná naslouchací adresa</string>
     <string name="configuration">Nastavení</string>
     <string name="battery_optimizations">Optimalizace baterie</string>
     <string name="listen_address">Naslouchací adresa</string>
     <string name="start_automatically">Spustit automaticky</string>
-    <string name="start_automatically_help">Pokud je tato volba zapnutá, baresip se spustí automaticky po (opětovném) spuštění zařízení nebo po instalaci nové verze baresip. Ke spuštění dojde po odemčení zařízení.</string>
+    <string name="start_automatically_help">Pokud je zaškrtnuto, baresip se spustí automaticky po (opětovném) spuštění zařízení nebo po instalaci nové verze baresip. Ke spuštění dojde po odemčení zařízení.</string>
     <string name="battery_optimizations_help">Pokud chcete snížit pravděpodobnost, že systém Android omezí přístup zařízení baresip k síti nebo jej přepne do pohotovostního režimu, zakažte optimalizace baterie.</string>
     <string name="listen_address_help">IP adresa a port ve tvaru \"address:port\", na kterém baresip naslouchá příchozím požadavkům SIP. Pokud je IP adresa IPv6, musí být zapsána v závorce []. IPv4 adresa 0.0.0.0 nebo IPv6 adresa [::] způsobí, že baresip bude naslouchat na všech dostupných adresách. Pokud zůstane prázdné (výchozí nastavení), bude baresip naslouchat na libovolném portu na všech dostupných adresách.</string>
     <string name="dns_servers">Servery DNS</string>
@@ -75,7 +76,7 @@
     <string name="tls_ca_file">Soubor TLS CA</string>
     <string name="failed_to_set_dns_servers">Nepodařilo se nastavit servery DNS</string>
     <string name="verify_server">Ověřit certifikáty serveru</string>
-    <string name="verify_server_help">Pokud je tato volba zapnutá, ověřuje baresip certifikáty TLS uživatelského agenta SIP a proxy serverů SIP, pokud se používá přenos TLS.</string>
+    <string name="verify_server_help">Pokud je tato možnost zaškrtnuta, ověřuje baresip certifikáty TLS uživatelského agenta SIP a proxy serverů SIP, pokud se používá přenos TLS.</string>
     <string name="dtmf_inband">Události v pásmu RTP</string>
     <string name="dtmf_info">Žádosti SIP INFO</string>
     <string name="media_encryption_help">Vybere protokol šifrování přenosu média (pokud existuje).
@@ -96,7 +97,7 @@
     <string name="default_account">Výchozí účet</string>
     <string name="invalid_country_code">Neplatný kód země \'%1$s\'</string>
     <string name="telephony_provider_help">Hostitelská část SIP URI používaná při volání na telefonní čísla. Výchozí tovární nastavení je doména účtu. Pokud není zadána, nelze tento účet použít pro volání na telefonní čísla.</string>
-    <string name="default_account_help">Při zapnutí této volby je tento účet vybrán při spuštění baresipu.</string>
+    <string name="default_account_help">Pokud je zatrženo, je tento účet vybrán při spuštění baresipu.</string>
     <string name="invalid_sip_uri_hostpart">Neplatná část hostitelského URI SIP \'%1$s\'</string>
     <string name="new_account">SIP URI nového účtu</string>
     <string name="accounts">Účty</string>
@@ -114,7 +115,7 @@
     <string name="calls_calls">volání</string>
     <string name="call_details">Podrobnosti o volání</string>
     <string name="calls_call">volání</string>
-    <string name="tls_ca_file_help">Pokud je tato volba zapnutá, byl nebo bude načten soubor obsahující certifikáty TLS takových certifikačních autorit, které nejsou součástí operačního systému Android. Ve verzi systému Android 9 se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
+    <string name="tls_ca_file_help">Pokud je zaškrtnuto, byl nebo bude načten soubor obsahující certifikáty TLS takových certifikačních autorit, které nejsou součástí operačního systému Android. Ve verzi systému Android 9 se ze složky Download načte soubor s názvem \'ca_certs.crt\'.</string>
     <string name="audio_settings">Nastavení zvuku</string>
     <string name="opus_bit_rate_help">Průměrná maximální přenosová rychlost používaná zvukovým tokem Opus. Platné hodnoty jsou 6000-510000. Výchozí hodnota je 28000.</string>
     <string name="opus_packet_loss">Očekávaná ztráta paketů Opus</string>
@@ -123,7 +124,7 @@
     <string name="default_call_volume">Výchozí hlasitost volání</string>
     <string name="dark_theme_help">Vynutit tmavé téma</string>
     <string name="failed_to_load_module">Nepodařilo se načíst modul.</string>
-    <string name="audio_modules_help">Zvukové kodeky poskytované zvolenými moduly jsou k dispozici pro použití v účtech.</string>
+    <string name="audio_modules_help">Zvukové kodeky poskytované zaškrtnutými moduly jsou k dispozici pro použití v účtech.</string>
     <string name="invalid_opus_packet_loss">Neplatné procento ztráty paketů Opus</string>
     <string name="invalid_opus_bitrate">Neplatný datový tok Opus</string>
     <string name="default_call_volume_help">Pokud je nastaveno, je výchozí hlasitost zvuku hovoru na stupnici 1-10.</string>
@@ -133,10 +134,10 @@
     <string name="video_size">Rozlišení videa</string>
     <string name="video_size_help">Rozlišení videa (šířka x výška)</string>
     <string name="contacts_help">Vybírá, zda se použijí kontakty baresip, kontakty Android nebo obojí. Pokud jsou použita volba obojí a v obou kontaktech existuje kontakt se stejným jménem, bude vybrán kontakt baresip.</string>
-    <string name="debug_help">Pokud je tato volba zapnutá, poskytuje zprávy protokolu Logcat na úrovni ladění a informací.</string>
-    <string name="sip_trace_help">Pokud je tato volba a volba Debug zapnutá, zprávy Logcat obsahují také trasování požadavků a odpovědí SIP. Zruší se automaticky při spuštění baresipu.</string>
+    <string name="debug_help">Pokud je zaškrtnuto, poskytuje zprávy protokolu Logcat na úrovni ladění a informací.</string>
+    <string name="sip_trace_help">Pokud je zaškrtnuto a pokud je zaškrtnuta volba Debug, zprávy Logcat obsahují také trasování požadavků a odpovědí SIP. Zruší se automaticky při spuštění baresipu.</string>
     <string name="reset_config">Obnovit výchozí nastavení</string>
-    <string name="reset_config_help">Pokud je tato volba zapnutá, nastavení se obnoví na výchozí hodnoty.</string>
+    <string name="reset_config_help">Pokud je zaškrtnuto, nastavení se obnoví na výchozí hodnoty.</string>
     <string name="reset_config_alert">Jste si jisti, že chcete obnovit výchozí hodnoty\?</string>
     <string name="reset">Obnovit</string>
     <string name="read_cert_error">Nepodařilo se načíst soubor \'cert.pem\'.</string>
@@ -150,7 +151,7 @@
     <string name="contact_name">Jméno</string>
     <string name="user_domain_or_number">uživatel@doména nebo telefonní číslo</string>
     <string name="contact_already_exists">Kontakt \'%1$s\' již existuje.</string>
-    <string name="android_contact_help">Pokud je tato volba zapnutá, je tento kontakt přidán do kontaktů systému Android.</string>
+    <string name="android_contact_help">Pokud je zaškrtnuto, je tento kontakt přidán do kontaktů systému Android.</string>
     <string name="avatar_image">Profilový obrázek</string>
     <string name="invalid_contact">Neplatné jméno kontaktu \'%1$s\'</string>
     <string name="contact_delete_question">Chcete odstranit kontakt \'%1$s\'\?</string>
@@ -252,7 +253,7 @@
     <string name="call_auto_rejected">Automaticky odmítat volání od %1$s</string>
     <string name="default_phone_app">Výchozí aplikace telefonu</string>
     <string name="dialer_role_not_available">Role výchozí aplikace pro telefonování není k dispozici</string>
-    <string name="default_phone_app_help">Pokud je tato volba zapnutá, je výchozí aplikací pro telefonování baresip.</string>
+    <string name="default_phone_app_help">Pokud je zaškrtnuto, je výchozí aplikací pro telefonování baresip.</string>
     <string name="redirect_notice">Automatické přesměrování na \'%1$s\'</string>
     <string name="favorite">Oblíbené</string>
     <string name="appear_on_top_permission">Automatické spuštění vyžaduje oprávnění Zobrazení přes ostatní aplikace.</string>
@@ -261,12 +262,12 @@
     <string name="redirect_mode">Režim přesměrování</string>
     <string name="redirect_request">Žádost o přesměrování</string>
     <string name="tone_country">Region tónů</string>
-    <string name="rel_100_help">Pokud je tato volba zapnutá, tak bude avizována podpora spolehlivých předběžných odpovědí (RFC 3262).</string>
+    <string name="rel_100_help">Pokud je zaškrtnuto, tak avizovat podporu spolehlivých předběžných odpovědí (RFC 3262).</string>
     <string name="tone_country_help">Země vyzvánění, čekajícího hovoru a obsazených tónů volajícího</string>
     <string name="rel_100">Spolehlivé předběžné odpovědi</string>
     <string name="restore_unzip_failed">Nepodařilo se obnovit data aplikace. Systém Android verze 14 a vyšší neumožňuje obnovení dat, která byla zálohována před verzí %1$s %2$s.</string>
     <string name="speaker_phone">Hlasitý poslech</string>
-    <string name="speaker_phone_help">Pokud je tato volba zapnutá, tak se hlasitý poslech zapne automaticky při zahájení hovoru.</string>
+    <string name="speaker_phone_help">Pokud je zatrženo, hlasitý poslech se zapne automaticky při zahájení hovoru.</string>
     <string name="dtmf_auto">In-band RTP nebo SIP INFO</string>
     <string name="call_request">Žádost o volání</string>
     <string name="call_request_query">Přijímáte požadavek na volání \'%1$s\'?</string>
@@ -282,7 +283,7 @@
     <string name="ringtone">Vyzvánění</string>
     <string name="select_ringtone">Vybrat vyzvánění</string>
     <string name="numeric_keypad">Numerická klávesnice</string>
-    <string name="numeric_keypad_help">Při zapnutí této volby se při zaměření pole \"Zavolat na ...\" zobrazí numerická klávesnice.</string>
+    <string name="numeric_keypad_help">Pokud je zatrženo, zobrazí se při zaměření pole \"Zavolat na ...\" numerická klávesnice.</string>
     <string name="reply">Odpovědět</string>
     <string name="save">Uložit</string>
     <string name="playing_recording">Přehrávání nahrávky …</string>
@@ -293,7 +294,7 @@
     <string name="no_read_permission">Aplikace nemá oprávnění k externímu úložišti</string>
     <string name="colorblind">Barvoslepost</string>
     <string name="colorblind_help">Používat ikony stavu registrace přizpůsobené barvosleposti</string>
-    <string name="favorite_help">Pokud je tato volba zapnutá, kontakt se zobrazí mezi oblíbenými v horní části seznamu kontaktů.</string>
+    <string name="favorite_help">Je-li zaškrtnuto, kontakt se zobrazí mezi oblíbenými v horní části seznamu kontaktů.</string>
     <string name="no_aec">Hardwarové potlačení ozvěny není dostupné!</string>
     <string name="call_recording_title">Nahrávání hovoru</string>
     <string name="call_recording_tip">Pokud je aktivováno, nové příchozí i odchozí hovory budou nahrávány. Nahrávky lze přehrát na stránce historie volání.</string>
@@ -306,7 +307,7 @@
     <string name="dynamic_colors">Dynamické barvy</string>
     <string name="dynamic_colors_help">Použijí se dynamické barvy, pokud jsou povoleny v nastavení Androidu</string>
     <string name="about_text"><![CDATA[
-     <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
+        <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Verze %1$s</p>
@@ -392,7 +393,7 @@
     <string name="restart_request">Požadavek na restart</string>
     <string name="about_text_plus"><![CDATA["\n        <h1>SIP klient založený na knihovně <a href=\"https://github.com/baresip/baresip\">baresip</a></h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>Verze %1$s</p>\n        <br>\n        <h2>Nápověda</h2>\n        <ul>\n                 <li>Zkontrolujte, zda výchozí hodnoty v nastavení baresipu vyhovují vašim potřebám \n                      (nápovědu získáte ťuknutím na názvy položek).</li>\n                 <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět ťukněte na názvy položek).</li>\n                 <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace \n                      proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace \n                      nezačala).</li>\n                 <li>Klepnutí na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.</li>\n                 <li>Dlouhým dotykem na ikony na liště baresip zobrazíte informace o ikonách.</li>\n                 <li>Přejetí prstem dolů po obrazovce (gesto) zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>\n                 <li>Dlouhým dotykem na aktuálně zobrazený účet povolíte nebo zakážete jeho registraci.</li>\n                 <li>Mezi účty se můžete přepnout přejetím prstem vlevo/vpravo po obrazovce (gesto).</li>\n                 <li>Poslední volaný kontakt lze znovu rychle vybrat klepnutím na ikonu hovoru, pokud je pole \"Zavolat na ...\" prázdné.</li>\n                 <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhým podržením.</li>\n                 <li>Dlouhým podržením lze také odstraňovat hovory, chaty, zprávy a kontakty.</li> \n                 <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>\n                 <li>Dlouhým dotykem na zvukový kodek lze kodek povolit/zakázat.</li>\n                 <li>Navštivte <a href=https://github.com/juha-h/baresip-studio/wiki>Wiki</a> pro více\n                          informací.</li>\n        </ul>\n        <h2>Známé problémy</h2>\n        <ul>\n                <li>Náhled sebe sama se nezobrazuje správně, když je video stream pouze pro odesílání..</li>\n        </ul>\n        <h2>Zásady ochrany osobních údajů</h2>\n                <p>Zásady ochrany osobních údajů jsou k dispozici\n                        <a href=https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt>zde</a>.</p>\n        <br>\n        <h2>Zdrojový kód</h2>\n               <p>Zdrojový kód je k dispozici na <a href=https://github.com/juha-h/baresip-studio>GitHubu</a>,\n                kde je také možno nahlásit problémy, náměty a požadavky.</p>\n        <br>\n        <h2>Překlady do jiných jazyků</h2>\n            <p>Překlady jsou realizovány skrze projekt baresip\n                    <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>.</p>\n        <br>\n        <h2>Licence</h2>\n        <ul>\n                 <li><b>BSD-3-Clause</b> kromě následujících:</li>\n                 <li><b>Apache 2.0</b> AMR codecs a TLS security</li>\n                 <li><b>AGPLv4</b> šifrování médií ZRTP</li>\n                 <li><b>GNU LGPL 2.1</b> Codec2 codec</li>\n                 <li><b>Free</b> G.722 codec</li>\n                 <li><b>GNU GPLv3</b> kodek G.729 </li>\n                 <li><b>GNU GPLv2</b> H.264 a H.265 kodeky</li>\n                <li><b>AOMedia</b> AV1 kodek</li>\n        </ul>\n        "]]></string>
     <string name="unique_contact_uri">Jedinečné URI kontaktu</string>
-    <string name="unique_contact_uri_help">Pokud je tato volba zapnutá, URI kontaktu je zaručeně jedinečné. Je nutné tuto volbu zapnout, pokud existuje více účtů se stejnou uživatelskou částí SIP URI, a zároveň zlepšuje ochranu účtů proti útokům.</string>
+    <string name="unique_contact_uri_help">Pokud je zaškrtnuto, URI kontaktu je zaručeně jedinečné. Je nutné tuto volbu zapnout, pokud existuje více účtů se stejnou uživatelskou částí SIP URI, a zároveň zlepšuje ochranu účtů proti útokům.</string>
     <string name="not_available">Nedostupné</string>
     <string name="voicemain_tel_uri_help">TEL URI pro kontrolu hlasových zpráv.</string>
     <string name="custom_parameters">Vlastní parametry</string>
@@ -402,37 +403,4 @@
     <string name="call_is_ringing">Hovor vyzvání</string>
     <string name="call_is_connected">Hovor je spojen</string>
     <string name="replaces_not_supported">Protistrana nepodporuje funkci REPLACES</string>
-    <string name="tel_uri_calls">TEL URI pro hovory</string>
-    <string name="tel_uri_messages">TEL URI pro zprávy</string>
-    <string name="sim_manager">Správa SIM</string>
-    <string name="block_hidden">Blokovat skryté kontakty</string>
-    <string name="block_hidden_help">Blokovat hovory a zprávy od volajících se skrytou identifikací (anonymní).</string>
-    <string name="hidden_call_blocked">Automaticky odmítnout hovory od volajících se skrytou identitou</string>
-    <string name="hidden_message_blocked">Automaticky odmítnout zprávy od odesílatelů se skrytou identitou</string>
-    <string name="blocking">Blokování</string>
-    <string name="blocking_list">Seznam blokování</string>
-    <string name="new_blocking_rule">Nové pravidlo blokování</string>
-    <string name="blocking_rule_help">Pravidlo blokování může být buď obyčejný textový řetězec, nebo regulární výraz. Pokud URI protistrany obsahuje zadaný textový řetězec nebo odpovídá zadanému regulárnímu výrazu, hovor nebo zpráva budou zablokovány.</string>
-    <string name="blocking_delete_alert">Opravdu chcete odstranit pravidlo blokování %1$s?</string>
-    <string name="default_messaging_app">Výchozí aplikace pro zprávy</string>
-    <string name="default_messaging_app_help">Pokud je tato volba zapnutá, baresip bude výchozí aplikací pro SMS/MMS.</string>
-    <string name="messaging_role_not_available">Role výchozí aplikace pro zprávy není k dispozici</string>
-    <string name="enable_default_messaging">Povolte prosím v Nastavení výchozí aplikaci pro zprávy</string>
-    <string name="label">Označení</string>
-    <string name="email">Email</string>
-    <string name="contact_no_sip_or_tel_uri">Kontakt \'%1$s\' nemá žádnou SIP ani TEL URI</string>
-    <string name="contact_no_tel_uri">Kontakt \'%1$s\' nemá žádnou TEL URI</string>
-    <string name="contact_email_action_question">Chcete kontaktu \'%1$s\' zavolat, poslat zprávu nebo e-mail?</string>
-    <string name="send_email">Poslat email</string>
-    <string name="contacts_delete_question">Přejete si smazat všechny kontakty?</string>
-    <string name="import_contacts">Importovat</string>
-    <string name="export_contacts">Exportovat</string>
-    <string name="contact_import_success">Kontakty byly úspěšně importovány</string>
-    <string name="contact_import_failure">Import kontaktů se nezdařil</string>
-    <string name="contact_export_success">Kontakty byl úspěšně exportovány</string>
-    <string name="contact_export_failure">Export kontaktů se nezdařil</string>
-    <string name="block">Blokovat</string>
-    <string name="copy_uri">Kopírovat URI</string>
-    <string name="copied_to_clipboard">Zkopírováno do schránky</string>
-    <string name="airplane_mode">Režim letadlo je zapnutý. Vypněte jej pro použití mobilního účtu.</string>
 </resources>

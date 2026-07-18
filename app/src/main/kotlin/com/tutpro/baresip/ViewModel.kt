@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 // Sealed class for type-safe navigation events
 sealed class NavigationCommand {
     object NavigateToHome : NavigationCommand()
-    object NavigateToChats : NavigationCommand()
+    object NavigateToCall : NavigationCommand()
     data class NavigateToCalls(val aor: String) : NavigationCommand()
     data class NavigateToChat(val aor: String, val peerUri: String) : NavigationCommand()
 }
@@ -33,10 +32,11 @@ class ViewModel: ViewModel() {
 
     fun updateAorPeerMessage(aor: String, peerUri: String, message: String) {
         val key = "$aor:$peerUri"
-        if (message.isEmpty())
+        if (message.isEmpty()) {
             messageDrafts.remove(key)
-        else
+        } else {
             messageDrafts[key] = message
+        }
     }
 
     data class DialerState(
@@ -71,7 +71,7 @@ class ViewModel: ViewModel() {
     private val _isSpeakerOn = MutableStateFlow(false)
     val isSpeakerOn = _isSpeakerOn.asStateFlow()
 
-    private val _isDialpadVisible = MutableStateFlow(false)
+    private val _isDialpadVisible = MutableStateFlow(true)
     val isDialpadVisible = _isDialpadVisible.asStateFlow()
 
     private val _showKeyboard = MutableStateFlow(0)
@@ -80,7 +80,7 @@ class ViewModel: ViewModel() {
     private val _hideKeyboard = MutableStateFlow(0)
     val hideKeyboard = _hideKeyboard.asStateFlow()
 
-    private val _navigationCommand = MutableSharedFlow<NavigationCommand>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _navigationCommand = MutableSharedFlow<NavigationCommand>()
     val navigationCommand = _navigationCommand.asSharedFlow()
 
     private var lastRenderedAor = ""
@@ -163,9 +163,9 @@ class ViewModel: ViewModel() {
         }
     }
 
-    fun navigateToChats() {
+    fun navigateToCall() {
         viewModelScope.launch {
-            _navigationCommand.emit(NavigationCommand.NavigateToChats)
+            _navigationCommand.emit(NavigationCommand.NavigateToCall)
         }
     }
 

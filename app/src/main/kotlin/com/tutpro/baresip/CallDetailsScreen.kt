@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -93,7 +94,7 @@ fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewMod
 private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
     val detailsState = remember { callRow.details.toMutableStateList() }
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -293,8 +294,8 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
     Text(
         text = startTimeText,
         modifier = Modifier.combinedClickable(
-            onClick = { showDialog.value = true },
-            onLongClick = { }
+            onClick = {},
+            onLongClick = { showDialog.value = true }
         )
     )
 

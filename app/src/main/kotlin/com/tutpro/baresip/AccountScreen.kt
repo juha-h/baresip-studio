@@ -1,8 +1,6 @@
 package com.tutpro.baresip
 
 import android.content.Context
-import android.content.Intent
-import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +13,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -88,7 +87,6 @@ import java.io.StringReader
 import java.net.URL
 import java.util.Locale
 import javax.net.ssl.HttpsURLConnection
-import android.provider.Settings
 import android.telephony.SubscriptionManager
 
 fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
@@ -166,13 +164,15 @@ private fun AccountScreen(
         }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding().navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
-                    title = { Text(text = acc.text(), fontWeight = FontWeight.Bold) },
+                    title = {
+                        Text(text = acc.text(), fontWeight = FontWeight.Bold)
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -200,7 +200,10 @@ private fun AccountScreen(
         if (isAccountLoaded)
             AccountContent(viewModel, navController, contentPadding, ua, resumeToggle)
         else
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
     }
@@ -237,7 +240,9 @@ private fun AccountContent(
             onValueChange = {},
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 18.sp),
-            label = { Text(text = label, fontWeight = FontWeight.Bold) },
+            label = {
+                Text(text = label, fontWeight = FontWeight.Bold)
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
                 disabledBorderColor = MaterialTheme.colorScheme.outline,
@@ -254,7 +259,7 @@ private fun AccountContent(
             Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (ua.account.isMobile && Build.VERSION.SDK_INT >= 29) {
+            if (ua.account.isMobile && android.os.Build.VERSION.SDK_INT >= 29) {
                 val voiceSubId = remember(toggle) { SubscriptionManager.getDefaultVoiceSubscriptionId() }
                 val smsSubId = remember(toggle) { SubscriptionManager.getDefaultSmsSubscriptionId() }
 
@@ -327,35 +332,6 @@ private fun AccountContent(
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     keyboardType = KeyboardType.Text),
-            )
-        }
-    }
-
-    @Composable
-    fun SimManager() {
-        Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(
-                text = stringResource(R.string.sim_manager),
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        try {
-                            val action =
-                                if (Build.VERSION.SDK_INT >= 31)
-                                    Settings.ACTION_MANAGE_ALL_SIM_PROFILES_SETTINGS
-                                else
-                                    Settings.ACTION_WIRELESS_SETTINGS
-                            ctx.startActivity(Intent(action))
-                        } catch (_: Exception) {
-                            ctx.startActivity(Intent(Settings.ACTION_SETTINGS))
-                        }
-                    },
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -628,17 +604,55 @@ private fun AccountContent(
     }
 
     @Composable
-    fun Blocking(navController: NavController, aor: String) {
+    fun BlockUnknown() {
+        val blockUnknownTitle = stringResource(R.string.block_unknown)
+        val blockUnknownHelp = stringResource(R.string.block_unknown_help)
+        val block by viewModel.blockUnknown.collectAsState()
         Row(
-            Modifier.fillMaxWidth().padding(top = 8.dp),
+            Modifier.fillMaxWidth().padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(
-                text = stringResource(R.string.blocking),
-                modifier = Modifier.weight(1f).clickable { navController.navigate("blocking/$aor") },
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+            Text(text = blockUnknownTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = blockUnknownTitle
+                        alertMessage.value = blockUnknownHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            Switch(
+                checked = block,
+                onCheckedChange = { viewModel.blockUnknown.value = it }
+            )
+        }
+    }
+
+    @Composable
+    fun BlockHidden() {
+        val blockHiddenTitle = stringResource(R.string.block_hidden)
+        val blockHiddenHelp = stringResource(R.string.block_hidden_help)
+        val block by viewModel.blockHidden.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = blockHiddenTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = blockHiddenTitle
+                        alertMessage.value = blockHiddenHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            Switch(
+                checked = block,
+                onCheckedChange = { viewModel.blockHidden.value = it }
             )
         }
     }
@@ -646,7 +660,7 @@ private fun AccountContent(
     @Composable
     fun AudioCodecs(navController: NavController, aor: String) {
         Row(
-            Modifier.fillMaxWidth().padding(top = 8.dp),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -760,7 +774,9 @@ private fun AccountContent(
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = { isDropDownExpanded.value = false }
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }
                 ) {
                     var index = 0
                     mediaNatMap.forEach {
@@ -980,8 +996,9 @@ private fun AccountContent(
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = { isDropDownExpanded.value = false }
-                ) {
+                    onDismissRequest = {
+                        isDropDownExpanded.value = false
+                    }) {
                     var index = 0
                     dtmfModeMap.forEach {
                         DropdownMenuItem(text = { Text(text = it.value) },
@@ -1289,13 +1306,14 @@ private fun AccountContent(
         }
     }
 
-    if (showAlert.value)
+    if (showAlert.value) {
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
             lastButtonText = stringResource(R.string.ok),
         )
+    }
 
     keyboardController = LocalSoftwareKeyboardController.current
 
@@ -1312,8 +1330,6 @@ private fun AccountContent(
     ) {
         AoR(resumeToggle)
         Nickname()
-        if (ua.account.isMobile)
-            SimManager()
         if (!ua.account.isMobile) {
             DisplayName()
             AuthUser()
@@ -1327,7 +1343,8 @@ private fun AccountContent(
                 CheckOrigin()
             }
         }
-        Blocking(navController, aor)
+        BlockUnknown()
+        BlockHidden()
         if (!ua.account.isMobile) {
             AudioCodecs(navController, aor)
             MediaEnc()
@@ -1356,7 +1373,6 @@ private fun AccountContent(
 
 private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgent): Boolean {
 
-    reRegister = false
     val acc = ua.account
     val noticeTitle = ctx.getString(R.string.notice)
 
@@ -1388,9 +1404,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             if (Api.account_set_display_name(acc.accp, dn) == 0) {
                 acc.displayName = Api.account_display_name(acc.accp)
                 Log.d(TAG, "New display name is ${acc.displayName}")
-            }
-            else
+            } else {
                 Log.e(TAG, "Setting of display name failed")
+            }
         }
         else {
             alertTitle.value = noticeTitle
@@ -1409,8 +1425,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 if (acc.regint > 0)
                     reRegister = true
             }
-            else
+            else {
                 Log.e(TAG, "Setting of auth user failed")
+            }
         }
         else {
             alertTitle.value = noticeTitle
@@ -1456,8 +1473,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (ob1 != "") {
         if (!ob1.startsWith("sip:"))
             ob1 = "sip:$ob1"
-        if (checkOutboundUri(ob1))
+        if (checkOutboundUri(ob1)) {
             ob.add(ob1)
+        }
         else {
             alertTitle.value = noticeTitle
             alertMessage.value = String.format(ctx.getString(R.string.invalid_proxy_server_uri), ob1)
@@ -1511,9 +1529,10 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     val reReg = (viewModel.register.value != acc.regint > 0) ||
             (viewModel.register.value && regInt != acc.configuredRegInt)
     if (reReg) {
-        if (Api.account_set_regint(acc.accp, if (viewModel.register.value) regInt else 0) != 0)
+        if (Api.account_set_regint(acc.accp,
+                if (viewModel.register.value) regInt else 0) != 0) {
             Log.e(TAG, "Setting of regint failed")
-        else {
+        } else {
             acc.regint = Api.account_regint(acc.accp)
             acc.configuredRegInt = regInt
             Log.d(TAG, "New regint is ${acc.regint}")
@@ -1571,9 +1590,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         if (Api.account_set_stun_uri(acc.accp, newStunServer) == 0) {
             acc.stunServer = Api.account_stun_uri(acc.accp)
             Log.d(TAG, "New STUN/TURN server URI is '${acc.stunServer}'")
-        }
-        else
+        } else {
             Log.e(TAG, "Setting of STUN/TURN URI server $newStunServer failed")
+        }
     }
 
     val newStunUser = viewModel.stunUser.value.trim()
@@ -1617,9 +1636,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         if (Api.account_set_rtcp_mux(acc.accp, newRtcpMux) == 0) {
             acc.rtcpMux = Api.account_rtcp_mux(acc.accp)
             Log.d(TAG, "New rtcpMux is ${acc.rtcpMux}")
-        }
-        else
+        } else {
             Log.e(TAG, "Setting of account_rtc_mux $newRtcpMux failed")
+        }
 
     val new100Rel = viewModel.rel100.value
     if (new100Rel != (acc.rel100Mode == Api.REL100_ENABLED)) {
@@ -1628,9 +1647,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             acc.rel100Mode = Api.account_rel100_mode(acc.accp)
             Api.ua_update_account(ua.uap)
             Log.d(TAG, "New rel100Mode is ${acc.rel100Mode}")
-        }
-        else
+        } else {
             Log.e(TAG, "Setting of account_rel100Mode $mode failed")
+        }
     }
 
     val newDtmfMode = viewModel.dtmfMode.value
@@ -1638,9 +1657,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         if (Api.account_set_dtmfmode(acc.accp, newDtmfMode) == 0) {
             acc.dtmfMode = Api.account_dtmfmode(acc.accp)
             Log.d(TAG, "New dtmfMode is ${acc.dtmfMode}")
-        }
-        else
+        } else {
             Log.e(TAG, "Setting of dtmfMode $newDtmfMode failed")
+        }
     }
 
     val newAnswerMode = viewModel.answerMode.value
@@ -1648,9 +1667,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         if (Api.account_set_answermode(acc.accp, newAnswerMode) == 0) {
             acc.answerMode = Api.account_answermode(acc.accp)
             Log.d(TAG, "New answerMode is ${acc.answerMode}")
-        }
-        else
+        } else {
             Log.e(TAG, "Setting of answerMode $newAnswerMode failed")
+        }
     }
 
     val newAutoRedirect = viewModel.autoRedirect.value
@@ -1697,7 +1716,10 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 }
             }
             if (!Utils.checkUri(newVmUri))
-                error = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), newVmUri)
+                error = String.format(
+                    ctx.getString(R.string.invalid_sip_or_tel_uri),
+                    newVmUri
+                )
             if (error != "") {
                 alertTitle.value = noticeTitle
                 alertMessage.value = error

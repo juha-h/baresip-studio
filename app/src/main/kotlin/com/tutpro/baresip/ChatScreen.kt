@@ -1,8 +1,8 @@
 package com.tutpro.baresip
 
+import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils.isToday
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -13,6 +13,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +43,8 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -102,6 +110,7 @@ fun NavGraphBuilder.chatScreenRoute(navController: NavController, viewModel: Vie
         val aor = backStackEntry.arguments?.getString("aor")!!
         val peerUri = backStackEntry.arguments?.getString("peer")!!
         ChatScreen(
+            ctx = LocalContext.current,
             navController = navController,
             viewModel = viewModel,
             account = Account.ofAor(aor)!!,
@@ -112,13 +121,13 @@ fun NavGraphBuilder.chatScreenRoute(navController: NavController, viewModel: Vie
 
 @Composable
 private fun ChatScreen(
+    ctx: Context,
     navController: NavController,
     viewModel: ViewModel,
     account: Account,
     peerUri: String
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val ctx = LocalContext.current
 
     val aor = account.aor
 
@@ -163,26 +172,22 @@ private fun ChatScreen(
     }
 
     BackHandler(enabled = true) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Unread"
-        serviceIntent.putExtra("uap", account.accp)
-        serviceIntent.putExtra("peer", peerUri)
-        ctx.startService(serviceIntent)
         backAction(navController, account, peerUri)
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Color(0xFFF9FAFB),
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
-                TopAppBar(navController, viewModel, account, peerUri)
+                TopAppBar(ctx, navController, viewModel, account, peerUri)
             }
         },
         bottomBar = {
             NewMessage(
-                viewModel,
+                ctx = ctx,
+                viewModel = viewModel,
                 account = account,
                 peerUri = peerUri,
                 addMessage = addMessage
@@ -191,6 +196,8 @@ private fun ChatScreen(
         content = { contentPadding ->
             if (areMessagesLoaded)
                 ChatContent(
+                    ctx,
+                    navController,
                     contentPadding,
                     account, peerUri,
                     chatMessages,
@@ -203,39 +210,56 @@ private fun ChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopAppBar(
+    ctx: Context,
     navController: NavController,
     viewModel: ViewModel,
     account: Account,
     peerUri: String
 ) {
-    val ctx = LocalContext.current
     val aor = account.aor
     TopAppBar(
         title = {
-            Text(
-                text = format(ctx.getString(R.string.chat_with), Utils.friendlyUri(ctx, peerUri, account)),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
+            androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
+                val contact = Contact.findContact(peerUri)
+                if (contact != null) {
+                    when (contact) {
+                        is Contact.BaresipContact -> {
+                            val avatarImage = contact.avatarImage
+                            if (avatarImage != null)
+                                CustomElements.ImageAvatar(avatarImage)
+                            else
+                                CustomElements.TextAvatar(contact.name, contact.color)
+                        }
+                        is Contact.AndroidContact -> {
+                            val thumbNailUri = contact.thumbnailUri
+                            if (thumbNailUri != null)
+                                coil.compose.AsyncImage(
+                                    model = thumbNailUri,
+                                    contentDescription = "Avatar",
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                    modifier = Modifier.size(36.dp).clip(androidx.compose.foundation.shape.CircleShape),
+                                )
+                            else
+                                CustomElements.TextAvatar(contact.name, contact.color)
+                        }
+                    }
+                    androidx.compose.foundation.layout.Spacer(Modifier.size(12.dp))
+                }
+                Text(
+                    text = Utils.friendlyUri(ctx, peerUri, account).uppercase(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            navigationIconContentColor = Color.White,
+            titleContentColor = Color.White,
+            actionIconContentColor = Color.White
         ),
         navigationIcon = {
-            val ctx = LocalContext.current
-            IconButton(
-                onClick = {
-                    val serviceIntent = Intent(ctx, BaresipService::class.java)
-                    serviceIntent.action = "Clear Unread"
-                    serviceIntent.putExtra("uap", account.accp)
-                    serviceIntent.putExtra("peer", peerUri)
-                    ctx.startService(serviceIntent)
-                    backAction(navController, account, peerUri)
-                }
-            ) {
+            IconButton(onClick = { backAction(navController, account, peerUri) }) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
@@ -249,10 +273,6 @@ private fun TopAppBar(
                             .putExtra("uap", ua.uap)
                             .putExtra("peer", peerUri)
                         handleIntent(ctx, viewModel, callIntent, "call")
-                        navController.navigate("main") {
-                            popUpTo("main")
-                            launchSingleTop = true
-                        }
                     }
                     else
                         Log.w(TAG, "Call button onClick listener did not find UA for $aor")
@@ -263,37 +283,14 @@ private fun TopAppBar(
                     contentDescription = "Call",
                 )
             }
-            val contact = Contact.findContact(peerUri)
-            if (contact != null && contact is Contact.BaresipContact && contact.email.isNotEmpty())
-                IconButton(
-                    onClick = {
-                        val ua = UserAgent.ofAor(account.aor)
-                        if (ua != null) {
-                            val contact = Contact.findContact(peerUri)
-                            if (contact != null && contact is Contact.BaresipContact &&
-                                    contact.email.isNotEmpty()) {
-                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                                    data = "mailto:${contact.email}".toUri()
-                                }
-                                try {
-                                    ctx.startActivity(emailIntent)
-                                } catch (e: Exception) {
-                                    Log.e(TAG, "Failed to start email activity: ${e.message}")
-                                }
-                            }
-                        }
-                        else
-                            Log.w(TAG, "Call button onClick listener did not find UA for $aor")
-                    }
-                ) {
-                    Icon(imageVector = Icons.Outlined.Email, contentDescription = "Email")
-                }
         }
     )
 }
 
 @Composable
 private fun ChatContent(
+    ctx: Context,
+    navController: NavController,
     contentPadding: PaddingValues,
     account: Account,
     peerUri: String,
@@ -301,35 +298,35 @@ private fun ChatContent(
     onMessageDeleted: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(contentPadding),
+        modifier = Modifier.fillMaxWidth().padding(contentPadding).background(Color(0xFFF9FAFB)),
         verticalArrangement = Arrangement.Bottom
     ) {
-        Account(account)
-        Spacer(modifier = Modifier.weight(1f))
-        Messages(account, peerUri, messages, onMessageDeleted)
+        Account(ctx, account)
+        Messages(ctx, navController, account, peerUri, messages, onMessageDeleted)
     }
 }
 
 @Composable
-private fun Account(account: Account) {
-    val ctx = LocalContext.current
+private fun Account(ctx: Context, account: Account) {
     Text(
         text = ctx.getString(R.string.account) + " " + account.text(),
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 8.dp),
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Normal,
+        color = Color.DarkGray,
         textAlign = TextAlign.Center
     )
 }
 
 @Composable
-private fun Messages(
+private fun ColumnScope.Messages(
+    ctx: Context,
+    navController: NavController,
     account: Account,
     peerUri: String,
     messages: List<Message>,
     onMessageDeleted: () -> Unit
 ) {
-    val ctx = LocalContext.current
     val peerName = Utils.friendlyUri(ctx, peerUri, account)
 
     val showDialog = remember { mutableStateOf(false) }
@@ -354,7 +351,6 @@ private fun Messages(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(messages) {
-        // Scroll to the bottom when new messages are added
         if (messages.isNotEmpty())
             coroutineScope.launch { lazyListState.scrollToItem(0) }
     }
@@ -362,91 +358,91 @@ private fun Messages(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 2.dp)
-            .verticalScrollbar(state = lazyListState)
-            .background(MaterialTheme.colorScheme.background),
+            .weight(1f)
+            .padding(horizontal = 16.dp)
+            .verticalScrollbar(state = lazyListState),
         reverseLayout = true,
         state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(items = messages, key = { message -> message.timeStamp }) { message ->
             val down = message.direction == MESSAGE_DOWN
-            val sender: String = if (down)
-                peerName
-            else if (BaresipService.uas.value.size == 1)
-                stringResource(R.string.you)
-            else
-                account.text()
             var info: String
             val cal = GregorianCalendar()
             cal.timeInMillis = message.timeStamp
-            val fmt: DateFormat = if (isToday(message.timeStamp))
-                DateFormat.getTimeInstance(DateFormat.SHORT)
-            else
-                DateFormat.getDateInstance(DateFormat.SHORT)
+            val fmt: DateFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
             info = fmt.format(cal.time)
-            if (info.length < 6) info = "${stringResource(R.string.today)} $info"
+
             if (message.direction == MESSAGE_UP_FAIL) {
                 info = if (message.responseCode != 0)
                     "$info - ${stringResource(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
                 else
                     "$info - ${stringResource(R.string.sending_failed)}"
             }
+
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 12.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (down) Arrangement.Start else Arrangement.End
             ) {
-                CustomElements.Button(
-                    onClick = {
-                        dialogMessage.value = ctx.getString(R.string.short_message_question)
-                        secondButtonText.value = ""
-                        lastButtonText.value = ctx.getString(R.string.delete)
-                        lastAction.value = {
-                            message.delete()
-                            onMessageDeleted()
-                        }
-                        showDialog.value = true
-                    },
-                    onLongClick = {
-                    },
-                    shape = if (message.direction == MESSAGE_DOWN)
-                        RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
-                    else
-                        RoundedCornerShape(20.dp, 10.dp, 50.dp, 20.dp),
-                    color =
-                        if (message.direction == MESSAGE_DOWN)
-                            MaterialTheme.colorScheme.secondaryContainer
-                        else
-                            MaterialTheme.colorScheme.primaryContainer,
+                androidx.compose.foundation.layout.Box(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(
-                            start = if (message.direction == MESSAGE_DOWN) 0.dp else 24.dp,
-                            end = if (message.direction == MESSAGE_DOWN) 24.dp else 0.dp
-                        )
+                        .padding(top = 4.dp, bottom = 4.dp)
+                        .clip(if (down) RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp) else RoundedCornerShape(12.dp, 12.dp, 0.dp, 12.dp))
+                        .background(if (down) Color.White else Color(0xFFE1F0FF))
+                        .clickable {
+                            if (Contact.findContact(peerUri) == null) {
+                                dialogMessage.value = String.format(
+                                    ctx.getString(R.string.long_message_question),
+                                    peerUri
+                                )
+                                secondButtonText.value = ctx.getString(R.string.add_contact)
+                                secondAction.value = { navController.navigate("contact/$peerUri/new") }
+                                lastButtonText.value = ctx.getString(R.string.delete)
+                                lastAction.value = {
+                                    message.delete()
+                                    onMessageDeleted()
+                                }
+                            } else {
+                                dialogMessage.value = ctx.getString(R.string.short_message_question)
+                                secondButtonText.value = ""
+                                lastButtonText.value = ctx.getString(R.string.delete)
+                                lastAction.value = {
+                                    message.delete()
+                                    onMessageDeleted()
+                                }
+                            }
+                            showDialog.value = true
+                        }
+                        .padding(12.dp)
                 ) {
                     Column {
-                        val textColor = if (message.direction == MESSAGE_DOWN)
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                        else
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        Row {
-                            Text(text = sender, fontSize = 12.sp, color = textColor)
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(text = info, fontSize = 12.sp, color = textColor)
+                        SelectionContainer {
+                            Text(
+                                text = message.message,
+                                color = Color.Black,
+                                fontSize = 16.sp,
+                                fontWeight = if (down && message.new) FontWeight.Bold else FontWeight.Normal
+                            )
                         }
-                        Row {
-                            SelectionContainer {
-                                Text(
-                                    text = message.message,
-                                    color = textColor,
-                                    fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
-                                        FontWeight.Bold else FontWeight.Normal
-                                )
-                            }
+                        Row(modifier = Modifier.align(Alignment.End).padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = info, fontSize = 10.sp, color = Color.Gray)
                         }
                     }
+                }
+            }
+        }
+        
+        // Today Badge at the top of the messages (end of reversed list)
+        item {
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center) {
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFFE5E7EB))
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Text(text = "Today", fontSize = 12.sp, color = Color.Black)
                 }
             }
         }
@@ -456,12 +452,13 @@ private fun Messages(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NewMessage(
+    ctx: Context,
     viewModel: ViewModel,
     account: Account,
     peerUri: String,
     addMessage: (message: Message) -> Unit
 ) {
-    val ctx = LocalContext.current
+
     val aor = account.aor
     val ua = UserAgent.ofAor(aor)!!
 
@@ -484,43 +481,132 @@ private fun NewMessage(
 
     Row(modifier = Modifier
         .fillMaxWidth()
+        .background(Color(0xFFF9FAFB))
         .navigationBarsPadding()
-        .padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp),
+        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
         OutlinedTextField(
             value = newMessage.value,
-            placeholder = { Text(stringResource(R.string.new_message)) },
+            placeholder = { Text("Type a message", color = Color.Gray) },
             onValueChange = {
                 newMessage.value = it
                 viewModel.updateAorPeerMessage(aor, peerUri, it.text)
             },
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp)
                 .verticalScroll(rememberScrollState())
                 .focusRequester(focusRequester)
                 .onGloballyPositioned {
                     if (!textFieldLoaded)
                         textFieldLoaded = true
                 },
-            singleLine = false,
+            shape = RoundedCornerShape(50),
+            colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedBorderColor = Color.LightGray,
+                unfocusedBorderColor = Color.LightGray,
+                cursorColor = Color.Black
+            ),
+            leadingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_emoji_svg),
+                    contentDescription = "Emoji",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(24.dp).padding(start = 4.dp).clickable {
+                        focusRequester.requestFocus()
+                        keyboardController?.show()
+                    }
+                )
+            },
             trailingIcon = {
-                if (newMessage.value.text.isNotEmpty()) {
+                IconButton(
+                    onClick = {
+                        val msgText = newMessage.value.text
+                        if (msgText.isNotEmpty()) {
+                            keyboardController?.hide()
+                            val time = System.currentTimeMillis()
+                            val msg = Message(
+                                aor,
+                                peerUri,
+                                msgText,
+                                time,
+                                MESSAGE_UP_WAIT,
+                                0,
+                                "",
+                                true
+                            )
+                            msg.add()
+                            var msgUri = ""
+                            addMessage(msg)
+                            if (ua.account.isMobile) {
+                                if (ua.status != circleGreen.getValue(colorblind)) {
+                                    dialogMessage.value = ctx.getString(R.string.airplane_mode)
+                                    showDialog.value = true
+                                }
+                                else {
+                                    val destination = Utils.uriUserPart(peerUri)
+                                    if (Utils.sendSms(ctx, destination, msgText)) {
+                                        msg.direction = MESSAGE_UP
+                                        newMessage.value = TextFieldValue("")
+                                        viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                        keyboardController?.hide()
+                                    }
+                                    else {
+                                        Toast.makeText(
+                                            ctx, "${ctx.getString(R.string.message_failed)}!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        msg.direction = MESSAGE_UP_FAIL
+                                        msg.responseReason = ctx.getString(R.string.message_failed)
+                                    }
+                                }
+                            }
+                            else {
+                                if (Utils.isTelUri(peerUri)) {
+                                    if (ua.account.telProvider == "") {
+                                        dialogMessage.value = String.format(
+                                            ctx.getString(R.string.no_telephony_provider),
+                                            Utils.plainAor(aor)
+                                        )
+                                        showDialog.value = true
+                                    }
+                                    else
+                                        msgUri = Utils.telToSip(peerUri, ua.account)
+                                }
+                                else
+                                    msgUri = peerUri
+                                if (msgUri != "") {
+                                    if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
+                                        Toast.makeText(
+                                            ctx, "${ctx.getString(R.string.message_failed)}!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        msg.direction = MESSAGE_UP_FAIL
+                                        msg.responseReason = ctx.getString(R.string.message_failed)
+                                    }
+                                    else {
+                                        newMessage.value = TextFieldValue("")
+                                        viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                        keyboardController?.hide()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ) {
                     Icon(
-                        Icons.Outlined.Clear,
-                        contentDescription = "Clear",
-                        modifier = Modifier.clickable {
-                            newMessage.value = TextFieldValue("")
-                            viewModel.updateAorPeerMessage(aor, peerUri, "")
-                        },
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_send_message_svg),
+                        contentDescription = "Send",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(24.dp).padding(end = 4.dp)
                     )
                 }
             },
-            label = { Text(stringResource(R.string.new_message)) },
-            textStyle = TextStyle(fontSize = 18.sp),
+            singleLine = false,
+            textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 keyboardType = KeyboardType.Text,
@@ -530,90 +616,6 @@ private fun NewMessage(
         LaunchedEffect(Unit) {
             if (newMessage.value.text.isNotEmpty())
                 focusRequester.requestFocus()
-        }
-        SmallFloatingActionButton(
-            modifier = Modifier.offset(y = 2.dp),
-            onClick = {
-                val msgText = newMessage.value.text
-                if (msgText.isNotEmpty()) {
-                    keyboardController?.hide()
-                    val time = System.currentTimeMillis()
-                    val msg = Message(
-                        aor,
-                        peerUri,
-                        msgText,
-                        time,
-                        MESSAGE_UP_WAIT,
-                        0,
-                        "",
-                        true
-                    )
-                    msg.add()
-                    var msgUri = ""
-                    addMessage(msg)
-                    if (ua.account.isMobile) {
-                        if (ua.status != circleGreen.getValue(colorblind)) {
-                            dialogMessage.value = ctx.getString(R.string.airplane_mode)
-                            showDialog.value = true
-                        }
-                        else {
-                            val destination = Utils.uriUserPart(peerUri)
-                            if (Utils.sendSms(ctx, destination, msgText)) {
-                                msg.direction = MESSAGE_UP
-                                newMessage.value = TextFieldValue("")
-                                viewModel.updateAorPeerMessage(aor, peerUri, "")
-                                keyboardController?.hide()
-                            }
-                            else {
-                                Toast.makeText(
-                                    ctx, "${ctx.getString(R.string.message_failed)}!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = ctx.getString(R.string.message_failed)
-                            }
-                        }
-                    }
-                    else {
-                        if (Utils.isTelUri(peerUri)) {
-                            if (ua.account.telProvider == "") {
-                                dialogMessage.value = String.format(
-                                    ctx.getString(R.string.no_telephony_provider),
-                                    Utils.plainAor(aor)
-                                )
-                                showDialog.value = true
-                            }
-                            else
-                                msgUri = Utils.telToSip(peerUri, ua.account)
-                        }
-                        else
-                            msgUri = peerUri
-                        if (msgUri != "") {
-                            if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
-                                Toast.makeText(
-                                    ctx, "${ctx.getString(R.string.message_failed)}!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = ctx.getString(R.string.message_failed)
-                            }
-                            else {
-                                newMessage.value = TextFieldValue("")
-                                viewModel.updateAorPeerMessage(aor, peerUri, "")
-                                keyboardController?.hide()
-                            }
-                        }
-                    }
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
-                modifier = Modifier.size(28.dp),
-                contentDescription = stringResource(R.string.add)
-            )
         }
     }
 }
