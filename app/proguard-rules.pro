@@ -9,13 +9,5 @@
 
 # Add any project specific keep options here:
 -keepattributes LineNumberTable,SourceFile
+-dontobfuscate
 
-# Keep classes and members accessed via JNI
--keep class com.tutpro.baresip.Api {
-    native <methods>;
-}
-
--keep class com.tutpro.baresip.BaresipService {
-    native <methods>;
-    @androidx.annotation.Keep <methods>;
-}
