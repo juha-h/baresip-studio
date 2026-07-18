@@ -1032,7 +1032,8 @@ class BaresipService: Service() {
                     "call outgoing" -> {
                         if (call!!.status.value == "transferring")
                             break
-                        speakerPhone = speakerPhoneAuto
+                        if (speakerPhoneAuto)
+                            speakerPhone = true
                         stopMediaPlayer()
                         setCallVolume()
                         ensureCommunicationMode()
@@ -1053,7 +1054,8 @@ class BaresipService: Service() {
                     }
 
                     "incoming call" -> {
-                        speakerPhone = speakerPhoneAuto
+                        if (speakerPhoneAuto)
+                            speakerPhone = true
                         val peerUri = ev[1]
                         var blockedCall = false
                         val toastMsg = if (Call.isAnyCallActive(this))
@@ -2753,17 +2755,6 @@ class BaresipService: Service() {
             }
         }
         else if (!Call.inCall() && currentMode == MODE_NORMAL) {
-            if (speakerPhone) {
-                Log.d(TAG, "Resetting speakerPhone UI state while idle")
-                speakerPhone = false
-                postServiceEvent(
-                    ServiceEvent(
-                        "speaker update,false",
-                        arrayListOf(0L, 0L),
-                        System.nanoTime()
-                    )
-                )
-            }
             return
         }
 
