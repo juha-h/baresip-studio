@@ -1,0 +1,4 @@
+- Added Edit button also to Android contact top app bar
+- Use baresip's missed call notification also for missed mobile calls
+- Restored capability to turn speakerphone on also before call starts
+- New translations from Weblate (Russian)
