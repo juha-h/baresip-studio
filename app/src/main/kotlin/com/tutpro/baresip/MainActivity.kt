@@ -250,15 +250,14 @@ class MainActivity : ComponentActivity() {
                         when (command) {
                             is NavigationCommand.NavigateToChat -> {
                                 val route = "chat/${command.aor}/${command.peerUri}"
-                                navController.navigate(route)
+                                navController.navigate(route) { launchSingleTop = true }
                             }
                             is NavigationCommand.NavigateToCalls -> {
                                 val route = "calls/${command.aor}"
-                                navController.navigate(route)
+                                navController.navigate(route) { launchSingleTop = true }
                             }
-                            is NavigationCommand.NavigateToChats -> {
-                                navController.navigate("chats")
-                            }
+                            is NavigationCommand.NavigateToChats ->
+                                navController.navigate("chats") { launchSingleTop = true }
                             is NavigationCommand.NavigateToHome ->
                                 navController.navigate("main") {
                                     popUpTo("main") { inclusive = true }
