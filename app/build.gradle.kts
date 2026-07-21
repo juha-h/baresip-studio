@@ -13,8 +13,8 @@ configure<ApplicationExtension> {
         applicationId = "com.tutpro.baresip.plus"
         minSdk = 28
         targetSdk = 36
-        versionCode = 289
-        versionName = "76.0.1"
+        versionCode = 290
+        versionName = "76.2.0"
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
