@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -594,9 +595,8 @@ private fun BottomBar(
             value = searchContactName,
             onValueChange = {
                 onSearchContactNameChange(it)
-                if (it.isBlank()) {
+                if (it.isBlank())
                     keyboardController?.hide()
-                }
             },
             modifier = Modifier.weight(1f),
             singleLine = true,
@@ -661,35 +661,45 @@ private fun ContactsContent(
 
     var lastSearchQuery by remember { mutableStateOf("") }
     LaunchedEffect(searchQuery) {
-        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank()) {
+        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank())
             lazyListState.scrollToItem(0)
-        }
         lastSearchQuery = searchQuery
     }
 
     val filteredContacts = remember(BaresipService.contacts, searchQuery) {
-        if (searchQuery.isBlank()) {
+        if (searchQuery.isBlank())
             BaresipService.contacts.map { contact ->
-                Pair(contact, buildAnnotatedString { append(contact.name()) })
+                Triple(contact, buildAnnotatedString { append(contact.name()) }, null)
             }
-        } else {
+        else {
             val normalizedQuery = Utils.unaccent(searchQuery)
-            BaresipService.contacts
-                .filter { contact ->
-                    Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
+            val numericQuery = searchQuery.filter { it.isDigit() || it == '+' }
+            BaresipService.contacts.mapNotNull { contact ->
+                val nameMatch = Utils.unaccent(contact.name()).contains(normalizedQuery, ignoreCase = true)
+                var matchingUri: Contact.ContactUri? = null
+                if (numericQuery.isNotEmpty()) {
+                    matchingUri = contact.uris().find {
+                        it.uri.startsWith("tel:") && it.uri.substring(4).contains(numericQuery)
+                    }
                 }
-                .map { contact ->
-                    Pair(contact, Utils.buildAnnotatedStringWithHighlight(contact.name(), searchQuery))
+                if (nameMatch || matchingUri != null) {
+                    val annotatedName = if (nameMatch)
+                        Utils.buildAnnotatedStringWithHighlight(contact.name(), searchQuery)
+                    else
+                        AnnotatedString(contact.name())
+                    Triple(contact, annotatedName, matchingUri)
+                } else {
+                    null
                 }
+            }
         }
     }
 
     LaunchedEffect(scrollToContact?.value, filteredContacts) {
         scrollToContact?.value?.let { name ->
             val index = filteredContacts.indexOfFirst { it.first.name() == name }
-            if (index != -1) {
+            if (index != -1)
                 lazyListState.scrollToItem(index)
-            }
             navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scrollToContact")
         }
     }
@@ -705,9 +715,8 @@ private fun ContactsContent(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         itemsIndexed(
-            filteredContacts, key = { index, (contact, _) -> "${contact.id()}_$index" }
-        ) { _, (contact, annotatedName) ->
-
+            filteredContacts, key = { index, (contact, _, _) -> "${contact.id()}_$index" }
+        ) { _, (contact, annotatedName, matchingUri) ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
@@ -721,9 +730,7 @@ private fun ContactsContent(
                                 bitmap = avatarImage.asImageBitmap(),
                                 contentDescription = "Avatar",
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
+                                modifier = Modifier.size(36.dp).clip(CircleShape)
                             )
                         else
                             TextAvatar(contact.name(), contact.color)
@@ -736,91 +743,73 @@ private fun ContactsContent(
                                 model = thumbNailUri,
                                 contentDescription = "Avatar",
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape),
+                                modifier = Modifier.size(36.dp).clip(CircleShape),
                             )
                         else
                             TextAvatar(contact.name(), contact.color)
                     }
                 }
-
-                when (contact) {
-
-                    is Contact.BaresipContact -> {
-                        Text(text = annotatedName,
-                            fontSize = 20.sp,
-                            fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 10.dp)
-                                .combinedClickable(
-                                    onClick = {
-                                        navController.navigate("contact/${contact.name()}/old")
-                                    },
-                                    onLongClick = {
-                                        title.value = confirmationText
-                                        message.value = String.format(
-                                            contactDeleteQuestion,
-                                            contact.name()
-                                        )
-                                        firstButtonText.value = cancelText
-                                        onFirstClicked.value = { }
-                                        lastButtonText.value = deleteText
-                                        onLastClicked.value = {
-                                            val id = contact.id
-                                            val avatarFile = File(
-                                                BaresipService.filesPath,
-                                                "$id.png"
-                                            )
-                                            if (avatarFile.exists()) {
-                                                try {
-                                                    avatarFile.delete()
-                                                } catch (e: IOException) {
-                                                    Log.e(
-                                                        TAG,
-                                                        "Could not delete file $id.png: ${e.message}"
-                                                    )
-                                                }
+                val textModifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp)
+                    .combinedClickable(
+                        onClick = { navController.navigate("contact/${contact.name()}/old") },
+                        onLongClick = {
+                            title.value = confirmationText
+                            message.value = String.format(contactDeleteQuestion, contact.name())
+                            firstButtonText.value = cancelText
+                            onFirstClicked.value = { }
+                            lastButtonText.value = deleteText
+                            onLastClicked.value = {
+                                when (contact) {
+                                    is Contact.BaresipContact -> {
+                                        val id = contact.id
+                                        val avatarFile = File(BaresipService.filesPath, "$id.png")
+                                        if (avatarFile.exists())
+                                            try {
+                                                avatarFile.delete()
+                                            } catch (e: IOException) {
+                                                Log.e(TAG, "Could not delete file $id.png: ${e.message}")
                                             }
-                                            Contact.removeBaresipContact(contact)
-                                        }
-                                        showDialog.value = true
+                                        Contact.removeBaresipContact(contact)
                                     }
-                                )
-                        )
-                    }
-
-                    is Contact.AndroidContact -> {
-                        Text(text = annotatedName,
-                            fontSize = 20.sp,
-                            fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
-                                .combinedClickable(
-                                    onClick = {
-                                        navController.navigate("contact/${contact.name()}/old")
-                                    },
-                                    onLongClick = {
-                                        title.value = confirmationText
-                                        message.value = String.format(
-                                            contactDeleteQuestion,
-                                            contact.name()
+                                    is Contact.AndroidContact -> {
+                                        ctx.contentResolver.delete(
+                                            ContactsContract.RawContacts.CONTENT_URI,
+                                            ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
+                                            null
                                         )
-                                        firstButtonText.value = cancelText
-                                        onFirstClicked.value = { }
-                                        lastButtonText.value = deleteText
-                                        onLastClicked.value = {
-                                            ctx.contentResolver.delete(
-                                                ContactsContract.RawContacts.CONTENT_URI,
-                                                ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
-                                                null
-                                            )
-                                        }
-                                        showDialog.value = true
                                     }
-                                )
+                                }
+                            }
+                            showDialog.value = true
+                        }
+                    )
+
+                Column(
+                    modifier = if (contact is Contact.AndroidContact)
+                        textModifier.padding(top = 4.dp, bottom = 4.dp)
+                    else
+                        textModifier
+                ) {
+                    Text(
+                        text = annotatedName,
+                        fontSize = 20.sp,
+                        fontStyle = if (contact.favorite()) FontStyle.Italic else FontStyle.Normal
+                    )
+                    if (matchingUri != null) {
+                        val tel = matchingUri.uri.substring(4)
+                        val annotatedTel = Utils.buildAnnotatedStringWithHighlight(
+                            tel,
+                            searchQuery.filter { it.isDigit() || it == '+' })
+                        Text(
+                            text = buildAnnotatedString {
+                                if (matchingUri.label.isNotEmpty())
+                                    append("${matchingUri.label} ")
+                                append(annotatedTel)
+                            },
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

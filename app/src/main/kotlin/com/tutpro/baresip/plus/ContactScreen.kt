@@ -650,7 +650,14 @@ private fun UrisSection(
                             },
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                            label = { Text("${stringResource(R.string.sip_or_tel_uri)} ${index + 1}") },
+                            label = {
+                                val labelText = when {
+                                    contactUri.uri.startsWith("sip:") -> stringResource(R.string.sip_uri)
+                                    contactUri.uri.startsWith("tel:") -> stringResource(R.string.tel_uri)
+                                    else -> stringResource(R.string.sip_or_tel_uri)
+                                }
+                                Text(labelText)
+                            },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                         )
                         OutlinedTextField(
@@ -707,15 +714,10 @@ private fun UrisSection(
         }
     else
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            uris.forEachIndexed { index, contactUri ->
+            uris.forEach { contactUri ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val uri = contactUri.uri
-                    val label = contactUri.label.ifEmpty {
-                        if (uri.startsWith("tel:"))
-                            "${stringResource(R.string.tel_uri)} ${index + 1}"
-                        else
-                            "${stringResource(R.string.sip_uri)} ${index + 1}"
-                    }
+                    val label = contactUri.label
 
                     OutlinedTextField(
                         value = uri.substringAfter(":"),
@@ -723,7 +725,15 @@ private fun UrisSection(
                         readOnly = true,
                         modifier = Modifier.weight(1f),
                         textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
-                        label = { Text(text = label, fontWeight = FontWeight.Bold) },
+                        label = {
+                            val labelText = label.ifEmpty {
+                                if (uri.startsWith("tel:"))
+                                    stringResource(R.string.tel_uri)
+                                else
+                                    stringResource(R.string.sip_uri)
+                            }
+                            Text(text = labelText, fontWeight = FontWeight.Bold)
+                        },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.outline,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
@@ -1099,6 +1109,7 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
     for (contactUri in contact.uris) {
         val uri = contactUri.uri
         val label = contactUri.label
+        @Suppress("DEPRECATION")
         val mimeType = if (uri.startsWith("sip:"))
             CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
         else
@@ -1147,6 +1158,7 @@ private fun updateAndroidContact(ctx: Context, rawContactId: Long, contact: Cont
 private fun addAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.ContactUri) {
     val uri = contactUri.uri
     val label = contactUri.label
+    @Suppress("DEPRECATION")
     val mimeType = if (uri.startsWith("sip:"))
         CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
     else
@@ -1173,6 +1185,7 @@ private fun addAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.
 private fun updateAndroidUri(ctx: Context, rawContactId: Long, contactUri: Contact.ContactUri): Int {
     val uri = contactUri.uri
     val label = contactUri.label
+    @Suppress("DEPRECATION")
     val mimeType = if (uri.startsWith("sip:"))
         CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
     else
