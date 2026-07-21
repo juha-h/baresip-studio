@@ -1,0 +1,3 @@
+- When searching contacts on contacts screen, show also contacts whose TEL URI matches the search string
+- Improved contact URI labeling
+- Fixed need to touch back button twice in order to leave chat screen
