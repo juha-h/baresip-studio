@@ -211,8 +211,10 @@ sealed class Contact {
                 ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
                 ContactsContract.Data.DATA2, ContactsContract.Data.PHOTO_THUMBNAIL_URI,
                 ContactsContract.Contacts.STARRED)
+            @Suppress("DEPRECATION")
+            val sipMime = ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
             val selection =
-                ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE + "' OR " +
+                ContactsContract.Data.MIMETYPE + "='" + sipMime + "' OR " +
                         ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "' OR " +
                         ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE + "'"
             val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
@@ -242,7 +244,7 @@ sealed class Contact {
                         if (contact.uris.none { it.uri == uri })
                             contact.uris.add(ContactUri(uri, label))
                     }
-                    ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE -> {
+                    sipMime -> {
                         val uri = "sip:$data"
                         if (contact.uris.none { it.uri == uri })
                             contact.uris.add(ContactUri(uri, ""))
