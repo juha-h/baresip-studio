@@ -241,7 +241,7 @@ private fun ContactsScreen(navController: NavController) {
                                 photoBase64 = line.substringAfter(":").trim()
                             }
                             line.startsWith("END:VCARD", ignoreCase = true) -> {
-                                if (name.isNotEmpty() && (uris.isNotEmpty() || email.isNotEmpty())) {
+                                if (name.isNotEmpty()) {
                                     val existingContact = newBaresipContacts.find { it.name == name }
                                     val contactId = existingContact?.id ?: (System.currentTimeMillis() + contactNo++)
                                     if (photoBase64.isNotEmpty())

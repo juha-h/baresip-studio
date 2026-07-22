@@ -178,7 +178,7 @@ private fun ContactScreen(
                 new = true,
                 isEditing = true,
                 name = "",
-                uris = if (uriOrNameArg == "") emptyList() else listOf(Contact.ContactUri(uriOrNameArg, "")),
+                uris = listOf(Contact.ContactUri(uriOrNameArg, "")),
                 email = "",
                 favorite = false,
                 android = BaresipService.contactsMode == "android",
@@ -288,8 +288,10 @@ private fun ContactScreen(
     }
 
     val onEdit: () -> Unit = {
-        if (screenState.isBaresipContact)
-            screenState = screenState.copy(isEditing = true)
+        if (screenState.isBaresipContact) {
+            val uris = screenState.uris.ifEmpty { listOf(Contact.ContactUri("", "")) }
+            screenState = screenState.copy(isEditing = true, uris = uris)
+        }
         else {
             val intent = Intent(Intent.ACTION_EDIT).apply {
                 val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, screenState.id)
@@ -908,16 +910,10 @@ private fun checkOnClick(
         newUris.add(Contact.ContactUri(u, contactUri.label))
     }
 
-    if (newUris.isEmpty() && currentState.email.trim().isEmpty()) {
-        alertTitle.value = ctx.getString(R.string.notice)
-        alertMessage.value = ctx.getString(R.string.sip_or_tel_uri)
-        showAlert.value = true
-        return false
-    }
-
     var newName = currentState.name.trim()
     if (newName == "")
         newName = if (newUris.isNotEmpty()) newUris[0].uri.substringAfter(":") else currentState.email
+
     if (!Utils.checkName(newName)) {
         alertTitle.value = ctx.getString(R.string.notice)
         alertMessage.value = String.format(ctx.getString(R.string.invalid_contact), newName)
