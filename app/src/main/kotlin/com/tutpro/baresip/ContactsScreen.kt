@@ -117,6 +117,7 @@ private fun ContactsScreen(navController: NavController) {
     val ok = stringResource(R.string.ok)
 
     var expanded by remember { mutableStateOf(false) }
+    val showModeDialog = remember { mutableStateOf(false) }
     val both = stringResource(R.string.both)
     val import = stringResource(R.string.import_contacts)
     val export = stringResource(R.string.export_contacts)
@@ -300,25 +301,9 @@ private fun ContactsScreen(navController: NavController) {
         listOf(if (BaresipService.contactAction == "call") call else showCall)
     }
 
-    val contactNames = remember(BaresipService.contactsMode) {
-        val names = mutableListOf("baresip", "Android", both)
-        val values = listOf("baresip", "android", "both")
-        val index = values.indexOf(BaresipService.contactsMode)
-        if (index != -1) {
-            val name = names.removeAt(index)
-            names.add(0, name)
-        }
-        names
-    }
-    val contactValues = remember(BaresipService.contactsMode) {
-        val values = mutableListOf("baresip", "android", "both")
-        val index = values.indexOf(BaresipService.contactsMode)
-        if (index != -1) {
-            val value = values.removeAt(index)
-            values.add(0, value)
-        }
-        values
-    }
+    val contactModeNames = remember(both) { listOf("baresip", "Android", both) }
+    val contactModeValues = listOf("baresip", "android", "both")
+    val currentContactModeName = contactModeNames[contactModeValues.indexOf(BaresipService.contactsMode)]
 
     val showDialog = remember { mutableStateOf(false) }
     val showNoticeDialog = remember { mutableStateOf(false) }
@@ -418,12 +403,17 @@ private fun ContactsScreen(navController: NavController) {
                         IconButton(onClick = { expanded = !expanded }) {
                             Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
                         }
+                        val contactModeMenuName = currentContactModeName
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames + contactActionName + import + export + delete,
+                            items = listOf(contactModeMenuName) + contactActionName + import + export + delete,
                             onItemClick = { name ->
                                 expanded = false
+                                if (name == contactModeMenuName) {
+                                    showModeDialog.value = true
+                                    return@DropdownMenu
+                                }
                                 if (name == call || name == showCall) {
                                     val newAction = if (BaresipService.contactAction == "call") "dial" else "call"
                                     BaresipService.contactAction = newAction
@@ -462,7 +452,14 @@ private fun ContactsScreen(navController: NavController) {
                                     showDialog.value = true
                                     return@DropdownMenu
                                 }
-                                val mode = contactValues[contactNames.indexOf(name)]
+                            }
+                        )
+                        CustomElements.SelectableAlertDialog(
+                            openDialog = showModeDialog,
+                            title = stringResource(R.string.contacts),
+                            items = contactModeNames,
+                            onItemClicked = { index ->
+                                val mode = contactModeValues[index]
                                 val contactsPermissions = arrayOf(
                                     Manifest.permission.READ_CONTACTS,
                                     Manifest.permission.WRITE_CONTACTS
