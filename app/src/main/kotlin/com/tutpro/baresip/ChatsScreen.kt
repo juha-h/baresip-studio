@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -67,6 +69,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -83,7 +86,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.DropdownMenu
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
@@ -137,6 +139,7 @@ private fun ChatsScreen(navController: NavController, aor: String) {
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -260,7 +263,6 @@ private fun Chats(
     account: Account,
     uaMessages: MutableState<List<Message>>
 ) {
-    val ctx = LocalContext.current
     val aor = account.aor
 
     val showDialog = remember { mutableStateOf(false) }
@@ -271,6 +273,14 @@ private fun Chats(
     val thirdAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
+
+    val shortChatQuestion = stringResource(R.string.short_chat_question)
+    val longChatQuestion = stringResource(R.string.long_chat_question)
+    val addContactText = stringResource(R.string.add_contact)
+    val blockText = stringResource(R.string.block)
+    val deleteText = stringResource(R.string.delete)
+    val anonymousText = stringResource(R.string.anonymous)
+    val unknownText = stringResource(R.string.unknown)
 
     if (showDialog.value)
         AlertDialog(
@@ -341,17 +351,17 @@ private fun Chats(
                 CustomElements.Button(
                     onClick = { navController.navigate("chat/${aor}/${message.peerUri}") },
                     onLongClick = {
-                        val peerName = Utils.friendlyUri(ctx, message.peerUri, account, includeLabel = false)
-                        val peerNameWithLabel = Utils.friendlyUri(ctx, message.peerUri, account)
+                        val peerName = Utils.friendlyUri(message.peerUri, account, includeLabel = false, anonymous = anonymousText, unknown = unknownText)
+                        val peerNameWithLabel = Utils.friendlyUri(message.peerUri, account, anonymous = anonymousText, unknown = unknownText)
                         val contactExists =
                             Contact.nameExists(peerName, BaresipService.contacts, false)
                         if (contactExists) {
                             dialogMessage.value = String.format(
-                                ctx.getString(R.string.short_chat_question),
+                                shortChatQuestion,
                                 peerNameWithLabel
                             )
                             secondButtonText.value = ""
-                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastButtonText.value = deleteText
                             lastAction.value = {
                                 deleteMessages(uaMessages, account, message.peerUri)
                             }
@@ -359,19 +369,19 @@ private fun Chats(
                         else {
                             dialogMessage.value =
                                 String.format(
-                                    ctx.getString(R.string.long_chat_question),
+                                    longChatQuestion,
                                     peerName
                                 )
-                            secondButtonText.value = ctx.getString(R.string.add_contact)
+                            secondButtonText.value = addContactText
                             secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
-                            thirdButtonText.value = ctx.getString(R.string.block)
+                            thirdButtonText.value = blockText
                             thirdAction.value = {
                                 if (!BlockRule.exists(message.peerUri)) {
                                     BaresipService.blockRules.add(BlockRule(message.peerUri))
                                     BlockRule.save()
                                 }
                             }
-                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastButtonText.value = deleteText
                             lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
                         }
                         showDialog.value = true
@@ -384,7 +394,7 @@ private fun Chats(
                     else
                         MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    val peerName = Utils.friendlyUri(ctx, message.peerUri, account)
+                    val peerName = Utils.friendlyUri(message.peerUri, account, anonymous = anonymousText, unknown = unknownText)
                     val cal = GregorianCalendar()
                     cal.timeInMillis = message.timeStamp
                     val fmt: DateFormat = if (isToday(message.timeStamp))
@@ -424,11 +434,16 @@ private fun Chats(
 
 @Composable
 private fun NewChatPeer(navController: NavController, account: Account) {
-    val ctx = LocalContext.current
 
     val alertTitle = remember { mutableStateOf("") }
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
+
+    val noticeText = stringResource(R.string.notice)
+    val noTelephonyProviderText = stringResource(R.string.no_telephony_provider)
+    val invalidSipOrTelUriText = stringResource(R.string.invalid_sip_or_tel_uri)
+    val contactNoTelUriText = stringResource(R.string.contact_no_tel_uri)
+    val contactNoSipOrTelUriText = stringResource(R.string.contact_no_sip_or_tel_uri)
 
     fun makeChat(navController: NavController, account: Account, chatPeer: String) {
         val peerUri = if (Utils.isTelNumber(chatPeer))
@@ -440,9 +455,9 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                 peerUri
             else
                 if (account.telProvider == "") {
-                    alertTitle.value = ctx.getString(R.string.notice)
+                    alertTitle.value = noticeText
                     alertMessage.value =
-                        String.format(ctx.getString(R.string.no_telephony_provider), account.aor)
+                        String.format(noTelephonyProviderText, account.aor)
                     showAlert.value = true
                     ""
                 } else
@@ -452,8 +467,8 @@ private fun NewChatPeer(navController: NavController, account: Account) {
             Utils.uriComplete(peerUri, account.aor)
         if (alertMessage.value.isEmpty()) {
             if (!Utils.checkUri(uri)) {
-                alertTitle.value = ctx.getString(R.string.notice)
-                alertMessage.value = String.format(ctx.getString(R.string.invalid_sip_or_tel_uri), uri)
+                alertTitle.value = noticeText
+                alertMessage.value = String.format(invalidSipOrTelUriText, uri)
                 showAlert.value = true
             }
             else
@@ -483,8 +498,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
         onNeutralClicked = {}
     )
 
-    val suggestions by remember { contactNames }
-    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
+    var filteredSuggestions by remember { mutableStateOf<List<Triple<Contact, AnnotatedString, Contact.ContactUri?>>>(emptyList()) }
     var showSuggestions by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
@@ -518,23 +532,40 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                         ) {
                             items(
                                 items = filteredSuggestions,
-                                key = { suggestion -> suggestion.toString() }
-                            ) { suggestion ->
+                                key = { (contact, _, _) -> "${contact.id()}" }
+                            ) { (contact, annotatedName, matchingUri) ->
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            newPeer = suggestion.toString()
+                                            val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
+                                            newPeer = uri.substringAfter(":")
                                             showSuggestions = false
                                         }
                                         .padding(12.dp)
                                 ) {
-                                    Text(
-                                        text = suggestion,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 18.sp
-                                    )
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Text(
+                                            text = annotatedName,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 18.sp
+                                        )
+                                        if (matchingUri != null) {
+                                            val tel = matchingUri.uri.substring(4)
+                                            val annotatedTel = Utils.buildAnnotatedStringWithHighlight(
+                                                tel,
+                                                newPeer.filter { c -> c.isDigit() || c == '+' })
+                                            Text(
+                                                text = buildAnnotatedString {
+                                                    if (matchingUri.label.isNotEmpty())
+                                                        append("${matchingUri.label} ")
+                                                    append(annotatedTel)
+                                                },
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -552,14 +583,25 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                         emptyList()
                     else {
                         val normalizedInput = Utils.unaccent(it)
-                        suggestions
-                            .filter { suggestion ->
-                                it.length > 1 &&
-                                    Utils.unaccent(suggestion).contains(normalizedInput, ignoreCase = true)
+                        val numericInput = it.filter { c -> c.isDigit() || c == '+' }
+                        BaresipService.contacts.mapNotNull { contact ->
+                            val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
+                            var matchingUri: Contact.ContactUri? = null
+                            if (numericInput.isNotEmpty()) {
+                                matchingUri = contact.uris().find { u ->
+                                    u.uri.startsWith("tel:") && u.uri.substring(4).contains(numericInput)
+                                }
                             }
-                            .map { suggestion ->
-                                Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                            if (nameMatch || matchingUri != null) {
+                                val annotatedName = if (nameMatch)
+                                    Utils.buildAnnotatedStringWithHighlight(contact.name(), it)
+                                else
+                                    AnnotatedString(contact.name())
+                                Triple(contact, annotatedName, matchingUri)
+                            } else {
+                                null
                             }
+                        }
                     }
                 },
                 modifier = Modifier.padding(end = 6.dp).fillMaxWidth(),
@@ -595,11 +637,11 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                     val uris = Contact.contactContactUris(peerText, account.isMobile)
                     if (uris.isEmpty()) {
                         if (Contact.nameExists(peerText, BaresipService.contacts, true)) {
-                            alertTitle.value = ctx.getString(R.string.notice)
+                            alertTitle.value = noticeText
                             alertMessage.value = if (account.isMobile)
-                                String.format(ctx.getString(R.string.contact_no_tel_uri), peerText)
+                                String.format(contactNoTelUriText, peerText)
                             else
-                                String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), peerText)
+                                String.format(contactNoSipOrTelUriText, peerText)
                             showAlert.value = true
                         } else {
                             makeChat(navController, account, peerText)

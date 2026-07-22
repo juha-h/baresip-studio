@@ -135,6 +135,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -153,7 +154,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.tutpro.baresip.BaresipService.Companion.circleGreen
 import com.tutpro.baresip.BaresipService.Companion.colorblind
-import com.tutpro.baresip.BaresipService.Companion.contactNames
 import com.tutpro.baresip.BaresipService.Companion.uas
 import com.tutpro.baresip.BaresipService.Companion.uasStatus
 import com.tutpro.baresip.CustomElements.AlertDialog
@@ -1177,8 +1177,7 @@ private fun CallUriRow(
 
     val isDialer = dialerState != null
 
-    val suggestions by remember { contactNames }
-    var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
+    var filteredSuggestions by remember { mutableStateOf<List<Triple<Contact, AnnotatedString, Contact.ContactUri?>>>(emptyList()) }
     val focusRequester = remember { FocusRequester() }
     val lazyListState = rememberLazyListState()
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
@@ -1201,16 +1200,28 @@ private fun CallUriRow(
                                 dialerState.showCallButton.value = true
                                 dialerState.showCallConferenceButton.value = true
                             }
-                            val normalizedInput = Utils.unaccent(it)
-                            filteredSuggestions = suggestions
-                                .filter { suggestion ->
-                                    it.length > 1 &&
-                                            Utils.unaccent(suggestion)
-                                                .contains(normalizedInput, ignoreCase = true)
+                            if (it.length > 1) {
+                                val normalizedInput = Utils.unaccent(it)
+                                val numericInput = it.filter { c -> c.isDigit() || c == '+' }
+                                filteredSuggestions = BaresipService.contacts.mapNotNull { contact ->
+                                    val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
+                                    var matchingUri: Contact.ContactUri? = null
+                                    if (numericInput.isNotEmpty()) {
+                                        matchingUri = contact.uris().find { u ->
+                                            u.uri.startsWith("tel:") && u.uri.substring(4).contains(numericInput)
+                                        }
+                                    }
+                                    if (nameMatch || matchingUri != null) {
+                                        val annotatedName = if (nameMatch)
+                                            Utils.buildAnnotatedStringWithHighlight(contact.name(), it)
+                                        else
+                                            AnnotatedString(contact.name())
+                                        Triple(contact, annotatedName, matchingUri)
+                                    } else {
+                                        null
+                                    }
                                 }
-                                .map { suggestion ->
-                                    Utils.buildAnnotatedStringWithHighlight(suggestion, it)
-                                }
+                            }
                             dialerState.showSuggestions.value = it.length > 1
                         }
                 },
@@ -1305,23 +1316,40 @@ private fun CallUriRow(
                         ) {
                             items(
                                 items = filteredSuggestions,
-                                key = { suggestion -> suggestion.toString() }
-                            ) { suggestion ->
+                                key = { (contact, _, _) -> "${contact.id()}" }
+                            ) { (contact, annotatedName, matchingUri) ->
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            dialerState.callUri.value = suggestion.toString()
+                                            val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
+                                            dialerState.callUri.value = uri.substringAfter(":")
                                             dialerState.showSuggestions.value = false
                                         }
                                         .padding(12.dp)
                                 ) {
-                                    Text(
-                                        text = suggestion,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 18.sp
-                                    )
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Text(
+                                            text = annotatedName,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 18.sp
+                                        )
+                                        if (matchingUri != null) {
+                                            val tel = matchingUri.uri.substring(4)
+                                            val annotatedTel = Utils.buildAnnotatedStringWithHighlight(
+                                                tel,
+                                                dialerState.callUri.value.filter { c -> c.isDigit() || c == '+' })
+                                            Text(
+                                                text = buildAnnotatedString {
+                                                    if (matchingUri.label.isNotEmpty())
+                                                        append("${matchingUri.label} ")
+                                                    append(annotatedTel)
+                                                },
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1617,8 +1645,7 @@ private fun CallRow(
                                     color = MaterialTheme.colorScheme.onSurface,
                                 )
                                 var transferUri by remember { mutableStateOf("") }
-                                val suggestions by remember { contactNames }
-                                var filteredSuggestions by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
+                                var filteredSuggestions by remember { mutableStateOf<List<Triple<Contact, AnnotatedString, Contact.ContactUri?>>>(emptyList()) }
                                 val focusRequester = remember { FocusRequester() }
                                 val lazyListState = rememberLazyListState()
                                 OutlinedTextField(
@@ -1629,14 +1656,25 @@ private fun CallRow(
                                             transferUri = it
                                             if (it.length > 1) {
                                                 val normalizedInput = Utils.unaccent(it)
-                                                filteredSuggestions = suggestions
-                                                    .filter { suggestion ->
-                                                        Utils.unaccent(suggestion)
-                                                            .contains(normalizedInput, ignoreCase = true)
+                                                val numericInput = it.filter { c -> c.isDigit() || c == '+' }
+                                                filteredSuggestions = BaresipService.contacts.mapNotNull { contact ->
+                                                    val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
+                                                    var matchingUri: Contact.ContactUri? = null
+                                                    if (numericInput.isNotEmpty()) {
+                                                        matchingUri = contact.uris().find { u ->
+                                                            u.uri.startsWith("tel:") && u.uri.substring(4).contains(numericInput)
+                                                        }
                                                     }
-                                                    .map { suggestion ->
-                                                        Utils.buildAnnotatedStringWithHighlight(suggestion, it)
+                                                    if (nameMatch || matchingUri != null) {
+                                                        val annotatedName = if (nameMatch)
+                                                            Utils.buildAnnotatedStringWithHighlight(contact.name(), it)
+                                                        else
+                                                            AnnotatedString(contact.name())
+                                                        Triple(contact, annotatedName, matchingUri)
+                                                    } else {
+                                                        null
                                                     }
+                                                }
                                             }
                                             call.showSuggestions.value = transferUri.length > 1
                                         }
@@ -1688,23 +1726,40 @@ private fun CallRow(
                                             ) {
                                                 items(
                                                     items = filteredSuggestions,
-                                                    key = { suggestion -> suggestion.toString() }
-                                                ) { suggestion ->
+                                                    key = { (contact, _, _) -> "${contact.id()}" }
+                                                ) { (contact, annotatedName, matchingUri) ->
                                                     Box(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-                                                                transferUri = suggestion.toString()
+                                                                val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
+                                                                transferUri = uri.substringAfter(":")
                                                                 call.showSuggestions.value = false
                                                             }
                                                             .padding(12.dp)
                                                     ) {
-                                                        Text(
-                                                            text = suggestion,
-                                                            modifier = Modifier.fillMaxWidth(),
-                                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                            fontSize = 18.sp
-                                                        )
+                                                        Column(modifier = Modifier.fillMaxWidth()) {
+                                                            Text(
+                                                                text = annotatedName,
+                                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                                fontSize = 18.sp
+                                                            )
+                                                            if (matchingUri != null) {
+                                                                val tel = matchingUri.uri.substring(4)
+                                                                val annotatedTel = Utils.buildAnnotatedStringWithHighlight(
+                                                                    tel,
+                                                                    transferUri.filter { c -> c.isDigit() || c == '+' })
+                                                                Text(
+                                                                    text = buildAnnotatedString {
+                                                                        if (matchingUri.label.isNotEmpty())
+                                                                            append("${matchingUri.label} ")
+                                                                        append(annotatedTel)
+                                                                    },
+                                                                    fontSize = 14.sp,
+                                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                                )
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
