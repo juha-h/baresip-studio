@@ -158,6 +158,13 @@ object Utils {
 
     fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true,
                     includeLabel: Boolean = true): String {
+        return friendlyUri(uri, account, e164Check, includeLabel,
+            ctx.getString(R.string.anonymous), ctx.getString(R.string.unknown))
+    }
+
+    fun friendlyUri(uri: String, account: Account, e164Check: Boolean = true,
+                    includeLabel: Boolean = true, anonymous: String = "Anonymous",
+                    unknown: String = "Unknown"): String {
         var u = Contact.contactName(uri, includeLabel)
         if (u != uri)
             return u
@@ -175,9 +182,9 @@ object Utils {
             return if (host == aorDomain(account.aor) || params.contains("user=phone"))
                 user
             else if (host == "anonymous.invalid")
-                ctx.getString(R.string.anonymous)
+                anonymous
             else if (host == "unknown.invalid")
-                ctx.getString(R.string.unknown)
+                unknown
             else if (params.isEmpty())
                 "$user@$host"
             else

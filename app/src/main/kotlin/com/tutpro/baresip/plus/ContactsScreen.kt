@@ -40,6 +40,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,6 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -117,6 +119,7 @@ private fun ContactsScreen(navController: NavController) {
     val ok = stringResource(R.string.ok)
 
     var expanded by remember { mutableStateOf(false) }
+    val showModeDialog = remember { mutableStateOf(false) }
     val both = stringResource(R.string.both)
     val import = stringResource(R.string.import_contacts)
     val export = stringResource(R.string.export_contacts)
@@ -239,7 +242,7 @@ private fun ContactsScreen(navController: NavController) {
                                 photoBase64 = line.substringAfter(":").trim()
                             }
                             line.startsWith("END:VCARD", ignoreCase = true) -> {
-                                if (name.isNotEmpty() && (uris.isNotEmpty() || email.isNotEmpty())) {
+                                if (name.isNotEmpty()) {
                                     val existingContact = newBaresipContacts.find { it.name == name }
                                     val contactId = existingContact?.id ?: (System.currentTimeMillis() + contactNo++)
                                     if (photoBase64.isNotEmpty()) {
@@ -315,25 +318,9 @@ private fun ContactsScreen(navController: NavController) {
         listOf(if (BaresipService.contactAction == "call") call else showCall)
     }
 
-    val contactNames = remember(BaresipService.contactsMode) {
-        val names = mutableListOf("baresip", "Android", both)
-        val values = listOf("baresip", "android", "both")
-        val index = values.indexOf(BaresipService.contactsMode)
-        if (index != -1) {
-            val name = names.removeAt(index)
-            names.add(0, name)
-        }
-        names
-    }
-    val contactValues = remember(BaresipService.contactsMode) {
-        val values = mutableListOf("baresip", "android", "both")
-        val index = values.indexOf(BaresipService.contactsMode)
-        if (index != -1) {
-            val value = values.removeAt(index)
-            values.add(0, value)
-        }
-        values
-    }
+    val contactModeNames = remember(both) { listOf("baresip", "Android", both) }
+    val contactModeValues = listOf("baresip", "android", "both")
+    val currentContactModeName = contactModeNames[contactModeValues.indexOf(BaresipService.contactsMode)]
 
     val showDialog = remember { mutableStateOf(false) }
     val showNoticeDialog = remember { mutableStateOf(false) }
@@ -455,9 +442,13 @@ private fun ContactsScreen(navController: NavController) {
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = contactNames + contactActionName + import + export + delete,
+                            items = listOf(currentContactModeName) + contactActionName + import + export + delete,
                             onItemClick = { name ->
                                 expanded = false
+                                if (name == currentContactModeName) {
+                                    showModeDialog.value = true
+                                    return@DropdownMenu
+                                }
                                 if (name == call || name == showCall) {
                                     val newAction = if (BaresipService.contactAction == "call") "dial" else "call"
                                     BaresipService.contactAction = newAction
@@ -496,7 +487,14 @@ private fun ContactsScreen(navController: NavController) {
                                     showDialog.value = true
                                     return@DropdownMenu
                                 }
-                                val mode = contactValues[contactNames.indexOf(name)]
+                            }
+                        )
+                        CustomElements.SelectableAlertDialog(
+                            openDialog = showModeDialog,
+                            title = stringResource(R.string.contacts),
+                            items = contactModeNames,
+                            onItemClicked = { index ->
+                                val mode = contactModeValues[index]
                                 val contactsPermissions = arrayOf(
                                     Manifest.permission.READ_CONTACTS,
                                     Manifest.permission.WRITE_CONTACTS
@@ -546,9 +544,21 @@ private fun ContactsScreen(navController: NavController) {
                 )
             }
         },
+        floatingActionButton = {
+            SmallFloatingActionButton(
+                onClick = { navController.navigate("contact//new") },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    modifier = Modifier.size(36.dp),
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
+        },
         bottomBar = {
             BottomBar(
-                navController = navController,
                 searchContactName = searchContactName,
                 onSearchContactNameChange = { searchContactName = it }
             )
@@ -577,11 +587,11 @@ private fun ContactsScreen(navController: NavController) {
 
 @Composable
 private fun BottomBar(
-    navController: NavController,
     searchContactName: String,
     onSearchContactNameChange: (String) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    var isFocused by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -598,8 +608,15 @@ private fun BottomBar(
                 if (it.isBlank())
                     keyboardController?.hide()
             },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { isFocused = it.isFocused },
             singleLine = true,
+            leadingIcon = if (!isFocused && searchContactName.isEmpty()) {
+                { Icon(Icons.Filled.Search, contentDescription = null) }
+            } else {
+                null
+            },
             trailingIcon = {
                 if (searchContactName.isNotEmpty())
                     Icon(
@@ -619,17 +636,6 @@ private fun BottomBar(
                 imeAction = ImeAction.Done
             )
         )
-        SmallFloatingActionButton(
-            onClick = { navController.navigate("contact//new") },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                modifier = Modifier.size(36.dp),
-                contentDescription = stringResource(R.string.add)
-            )
-        }
     }
 }
 
