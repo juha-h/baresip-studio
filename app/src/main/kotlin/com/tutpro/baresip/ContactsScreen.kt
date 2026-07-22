@@ -40,6 +40,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,6 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -403,14 +405,13 @@ private fun ContactsScreen(navController: NavController) {
                         IconButton(onClick = { expanded = !expanded }) {
                             Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
                         }
-                        val contactModeMenuName = currentContactModeName
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = listOf(contactModeMenuName) + contactActionName + import + export + delete,
+                            items = listOf(currentContactModeName) + contactActionName + import + export + delete,
                             onItemClick = { name ->
                                 expanded = false
-                                if (name == contactModeMenuName) {
+                                if (name == currentContactModeName) {
                                     showModeDialog.value = true
                                     return@DropdownMenu
                                 }
@@ -510,9 +511,21 @@ private fun ContactsScreen(navController: NavController) {
                 )
             }
         },
+        floatingActionButton = {
+            SmallFloatingActionButton(
+                onClick = { navController.navigate("contact//new") },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    modifier = Modifier.size(36.dp),
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
+        },
         bottomBar = {
             BottomBar(
-                navController = navController,
                 searchContactName = searchContactName,
                 onSearchContactNameChange = { searchContactName = it }
             )
@@ -541,11 +554,11 @@ private fun ContactsScreen(navController: NavController) {
 
 @Composable
 private fun BottomBar(
-    navController: NavController,
     searchContactName: String,
     onSearchContactNameChange: (String) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    var isFocused by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -562,8 +575,15 @@ private fun BottomBar(
                 if (it.isBlank())
                     keyboardController?.hide()
             },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { isFocused = it.isFocused },
             singleLine = true,
+            leadingIcon = if (!isFocused && searchContactName.isEmpty()) {
+                { Icon(Icons.Filled.Search, contentDescription = null) }
+            } else {
+                null
+            },
             trailingIcon = {
                 if (searchContactName.isNotEmpty())
                     Icon(
@@ -580,17 +600,6 @@ private fun BottomBar(
             textStyle = TextStyle(fontSize = 18.sp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
         )
-        SmallFloatingActionButton(
-            onClick = { navController.navigate("contact//new") },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                modifier = Modifier.size(36.dp),
-                contentDescription = stringResource(R.string.add)
-            )
-        }
     }
 }
 
