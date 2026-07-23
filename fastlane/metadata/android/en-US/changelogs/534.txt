@@ -1,0 +1,6 @@
+- Improved contact mode selection in contacts screen menu
+- Improved contacts screen search and new contact layout
+- Match search string to contacts' TEL URIs also on main and chats screens
+- Allow contact with name only
+- Improved contact's edit layout
+- Always show new incoming chat message last in the message list
