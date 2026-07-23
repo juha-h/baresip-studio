@@ -146,7 +146,7 @@ private fun ChatScreen(
     }
 
     val addMessage = { newMessage: Message ->
-        chatMessages = chatMessages + newMessage
+        chatMessages = listOf(newMessage) + chatMessages
     }
 
     DisposableEffect(key1 = lifecycleOwner, key2 = account.aor, key3 = peerUri) {
@@ -214,7 +214,15 @@ private fun TopAppBar(
     TopAppBar(
         title = {
             Text(
-                text = format(ctx.getString(R.string.chat_with), Utils.friendlyUri(ctx, peerUri, account)),
+                text = format(
+                    stringResource(R.string.chat_with),
+                    Utils.friendlyUri(
+                        uri = peerUri,
+                        account = account,
+                        anonymous = stringResource(R.string.anonymous),
+                        unknown = stringResource(R.string.unknown)
+                    )
+                ),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -226,7 +234,6 @@ private fun TopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
-            val ctx = LocalContext.current
             IconButton(
                 onClick = {
                     val serviceIntent = Intent(ctx, BaresipService::class.java)
@@ -337,9 +344,8 @@ private fun ChatContent(
 
 @Composable
 private fun Account(account: Account) {
-    val ctx = LocalContext.current
     Text(
-        text = ctx.getString(R.string.account) + " " + account.text(),
+        text = stringResource(R.string.account) + " " + account.text(),
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
@@ -354,8 +360,15 @@ private fun Messages(
     messages: List<Message>,
     onMessageDeleted: () -> Unit
 ) {
-    val ctx = LocalContext.current
-    val peerName = Utils.friendlyUri(ctx, peerUri, account)
+    val peerName = Utils.friendlyUri(
+        uri = peerUri,
+        account = account,
+        anonymous = stringResource(R.string.anonymous),
+        unknown = stringResource(R.string.unknown)
+    )
+
+    val shortMessageQuestion = stringResource(R.string.short_message_question)
+    val deleteString = stringResource(R.string.delete)
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
@@ -423,9 +436,9 @@ private fun Messages(
             ) {
                 CustomElements.Button(
                     onClick = {
-                        dialogMessage.value = ctx.getString(R.string.short_message_question)
+                        dialogMessage.value = shortMessageQuestion
                         secondButtonText.value = ""
-                        lastButtonText.value = ctx.getString(R.string.delete)
+                        lastButtonText.value = deleteString
                         lastAction.value = {
                             message.delete()
                             onMessageDeleted()
@@ -499,6 +512,10 @@ private fun NewMessage(
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
+
+    val airplaneMode = stringResource(R.string.airplane_mode)
+    val messageFailed = stringResource(R.string.message_failed)
+    val noTelephonyProvider = stringResource(R.string.no_telephony_provider)
 
     AlertDialog(
         showDialog = showDialog,
@@ -578,7 +595,7 @@ private fun NewMessage(
                     addMessage(msg)
                     if (ua.account.isMobile) {
                         if (ua.status != circleGreen.getValue(colorblind)) {
-                            dialogMessage.value = ctx.getString(R.string.airplane_mode)
+                            dialogMessage.value = airplaneMode
                             showDialog.value = true
                         }
                         else {
@@ -591,11 +608,11 @@ private fun NewMessage(
                             }
                             else {
                                 Toast.makeText(
-                                    ctx, "${ctx.getString(R.string.message_failed)}!",
+                                    ctx, "$messageFailed!",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = ctx.getString(R.string.message_failed)
+                                msg.responseReason = messageFailed
                             }
                         }
                     }
@@ -603,7 +620,7 @@ private fun NewMessage(
                         if (Utils.isTelUri(peerUri)) {
                             if (ua.account.telProvider == "") {
                                 dialogMessage.value = String.format(
-                                    ctx.getString(R.string.no_telephony_provider),
+                                    noTelephonyProvider,
                                     Utils.plainAor(aor)
                                 )
                                 showDialog.value = true
@@ -616,11 +633,11 @@ private fun NewMessage(
                         if (msgUri != "") {
                             if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
                                 Toast.makeText(
-                                    ctx, "${ctx.getString(R.string.message_failed)}!",
+                                    ctx, "$messageFailed!",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = ctx.getString(R.string.message_failed)
+                                msg.responseReason = messageFailed
                             }
                             else {
                                 newMessage.value = TextFieldValue("")
