@@ -87,11 +87,8 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material.icons.outlined.PauseCircle
-import androidx.compose.material.icons.outlined.Receipt
-import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
