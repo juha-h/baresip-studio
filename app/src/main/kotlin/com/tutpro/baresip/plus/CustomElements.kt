@@ -72,6 +72,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -79,6 +80,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import kotlin.jvm.JvmName
+
+data class MenuItem(
+    val text: String,
+    val icon: ImageVector? = null
+)
 
 object CustomElements {
 
@@ -118,6 +125,7 @@ object CustomElements {
     }
 
     @Composable
+    @JvmName("DropdownMenuString")
     fun DropdownMenu(
         expanded: Boolean,
         onDismissRequest: () -> Unit,
@@ -127,19 +135,43 @@ object CustomElements {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismissRequest,
+            menuItems = items.map { MenuItem(it) },
+            onItemClick = onItemClick
+        )
+    }
+
+    @Composable
+    fun DropdownMenu(
+        expanded: Boolean,
+        onDismissRequest: () -> Unit,
+        menuItems: List<MenuItem>,
+        onItemClick: (String) -> Unit
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = onDismissRequest,
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ) {
-            val itemsIterator = items.iterator()
+            val itemsIterator = menuItems.iterator()
             while (itemsIterator.hasNext()) {
-                val item = itemsIterator.next()
+                val menuItem = itemsIterator.next()
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = item,
+                            text = menuItem.text,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 16.sp
-                        ) },
-                    onClick = { onItemClick(item) }
+                        )
+                    },
+                    leadingIcon = {
+                        if (menuItem.icon != null)
+                            Icon(
+                                imageVector = menuItem.icon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                    },
+                    onClick = { onItemClick(menuItem.text) }
                 )
                 if (itemsIterator.hasNext())
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
