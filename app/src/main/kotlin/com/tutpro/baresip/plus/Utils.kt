@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.role.RoleManager
-import android.widget.Toast
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -38,11 +37,12 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.telecom.PhoneAccountHandle
+import android.telecom.TelecomManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
-import android.telecom.TelecomManager
-import android.telecom.PhoneAccountHandle
 import android.text.format.DateUtils
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -98,6 +98,9 @@ import com.tutpro.baresip.plus.Call.Companion.inCall
 
 object Utils {
 
+    val BARESIP_FILES = listOf("accounts", "call_history", "config", "contacts", "messages", "uuid",
+        "gzrtp.zid", "cert.pem", "ca_certs.crt", "blocked.json")
+
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
         val result = ArrayList<String>()
@@ -115,13 +118,13 @@ object Utils {
     }
 
     fun uriHostPart(uri: String): String {
-        return if (uri.contains("@")) {
+        return if (uri.contains("@"))
             uri.substringAfter("@")
                 .substringBefore(":")
                 .substringBefore(";")
                 .substringBefore("?")
                 .substringBefore(">")
-        } else {
+        else {
             val parts = uri.split(":")
             when (parts.size) {
                 2 -> parts[1].substringBefore(";")
@@ -203,7 +206,7 @@ object Utils {
     fun e164Uri(uri: String, countryCode: String): String {
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
-        return if (userPart.isNotEmpty() && userPart.isDigitsOnly()) {
+        return if (userPart.isNotEmpty() && userPart.isDigitsOnly())
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
                     scheme + "+" + userPart.substring(2))
@@ -212,7 +215,7 @@ object Utils {
                     "$scheme$countryCode")
                 else -> uri.replace(scheme, "$scheme$countryCode")
             }
-        } else
+        else
             uri
     }
 
@@ -241,21 +244,18 @@ object Utils {
         if (!checkSipUri(aor)) return false
         val params = uriParams(aor)
         return params.isEmpty() ||
-                ((params.size == 1) &&
-                        params[0] in arrayOf("transport=udp", "transport=tcp", "transport=tls"))
+                ((params.size == 1) && params[0] in arrayOf("transport=udp", "transport=tcp", "transport=tls"))
     }
 
     private fun checkTransport(transport: String, transports: Set<String>): Boolean {
-        return transport.split("=")[0] == "transport" &&
-                transport.split("=")[1].lowercase() in transports
+        return transport.split("=")[0] == "transport" && transport.split("=")[1].lowercase() in transports
     }
 
     fun checkStunUri(uri: String): Boolean {
         if (uri.substringBefore(":").lowercase() !in setOf("stun", "stuns", "turn", "turns"))
             return false
         return checkHostPort(uri.substringAfter(":").substringBefore("?")) &&
-                (uri.indexOf("?") == -1 ||
-                checkTransport(uri.substringAfter("?"), setOf("udp", "tcp")))
+                (uri.indexOf("?") == -1 || checkTransport(uri.substringAfter("?"), setOf("udp", "tcp")))
     }
 
     fun checkIpV4(ip: String): Boolean {
@@ -280,11 +280,10 @@ object Utils {
 
     fun checkDomain(domain: String): Boolean {
         val parts = domain.split(".")
-        for (p in parts) {
+        for (p in parts)
             if (p.endsWith("-") || p.startsWith("-") ||
                     !Regex("^[-a-zA-Z0-9]+$").matches(p))
                 return false
-        }
         return true
     }
 
@@ -370,9 +369,9 @@ object Utils {
                     checkUriUser(userRest[0]) && checkHostPortParams(userRest[1])
                 else -> false
             }
-        } else {
-            false
         }
+        else
+            false
     }
 
     fun isTelNumber(no: String): Boolean {
@@ -454,12 +453,8 @@ object Utils {
 
     fun implode(list: List<String>, sep: String): String {
         var res = ""
-        for (s in list) {
-            res = if (res == "")
-                s
-            else
-                res + sep + s
-        }
+        for (s in list)
+            res = if (res == "") s else res + sep + s
         return res
     }
 
@@ -472,9 +467,9 @@ object Utils {
         val normalizedName = unaccent(name)
         val normalizedQuery = unaccent(query)
         val startIndex = normalizedName.indexOf(normalizedQuery, ignoreCase = true)
-        return if (startIndex == -1) {
+        return if (startIndex == -1)
             buildAnnotatedString { append(name) }
-        } else {
+        else
             buildAnnotatedString {
                 append(name.take(startIndex))
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -482,7 +477,6 @@ object Utils {
                 }
                 append(name.drop(startIndex + normalizedQuery.length))
             }
-        }
     }
 
     fun isVisible(): Boolean {
@@ -526,14 +520,13 @@ object Utils {
     }
 
     fun checkPermissions(ctx: Context, permissions: Array<String>) : Boolean {
-        for (p in permissions) {
+        for (p in permissions)
             if (ContextCompat.checkSelfPermission(ctx, p) != PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "Permission $p is denied")
                 return false
-            } else {
-                Log.d(TAG, "Permission $p is granted")
             }
-        }
+            else
+                Log.d(TAG, "Permission $p is granted")
         return true
     }
 
@@ -569,13 +562,12 @@ object Utils {
     }
 
     fun deleteFile(file: File) {
-        if (file.exists()) {
+        if (file.exists())
             try {
                 file.delete()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not delete file ${file.absolutePath}: ${e.message}")
             }
-        }
     }
 
     fun deleteFile(ctx: Context, uri: Uri): Boolean {
@@ -589,7 +581,8 @@ object Utils {
                     Log.d(TAG, "File not found or could not be deleted: $uri")
                     return false
                 }
-            } else {
+            }
+            else {
                 Log.d(TAG, "Uri is not a document uri: $uri")
                 return false
             }
@@ -627,9 +620,7 @@ object Utils {
 
     fun File.copyInputStreamToFile(inputStream: InputStream): Boolean {
         try {
-            this.outputStream().use { fileOut ->
-                inputStream.copyTo(fileOut)
-            }
+            this.outputStream().use { fileOut -> inputStream.copyTo(fileOut) }
             return true
         }
         catch (e: IOException) {
@@ -777,9 +768,7 @@ object Utils {
         try {
             val stream = ctx.contentResolver.openOutputStream(uri)
             if (stream != null)
-                ObjectOutputStream(stream).use {
-                    it.writeObject(obj)
-                }
+                ObjectOutputStream(stream).use { it.writeObject(obj) }
             else {
                 Log.w(TAG, "encryptToUri: could not open output stream")
                 return false
@@ -829,7 +818,7 @@ object Utils {
                 val data = ByteArray(1024)
                 for (fileName in fileNames) {
                     val filePath = BaresipService.filesPath + "/" + fileName
-                    if (File(filePath).exists()) {
+                    if (File(filePath).exists())
                         FileInputStream(filePath).use { fi ->
                             BufferedInputStream(fi).use { origin ->
                                 val entry = ZipEntry(fileName)
@@ -841,7 +830,6 @@ object Utils {
                                 }
                             }
                         }
-                    }
                 }
             }
         } catch (e: IOException) {
@@ -852,8 +840,6 @@ object Utils {
     }
 
     fun unZip(zipFilePath: String): Boolean {
-        val allFiles = listOf("accounts", "call_history", "config", "contacts", "messages", "uuid",
-                "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt")
         val zipFiles = mutableListOf<String>()
         try {
             ZipFile(File(zipFilePath)).use { zip ->
@@ -874,7 +860,7 @@ object Utils {
             Log.e(TAG, "Failed to unzip file '$zipFilePath': $e")
             return false
         }
-        (allFiles - zipFiles.toSet()).iterator().forEach {
+        (BARESIP_FILES - zipFiles.toSet()).iterator().forEach {
             deleteFile(File(BaresipService.filesPath, it))
         }
         return true
@@ -973,7 +959,7 @@ object Utils {
         try {
             val getCallsMethod = TelecomManager::class.java.getMethod("getCalls")
             val calls = getCallsMethod.invoke(tm) as? List<*>
-            if (calls != null) {
+            if (calls != null)
                 for (c in calls) {
                     if (c == null) continue
                     val state = c.javaClass.getMethod("getState").invoke(c) as Int
@@ -986,7 +972,6 @@ object Utils {
                         }
                     }
                 }
-            }
         } catch (e: Exception) {
             Log.e(TAG, "isPSTNCallActive reflection error: $e")
         }
@@ -1002,7 +987,8 @@ object Utils {
         return if (DateUtils.isToday(time.timeInMillis)) {
             val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
             ctx.getString(R.string.today) + "\n" + fmt.format(time.time)
-        } else {
+        }
+        else {
             val month = time.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())!!
                 .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
             val day = time.get(Calendar.DAY_OF_MONTH)
@@ -1010,9 +996,9 @@ object Utils {
             if (time.get(Calendar.YEAR) == currentYear) {
                 val fmt = DateFormat.getTimeInstance(DateFormat.SHORT)
                 "$month $day" + "\n" + fmt.format(time.time)
-            } else {
-                "$month $day" + "\n" + time.get(Calendar.YEAR)
             }
+            else
+                "$month $day" + "\n" + time.get(Calendar.YEAR)
         }
     }
 
@@ -1045,7 +1031,8 @@ object Utils {
                     Log.d(TAG, "Setting com device to ${speakerDevice.type} in MODE_NORMAL")
                     if (!am.setCommunicationDevice(speakerDevice))
                         Log.e(TAG, "Could not set com device")
-                } else {
+                }
+                else {
                     val normalListener = object : AudioManager.OnModeChangedListener {
                         override fun onModeChanged(mode: Int) {
                             if (mode == AudioManager.MODE_NORMAL) {
@@ -1066,7 +1053,8 @@ object Utils {
                 Log.d(TAG, "New com device/mode is " +
                         "${am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN}/${am.mode}")
             }
-        } else {
+        }
+        else {
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn = enable
             Log.d(TAG, "Speakerphone is $enable")
@@ -1099,10 +1087,9 @@ object Utils {
     fun clearCommunicationDevice(am: AudioManager) {
         if (Build.VERSION.SDK_INT >= 31)
             am.clearCommunicationDevice()
-        else {
+        else
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn = false
-        }
     }
 
     fun mergeWavFiles(file1: File, file2: File, mergedFile: File): Boolean {
@@ -1390,10 +1377,9 @@ object Utils {
         return if (Build.VERSION.SDK_INT >= 29) {
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
             roleManager.isRoleHeld(RoleManager.ROLE_SMS)
-        } else {
+        } else
             @Suppress("DEPRECATION")
             android.provider.Telephony.Sms.getDefaultSmsPackage(ctx) == ctx.packageName
-        }
     }
 
     @Suppress("unused")
@@ -1449,9 +1435,9 @@ object Utils {
                 BaresipService.aecAvailable = true
                 aec.release()
                 Log.i(TAG, "Creation of hardware AEC for $sessionId succeeded")
-            } else {
-                Log.w(TAG, "Creation of hardware AEC for $sessionId failed")
             }
+            else
+                Log.w(TAG, "Creation of hardware AEC for $sessionId failed")
         }
         else
             Log.i(TAG, "Hardware AEC is NOT available")
@@ -1462,9 +1448,9 @@ object Utils {
                 BaresipService.agcAvailable = true
                 agc.release()
                 Log.d(TAG, "Creation of hardware AGC for $sessionId succeeded")
-            } else {
-                Log.w(TAG, "Creation of hardware AGC for $sessionId failed")
             }
+            else
+                Log.w(TAG, "Creation of hardware AGC for $sessionId failed")
         }
         else
             Log.i(TAG, "Hardware AGC is NOT available")
@@ -1475,9 +1461,9 @@ object Utils {
                 BaresipService.nsAvailable = true
                 ns.release()
                 Log.d(TAG, "Creation of hardware NS for $sessionId succeeded")
-            } else {
-                Log.w(TAG, "Creation of hardware NS for $sessionId failed")
             }
+            else
+                Log.w(TAG, "Creation of hardware NS for $sessionId failed")
         }
         else
             Log.i(TAG, "Hardware NS is NOT available")
