@@ -2791,8 +2791,7 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
 }
 
 private fun backup(ctx: Context, password: String) {
-    val files = arrayListOf("accounts", "config", "contacts", "call_history",
-        "messages", "uuid", "gzrtp.zid", "cert.pem", "ca_cert", "ca_certs.crt", "blocked.json")
+    val files = ArrayList(Utils.BARESIP_FILES)
     File(BaresipService.filesPath).walk().forEach {
         if (it.name.endsWith(".png"))
             files.add(it.name)
