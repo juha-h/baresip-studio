@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.role.RoleManager
-import android.widget.Toast
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -34,11 +33,12 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.telecom.PhoneAccountHandle
+import android.telecom.TelecomManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
-import android.telecom.TelecomManager
-import android.telecom.PhoneAccountHandle
 import android.text.format.DateUtils
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
@@ -1526,26 +1526,35 @@ object Utils {
     }
 
     @Suppress("unused")
-    fun listFilesInDirectory(directoryPath: String): List<File> {
-        val directory = File(directoryPath)
+    fun listFilesInDirectory(directory: File): List<File> {
         if (!directory.exists()) {
-            Log.w(TAG, "Directory does not exist: $directoryPath")
+            Log.w(TAG, "Directory does not exist: $directory")
             return emptyList()
         }
         if (!directory.isDirectory) {
-            Log.w(TAG, "Path is not a directory: $directoryPath")
+            Log.w(TAG, "Path is not a directory: $directory")
             return emptyList()
         }
         val files = directory.listFiles()
         if (files == null) {
             Log.e(
                 TAG,
-                "Failed to list files in directory (listFiles returned null): $directoryPath"
+                "Failed to list files in directory (listFiles returned null): $directory"
             )
             return emptyList()
         }
         return files.filter { it.isFile }
     }
+
+    /*
+    val files = LocalContext.current.filesDir.listFiles() ?: emptyArray()
+    for (file in files) {
+        val attrs = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
+        val creationTime = attrs.creationTime()
+        val fileSize = attrs.size()
+        Log.d(TAG, "file: ${file.name} $fileSize $creationTime")
+    }
+    */
 
     @SuppressLint("RestrictedApi")
     @Suppress("unused", "DEPRECATION")
