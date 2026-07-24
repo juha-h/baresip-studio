@@ -199,9 +199,7 @@ object CustomElements {
             bitmap = bitmap.asImageBitmap(),
             contentDescription = "Avatar",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
+            modifier = Modifier.size(36.dp).clip(CircleShape)
         )
     }
 
