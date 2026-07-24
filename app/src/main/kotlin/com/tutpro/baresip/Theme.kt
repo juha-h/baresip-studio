@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 @Composable
 fun AppTheme(
@@ -106,17 +107,23 @@ fun AppTheme(
         DisposableEffect(isDark) {
             val activity = context as? ComponentActivity
             if (activity != null) {
-                val barStyle = if (isDark)
-                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-                else
-                    SystemBarStyle.light(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
+                if (VERSION.SDK_INT < 35) {
+                    val barStyle = if (isDark)
+                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    else
+                        SystemBarStyle.light(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                        )
+                    activity.enableEdgeToEdge(
+                        statusBarStyle = barStyle,
+                        navigationBarStyle = barStyle
                     )
-                activity.enableEdgeToEdge(
-                    statusBarStyle = barStyle,
-                    navigationBarStyle = barStyle
-                )
+                } else {
+                    val controller = WindowCompat.getInsetsController(activity.window, view)
+                    controller.isAppearanceLightStatusBars = !isDark
+                    controller.isAppearanceLightNavigationBars = !isDark
+                }
                 if (VERSION.SDK_INT >= 29)
                     activity.window.isNavigationBarContrastEnforced = false
             }
