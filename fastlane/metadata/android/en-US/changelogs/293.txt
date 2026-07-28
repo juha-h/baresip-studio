@@ -1,0 +1,2 @@
+- Calls and messages are now backed up in JSON format (backup now to make sure that restore works in the future)
+- Added icons to main screen menu items
