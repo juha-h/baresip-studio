@@ -96,4 +96,3 @@ fun AboutScreen(onBack: () -> Unit) {
         )
     }
 }
-

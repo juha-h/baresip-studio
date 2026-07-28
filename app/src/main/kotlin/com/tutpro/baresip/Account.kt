@@ -66,9 +66,9 @@ class Account(val accp: Long, virtualAor: String? = null) {
                 if (ac != "") {
                     audioCodec.add(ac)
                     i++
-                } else {
-                    break
                 }
+                else
+                    break
             }
         }
 
@@ -91,14 +91,12 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
     fun print() : String {
 
-        var res = if (isMobile) {
+        var res = if (isMobile)
             "<sip:mobile@pstn;transport=udp>"
-        } else {
-            if (displayName != "")
-                "\"${displayName}\" "
-            else
+        else if (displayName != "")
+            "\"${displayName}\" "
+        else
                 ""
-        }
 
         if (!isMobile) {
             res = "$res<$luri>"
@@ -118,14 +116,11 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
         if (mediaNat != "") res += ";medianat=${mediaNat}"
 
-        if (stunServer != "")
-            res += ";stunserver=\"${stunServer}\""
+        if (stunServer != "") res += ";stunserver=\"${stunServer}\""
 
-        if (stunUser != "")
-            res += ";stunuser=\"${stunUser}\""
+        if (stunUser != "") res += ";stunuser=\"${stunUser}\""
 
-        if (stunPass != "")
-            res += ";stunpass=\"${stunPass}\""
+        if (stunPass != "") res += ";stunpass=\"${stunPass}\""
 
         if (audioCodec.isNotEmpty()) {
             var first = true
@@ -134,15 +129,14 @@ class Account(val accp: Long, virtualAor: String? = null) {
                 if (first) {
                     res += c
                     first = false
-                } else {
-                    res = "$res,$c"
                 }
+                else
+                    res = "$res,$c"
         }
 
         if (mediaEnc != "") res += ";mediaenc=${mediaEnc}"
 
-        if (rtcpMux)
-            res += ";rtcp_mux=yes"
+        if (rtcpMux) res += ";rtcp_mux=yes"
 
         res += if (rel100Mode == Api.REL100_ENABLED)
             ";100rel=yes"
@@ -159,55 +153,41 @@ class Account(val accp: Long, virtualAor: String? = null) {
         else
             "$res;mwi=yes;vm_uri=\"$vmUri\""
 
-        if (answerMode == Api.ANSWERMODE_AUTO)
-            res += ";answermode=auto"
+        if (answerMode == Api.ANSWERMODE_AUTO) res += ";answermode=auto"
 
-        if (autoRedirect)
-            res += ";sip_autoredirect=yes"
+        if (autoRedirect) res += ";sip_autoredirect=yes"
 
         res += ";ptime=20;regint=${regint};regq=0.5;pubint=0;inreq_allowed=yes"
 
-        if (isMobile)
-            res += ";call_transfer=no"
+        if (isMobile) res += ";call_transfer=no"
 
         var extra = ""
 
-        if (nickName != "")
-            extra += ";nickname=${nickName}"
+        if (nickName != "") extra += ";nickname=${nickName}"
 
-        if (isMobile)
-            extra += ";is_mobile=yes"
+        if (isMobile) extra += ";is_mobile=yes"
 
-        if (!callHistory)
-            extra += ";call_history=no"
+        if (!callHistory) extra += ";call_history=no"
 
-        if (blockUnknown)
-            extra += ";block_unknown=yes"
+        if (blockUnknown) extra += ";block_unknown=yes"
 
-        if (blockHidden)
-            extra += ";block_hidden=yes"
+        if (blockHidden) extra += ";block_hidden=yes"
 
-        if (telProvider != "")
-            extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
+        if (telProvider != "") extra += ";tel_provider=${URLEncoder.encode(telProvider, "UTF-8")}"
 
-        if (countryCode != "")
-            extra += ";country_code=$countryCode"
+        if (countryCode != "") extra += ";country_code=$countryCode"
 
-        if (configuredRegInt != REGISTRATION_INTERVAL)
-            extra += ";regint=$configuredRegInt"
+        if (configuredRegInt != REGISTRATION_INTERVAL) extra += ";regint=$configuredRegInt"
 
-        if (numericKeypad)
-            extra += ";numeric_keypad=yes"
+        if (numericKeypad) extra += ";numeric_keypad=yes"
 
         extra += ";last=empty"
 
-        if (customParams != "")
-            extra += ";$customParams"
+        if (customParams != "") extra += ";$customParams"
 
         res += ";extra=\"" + extra.substringAfter(";") + "\""
 
-        if (customParams != "")
-            res += ";$customParams"
+        if (customParams != "") res += ";$customParams"
 
         return res
     }
@@ -219,7 +199,8 @@ class Account(val accp: Long, virtualAor: String? = null) {
                 cxt.getString(R.string.one_new_message)
             else
                 "$vmNew ${cxt.getString(R.string.new_messages)}"
-        } else
+        }
+        else
             ""
 
         val old = if (vmOld > 0) {
@@ -227,21 +208,22 @@ class Account(val accp: Long, virtualAor: String? = null) {
                 cxt.getString(R.string.one_old_message)
             else
                     "$vmOld ${cxt.getString(R.string.old_messages)}"
-        } else
+        }
+        else
             ""
 
         var msg = cxt.getString(R.string.you_have)
         if (new != "") {
             msg = "$msg $new"
             if (old != "") msg = "$msg ${cxt.getString(R.string.and)} $old"
-        } else {
+        }
+        else
             msg = if (old != "")
                 "$msg $old"
             else
                 cxt.getString(R.string.no_messages)
-        }
 
-         return "$msg."
+        return "$msg."
     }
 
     fun host() : String {
@@ -277,9 +259,8 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
         fun accounts(): ArrayList<Account> {
             val res = ArrayList<Account>()
-            for (ua in BaresipService.uas.value) {
+            for (ua in BaresipService.uas.value)
                 res.add(ua.account)
-            }
             return res
         }
 
