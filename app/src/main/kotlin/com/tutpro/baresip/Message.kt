@@ -1,10 +1,13 @@
 package com.tutpro.baresip
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import java.io.*
 
+@Serializable
 class Message(val aor: String, val peerUri: String, val message: String, val timeStamp: Long,
               var direction: Int, var responseCode: Int, var responseReason: String,
-              var new: Boolean): Serializable {
+              var new: Boolean): java.io.Serializable {
 
     fun add() {
         val updatedMessages = synchronized(BaresipService.messages) {
@@ -41,6 +44,9 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
     }
 
     companion object {
+
+        @Suppress("unused")
+        const val serialVersionUID: Long = 434313168853691766L
 
         const val MESSAGE_HISTORY_SIZE = 100
 
@@ -133,30 +139,50 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             }
             val file = File(BaresipService.filesPath, "messages")
             try {
-                val fos = FileOutputStream(file)
-                val oos = ObjectOutputStream(fos)
-                oos.writeObject(messagesCopy)
-                oos.close()
-                fos.close()
-                Log.d(TAG, "Saved ${messagesCopy.size} messages")
-            } catch (e: IOException) {
-                Log.e(TAG, "OutputStream exception", e)
+                val jsonString = Json.encodeToString(messagesCopy)
+                file.writeText(jsonString)
+                Log.d(TAG, "Saved ${messagesCopy.size} messages in JSON")
+            } catch (e: Exception) {
+                Log.e(TAG, "Serialization exception", e)
+                try {
+                    val fos = FileOutputStream(file)
+                    val oos = ObjectOutputStream(fos)
+                    oos.writeObject(messagesCopy)
+                    oos.close()
+                    fos.close()
+                    Log.d(TAG, "Saved ${messagesCopy.size} messages in Java")
+                } catch (e2: IOException) {
+                    Log.e(TAG, "OutputStream exception", e2)
+                }
             }
         }
 
         fun restore() {
             val file = File(BaresipService.filesPath, "messages")
             if (file.exists()) {
+                val content = file.readText()
+                if (content.startsWith("[")) {
+                    try {
+                        val restoredMessages = Json.decodeFromString<List<Message>>(content)
+                        BaresipService.messages = restoredMessages
+                        Log.d(TAG, "Restored ${BaresipService.messages.size} messages from JSON")
+                        return
+                    } catch (e: Exception) {
+                        Log.d(TAG, "JSON restore failed, trying Java serialization: $e")
+                    }
+                }
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
                     @Suppress("UNCHECKED_CAST")
                     val restoredMessages = ois.readObject() as? List<Message>
-                    if (restoredMessages != null)
+                    if (restoredMessages != null) {
                         BaresipService.messages = restoredMessages
+                        Log.d(TAG, "Restored ${BaresipService.messages.size} messages from Java")
+                        save()
+                    }
                     ois.close()
                     fis.close()
-                    Log.d(TAG, "Restored ${BaresipService.messages.size} messages")
                 } catch (e: Exception) {
                     Log.e(TAG, "InputStream exception: - $e")
                 }

@@ -578,6 +578,7 @@ class BaresipService: Service() {
                     CallHistoryNew.restore()
                     Blocked.restore()
                     BlockRule.restore()
+                    Message.restore()
 
                     val recordings = File(filesDir, "recordings")
 
@@ -586,6 +587,7 @@ class BaresipService: Service() {
                         Log.d(TAG, "Clearing recordings")
                         CallHistoryNew.clearRecordings()
                         CallHistoryNew.save()
+                        Message.save()
                         if (recordings.exists())
                             recordings.deleteRecursively()
                         restored.delete()
@@ -593,8 +595,6 @@ class BaresipService: Service() {
 
                     File(filesDir, "recordings").mkdir()
                     File(filesDir, "tmp").mkdir()
-
-                    Message.restore()
                 }.start()
 
                 hotSpotAddresses = Utils.hotSpotAddresses()
