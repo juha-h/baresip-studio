@@ -1,18 +1,22 @@
 package com.tutpro.baresip.plus
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.io.Serializable
 import java.util.GregorianCalendar
 
-class CallHistoryNew(val aor: String, val peerUri: String, val direction: String) : Serializable {
+@Serializable
+class CallHistoryNew(val aor: String, val peerUri: String, val direction: String) : java.io.Serializable {
 
     // Set to time when call is established (if ever) or stopTime if call was completed elsewhere
+    @Serializable(with = Utils.GregorianCalendarSerializer::class)
     var startTime: GregorianCalendar? = null
+    @Serializable(with = Utils.GregorianCalendarSerializer::class)
     var stopTime = GregorianCalendar()        // Set to time when call is closed
     var rejected = false
     var recording = arrayOf("", "")           // Encoder and decoder recording files, merged file is in [0]
@@ -78,30 +82,48 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
             Log.d(TAG, "Saving history of ${historyCopy.size} calls")
             val file = File(BaresipService.filesPath + "/call_history")
             try {
-                val fos = FileOutputStream(file)
-                val oos = ObjectOutputStream(fos)
-                oos.writeObject(historyCopy)
-                oos.close()
-                fos.close()
-            } catch (e: IOException) {
-                Log.e(TAG, "OutputStream exception: $e")
-                e.printStackTrace()
+                val jsonString = Json.encodeToString(historyCopy)
+                file.writeText(jsonString)
+            } catch (e: Exception) {
+                Log.e(TAG, "Serialization exception: $e")
+                try {
+                    val fos = FileOutputStream(file)
+                    val oos = ObjectOutputStream(fos)
+                    oos.writeObject(historyCopy)
+                    oos.close()
+                    fos.close()
+                } catch (e2: IOException) {
+                    Log.e(TAG, "OutputStream exception: $e2")
+                }
             }
         }
 
         fun restore() {
             val file = File(BaresipService.filesPath + "/call_history")
             if (file.exists()) {
+                val content = file.readText()
+                if (content.startsWith("[")) {
+                    try {
+                        val restoredHistory = Json.decodeFromString<List<CallHistoryNew>>(content)
+                        BaresipService.callHistory = ArrayList(restoredHistory)
+                        Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls from JSON")
+                        return
+                    } catch (e: Exception) {
+                        Log.d(TAG, "JSON restore failed, trying Java serialization: $e")
+                    }
+                }
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)
                     @Suppress("UNCHECKED_CAST")
                     val restoredHistory = ois.readObject() as? List<CallHistoryNew>
-                    if (restoredHistory != null)
+                    if (restoredHistory != null) {
                         BaresipService.callHistory = ArrayList(restoredHistory)
+                        Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls from Java")
+                        save()
+                    }
                     ois.close()
                     fis.close()
-                    Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls")
                 } catch (e: Exception) {
                     Log.e(TAG, "InputStream exception: - $e")
                 }

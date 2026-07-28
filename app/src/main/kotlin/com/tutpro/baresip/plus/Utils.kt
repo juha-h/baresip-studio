@@ -53,9 +53,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
+import com.tutpro.baresip.plus.Call.Companion.inCall
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -92,9 +95,12 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
-import androidx.core.graphics.toColorInt
-import androidx.lifecycle.ProcessLifecycleOwner
-import com.tutpro.baresip.plus.Call.Companion.inCall
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 object Utils {
 
@@ -1610,5 +1616,15 @@ object Utils {
         if (p1.dnsServers != p2.dnsServers) return false
         if (p1.routes != p2.routes) return false
         return true
+    }
+
+    object GregorianCalendarSerializer : KSerializer<GregorianCalendar> {
+        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("GregorianCalendar", PrimitiveKind.LONG)
+        override fun serialize(encoder: Encoder, value: GregorianCalendar) = encoder.encodeLong(value.timeInMillis)
+        override fun deserialize(decoder: Decoder): GregorianCalendar {
+            val calendar = GregorianCalendar()
+            calendar.timeInMillis = decoder.decodeLong()
+            return calendar
+        }
     }
 }
