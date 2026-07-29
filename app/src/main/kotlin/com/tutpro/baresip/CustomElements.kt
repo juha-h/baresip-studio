@@ -147,6 +147,7 @@ object CustomElements {
         menuItems: List<MenuItem>,
         onItemClick: (String) -> Unit
     ) {
+        val hasAnyIcon = menuItems.any { it.icon != null }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismissRequest,
@@ -163,14 +164,19 @@ object CustomElements {
                             fontSize = 16.sp
                         )
                     },
-                    leadingIcon = {
-                        if (menuItem.icon != null)
-                            Icon(
-                                imageVector = menuItem.icon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                    },
+                    leadingIcon = if (hasAnyIcon) {
+                        {
+                            if (menuItem.icon != null)
+                                Icon(
+                                    imageVector = menuItem.icon,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            else
+                                Spacer(Modifier.size(24.dp))
+                        }
+                    }
+                    else null,
                     onClick = { onItemClick(menuItem.text) }
                 )
                 if (itemsIterator.hasNext())
