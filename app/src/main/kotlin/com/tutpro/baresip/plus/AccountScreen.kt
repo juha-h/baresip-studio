@@ -144,9 +144,7 @@ private fun AccountScreen(
                 resumeToggle = System.currentTimeMillis()
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     var isAccountAvailable by remember { mutableStateOf(false) }
@@ -259,8 +257,8 @@ private fun AccountContent(
                 val smsSubId = remember(toggle) { SubscriptionManager.getDefaultSmsSubscriptionId() }
 
                 if (voiceSubId != smsSubId &&
-                    voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID &&
-                    smsSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
+                        voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID &&
+                        smsSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
                 ) {
                     val voiceNumber = remember(voiceSubId, toggle) { Utils.getLine1Number(ctx, voiceSubId) }
                     AoRField(
@@ -441,9 +439,7 @@ private fun AccountContent(
                 else
                     PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = {
-                        showPassword.value = !showPassword.value
-                    }) {
+                    IconButton(onClick = { showPassword.value = !showPassword.value }) {
                         Icon(
                             if (showPassword.value)
                                 Icons.Filled.Visibility
@@ -709,9 +705,7 @@ private fun AccountContent(
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
                     Text(text = mediaEncMap[mediaEnc]!!)
                     Icon(
@@ -722,9 +716,8 @@ private fun AccountContent(
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = {
-                        isDropDownExpanded.value = false
-                    }) {
+                    onDismissRequest = { isDropDownExpanded.value = false }
+                ) {
                     var index = 0
                     mediaEncMap.forEach {
                         DropdownMenuItem(text = { Text(text = it.value) },
@@ -751,7 +744,8 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(mediaNatTitle,
+            Text(
+                text = mediaNatTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -767,9 +761,7 @@ private fun AccountContent(
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
-                    }
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
                 ) {
                     Text(text = mediaNatMap[mediaNat]!!)
                     Icon(
@@ -878,7 +870,7 @@ private fun AccountContent(
                 trailingIcon = {
                     IconButton(onClick = { showPassword.value = !showPassword.value }) {
                         Icon(
-                            if (showPassword.value)
+                            imageVector = if (showPassword.value)
                                 Icons.Filled.Visibility
                             else
                                 Icons.Filled.VisibilityOff,
@@ -911,7 +903,8 @@ private fun AccountContent(
             horizontalArrangement = Arrangement.Start
         ) {
             val rtcpMux by viewModel.rtcpMux.collectAsState()
-            Text(text = rtcpMuxTitle,
+            Text(
+                text = rtcpMuxTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -969,10 +962,13 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val dtmfModeMap = mapOf(Api.DTMFMODE_RTP_EVENT to dtmfInbandText,
+            val dtmfModeMap = mapOf(
+                Api.DTMFMODE_RTP_EVENT to dtmfInbandText,
                 Api.DTMFMODE_SIP_INFO to dtmfInfoText,
-                Api.DTMFMODE_AUTO to dtmfAutoText)
-            Text(text = dtmfModeTitle,
+                Api.DTMFMODE_AUTO to dtmfAutoText
+            )
+            Text(
+                text = dtmfModeTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -1032,8 +1028,7 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to manualText,
-                Api.ANSWERMODE_AUTO to autoText)
+            val answerModeMap = mapOf(Api.ANSWERMODE_MANUAL to manualText, Api.ANSWERMODE_AUTO to autoText)
             Text(text = answerModeTitle,
                 modifier = Modifier
                     .weight(1f)
@@ -1088,8 +1083,7 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val redirectModeMap = mapOf(false to manualText,
-                true to autoText)
+            val redirectModeMap = mapOf(false to manualText, true to autoText)
             Text(text = redirectModeTitle,
                 modifier = Modifier
                     .weight(1f)
@@ -1475,8 +1469,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     val ob = ArrayList<String>()
     var ob1 = viewModel.outbound1.value.trim().replace(" ", "")
     if (ob1 != "") {
-        if (!ob1.startsWith("sip:"))
-            ob1 = "sip:$ob1"
+        if (!ob1.startsWith("sip:")) ob1 = "sip:$ob1"
         if (checkOutboundUri(ob1))
             ob.add(ob1)
         else {
@@ -1488,8 +1481,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     }
     var ob2 = viewModel.outbound2.value.trim().replace(" ", "")
     if (ob2 != "") {
-        if (!ob2.startsWith("sip:"))
-            ob2 = "sip:$ob2"
+        if (!ob2.startsWith("sip:")) ob2 = "sip:$ob2"
         if (checkOutboundUri(ob2))
             ob.add(ob2)
         else {
@@ -1541,10 +1533,8 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             reRegister = true
         }
     }
-    else {
-        if (regInt != acc.configuredRegInt)
-            acc.configuredRegInt = regInt
-    }
+    else if (regInt != acc.configuredRegInt)
+        acc.configuredRegInt = regInt
 
     val newCheckOrigin = viewModel.checkOrigin.value
     if (newCheckOrigin != acc.checkOrigin) {
@@ -1581,8 +1571,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             (newMediaNat == "turn" &&
                     newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_server),
-                newStunServer)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_server), newStunServer)
             showAlert.value = true
             return false
         }
@@ -1626,8 +1615,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
         }
         else {
             alertTitle.value = noticeTitle
-            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_password),
-                newStunPass)
+            alertMessage.value = String.format(ctx.getString(R.string.invalid_stun_password), newStunPass)
             showAlert.value = true
             return false
         }
