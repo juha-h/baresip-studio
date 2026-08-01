@@ -229,7 +229,7 @@ fun BlockingContent(
         BlockHidden(acc)
         Spacer(Modifier.size(16.dp))
         Text(
-            text = stringResource(R.string.blocking_list),
+            text = stringResource(R.string.blocking_rules),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
