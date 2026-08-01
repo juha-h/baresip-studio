@@ -23,6 +23,11 @@ class BlockRule(
             return BaresipService.blockRules.any { it.aor == aor && it.pattern == pattern }
         }
 
+        fun clear(aor: String) {
+            BaresipService.blockRules.removeAll { it.aor == aor }
+            save()
+        }
+
         fun save() {
             Log.d(TAG, "Saving ${BaresipService.blockRules.size} block rules")
             val file = File(BaresipService.filesPath + "/blocking")

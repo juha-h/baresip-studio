@@ -870,6 +870,8 @@ class BaresipService: Service() {
                 Log.d(TAG, "Removing Mobile account on API < 29")
                 CallHistoryNew.clear(ua.account.aor)
                 Message.clearMessagesOfAor(ua.account.aor)
+                Blocked.clear(ua.account.aor)
+                BlockRule.clear(ua.account.aor)
                 Api.ua_destroy(uap)
                 Account.saveAccounts()
                 return
