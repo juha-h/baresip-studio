@@ -77,7 +77,9 @@ fun NavGraphBuilder.blockingScreenRoute(navController: NavController) {
 @Composable
 fun BlockingScreen(navController: NavController, viewModel: AccountViewModel, ua: UserAgent) {
     val acc = ua.account
-    var rules by remember { mutableStateOf(BaresipService.blockRules.toList()) }
+    var rules by remember {
+        mutableStateOf(BaresipService.blockRules.filter { it.aor == acc.aor || it.aor == "" })
+    }
 
     remember {
         viewModel.loadAccount(acc)
@@ -111,14 +113,14 @@ fun BlockingScreen(navController: NavController, viewModel: AccountViewModel, ua
                 )
             }
         },
-        bottomBar = { NewRule(onRuleAdded = { rules = BaresipService.blockRules.toList() }) },
+        bottomBar = { NewRule(acc.aor, onRuleAdded = { rules = BaresipService.blockRules.filter { it.aor == acc.aor || it.aor == "" } }) },
         content = { contentPadding ->
             BlockingContent(
                 contentPadding,
                 viewModel,
                 rules,
                 acc,
-                onRuleDeleted = { rules = BaresipService.blockRules.toList() }
+                onRuleDeleted = { rules = BaresipService.blockRules.filter { it.aor == acc.aor || it.aor == "" } }
             )
         },
     )
@@ -294,7 +296,7 @@ fun BlockingContent(
 }
 
 @Composable
-fun NewRule(onRuleAdded: () -> Unit) {
+fun NewRule(aor: String, onRuleAdded: () -> Unit) {
     val alertTitle = remember { mutableStateOf("") }
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
@@ -353,8 +355,8 @@ fun NewRule(onRuleAdded: () -> Unit) {
                 modifier = Modifier.offset(y = 2.dp),
                 onClick = {
                     if (pattern.trim().isNotEmpty()) {
-                        if (!BlockRule.exists(pattern.trim())) {
-                            BaresipService.blockRules.add(BlockRule(pattern.trim()))
+                        if (!BlockRule.exists(aor, pattern.trim())) {
+                            BaresipService.blockRules.add(BlockRule(aor, pattern.trim()))
                             BlockRule.save()
                             onRuleAdded()
                         }

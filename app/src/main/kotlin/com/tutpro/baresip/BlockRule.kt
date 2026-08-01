@@ -6,6 +6,7 @@ import java.io.File
 
 @Serializable
 class BlockRule(
+    val aor: String = "",
     val pattern: String
 ) {
     fun matches(uri: String): Boolean {
@@ -18,8 +19,8 @@ class BlockRule(
     }
 
     companion object {
-        fun exists(pattern: String): Boolean {
-            return BaresipService.blockRules.any { it.pattern == pattern }
+        fun exists(aor: String, pattern: String): Boolean {
+            return BaresipService.blockRules.any { it.aor == aor && it.pattern == pattern }
         }
 
         fun save() {
