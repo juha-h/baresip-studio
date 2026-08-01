@@ -416,7 +416,6 @@
     <string name="hidden_call_blocked">已自动拒绝来自隐藏来电者的来电</string>
     <string name="hidden_message_blocked">已自动拒绝来自隐藏发送者的消息</string>
     <string name="blocking">屏蔽</string>
-    <string name="blocking_list">屏蔽列表</string>
     <string name="new_blocking_rule">新建屏蔽规则</string>
     <string name="blocking_rule_help">屏蔽规则可以是纯字符串或正则表达式字符串。如果纯字符串包含在联系人 URI 中，或者如果正则表达式与联系人 URI 匹配，则通话或消息将被屏蔽。</string>
     <string name="blocking_delete_alert">是否要删除屏蔽规则“%1$s”？</string>

@@ -414,7 +414,6 @@
     <string name="hidden_call_blocked">Panggilan dari penelepon tersembunyi ditolak otomatis</string>
     <string name="hidden_message_blocked">Pesan dari pengirim tersembunyi ditolak otomatis</string>
     <string name="blocking">Pemblokiran</string>
-    <string name="blocking_list">Daftar Blokir</string>
     <string name="new_blocking_rule">Aturan Blokir Baru</string>
     <string name="blocking_rule_help">Aturan blokir dapat berupa string biasa atau string regular expression. Jika string biasa terdapat dalam URI pihak terkait atau string regular expression cocok dengan URI pihak terkait, panggilan atau pesan akan diblokir.</string>
     <string name="blocking_delete_alert">Apakah Anda ingin menghapus aturan blokir \'%1$s\'?</string>

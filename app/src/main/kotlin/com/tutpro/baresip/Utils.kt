@@ -104,8 +104,8 @@ import kotlinx.serialization.encoding.Encoder
 
 object Utils {
 
-    val BARESIP_FILES = listOf("accounts", "call_history", "config", "contacts", "messages", "uuid",
-        "gzrtp.zid", "cert.pem", "ca_certs.crt", "blocked.json")
+    val BARESIP_FILES = listOf("accounts", "call_history", "blocked", "blocking", "config",
+        "contacts", "messages", "uuid", "gzrtp.zid", "cert.pem", "ca_certs.crt")
 
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")

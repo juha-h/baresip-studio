@@ -282,7 +282,7 @@
     <string name="hidden_message_blocked">Estetty viesti tuntemattomalta lähettäjältä</string>
     <!-- Blocking Activity -->
     <string name="blocking">Estot</string>
-    <string name="blocking_list">Estolista</string>
+    <string name="blocking_rules">Estosäännöt</string>
     <string name="new_blocking_rule">Uusi estosääntö</string>
     <string name="blocking_rule_help">Estosääntö voi olla joko tavallinen merkkijono tai säännöllinen lauseke. Jos tavallinen merkkijono löytyy soittajan tai viestin lähettäjän URI:sta tai jos säännöllinen lauseke sopii siihen, niin puhelu tai viesti estetään.</string>
     <string name="blocking_delete_alert">Haluatko poistaa estosäännön \'%1$s\'?</string>

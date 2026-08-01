@@ -36,7 +36,7 @@ class Blocked (
 
         fun save() {
             Log.d(TAG, "Saving ${BaresipService.blocked.size} blocked calls and messages")
-            val file = File(BaresipService.filesPath + "/blocked.json")
+            val file = File(BaresipService.filesPath + "/blocked")
             try {
                 val jsonString = Json.encodeToString(BaresipService.blocked)
                 file.writeText(jsonString)
@@ -46,7 +46,12 @@ class Blocked (
         }
 
         fun restore() {
-            val file = File(BaresipService.filesPath + "/blocked.json")
+            val file = File(BaresipService.filesPath + "/blocked")
+            val oldFile = File(BaresipService.filesPath + "/blocked.json")
+            if (oldFile.exists()) {
+                Log.i(TAG, "Migrating blocked.json to blocked")
+                oldFile.renameTo(file)
+            }
             if (file.exists()) {
                 try {
                     val jsonString = file.readText()

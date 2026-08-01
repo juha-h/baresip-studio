@@ -24,7 +24,7 @@ class BlockRule(
 
         fun save() {
             Log.d(TAG, "Saving ${BaresipService.blockRules.size} block rules")
-            val file = File(BaresipService.filesPath + "/blocking.json")
+            val file = File(BaresipService.filesPath + "/blocking")
             try {
                 val jsonString = Json.encodeToString(BaresipService.blockRules)
                 file.writeText(jsonString)
@@ -34,7 +34,12 @@ class BlockRule(
         }
 
         fun restore() {
-            val file = File(BaresipService.filesPath + "/blocking.json")
+            val file = File(BaresipService.filesPath + "/blocking")
+            val oldFile = File(BaresipService.filesPath + "/blocking.json")
+            if (oldFile.exists()) {
+                Log.i(TAG, "Migrating blocking.json to blocking")
+                oldFile.renameTo(file)
+            }
             if (file.exists())
                 try {
                     val jsonString = file.readText()

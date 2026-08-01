@@ -466,7 +466,6 @@
     <string name="hidden_message_blocked">Mensaje auto‐rechazado del remitente oculto</string>
     <string name="sim_manager">Gestor SIM</string>
     <string name="blocking">Bloqueando</string>
-    <string name="blocking_list">Listado de bloqueos</string>
     <string name="new_blocking_rule">Nueva regla de bloqueo</string>
     <string name="blocking_rule_help">Regla de bloqueo puede ser una cadena simple o una expresión regular. Si la cadena simple es incluida en la URI emparejada o si la cadena de exp. reg. coincide con la pareja URL, la llamada o el mensaje será bloqueado.</string>
     <string name="blocking_delete_alert">¿Desea borrar regla de bloqueo \'%1$s\'?</string>
