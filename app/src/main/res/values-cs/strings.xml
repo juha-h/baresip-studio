@@ -410,7 +410,6 @@
     <string name="hidden_call_blocked">Automaticky odmítnout hovory od volajících se skrytou identitou</string>
     <string name="hidden_message_blocked">Automaticky odmítnout zprávy od odesílatelů se skrytou identitou</string>
     <string name="blocking">Blokování</string>
-    <string name="blocking_list">Seznam blokování</string>
     <string name="new_blocking_rule">Nové pravidlo blokování</string>
     <string name="blocking_rule_help">Pravidlo blokování může být buď obyčejný textový řetězec, nebo regulární výraz. Pokud URI protistrany obsahuje zadaný textový řetězec nebo odpovídá zadanému regulárnímu výrazu, hovor nebo zpráva budou zablokovány.</string>
     <string name="blocking_delete_alert">Opravdu chcete odstranit pravidlo blokování %1$s?</string>
