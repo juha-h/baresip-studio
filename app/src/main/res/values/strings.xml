@@ -274,7 +274,7 @@
     <string name="hidden_message_blocked">Auto-rejected message from hidden sender</string>
     <!-- Blocking Activity -->
     <string name="blocking">Blocking</string>
-    <string name="blocking_list">Blocking List</string>
+    <string name="blocking_rules">Blocking Rules</string>
     <string name="new_blocking_rule">New Blocking Rule</string>
     <string name="blocking_rule_help">Blocking rule can be either a plain string or a
         regular expression string. If plain string is included in the peer URI or if

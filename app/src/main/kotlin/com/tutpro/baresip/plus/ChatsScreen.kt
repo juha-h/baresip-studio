@@ -376,8 +376,8 @@ private fun Chats(
                             secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
                             thirdButtonText.value = blockText
                             thirdAction.value = {
-                                if (!BlockRule.exists(message.peerUri)) {
-                                    BaresipService.blockRules.add(BlockRule(message.peerUri))
+                                if (!BlockRule.exists(account.aor, message.peerUri)) {
+                                    BaresipService.blockRules.add(BlockRule(account.aor, message.peerUri))
                                     BlockRule.save()
                                 }
                             }

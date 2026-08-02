@@ -159,6 +159,8 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                             lastAction.value = {
                                 CallHistoryNew.clear(aor)
                                 Message.clearMessagesOfAor(aor)
+                                Blocked.clear(aor)
+                                BlockRule.clear(aor)
                                 ua.remove()
                                 Api.ua_destroy(ua.uap)
                                 Account.saveAccounts()

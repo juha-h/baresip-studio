@@ -400,7 +400,6 @@
     <string name="message_blocked">Автоматически отклонено заблокированное сообщение от %1$s</string>
     <string name="hidden_message_blocked">Автоматически отклонено сообщение от скрытого отправителя</string>
     <string name="blocking">Блокировка</string>
-    <string name="blocking_list">Список блокировки</string>
     <string name="new_blocking_rule">Новое правило блокировки</string>
     <string name="blocking_rule_help">Правило блокировки может быть простой строкой или регулярным выражением. Если простая строка содержится в URI собеседника или если регулярное выражение соответствует URI собеседника, вызов или сообщение будет заблокировано.</string>
     <string name="blocking_delete_alert">Удалить правило блокировки \'%1$s\'?</string>

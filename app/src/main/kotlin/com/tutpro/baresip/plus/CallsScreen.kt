@@ -462,8 +462,8 @@ private fun Calls(
                                     thirdButtonText.value = ""
                                     fourthButtonText.value = ctx.getString(R.string.block)
                                     fourthAction.value = {
-                                        if (!BlockRule.exists(peerUri)) {
-                                            BaresipService.blockRules.add(BlockRule(peerUri))
+                                        if (!BlockRule.exists(ua.account.aor, peerUri)) {
+                                            BaresipService.blockRules.add(BlockRule(ua.account.aor, peerUri))
                                             BlockRule.save()
                                         }
                                     }

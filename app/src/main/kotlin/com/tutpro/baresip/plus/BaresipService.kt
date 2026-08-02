@@ -882,6 +882,8 @@ class BaresipService: Service() {
                 Log.d(TAG, "Removing Mobile account on API < 29")
                 CallHistoryNew.clear(ua.account.aor)
                 Message.clearMessagesOfAor(ua.account.aor)
+                Blocked.clear(ua.account.aor)
+                BlockRule.clear(ua.account.aor)
                 Api.ua_destroy(uap)
                 Account.saveAccounts()
                 return
@@ -1110,7 +1112,7 @@ class BaresipService: Service() {
                             blockedCall = true
                             getString(R.string.hidden_call_blocked)
                         }
-                        else if (isBlocked(peerUri)) {
+                        else if (isBlocked(ua.account.aor, peerUri)) {
                             blockedCall = true
                             String.format(
                                 getString(R.string.call_blocked),
@@ -1591,7 +1593,7 @@ class BaresipService: Service() {
 
         if ((ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) ||
                 (ua.account.blockHidden && peerUri.contains("anonymous")) ||
-                    isBlocked(peerUri)) {
+                    isBlocked(aor, peerUri)) {
             Log.d(TAG, "Auto-rejecting blocked message from $peerUri")
             toast(
                 if (ua.account.blockHidden && peerUri.contains("anonymous"))
@@ -2266,7 +2268,7 @@ class BaresipService: Service() {
                     ).add()
                 return
             }
-            if (isBlocked(uri)) {
+            if (isBlocked(ua.account.aor, uri)) {
                 Log.d(TAG, "Auto-rejecting incoming PSTN call from $uri by block rule")
                 telecomCall.disconnect()
                 toast(
@@ -3281,9 +3283,9 @@ class BaresipService: Service() {
         var blocked = ArrayList<Blocked>()
         var blockRules = mutableListOf<BlockRule>()
 
-        fun isBlocked(uri: String): Boolean {
+        fun isBlocked(aor: String, uri: String): Boolean {
             for (rule in blockRules)
-                if (rule.matches(uri)) return true
+                if ((rule.aor == aor || rule.aor == "") && rule.matches(uri)) return true
             return false
         }
 
