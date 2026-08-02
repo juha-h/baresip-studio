@@ -1,0 +1,5 @@
+- Removed empty icon space from calls and contacts menu items
+- Renamed blocking_list string to blocking_rules string
+- Made blocking rules account specific
+- Cleared all account's blocking related records when account is deleted
+- New translations (Chinese)
