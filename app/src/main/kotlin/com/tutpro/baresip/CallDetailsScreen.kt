@@ -174,18 +174,21 @@ private fun Peer(ctx: Context, callRow: CallRow) {
 @Composable
 private fun Details(ctx: Context, details: SnapshotStateList<Details>, onDelete: (Details) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = stringResource(R.string.direction),
+        Text(
+            text = stringResource(R.string.direction),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.width(96.dp)
         )
         Spacer(modifier = Modifier.width(6.dp))
-        Text(text = stringResource(R.string.time),
+        Text(
+            text = stringResource(R.string.time),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = stringResource(R.string.calls_duration),
+        Text(
+            text = stringResource(R.string.calls_duration),
             modifier = Modifier.padding(end = 12.dp),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
@@ -336,8 +339,7 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                         }
                         else
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(ctx, "Source file not found", Toast.LENGTH_SHORT)
-                                    .show()
+                                Toast.makeText(ctx, "Source file not found", Toast.LENGTH_SHORT).show()
                             }
                     }
                 } catch (e: Exception) {
@@ -354,8 +356,7 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
         showDialog = showPlaybackDialog,
         mediaPlayer = mediaPlayer,
         onStop = {
-            if (mediaPlayer.isPlaying)
-                mediaPlayer.stop()
+            if (mediaPlayer.isPlaying) mediaPlayer.stop()
             mediaPlayer.reset()
             showPlaybackDialog.value = false
         }
@@ -504,16 +505,10 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                             }
                                         } catch (e: Exception) {
                                             Log.e(TAG, "Playback failed: $e")
-                                            Toast.makeText(
-                                                ctx, "Playback error",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            Toast.makeText(ctx, "Playback error", Toast.LENGTH_SHORT).show()
                                         }
                                     else
-                                        Toast.makeText(
-                                            ctx, "Failed to process audio file",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast.makeText(ctx, "Failed to process audio file", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
@@ -578,9 +573,7 @@ private fun PlaybackDialog(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { onStop() }) {
-                    Text(stringResource(R.string.stop))
-                }
+                TextButton(onClick = { onStop() }) { Text(stringResource(R.string.stop)) }
             }
         )
     }

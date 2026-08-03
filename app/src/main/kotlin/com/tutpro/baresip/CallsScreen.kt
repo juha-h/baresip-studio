@@ -101,21 +101,17 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     val ctx = LocalContext.current
 
     LaunchedEffect(ua, refreshTrigger) {
-        if (ua.account.isMobile)
-            Utils.cancelMissedCallsNotification(ctx)
+        if (ua.account.isMobile) Utils.cancelMissedCallsNotification(ctx)
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME)
-                refreshTrigger++
+            if (event == Lifecycle.Event.ON_RESUME) refreshTrigger++
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     BackHandler(enabled = true) {
@@ -137,14 +133,7 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
         },
         content = { contentPadding ->
             if (isHistoryLoaded)
-                CallsContent(
-                    LocalContext.current,
-                    navController,
-                    viewModel,
-                    contentPadding,
-                    ua,
-                    callHistory
-                )
+                CallsContent(LocalContext.current, navController, viewModel, contentPadding, ua, callHistory)
         },
     )
 }
@@ -206,9 +195,7 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
             }
         },
         actions = {
-            IconButton(
-                onClick = { expanded = !expanded }
-            ) {
+            IconButton(onClick = { expanded = !expanded }) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
             }
             CustomElements.DropdownMenu(
@@ -230,9 +217,8 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
                             account.callHistory = !account.callHistory
                             Account.saveAccounts()
                         }
-                        blocked -> {
+                        blocked ->
                             navController.navigate("blocked/invite/${account.aor}")
-                        }
                     }
                 }
             )
@@ -250,10 +236,7 @@ private fun CallsContent(
     callHistory: MutableState<List<CallRow>>
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(contentPadding)
-            .padding(bottom = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(contentPadding).padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Account(ua.account)
@@ -378,14 +361,13 @@ private fun Calls(
                                                     ctx.getString(R.string.airplane_mode)
                                                 showAlert.value = true
                                             }
-                                            else
-                                                if (!Utils.isDefaultSmsApp(ctx)) {
+                                            else if (!Utils.isDefaultSmsApp(ctx)) {
                                                     alertTitle.value = ctx.getString(R.string.notice)
                                                     alertMessage.value =
                                                         ctx.getString(R.string.enable_default_messaging)
                                                     showAlert.value = true
                                                 }
-                                                else {
+                                            else {
                                                 handleIntent(ctx, viewModel, intent, "message")
                                                 navController.navigateUp()
                                             }
@@ -478,22 +460,19 @@ private fun Calls(
                                 else
                                     CustomElements.TextAvatar(contact.name, contact.color)
                             }
-                            null -> {
+                            null ->
                                 Icon(
                                     imageVector = Icons.Filled.AccountCircle,
                                     contentDescription = "Avatar",
                                     modifier = Modifier.size(36.dp).scale(1.2f),
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
-                            }
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                         var count = 1
                         for (d in callRow.details) {
-                            if (d.recording.isNotEmpty() && d.recording[0] != "")
-                                recordings = true
-                            if (count > 3)
-                                continue
+                            if (d.recording.isNotEmpty() && d.recording[0] != "") recordings = true
+                            if (count > 3) continue
                             Icon(
                                 imageVector = if (callUp(d.direction))
                                     Icons.AutoMirrored.Filled.CallMade
@@ -557,10 +536,9 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
                     if (h.rejected) CALL_UP_RED else CALL_MISSED_OUT
             }
             if (res.isNotEmpty() && res.last().peerUri == h.peerUri)
-                res.last().details.add(CallRow.Details(
-                    direction, h.startTime,
-                    h.stopTime, h.recording.toList()
-                ))
+                res.last().details.add(
+                    CallRow.Details(direction, h.startTime, h.stopTime, h.recording.toList())
+                )
             else
                 res.add(CallRow(h.aor, h.peerUri, direction, h.startTime, h.stopTime, h.recording.toList()))
         }
