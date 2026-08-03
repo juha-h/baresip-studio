@@ -60,9 +60,7 @@ import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.accountsScreenRoute(navController: NavController) {
-    composable("accounts") {
-        AccountsScreen(navController)
-    }
+    composable("accounts") { AccountsScreen(navController) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,9 +94,7 @@ fun AccountsScreen(navController: NavController) {
             }
         },
         bottomBar = { NewAccount(navController) },
-        content = { contentPadding ->
-            AccountsContent(contentPadding, navController)
-        },
+        content = { contentPadding -> AccountsContent(contentPadding, navController) },
     )
 }
 
@@ -137,9 +133,7 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                 val account = ua.account
                 val aor = account.aor
                 val text = account.text()
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = text,
                         fontSize = 20.sp,
@@ -147,9 +141,7 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = 10.dp)
-                            .clickable {
-                                navController.navigate("account/$aor/old")
-                            }
+                            .clickable { navController.navigate("account/$aor/old") }
                     )
                     val deleteAccountMessage = stringResource(R.string.delete_account)
                     SmallFloatingActionButton(
@@ -266,20 +258,17 @@ fun NewAccount(navController: NavController) {
                 },
             singleLine = false,
             trailingIcon = {
-                if (newAor.isNotEmpty()) {
+                if (newAor.isNotEmpty())
                     Icon(
                         Icons.Outlined.Clear,
                         contentDescription = "Clear",
                         modifier = Modifier.clickable { newAor = "" },
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
             },
             label = { Text(stringResource(R.string.new_account)) },
             textStyle = TextStyle(fontSize = 18.sp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-            )
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
         SmallFloatingActionButton(
             modifier = Modifier.offset(y = 2.dp),
