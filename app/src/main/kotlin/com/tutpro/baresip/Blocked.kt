@@ -16,9 +16,7 @@ class Blocked (
 
     fun add() {
         BaresipService.blocked.add(this)
-        val aorBlocked = BaresipService.blocked.filter {
-            it.aor == this.aor && it.request == this.request
-        }
+        val aorBlocked = BaresipService.blocked.filter { it.aor == this.aor && it.request == this.request }
         if (aorBlocked.size > blockedSize) {
             val oldestToRemove = aorBlocked.first()
             BaresipService.blocked.remove(oldestToRemove)
