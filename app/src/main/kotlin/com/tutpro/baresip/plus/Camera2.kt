@@ -83,11 +83,10 @@ class Camera2(
                         in 225 until 315 -> 90
                         else -> 0
                     }
-                    val degrees = if (isFrontFacing) {
+                    val degrees = if (isFrontFacing)
                         (sensorOrientation + rotation) % 360
-                    } else {
+                    else
                         (sensorOrientation - rotation + 360) % 360
-                    }
                     setRotation(userData, degrees)
                 }
             }
