@@ -5,10 +5,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 @Serializable
-class BlockRule(
-    val aor: String = "",
-    val pattern: String
-) {
+class BlockRule(val aor: String = "", val pattern: String) {
     fun matches(uri: String): Boolean {
         if (uri.contains(pattern, ignoreCase = true)) return true
         return try {

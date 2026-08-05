@@ -2827,10 +2827,9 @@ class BaresipService: Service() {
 
         val isSpeakerphoneOn = if (VERSION.SDK_INT >= 31)
             am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-        else {
+        else
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn
-        }
 
         if (Call.inCall() && isAnyCallMode) {
             cleanupRunnable?.let {
@@ -2846,9 +2845,8 @@ class BaresipService: Service() {
                 }
             }
         }
-        else if (!Call.inCall() && currentMode == MODE_NORMAL) {
+        else if (!Call.inCall() && currentMode == MODE_NORMAL)
             return
-        }
 
         Log.d(TAG, "Scheduling ensureCommunicationMode (current: $currentMode) in 500ms " +
                 "(target speaker: $speakerPhone)")
@@ -2867,21 +2865,21 @@ class BaresipService: Service() {
                 if (InCallService.instance != null) {
                     Log.d(TAG, "Using InCallService for audio route: $speakerPhone")
                     @Suppress("DEPRECATION")
-                    InCallService.instance!!.setAudioRoute(
-                        if (speakerPhone)
-                            android.telecom.CallAudioState.ROUTE_SPEAKER
-                        else
-                            android.telecom.CallAudioState.ROUTE_EARPIECE
-                    )
+                    val currentRoute = InCallService.instance!!.callAudioState?.route ?:
+                        android.telecom.CallAudioState.ROUTE_EARPIECE
+                    @Suppress("DEPRECATION")
+                    if (speakerPhone)
+                        InCallService.instance!!.setAudioRoute(android.telecom.CallAudioState.ROUTE_SPEAKER)
+                    else if (currentRoute == android.telecom.CallAudioState.ROUTE_SPEAKER)
+                        InCallService.instance!!.setAudioRoute(android.telecom.CallAudioState.ROUTE_EARPIECE)
                 }
                 else if (!hasTelecom) {
                     Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
                     Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
                 }
                 else
-                    for (c in Call.calls()) {
+                    for (c in Call.calls())
                         ConnectionService.setOutput(c.callp, speakerPhone)
-                    }
             }
             else {
                 if (am.mode != MODE_NORMAL) {

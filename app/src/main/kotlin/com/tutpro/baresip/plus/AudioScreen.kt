@@ -125,8 +125,8 @@ private fun AudioScreen(onBack: () -> Unit, checkOnClick: () -> Unit) {
                 )
             }
         }
-    ) { contentPadding ->
-        AudioContent(contentPadding)
+    ) {
+        contentPadding -> AudioContent(contentPadding)
     }
 }
 
@@ -161,8 +161,7 @@ private fun AudioContent(contentPadding: PaddingValues) {
         newAudioModules[module] = oldAudioModules.contains("${module}.so")
     oldOpusBitrate = Config.variable("opus_bitrate")
     oldOpusPacketLoss = Config.variable("opus_packet_loss")
-    if (!BaresipService.agcAvailable)
-        oldMicGain = Config.variable("augain")
+    if (!BaresipService.agcAvailable) oldMicGain = Config.variable("augain")
 
     if (showAlert.value)
         AlertDialog(
@@ -201,10 +200,12 @@ private fun Ringtone() {
     val selectRingToneMessage = stringResource(R.string.select_ringtone)
     val ctx = LocalContext.current
     var ringtoneUri by remember {
-        mutableStateOf(if (Preferences(ctx).ringtoneUri == "")
+        mutableStateOf(
+            if (Preferences(ctx).ringtoneUri == "")
             RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE).toString()
         else
-            Preferences(ctx).ringtoneUri!!)
+            Preferences(ctx).ringtoneUri!!
+        )
     }
     newRingtoneUri = ringtoneUri
     val launcher = rememberLauncherForActivityResult(
@@ -263,7 +264,8 @@ private fun ToneCountry() {
     ) {
         val toneCountryTitle = stringResource(R.string.tone_country)
         val toneCountryHelp = stringResource(R.string.tone_country_help)
-        Text(text = toneCountryTitle,
+        Text(
+            text = toneCountryTitle,
             modifier = Modifier
                 .weight(1f)
                 .clickable {
@@ -273,9 +275,7 @@ private fun ToneCountry() {
                 },
             fontSize = 18.sp
         )
-        val isDropDownExpanded = remember {
-            mutableStateOf(false)
-        }
+        val isDropDownExpanded = remember { mutableStateOf(false) }
         val countryNames = arrayListOf("BG", "BR", "DE", "CZ", "ES", "FI", "FR", "GB", "JP", "NO", "NZ", "SE", "RU", "US")
         val countryValues = arrayListOf("bg", "br", "de", "cz", "es", "fi", "fr", "uk", "jp", "no", "nz", "se", "ru", "us")
         val itemPosition = remember {
@@ -286,9 +286,7 @@ private fun ToneCountry() {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
+                modifier = Modifier.clickable { isDropDownExpanded.value = true }
             ) {
                 Text(text = countryNames[itemPosition.intValue])
                 Icon(
@@ -357,7 +355,8 @@ private fun CallVolume() {
     ) {
         val defaultCallVolumeTitle = stringResource(R.string.default_call_volume)
         val defaultCallVolumeHelp = stringResource(R.string.default_call_volume_help)
-        Text(text = defaultCallVolumeTitle,
+        Text(
+            text = defaultCallVolumeTitle,
             modifier = Modifier.weight(1f)
                 .clickable {
                     alertTitle.value = defaultCallVolumeTitle
@@ -377,9 +376,7 @@ private fun CallVolume() {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
+                modifier = Modifier.clickable { isDropDownExpanded.value = true }
             ) {
                 Text(text = volNames[itemPosition.intValue])
                 Icon(
@@ -449,14 +446,15 @@ private fun AudioModules() {
     ) {
         val audioModulesTitle = stringResource(R.string.audio_modules_title)
         val audioModulesHelp = stringResource(R.string.audio_modules_help)
-        Text(text = audioModulesTitle,
+        Text(
+            text = audioModulesTitle,
             fontSize = 18.sp,
             modifier = Modifier.clickable {
                 alertTitle.value = audioModulesTitle
                 alertMessage.value = audioModulesHelp
                 showAlert.value = true
             })
-        for (module in Config.audioModules) {
+        for (module in Config.audioModules)
             Row(horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 18.dp, end = 10.dp)
@@ -472,7 +470,6 @@ private fun AudioModules() {
                     }
                 )
             }
-        }
     }
 }
 
@@ -596,8 +593,7 @@ private fun checkOnClick(ctx: Context): Result {
 
     if (!BaresipService.agcAvailable) {
         var gain = newMicGain.trim()
-        if (!gain.contains("."))
-            gain = "$gain.0"
+        if (!gain.contains(".")) gain = "$gain.0"
         if (gain != oldMicGain) {
             if (!checkMicGain(gain)) {
                 alertTitle.value = ctx.getString(R.string.notice)

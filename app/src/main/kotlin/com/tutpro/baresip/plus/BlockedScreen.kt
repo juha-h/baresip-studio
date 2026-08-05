@@ -93,18 +93,13 @@ private fun BlockedScreen(navController: NavController, request: String, aor: St
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME)
-                refreshTrigger++
+            if (event == Lifecycle.Event.ON_RESUME) refreshTrigger++
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    BackHandler(enabled = true) {
-        navController.navigateUp()
-    }
+    BackHandler(enabled = true) { navController.navigateUp() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -117,12 +112,7 @@ private fun BlockedScreen(navController: NavController, request: String, aor: St
         },
         content = { contentPadding ->
             if (isBlockedLoaded)
-                BlockedContent(
-                    LocalContext.current,
-                    navController,
-                    contentPadding,
-                    account, blocked
-                )
+                BlockedContent(LocalContext.current, navController, contentPadding, account, blocked)
         },
     )
 }
@@ -167,9 +157,7 @@ private fun TopAppBar(
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
-            IconButton(
-                onClick = { navController.navigateUp() }
-            ) {
+            IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
@@ -177,9 +165,7 @@ private fun TopAppBar(
             }
         },
         actions = {
-            IconButton(
-                onClick = { expanded = !expanded }
-            ) {
+            IconButton(onClick = { expanded = !expanded }) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
             }
             CustomElements.DropdownMenu(
@@ -275,12 +261,11 @@ private fun Blocked(
                     .clickable(
                         enabled = !peerUri.contains("anonymous") && peerUri != unknown,
                         onClick = {
-                            message.value = String.format(ctx.getString(R.string.blocked_contact_question),
-                                peerUri)
+                            message.value = String.format(
+                                ctx.getString(R.string.blocked_contact_question), peerUri
+                            )
                             lastButtonText.value = ctx.getString(R.string.add_contact)
-                            lastAction.value = {
-                                navController.navigate("contact/$peerUri/new")
-                            }
+                            lastAction.value = { navController.navigate("contact/$peerUri/new") }
                             showDialog.value = true
                         }
                     )
@@ -288,7 +273,8 @@ private fun Blocked(
                 Text(
                     text = "\u2022",
                     modifier = Modifier.padding(start = 8.dp, end = 4.dp),
-                    fontSize = 18.sp)
+                    fontSize = 18.sp
+                )
                 Text(
                     text = Utils.friendlyUri(ctx, peerUri, acc),
                     fontSize = 18.sp,

@@ -11,11 +11,10 @@ class BaresipApp : Application() {
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            if (isImeDeadObjectException(throwable)) {
+            if (isImeDeadObjectException(throwable))
                 Log.e(TAG, "Caught DeadObjectException from IME: $throwable")
-            } else {
+            else
                 defaultHandler?.uncaughtException(thread, throwable)
-            }
         }
 
         if (!BaresipService.libraryLoaded) {
@@ -28,11 +27,9 @@ class BaresipApp : Application() {
     private fun isImeDeadObjectException(throwable: Throwable): Boolean {
         var cause: Throwable? = throwable
         while (cause != null) {
-            if (cause is DeadObjectException) {
-                if (cause.stackTrace.any { it.methodName == "updateCursorAnchorInfo" }) {
+            if (cause is DeadObjectException)
+                if (cause.stackTrace.any { it.methodName == "updateCursorAnchorInfo" })
                     return true
-                }
-            }
             cause = cause.cause
         }
         return false

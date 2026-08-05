@@ -93,9 +93,7 @@ fun BlockingScreen(navController: NavController, viewModel: AccountViewModel, ua
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
-                    title = {
-                        Text(text = stringResource(R.string.blocking), fontWeight = FontWeight.Bold)
-                    },
+                    title = { Text(text = stringResource(R.string.blocking), fontWeight = FontWeight.Bold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -156,7 +154,8 @@ fun BlockingContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = blockUnknownTitle,
+            Text(
+                text = blockUnknownTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -187,7 +186,8 @@ fun BlockingContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = blockHiddenTitle,
+            Text(
+                text = blockHiddenTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -247,9 +247,7 @@ fun BlockingContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 items(rules) { rule ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "\u2022",
                             modifier = Modifier.padding(start = 8.dp, end = 8.dp),
