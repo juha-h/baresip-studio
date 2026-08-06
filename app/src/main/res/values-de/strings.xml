@@ -189,11 +189,7 @@
     <string name="invalid_aor">Ungültiger benutzer@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
     <string name="long_chat_question">Möchten Sie den Chat mit Partner \'%1$s\' löschen oder Partner zu den Kontakten hinzufügen?</string>
     <string name="new_chat_peer">Neuer Chat Partner</string>
-    <string name="outbound_proxies_help">SIP URI von einem oder zwei Proxies, die beim Senden von Anfragen verwendet werden müssen. Wenn zwei angegeben sind werden REGISTER Anfragen an beide gesendet, andere Anfragen an den ersten antwortenden. Wenn keine Proxies für ausgehende Verbindungen angegeben sind, werden Verbindungen basiert auf DNS NAPTR/SRV/A record lookup des hostparts der URI der Rufadresse gesendet. Wenn der hostpart der SIP URI eine IPv6 Adresse ist, muß diese in eckigen Klammern geschrieben werden [].
-\nBeispiele:
-\n • sip:example.com:5061;transport=tls
-\n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">SIP URI von einem oder zwei Proxies, die beim Senden von Anfragen verwendet werden müssen. Wenn zwei angegeben sind werden REGISTER Anfragen an beide gesendet, andere Anfragen an den ersten antwortenden. Wenn keine Proxies für ausgehende Verbindungen angegeben sind, werden Verbindungen basiert auf DNS NAPTR/SRV/A record lookup des hostparts der URI der Rufadresse gesendet. Wenn der hostpart der SIP URI eine IPv6 Adresse ist, muß diese in eckigen Klammern geschrieben werden []. \nBeispiele: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
     <string name="stun_server_help">Ein STUN/TURN Server URI in der Form: schema:host[:port][?transport=udp|tcp], wobei schema \'stun\', \'stuns\', \'turn\', oder \'turns\' ist. Voreingestellter STUN Server für STUN und ICE Protokoll ist \'stun:stun.l.google.com:19302\' der zum öffentlichen Google STUN Server verweist. Es gibt keinen voreingestellten TURN Server.</string>
     <string name="media_encryption_help">Wählt eine (oder keine) Medientransportverschlüsselung.
 \n • ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried afterthe call has been established.
