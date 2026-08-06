@@ -12,11 +12,7 @@
     <string name="authentication_password">Contraseña de autenticación</string>
     <string name="authentication_password_help">Contraseña de autenticación de hasta 64 caracteres. Si se proporciona el nombre de usuario, pero no la contraseña, esta se le pedirá cuando inicie baresip.</string>
     <string name="outbound_proxies">Proxies salientes</string>
-    <string name="outbound_proxies_help">URI SIP de uno o dos proxies que deben utilizarse al enviar las solicitudes. Si se dan dos, las solicitudes de REGISTRO se envían a ambos y las demás solicitudes se envían a uno que responda. Si no se indica ningún proxy de salida, las solicitudes se envían basándose en la búsqueda del registro DNS NAPTR/SRV/A de la parte de host del URI del destinatario. Si la parte del host del URI SIP es una dirección IPv6, la dirección debe escribirse entre corchetes [].
-\nEjemplos:
-\n - sip:ejemplo.com:5061;transporte=tls
-\n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">URI SIP de uno o dos proxies que deben utilizarse al enviar las solicitudes. Si se dan dos, las solicitudes de REGISTRO se envían a ambos y las demás solicitudes se envían a uno que responda. Si no se indica ningún proxy de salida, las solicitudes se envían basándose en la búsqueda del registro DNS NAPTR/SRV/A de la parte de host del URI del destinatario. Si la parte del host del URI SIP es una dirección IPv6, la dirección debe escribirse entre corchetes []. \nEjemplos: \n - sip:ejemplo.com:5061;transporte=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
     <string name="sip_uri_of_proxy_server">SIP URI del servidor proxy</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI de otro servidor proxy</string>
     <string name="register">Registrar</string>
@@ -28,7 +24,7 @@
         Establecimiento, RFC 5245).
     </string>
     <string name="stun_server">Servidor STUN/TURN</string>
-    <string name="stun_server_help">Un URI de servidor STUN/TURN de la forma scheme:host[:port][\?transport=udp|tcp], donde scheme es \'stun\', \'stuns\', \'turn\', o \'turns\'. El servidor STUN predeterminado de fábrica para los protocolos STUN e ICE es \'stun:stun.l.google.com:19302\' que apunta al servidor STUN público de Google. No hay servidor TURN por defecto.</string>
+    <string name="stun_server_help">Un URI de servidor STUN/TURN de la forma scheme:host[:port][?transport=udp|tcp], donde scheme es \'stun\', \'stuns\', \'turn\', o \'turns\'. El servidor STUN predeterminado de fábrica para los protocolos STUN e ICE es \'stun:stun.l.google.com:19302\' que apunta al servidor STUN público de Google. No hay servidor TURN por defecto.</string>
     <string name="media_encryption">Cifrado de medios</string>
     <string name="media_encryption_help">Selecciona el protocolo de cifrado de transporte de medios (si lo hay).
 \n • ZRTP (recomendado) significa que la negociación de cifrado de medios de extremo a extremo de ZRTP se intenta después que
