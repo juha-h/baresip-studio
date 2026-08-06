@@ -144,13 +144,15 @@
         lähettää molemmille välityspalvelimille ja muut sanomat yhdelle
         toiminnassa olevalle välityspalvelimelle. Jos välityspalvelimia ei
         ole annettu, SIP-sanomat lähetetään palvelimelle, mikä selviää
-        kohteen domainille tehtävien NAPTR/SRV/Animipalvelukyselyiden perusteella.
-        Jos välityspalvelimen osoite SIP
+        kohteen domainille tehtävien NAPTR/SRV/A nimipalvelukyselyiden perusteella.
+        SIP URI on muotoa sip:&lt;host&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss].
+        Jos porttia ei ole annettu ja transport on annettu, portin oletusarvo on 5060 (udp, tcp),
+        5061 (tls) tai 443 (wss). Jos välityspalvelimen osoite SIP
         URI:ssa on IPv6-osoite, osoite pitää kirjoittaa sulkujen [] sisään.
 \nEsimerkkejä:
-\n • sip:example.com:5061;transport=tls
+\n • sip:example.com:6601transport=tls
 \n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss
+\n • sip:192.168.43.50:4430;transport=wss
     </string>
     <string name="sip_uri_of_proxy_server">Välityspalvelimen SIP URI</string>
     <string name="sip_uri_of_another_proxy_server">Toisen
@@ -256,13 +258,13 @@
     <string name="accounts">Tilit</string>
     <string name="new_account">Uuden tilin SIP URI</string>
     <string name="accounts_help">Uuden tilin SIP URI muotoa
-        &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls].
+        &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls|wss].
         Jos &lt;portti&gt; on annettu, mutta protokollaa ei ole annettu, protokolla on udp.
-        Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 tai 5061 (tls).
-        Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
+        Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 (udp, tcp), 5061 (tls) tai
+        443 (wss). Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
         rekisteröintipalvelin päätellään pelkästään domainin DNS-informaation perusteella.
     </string>
-    <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls] \'%1$s\'
+    <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls|wss] \'%1$s\'
     </string>
     <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
     <string name="account_allocation_failure">Uuden tilin luonti epäonnistui.</string>

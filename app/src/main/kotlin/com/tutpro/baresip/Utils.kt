@@ -249,8 +249,8 @@ object Utils {
     fun checkAor(aor: String): Boolean {
         if (!checkSipUri(aor)) return false
         val params = uriParams(aor)
-        return params.isEmpty() ||
-                ((params.size == 1) && params[0] in arrayOf("transport=udp", "transport=tcp", "transport=tls"))
+        val transports = arrayOf("transport=udp", "transport=tcp", "transport=tls", "transport=wss")
+        return params.isEmpty() || ((params.size == 1) && params[0] in transports)
     }
 
     private fun checkTransport(transport: String, transports: Set<String>): Boolean {
