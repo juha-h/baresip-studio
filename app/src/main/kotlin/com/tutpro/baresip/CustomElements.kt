@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
@@ -9,6 +10,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,6 +71,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -310,12 +314,15 @@ object CustomElements {
         onLastClicked: () -> Unit = {}
     ) {
         if (showDialog.value) {
+            val configuration = LocalConfiguration.current
+            val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
             BasicAlertDialog(
                 onDismissRequest = { showDialog.value = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false),
                 content = {
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(if (isLandscape) 0.9f else 0.95f)
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
@@ -331,13 +338,22 @@ object CustomElements {
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = message,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Start,
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            val scrollState = rememberScrollState()
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f, fill = false)
+                                    .verticalScrollbar(scrollState)
+                                    .verticalScroll(scrollState)
+                            ) {
+                                Text(
+                                    text = message,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             Spacer(modifier = Modifier.height(16.dp))
 
                             val buttons = listOf(
@@ -469,14 +485,17 @@ object CustomElements {
         onNeutralClicked: () -> Unit = {}
     ) {
         if (openDialog.value) {
+            val configuration = LocalConfiguration.current
+            val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
             BasicAlertDialog(
                 onDismissRequest = {
                     openDialog.value = false
                 },
+                properties = DialogProperties(usePlatformDefaultWidth = false),
                 content = {
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(if (isLandscape) 0.9f else 0.95f)
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
@@ -555,10 +574,13 @@ object CustomElements {
         val focusRequester = remember { FocusRequester() }
 
         if (showPasswordDialog.value) {
+            val configuration = LocalConfiguration.current
+            val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
             BasicAlertDialog(
                 properties = DialogProperties(
                     dismissOnBackPress = false,
                     dismissOnClickOutside = false,
+                    usePlatformDefaultWidth = false
                 ),
                 onDismissRequest = {
                     keyboardController?.hide()
@@ -567,7 +589,7 @@ object CustomElements {
             ) {
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(if (isLandscape) 0.9f else 0.95f)
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
