@@ -7,18 +7,14 @@
     <string name="tls_ca_file_help">Se estiver marcada, foi ou será carregado um ficheiro que contém certificados TLS de tais autoridades de certificação que não estão incluídas no sistema operativo Android. Na versão 9 do Android, um ficheiro chamado “ca_certs.crt” é carregado da pasta Download.</string>
     <string name="debug_help">Se selecionado, disponibiliza mensagens de depuração no registo log e informações para o Logcat.</string>
     <string name="opus_packet_loss_help">Esperada percentagem de perda de pacotes do fluxo de áudio do Opus, de 0-100. Por padrão o valor é 1. O valor 0 desativa o Opus Forward Error Correction (FEC).</string>
-    <string name="outbound_proxies_help">URI SIP de um ou dois proxies que precisam ser usados para enviar solicitações. Se dois forem informados, requisições de REGISTO serão enviados para ambos e as outras requisições serão enviadas para aquele que respondeu. Se nenhum proxy foi informado, requisições serão enviadas baseadas em DNS NAPTR/SRV/A pesquisa de registo da URI do host do destinatário. Se o host da URI SIP for um endereço IPv6, o endereço precisa ser escrito dentro de colchetes [].
-\nExemplos:
-\n • sip:example.com:5061;transport=tls
-\n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">URI SIP de um ou dois proxies que precisam ser usados para enviar solicitações. Se dois forem informados, requisições de REGISTO serão enviados para ambos e as outras requisições serão enviadas para aquele que respondeu. Se nenhum proxy foi informado, requisições serão enviadas baseadas em DNS NAPTR/SRV/A pesquisa de registo da URI do host do destinatário. Se o host da URI SIP for um endereço IPv6, o endereço precisa ser escrito dentro de colchetes []. \nExemplos: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
     <string name="send_message">Enviar Mensagem</string>
     <string name="account_allocation_failure">Falha ao alocar nova conta.</string>
     <string name="call_info_not_available">Nenhuma informação disponível</string>
     <string name="deny">Recusar</string>
     <string name="delete_history_alert">Quer apagar o histórico de chamadas da conta \'%1$s\'\?</string>
     <string name="add_contact">Adicionar Contato</string>
-    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta][\?transport=udp|tcp]. Onde o scheme é \'stun\', \'stuns\', \'turn\', ou \'turns\'. O Servidor predefinido de fábrica para o STUN e os protocolos ICE são \'stun:stun.l.google.com:19302\' apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
+    <string name="stun_server_help">Um URI do servidor STUN/TURN na forma de scheme:host[:porta][?transport=udp|tcp]. Onde o scheme é \'stun\', \'stuns\', \'turn\', ou \'turns\'. O Servidor predefinido de fábrica para o STUN e os protocolos ICE são \'stun:stun.l.google.com:19302\' apontando para o servidor STUN público do Google. Não há qualquer servidor STUN predefinido de fábrica.</string>
     <string name="start_failed">Baresip falhou ao iniciar. Isso pode ser devido a um valor inválido das Configurações. Verifique Endereço de Escuta, Ficheiro de Certificado TLS e Ficheiro CA TLS. Em seguida, reinicie o baresip.</string>
     <string name="call_already_active">Já tem uma chamada ativa.</string>
     <string name="calls_call">chamada</string>
