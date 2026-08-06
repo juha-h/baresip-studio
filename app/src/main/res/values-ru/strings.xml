@@ -169,7 +169,7 @@
     <string name="stun_username_help">Имя пользователя, если требуется сервером STUN/TURN</string>
     <string name="stun_username">Имя пользователя STUN/TURN</string>
     <string name="invalid_stun_server">Недействительный URI сервера STUN/TURN \'%1$s\'</string>
-    <string name="stun_server_help">URI сервера STUN/TURN в виде схема:хост[:порт][\?transport=udp|tcp], где схема — \'stun\', \'turn\' или \'turns\'. STUN-сервер по умолчанию для протоколов STUN и ICE — \'stun:stun.l.google.com:19302\' — общедоступный STUN-сервер Google. TURN-сервер по умолчанию не используется.</string>
+    <string name="stun_server_help">URI сервера STUN/TURN в виде схема:хост[:порт][?transport=udp|tcp], где схема — \'stun\', \'turn\' или \'turns\'. STUN-сервер по умолчанию для протоколов STUN и ICE — \'stun:stun.l.google.com:19302\' — общедоступный STUN-сервер Google. TURN-сервер по умолчанию не используется.</string>
     <string name="stun_server">STUN/TURN сервер</string>
     <string name="video_codecs">Видео кодеки</string>
     <string name="register_help">При отметке включается регистрация и REGISTER-запросы отправляются с указанным интервалом.</string>
