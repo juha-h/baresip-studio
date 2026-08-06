@@ -44,7 +44,7 @@
     <string name="invalid_stun_username">Ogiltigt användarnamn \'%1$s\'</string>
     <string name="stun_username_help">Användarnamn om STUN/TURN-servern kräver det</string>
     <string name="invalid_stun_server">Ogiltig STUN/TURN-server-URI \'%1$s\'</string>
-    <string name="stun_server_help">En STUN/TURN-server-URI på formatet schema:värd[:port][\?transport=udp|tcp], där schema är \'stun\', \'stuns\', \'turn\', eller \'turns\'. Förvald STUN-server för STUN- och ICE-protokollen är \'stun:stun.l.google.com:19302\' som är Googles publika STUN-server. Det finns ingen förvald TURN-server.</string>
+    <string name="stun_server_help">En STUN/TURN-server-URI på formatet schema:värd[:port][?transport=udp|tcp], där schema är \'stun\', \'stuns\', \'turn\', eller \'turns\'. Förvald STUN-server för STUN- och ICE-protokollen är \'stun:stun.l.google.com:19302\' som är Googles publika STUN-server. Det finns ingen förvald TURN-server.</string>
     <string name="media_nat">NAT-passering av media</string>
     <string name="media_nat_help">Väljer protokoll för NAT-passering av media. Möjliga val är STUN (Session Traversal Utilities for NAT, RFC 5389) och ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="no">Nej</string>
@@ -92,11 +92,7 @@
     <string name="invalid_proxy_server_uri">Ogiltig proxyserver-URI \'%1$s\'</string>
     <string name="sip_uri_of_proxy_server">SIP-URI för en proxyserver</string>
     <string name="sip_uri_of_another_proxy_server">SIP-URI för en annan proxyserver</string>
-    <string name="outbound_proxies_help">SIP-URI för en eller två proxyservrar som måste användas när SIP-förfrågningar skickas. Om två anges skickas REGISTER-förfrågningar till båda och andra förfrågningar skickas till den som svarar. Om ingen utgående proxyserver anges skickas förfrågningar genom att DNS NAPTR/SRV/A-poster slås upp från värdnamnet i mottagarens URI. Om värdnamnet är en IPv6-adress måste det skrivas inom hakparenteser [].
-\nExempel:
-\n • sip:example.com:5061;transport=tls
-\n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">SIP-URI för en eller två proxyservrar som måste användas när SIP-förfrågningar skickas. Om två anges skickas REGISTER-förfrågningar till båda och andra förfrågningar skickas till den som svarar. Om ingen utgående proxyserver anges skickas förfrågningar genom att DNS NAPTR/SRV/A-poster slås upp från värdnamnet i mottagarens URI. Om värdnamnet är en IPv6-adress måste det skrivas inom hakparenteser []. \nExempel: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
     <string name="outbound_proxies">Utgående proxyservrar</string>
     <string name="invalid_authentication_password">Ogiltigt lösenord för autentisering \'%1$s\'</string>
     <string name="authentication_password_help">Lösenord för autentisering, upp till 64 tecken. Om användarnamn för autentisering är ifyllt, men lösenordet lämnas tomt kommer baresip fråga om lösenord vid uppstart.</string>
