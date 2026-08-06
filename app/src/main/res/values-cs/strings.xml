@@ -9,11 +9,7 @@
     <string name="register">Registrace</string>
     <string name="invalid_proxy_server_uri">Neplatná URI proxy serveru \'%1$s\'</string>
     <string name="sip_uri_of_proxy_server">SIP URI proxy serveru</string>
-    <string name="outbound_proxies_help">SIP URI jednoho nebo dvou proxy serverů, které je třeba použít při odesílání požadavků. Pokud jsou zadány dva, jsou požadavky REGISTER zasílány oběma a ostatní požadavky jsou zasílány tomu, který odpoví. Pokud není zadán žádný odchozí proxy server, jsou požadavky odesílány na základě vyhledávání záznamů DNS NAPTR/SRV/A z hostitelského jména URI volaného. Pokud je hostitelské jméno URI SIP adresa IPv6, musí být adresa zapsána v závorkách [].
-\nPříklady:
-\n - sip:example.com:5061;transport=tls
-\n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">SIP URI jednoho nebo dvou proxy serverů, které je třeba použít při odesílání požadavků. Pokud jsou zadány dva, jsou požadavky REGISTER zasílány oběma a ostatní požadavky jsou zasílány tomu, který odpoví. Pokud není zadán žádný odchozí proxy server, jsou požadavky odesílány na základě vyhledávání záznamů DNS NAPTR/SRV/A z hostitelského jména URI volaného. Pokud je hostitelské jméno URI SIP adresa IPv6, musí být adresa zapsána v závorkách []. \nPříklady: \n - sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI dalšího proxy serveru</string>
     <string name="reg_int_help">Udává, jak často (v sekundách) baresip odesílá požadavky REGISTER. Platné hodnoty jsou od 60 do 3600.</string>
     <string name="invalid_reg_int">Neplatný interval registrace \'%1$s\'</string>
@@ -25,7 +21,7 @@
     <string name="media_nat_help">Vybírá protokol pro průchod médií skrze NAT (pokud existuje). Možné volby jsou STUN (Session Traversal Utilities for NAT, RFC 5389) a ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="stun_server">Server STUN/TURN</string>
     <string name="stun_username_help">Uživatelské jméno, pokud ho server STUN/TURN vyžaduje</string>
-    <string name="stun_server_help">URI serveru STUN/TURN ve tvaru scheme:host[:port][\?transport=udp|tcp], kde scheme je \"stun\", \"stuns\", \"turn\" nebo \"turns\". Výchozí server STUN pro protokoly STUN a ICE je \'stun:stun.l.google.com:19302\', který ukazuje na veřejný server STUN společnosti Google. Výchozí server TURN neexistuje.</string>
+    <string name="stun_server_help">URI serveru STUN/TURN ve tvaru scheme:host[:port][?transport=udp|tcp], kde scheme je \"stun\", \"stuns\", \"turn\" nebo \"turns\". Výchozí server STUN pro protokoly STUN a ICE je \'stun:stun.l.google.com:19302\', který ukazuje na veřejný server STUN společnosti Google. Výchozí server TURN neexistuje.</string>
     <string name="stun_password">Heslo STUN/TURN</string>
     <string name="stun_password_help">Heslo, pokud ho server STUN/TURN vyžaduje</string>
     <string name="invalid_stun_password">Neplatné heslo \'%1$s\'</string>
