@@ -8,25 +8,13 @@
     <string name="authentication_password_help">認証パスワードは64文字までです。
         もし、ユーザー名を入力したのにパスワードが入力されていない場合は、baresipの起動時に問い合わせます。
     </string>
-    <string name="outbound_proxies_help">リクエストを送るときに、1つか2つSIP URIを使う必要がある。
-        2つとも入力された場合、両方にREGISTERリクエストが送られ、他のリクエストは応答する方に送られます。
-        outboundプロキシが与えられない場合、リクエストはcalllee URI hostpartのDNS NAPTR/SRV/Aレコード検索に基づいて送信される。
-        SIP URIのhostpartがIPv6アドレスの場合、アドレスは括弧[]内に記載しなければなりません。
-        \n記入例:
-        \n • sip:example.com:5061;transport=tls
-        \n • sip:[2001:67c:223:777::10];transport=tcp
-        \n • sip:192.168.43.50:443;transport=wss
-    </string>
+    <string name="outbound_proxies_help">リクエストを送るときに、1つか2つSIP URIを使う必要がある。 2つとも入力された場合、両方にREGISTERリクエストが送られ、他のリクエストは応答する方に送られます。 outboundプロキシが与えられない場合、リクエストはcalllee URI hostpartのDNS NAPTR/SRV/Aレコード検索に基づいて送信される。 SIP URIのhostpartがIPv6アドレスの場合、アドレスは括弧[]内に記載しなければなりません。 \n記入例: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
     <string name="register_help">チェックを入れると、登録が有効になり、12 分間隔で REGISTER 要求が送信されます。</string>
     <string name="media_nat_help">必要であればメディアのNAT探索プロトコルを選択してください。
         選択肢としては、STUN（Session Traversal Utilities for NAT、RFC 5389）
         とICE（Interactive Connectivity Establishment、RFC 5245）があります。
     </string>
-    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port], where scheme
-        is \'stun\' or \'turn\'. Factory default STUN Server for STUN and
-        ICE protocols is \'stun:stun.l.google.com:19302\' pointing to public Google STUN server.
-        There is no factory default TURN server.
-    </string>
+    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port], where scheme is \'stun\' or \'turn\'. Factory default STUN Server for STUN and ICE protocols is \'stun:stun.l.google.com:19302\' pointing to public Google STUN server. There is no factory default TURN server.</string>
     <string name="media_encryption_help">Selects media transport encryption protocol (if any).
         \n • ZRTP (recommended) means that ZRTP end-to-end media encryption negotiation is tried after
         the call has been established.
@@ -164,7 +152,7 @@
     <string name="media_nat">メディアのNAT探索</string>
     <string name="stun_server">STUN/TURNサーバー</string>
     <string name="invalid_stun_server">無効なSTUN/TURNサーバーのURI %1$s です</string>
-    <string name="invalid_aor">無効なuser@domain[:port][;transport=udp|tcp|tls] %1$s です</string>
+    <string name="invalid_aor">無効なuser@domain[:port][;transport=udp|tcp|tls] %1$s です</string>
     <string name="answer_mode">応答モード</string>
     <string name="manual">マニュアル</string>
     <string name="auto">自動</string>
