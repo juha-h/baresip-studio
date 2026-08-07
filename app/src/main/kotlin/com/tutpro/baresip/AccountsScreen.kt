@@ -208,7 +208,7 @@ fun NewAccount(navController: NavController) {
         if (Account.ofAor(aor) != null) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value =
-                String.format(ctx.getString(R.string.account_exists), aor.removePrefix("sip:"))
+                String.format(ctx.getString(R.string.account_exists), aor.split(":")[1])
             showAlert.value = true
             return null
         }
