@@ -866,22 +866,34 @@ class BaresipService: Service() {
         if (ev[0] == "create") {
 
             val ua = UserAgent(uap)
-            if (VERSION.SDK_INT < 29 && ua.account.isMobile) {
-                Log.d(TAG, "Removing Mobile account on API < 29")
+            if (Utils.uriMatch(ua.account.aor, "sip:mobile@pstn"))
+                ua.account.isMobile = true
+
+            var removeMobile = false
+            if (ua.account.isMobile) {
+                if (VERSION.SDK_INT < 29) {
+                    Log.d(TAG, "Removing Mobile account on API < 29")
+                    removeMobile = true
+                } else if (Utils.pstnAccountHandle(this) == null || !isSimReady()) {
+                    Log.d(TAG, "Removing Mobile account (SIM not ready or not default dialer)")
+                    removeMobile = true
+                }
+            }
+
+            if (removeMobile) {
                 CallHistoryNew.clear(ua.account.aor)
                 Message.clearMessagesOfAor(ua.account.aor)
                 Blocked.clear(ua.account.aor)
                 BlockRule.clear(ua.account.aor)
                 Api.ua_destroy(uap)
-                Account.saveAccounts()
+                if (isNativeReady) Account.saveAccounts()
                 return
             }
 
             ua.status = if (ua.account.isMobile) {
                 val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-                val isSimReady = isSimReady()
                 if (VERSION.SDK_INT >= 29) {
-                    if (Utils.pstnAccountHandle(this) == null || !isSimReady || isAirplaneModeOn)
+                    if (isAirplaneModeOn)
                         R.drawable.circle_white
                     else
                         circleRed.getValue(colorblind)
@@ -905,7 +917,7 @@ class BaresipService: Service() {
                     Api.account_set_auth_pass(acc.accp, NO_AUTH_PASS)
             }
 
-            Log.d(TAG, "got uaEvent $event/${acc.aor}")
+            Log.d(TAG, "got uaEvent $ev/${acc.aor}")
             return
         }
 
@@ -1787,6 +1799,7 @@ class BaresipService: Service() {
 
         Handler(Looper.getMainLooper()).post {
             addMobileUserAgent()
+            Account.saveAccounts()
             if (VERSION.SDK_INT >= 29)
                 updateMobileStatus()
 
@@ -2303,7 +2316,7 @@ class BaresipService: Service() {
 
             val mobileAccountHandle = Utils.pstnAccountHandle(this)
             val isSimReady = isSimReady()
-            val existingMobileUa = uas.value.find { it.account.isMobile }
+            val existingMobileUa = uas.value.find { it.account.isMobile || Utils.uriMatch(it.account.aor, "sip:mobile@pstn") }
 
             if (mobileAccountHandle == null || !isSimReady) {
                 if (existingMobileUa != null) {
@@ -2311,7 +2324,7 @@ class BaresipService: Service() {
                     if (existingMobileUa.uap != 0L)
                         Api.ua_destroy(existingMobileUa.uap)
                     existingMobileUa.remove()
-                    Account.saveAccounts()
+                    if (isNativeReady) Account.saveAccounts()
                     updateStatusNotification()
                 }
                 return
@@ -2347,13 +2360,10 @@ class BaresipService: Service() {
             val mobileUa = UserAgent(0L, account)
             mobileUa.status = status
 
-            val updatedUas = uas.value.toMutableList()
-            updatedUas.add(mobileUa)
-            uas.value = updatedUas.toList()
-            uasStatus.value = UserAgent.statusMap()
+            mobileUa.add()
 
             registerTelephony()
-            Account.saveAccounts()
+            if (isNativeReady) Account.saveAccounts()
             CallHistoryNew.save()
             Message.save()
             updateStatusNotification()

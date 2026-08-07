@@ -152,11 +152,14 @@ object Utils {
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
-        if (firstUri.startsWith("tel:"))
-            return firstUri == secondUri || firstUri.substringAfter(":") == uriUserPart(secondUri)
-        if (firstUri.startsWith("sip:"))
-            return uriUserPart(firstUri) == uriUserPart(secondUri) &&
-                    uriHostPart(firstUri) == uriHostPart(secondUri)
+        val first = firstUri.removePrefix("<").removeSuffix(">")
+        val second = secondUri.removePrefix("<").removeSuffix(">")
+        if (first.startsWith("tel:", ignoreCase = true))
+            return first.equals(second, ignoreCase = true) ||
+                    first.substringAfter(":").equals(uriUserPart(second), ignoreCase = true)
+        if (first.startsWith("sip:", ignoreCase = true))
+            return uriUserPart(first).equals(uriUserPart(second), ignoreCase = true) &&
+                    uriHostPart(first).equals(uriHostPart(second), ignoreCase = true)
         return false
     }
 
@@ -346,14 +349,18 @@ object Utils {
 
     fun paramValue(params: String, name: String): String {
         if (params == "") return ""
-        for (param in params.split(";"))
+        for (p in params.split(";")) {
+            val param = p.trim()
             if (param.substringBefore("=") == name) return param.substringAfter("=")
+        }
         return ""
     }
 
     fun paramExists(params: String, name: String): Boolean {
-        for (param in params.split(";"))
+        for (p in params.split(";")) {
+            val param = p.trim()
             if (param.substringBefore("=") == name) return true
+        }
         return false
     }
 

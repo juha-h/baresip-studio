@@ -18,7 +18,16 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
     fun add() {
         synchronized(uas) {
             val updatedUas = uas.value.toMutableList()
-            updatedUas.add(this)
+            val index = updatedUas.indexOfFirst { Utils.uriMatch(it.account.aor, this.account.aor) }
+            if (index == -1) {
+                updatedUas.add(this)
+            } else {
+                if (updatedUas[index].uap == 0L && this.uap != 0L) {
+                    updatedUas[index] = this
+                } else {
+                    return
+                }
+            }
             uas.value = updatedUas.toList()
             uasStatus.value = statusMap()
         }
