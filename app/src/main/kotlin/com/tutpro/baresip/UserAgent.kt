@@ -98,11 +98,10 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
             return null
         }
 
-        fun uaAlloc(uri: String): UserAgent? {
+        fun uaAlloc(uri: String): Long {
             val uap = Api.ua_alloc(uri)
-            if (uap != 0L) return UserAgent(uap)
-            Log.e(TAG, "Failed to allocate UserAgent for $uri")
-            return null
+            if (uap == 0L) Log.e(TAG, "Failed to allocate UserAgent for $uri")
+            return uap
         }
 
         fun findAorIndex(aor: String): Int? {

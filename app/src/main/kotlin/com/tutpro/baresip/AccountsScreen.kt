@@ -208,14 +208,22 @@ fun NewAccount(navController: NavController) {
         if (Account.ofAor(aor) != null) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value =
-                String.format(ctx.getString(R.string.account_exists), aor.split(":")[1])
+                String.format(ctx.getString(R.string.account_exists), aor.removePrefix("sip:"))
             showAlert.value = true
             return null
         }
 
-        val ua = UserAgent.uaAlloc(
+        val uap = UserAgent.uaAlloc(
             "<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;check_origin=no;mwi=no"
         )
+        if (uap == 0L) {
+            alertTitle.value = ctx.getString(R.string.notice)
+            alertMessage.value = ctx.getString(R.string.account_allocation_failure)
+            showAlert.value = true
+            return null
+        }
+
+        val ua = UserAgent.ofUap(uap)
         if (ua == null) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = ctx.getString(R.string.account_allocation_failure)
@@ -225,7 +233,7 @@ fun NewAccount(navController: NavController) {
 
         val acc = ua.account
         acc.checkOrigin = true
-        Log.d(TAG, "Allocated UA ${ua.uap} with SIP URI ${acc.luri}")
+        Log.d(TAG, "Allocated UA $uap with SIP URI ${acc.luri}")
         Account.saveAccounts()
         return acc
     } // createNew
