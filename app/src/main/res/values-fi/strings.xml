@@ -150,7 +150,7 @@
         5061 (tls) tai 443 (wss). Jos välityspalvelimen osoite SIP
         URI:ssa on IPv6-osoite, osoite pitää kirjoittaa sulkujen [] sisään.
 \nEsimerkkejä:
-\n • sip:example.com:6601transport=tls
+\n • sip:example.com;transport=tls
 \n • sip:[2001:67c:223:777::10];transport=tcp
 \n • sip:192.168.43.50:4430;transport=wss
     </string>
@@ -263,6 +263,7 @@
         Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 (udp, tcp), 5061 (tls) tai
         443 (wss). Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
         rekisteröintipalvelin päätellään pelkästään domainin DNS-informaation perusteella.
+        \nEsimerkki: user@example.com
     </string>
     <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls|wss] \'%1$s\'
     </string>
