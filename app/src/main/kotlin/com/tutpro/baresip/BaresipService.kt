@@ -2302,18 +2302,25 @@ class BaresipService: Service() {
         if (VERSION.SDK_INT >= 29) {
 
             val mobileAccountHandle = Utils.pstnAccountHandle(this)
+            val isSimReady = isSimReady()
             val existingMobileUa = uas.value.find { it.account.isMobile }
 
-            if (existingMobileUa == null && mobileAccountHandle == null)
+            if (mobileAccountHandle == null || !isSimReady) {
+                if (existingMobileUa != null) {
+                    Log.d(TAG, "Removing existing Mobile account (SIM not ready or not default dialer)")
+                    if (existingMobileUa.uap != 0L)
+                        Api.ua_destroy(existingMobileUa.uap)
+                    existingMobileUa.remove()
+                    Account.saveAccounts()
+                    updateStatusNotification()
+                }
                 return
+            }
 
             val mobileAor = "sip:mobile@pstn"
 
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val isSimReady = isSimReady()
-            val status = if (mobileAccountHandle == null || !isSimReady)
-                R.drawable.circle_white
-            else if (existingMobileUa?.status == circleGreen.getValue(colorblind))
+            val status = if (existingMobileUa?.status == circleGreen.getValue(colorblind))
                 circleGreen.getValue(colorblind)
             else if (isAirplaneModeOn)
                 R.drawable.circle_white
@@ -2371,13 +2378,18 @@ class BaresipService: Service() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun updateMobileStatus(newStatus: Int? = null) {
-        uas.value.find { it.account.isMobile }?.let { ua ->
+        val mobileAccountHandle = Utils.pstnAccountHandle(this)
+        val isSimReady = isSimReady()
+        val mobileUa = uas.value.find { it.account.isMobile }
+
+        if (mobileUa == null || mobileAccountHandle == null || !isSimReady) {
+            addMobileUserAgent()
+            return
+        }
+
+        mobileUa.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val isSimReady = isSimReady()
-            val mobileAccountHandle = Utils.pstnAccountHandle(this)
-            val status = newStatus ?: if (mobileAccountHandle == null || !isSimReady)
-                R.drawable.circle_white
-            else if (ua.status == circleGreen.getValue(colorblind))
+            val status = newStatus ?: if (ua.status == circleGreen.getValue(colorblind))
                 ua.status
             else if (isAirplaneModeOn)
                 R.drawable.circle_white
