@@ -120,7 +120,7 @@
     <string name="authentication_password_help">סיסמת אימות עד 64 תוים. אם שם המשתמש לאימות נמסר, אך הסיסמה לא נמסרה, היא תתבקש כאשר baresip יתחיל.</string>
     <string name="invalid_authentication_password">סיסמת אימות לא תקינה \'%1$s\'</string>
     <string name="outbound_proxies">פרוקסים יוצאים</string>
-    <string name="outbound_proxies_help">כתובת SIP URI של פרוקסי אחד או שניים שיש להשתמש בהם בעת שליחת בקשות. אם ניתנים שניים, בקשות REGISTER נשלחות לשניהם, ושאר הבקשות נשלחות לזה שמגיב. אם לא הוגדר פרוקסי יוצא (outbound proxy), הבקשות נשלחות על פי חיפוש רשומות DNS מסוג NAPTR/SRV/A של ה־hostpart ב־URI של היעד. אם ה־hostpart של כתובת ה־SIP URI הוא כתובת IPv6, יש לכתוב את הכתובת בתוך סוגריים מרובעים []. \nדוגמאות: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">כתובת SIP URI של פרוקסי אחד או שניים שיש להשתמש בהם בעת שליחת בקשות. אם ניתנים שניים, בקשות REGISTER נשלחות לשניהם, ושאר הבקשות נשלחות לזה שמגיב. אם לא הוגדר פרוקסי יוצא (outbound proxy), הבקשות נשלחות על פי חיפוש רשומות DNS מסוג NAPTR/SRV/A של ה־hostpart בבקשת URI. SIP URI הוא בתבנית sip:&lt;host&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss]. אם &lt;port&gt; לא ניתן וכן ניתן פרוטוקול תעבורה, &lt;port&gt; ברירת מחדל הוא 5060 (udp, tcp), 5061 (tls), או 443 (wss). If &lt;host&gt; הוא כתובת IPv6, יש לכתוב את הכתובת בתוך סוגריים מרובעים []. \nדוגמאות: \n • sip:example.com;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:4430;transport=wss</string>
     <string name="sip_uri_of_proxy_server">כתובת SIP URI של שרת פרוקסי</string>
     <string name="sip_uri_of_another_proxy_server">כתובת SIP URI של שרת פרוקסי נוסף</string>
     <string name="invalid_proxy_server_uri">כתובת URI של שרת פרוקסי לא תקינה \'%1$s\'</string>
@@ -134,7 +134,7 @@
     <string name="media_nat">מעבר NAT למדיה</string>
     <string name="media_nat_help">בוחר את פרוטוקול מעבר ה־NAT למדיה (אם יש). האפשרויות הזמינות הן STUN (Session Traversal Utilities for NAT, RFC 5389) ו־ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="stun_server">שרת STUN/TURN</string>
-    <string name="stun_server_help">כתובת URI של שרת STUN/TURN בפורמט scheme:host[:port][?transport=udp|tcp], כאשר scheme הוא אחד מהבאים: \'stun\', \'stuns\', \'turn\' או \'turns\'. שרת ה־STUN המוגדר כברירת מחדל מהיצרן עבור פרוטוקולי STUN ו־ICE הוא \'stun:stun.l.google.com:19302\', המצביע על שרת STUN ציבורי של Google. לא קיים שרת TURN המוגדר כברירת מחדל מהיצרן.</string>
+    <string name="stun_server_help">כתובת URI של שרת STUN/TURN בפורמט scheme:host[:port][;transport=udp|tcp], כאשר scheme הוא אחד מהבאים: \'stun\', \'stuns\', \'turn\' או \'turns\'. שרת ה־STUN המוגדר כברירת מחדל מהיצרן עבור פרוטוקולי STUN ו־ICE הוא \'stun:stun.l.google.com:19302\', המצביע על שרת STUN ציבורי של Google. לא קיים שרת TURN המוגדר כברירת מחדל מהיצרן.</string>
     <string name="invalid_stun_server">כתובת URI לא חוקית של שרת STUN/TURN \'%1$s\'</string>
     <string name="media_encryption">הצפנת מדיה</string>
     <string name="media_encryption_help">בוחר את פרוטוקול הצפנת המדיה לתעבורה (אם קיים). \n • ZRTP (מומלץ) משמעותו שמתבצע ניסיון לניהול משא ומתן להצפנת מדיה מקצה לקצה באמצעות ZRTP לאחר שהשיחה כבר נוצרה. \n • DTLS-SRTPF משמעותו שהפרוטוקול UDP/TLS/RTP/SAVPF מוצע בשיחה יוצאת, ושבמקרה של שיחה נכנסת ייעשה שימוש באחד מהפרוטוקולים הבאים אם יוצעו: RTP/SAVP, RTP/SAVPF, UDP/TLS/RTP/SAVP או UDP/TLS/RTP/SAVPF. \n • SRTP-MANDF משמעותו שהפרוטוקול RTP/SAVPF מוצע בשיחה יוצאת ונדרש בשיחה נכנסת. \n • SRTP-MAND משמעותו שהפרוטוקול RTP/SAVP מוצע בשיחה יוצאת ונדרש בשיחה נכנסת. \n • SRTP משמעותו שהפרוטוקול RTP/AVP מוצע בשיחה יוצאת, ובשיחה נכנסת ייעשה שימוש ב-RTP/SAVP או ב-RTP/SAVPF אם הם מוצעים.</string>
@@ -195,7 +195,7 @@
     <string name="redirect_mode_help">בוחר האם בקשת הפניית שיחה תבוצע באופן אוטומטי, או שתידרש בקשת אישור מהמשתמש.</string>
     <string name="manual">מדריך למשתמש</string>
     <string name="auto">אוטומטית</string>
-    <string name="block_unknown">חסום \"לא מזוהה\"</string>
+    <string name="block_unknown">חסום זרים</string>
     <string name="block_unknown_help">חסום שיחות והודעות ממתקשרים שלא קיימים באנשי הקשר.</string>
     <string name="voicemail_uri">כתובת URI של דואר קולי</string>
     <string name="country_code">קידומת מדינה</string>
@@ -470,4 +470,6 @@
     <string name="copied_to_clipboard">הועתק ללוח</string>
     <string name="no_telephone_number">שיחה סלולרית נעשית רק למספר טלפון</string>
     <string name="airplane_mode">מצב טיסה מופעל. כבה אותו כדי להשתמש בחשבון סלולרי.</string>
+    <string name="sim_manager">מנהל SIM</string>
+    <string name="block_hidden">חסום מוסתרים</string>
 </resources>
