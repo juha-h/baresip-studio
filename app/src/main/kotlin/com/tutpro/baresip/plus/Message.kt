@@ -10,7 +10,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
               var new: Boolean): java.io.Serializable {
 
     fun add() {
-        val updatedMessages = synchronized(BaresipService.messages) {
+        val updatedMessages = synchronized(BaresipService.messagesLock) {
             BaresipService.messages.toMutableList()
         }
         updatedMessages.add(this)
@@ -26,18 +26,18 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             }
         if (remove != null)
             updatedMessages.remove(remove)
-        synchronized(BaresipService.messages) {
+        synchronized(BaresipService.messagesLock) {
             BaresipService.messages = updatedMessages.toList()
         }
         save()
     }
 
     fun delete() {
-        val updatedMessages = synchronized(BaresipService.messages) {
+        val updatedMessages = synchronized(BaresipService.messagesLock) {
             BaresipService.messages.toMutableList()
         }
         updatedMessages.remove(this)
-        synchronized(BaresipService.messages) {
+        synchronized(BaresipService.messagesLock) {
             BaresipService.messages = updatedMessages.toList()
         }
         save()
@@ -55,25 +55,25 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun clearMessagesOfAor(aor: String) {
-            val updatedMessages = synchronized(BaresipService.messages) {
+            val updatedMessages = synchronized(BaresipService.messagesLock) {
                 BaresipService.messages.toMutableList()
             }
             val it = updatedMessages.iterator()
             while (it.hasNext()) if (it.next().aor == aor) it.remove()
-            synchronized(BaresipService.messages) {
+            synchronized(BaresipService.messagesLock) {
                 BaresipService.messages = updatedMessages.toList()
             }
             save()
         }
 
         fun deleteAorMessage(aor: String, time: Long) {
-            val updatedMessages = synchronized(BaresipService.messages) {
+            val updatedMessages = synchronized(BaresipService.messagesLock) {
                 BaresipService.messages.toMutableList()
             }
             for (message in updatedMessages.reversed())
                 if (message.aor == aor && message.timeStamp == time) {
                     updatedMessages.remove(message)
-                    synchronized(BaresipService.messages) {
+                    synchronized(BaresipService.messagesLock) {
                         BaresipService.messages = updatedMessages.toList()
                     }
                     save()
@@ -82,13 +82,13 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun updateAorMessage(aor: String, time: Long) {
-            val updatedMessages = synchronized(BaresipService.messages) {
+            val updatedMessages = synchronized(BaresipService.messagesLock) {
                 BaresipService.messages.toMutableList()
             }
             for (message in updatedMessages.reversed())
                 if (message.aor == aor && message.timeStamp == time) {
                     message.new = false
-                    synchronized(BaresipService.messages) {
+                    synchronized(BaresipService.messagesLock) {
                         BaresipService.messages = updatedMessages.toList()
                     }
                     save()
@@ -97,7 +97,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun unreadMessages(aor: String): Boolean {
-            synchronized(BaresipService.messages) {
+            synchronized(BaresipService.messagesLock) {
                 for (message in BaresipService.messages.reversed())
                     if (message.aor == aor && message.new)
                         return true
@@ -106,7 +106,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun unreadMessagesFromPeer(aor: String, peerUri: String): Boolean {
-            synchronized(BaresipService.messages) {
+            synchronized(BaresipService.messagesLock) {
                 for (message in BaresipService.messages.reversed())
                     if (message.aor == aor && message.peerUri == peerUri && message.new)
                         return true
@@ -115,7 +115,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun updateMessagesFromPearRead(aor: String, peerUri: String): Boolean {
-            val updatedMessages = synchronized(BaresipService.messages) {
+            val updatedMessages = synchronized(BaresipService.messagesLock) {
                 BaresipService.messages.toMutableList()
             }
             var updated = false
@@ -125,7 +125,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     updated = true
                 }
             if (updated) {
-                synchronized(BaresipService.messages) {
+                synchronized(BaresipService.messagesLock) {
                     BaresipService.messages = updatedMessages.toList()
                 }
                 save()
@@ -134,7 +134,8 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         }
 
         fun save() {
-            val messagesCopy = synchronized(BaresipService.messages) {
+            if (!BaresipService.isNativeReady) return
+            val messagesCopy = synchronized(BaresipService.messagesLock) {
                 BaresipService.messages.toList()
             }
             val file = File(BaresipService.filesPath, "messages")
@@ -143,7 +144,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 file.writeText(jsonString)
                 Log.d(TAG, "Saved ${messagesCopy.size} messages in JSON")
             } catch (e: Exception) {
-                Log.e(TAG, "Serialization exception", e)
+                Log.e(TAG, "Serialization exception: $e")
                 try {
                     val fos = FileOutputStream(file)
                     val oos = ObjectOutputStream(fos)
@@ -164,7 +165,9 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 if (content.startsWith("[")) {
                     try {
                         val restoredMessages = Json.decodeFromString<List<Message>>(content)
-                        BaresipService.messages = restoredMessages
+                        synchronized(BaresipService.messagesLock) {
+                            BaresipService.messages = restoredMessages
+                        }
                         Log.d(TAG, "Restored ${BaresipService.messages.size} messages from JSON")
                         return
                     } catch (e: Exception) {
@@ -177,7 +180,9 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     @Suppress("UNCHECKED_CAST")
                     val restoredMessages = ois.readObject() as? List<Message>
                     if (restoredMessages != null) {
-                        BaresipService.messages = restoredMessages
+                        synchronized(BaresipService.messagesLock) {
+                            BaresipService.messages = restoredMessages
+                        }
                         Log.d(TAG, "Restored ${BaresipService.messages.size} messages from Java")
                         save()
                     }

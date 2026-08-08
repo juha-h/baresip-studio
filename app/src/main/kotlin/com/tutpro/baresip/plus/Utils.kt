@@ -965,6 +965,13 @@ object Utils {
         ) != 0
     }
 
+    fun mobileStatusMessage(ctx: Context, status: Int): String {
+        return if (status == R.drawable.circle_white)
+            ctx.getString(R.string.airplane_mode)
+        else
+            ctx.getString(R.string.mobile_service_not_available)
+    }
+
     @Suppress("unused")
     fun isPSTNCallActive(ctx: Context): Boolean {
         val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false

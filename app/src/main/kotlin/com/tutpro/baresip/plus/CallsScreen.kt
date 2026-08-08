@@ -349,7 +349,7 @@ private fun Calls(
                                      secondAction.value = {
                                          if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
                                              alertTitle.value = ctx.getString(R.string.notice)
-                                             alertMessage.value = ctx.getString(R.string.airplane_mode)
+                                             alertMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
                                              showAlert.value = true
                                          }
                                          else {
@@ -375,7 +375,7 @@ private fun Calls(
                                          if (ua.account.isMobile) {
                                              if (ua.status != circleGreen.getValue(colorblind)) {
                                                  alertTitle.value = ctx.getString(R.string.notice)
-                                                 alertMessage.value = ctx.getString(R.string.airplane_mode)
+                                                 alertMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
                                                  showAlert.value = true
                                              }
                                              else if (!Utils.isDefaultSmsApp(ctx)) {

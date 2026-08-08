@@ -26,6 +26,7 @@ class BlockRule(val aor: String = "", val pattern: String) {
         }
 
         fun save() {
+            if (!BaresipService.isNativeReady) return
             Log.d(TAG, "Saving ${BaresipService.blockRules.size} block rules")
             val file = File(BaresipService.filesPath + "/blocking")
             try {
@@ -46,7 +47,11 @@ class BlockRule(val aor: String = "", val pattern: String) {
             if (file.exists())
                 try {
                     val jsonString = file.readText()
-                    BaresipService.blockRules = Json.decodeFromString<MutableList<BlockRule>>(jsonString)
+                    val blockRules = Json.decodeFromString<List<BlockRule>>(jsonString)
+                    synchronized(BaresipService.blockRules) {
+                        BaresipService.blockRules.clear()
+                        BaresipService.blockRules.addAll(blockRules)
+                    }
                     Log.d(TAG, "Restored ${BaresipService.blockRules.size} block rules")
                 } catch (e: Exception) {
                     Log.e(TAG, "Deserialization exception: $e")
