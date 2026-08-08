@@ -12,15 +12,7 @@
     <string name="authentication_password">Парола за удостоверяване</string>
     <string name="authentication_password_help">Парола за удостоверяване, ако се изисква от изходящ прокси.</string>
     <string name="outbound_proxies">Изходящи прокси</string>
-    <string name="outbound_proxies_help">SIP URI на един или два прокси сървъра, които трябва да се използват при изпращане на заявки. 
-		Ако са дадени две, заявките за РЕГИСТРИРАНЕ се изпращат и до двете, и до други заявки 
-		тази, която отговаря. Ако не е даден изходящ прокси, заявките се изпращат въз основа на 
-		DNS NAPTR / SRV / Търсене на запис на хоризонталната част на URI на повикващия. Ако хостпарт на SIP URI е IPv6 
-		адрес, адресът трябва да бъде написан в скоби []. 
-\nExamples: 
-\n • sip:foo.com:5060;transport=tls 
-\n • sip:[2001:67c:223:777::10]:5060;transport=tcp 
-	</string>
+    <string name="outbound_proxies_help">SIP URI на един или два прокси сървъра, които трябва да се използват при изпращане на заявки. Ако са дадени две, заявките за РЕГИСТРИРАНЕ се изпращат и до двете, и до други заявки тази, която отговаря. Ако не е даден изходящ прокси, заявките се изпращат въз основа на DNS NAPTR / SRV / Търсене на запис на хоризонталната част на URI на повикващия. Ако хостпарт на SIP URI е IPv6 адрес, адресът трябва да бъде написан в скоби []. \nExamples: \n • sip:foo.com:5060;transport=tls \n • sip:[2001:67c:223:777::10]:5060;transport=tcp</string>
     <string name="sip_uri_of_proxy_server">SIP URI на прокси сървър</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI на друг прокси сървър</string>
     <string name="register">Регистрирай</string>
@@ -33,9 +25,7 @@
 		Учредяване, RFC 5245). 
 	</string>
     <string name="stun_server">СТУН Сървър</string>
-    <string name="stun_server_help">STUN сървър на хост на формуляра [: port]. 
-		Фабричната стойност по подразбиране е \'stun.l.google.com:19302\', сочещи към обществен сървър на Google STUN. 
-		В момента потребителското име и паролата не се поддържат. </string>
+    <string name="stun_server_help">STUN сървър на хост на формуляра [: port]. Фабричната стойност по подразбиране е \'stun.l.google.com:19302\', сочещи към обществен сървър на Google STUN. В момента потребителското име и паролата не се поддържат.</string>
     <string name="media_encryption">Шифроване на медиите</string>
     <string name="media_encryption_help">Избира протокол за криптиране на медийния транспорт (ако има такъв). 
 \n • ZRTP (препоръчително) означава, че след изпробване на преговорите за криптиране на медиите от край до край ZRTP 

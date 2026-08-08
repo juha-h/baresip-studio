@@ -15,10 +15,9 @@
             <ul>
                 <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi.
                     Kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Jos haluat käyttää baresip-sovellusta mobiilipuheluihin, aktivoi Oletus puhelusovellus
-                    -asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
-                <li>Sitten luo yksi tai useampi SIP-tili Tilit-sivulla. Jälleen kunkin otsikon
-                    kosketus tarjoaa apua.</li>
+                <li>Jos laitteessasi on SIM ja haluat käyttää baresip-sovellusta mobiilipuheluihin,
+                    aktivoi Oletus puhelusovellus -asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
+                <li>Sitten luo yksi tai useampi SIP-tili Tilit-sivulla. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
@@ -66,7 +65,9 @@
             <h2>Käyttövihjeitä</h2>
             <ul>
                 <li>Tarkista, että baresip+-sovelluksen Asetukset vastaavat tarpeitasi. Kunkin otsikon kosketus tarjoaa apua.</li>
-                <li>Sen jälkeen luo yksi tai useampi tili. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
+                <li>Jos laitteessasi on SIM ja haluat käyttää baresip-sovellusta mobiilipuheluihin,
+                    aktivoi Oletus puhelusovellus -asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
+                <li>Sen jälkeen luo yksi tai useampi SIP-tili Tilit-sivulla. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä ympyrällä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
                     valkoinen (rekisteröintiä ei ole aktivoitu).</li>
@@ -144,13 +145,15 @@
         lähettää molemmille välityspalvelimille ja muut sanomat yhdelle
         toiminnassa olevalle välityspalvelimelle. Jos välityspalvelimia ei
         ole annettu, SIP-sanomat lähetetään palvelimelle, mikä selviää
-        kohteen domainille tehtävien NAPTR/SRV/Animipalvelukyselyiden perusteella.
-        Jos välityspalvelimen osoite SIP
+        kohteen domainille tehtävien NAPTR/SRV/A nimipalvelukyselyiden perusteella.
+        SIP URI on muotoa sip:&lt;host&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss].
+        Jos porttia ei ole annettu ja transport on annettu, portin oletusarvo on 5060 (udp, tcp),
+        5061 (tls) tai 443 (wss). Jos välityspalvelimen osoite SIP
         URI:ssa on IPv6-osoite, osoite pitää kirjoittaa sulkujen [] sisään.
 \nEsimerkkejä:
-\n • sip:example.com:5061;transport=tls
+\n • sip:example.com;transport=tls
 \n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss
+\n • sip:192.168.43.50:4430;transport=wss
     </string>
     <string name="sip_uri_of_proxy_server">Välityspalvelimen SIP URI</string>
     <string name="sip_uri_of_another_proxy_server">Toisen
@@ -173,11 +176,10 @@
         for NAT, RFC 5389) ja ICE (Interactive Connectivity Establishment, RFC 5245).
     </string>
     <string name="stun_server">STUN/TURN-palvelin</string>
-    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][?transport=udp|tcp]\'
-        oleva URI, missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'. Oletus STUN-palvelin
-        STUN- ja ICE-protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
-        julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.
-    </string>
+    <string name="stun_server_help">STUN/TURN-palvelimen muotoa \'kaava:palvelin[:portti][;transport=udp|tcp]\' oleva URI,
+        missä kaava on \'stun\', \'stuns\', \'turn\' tai \'turns\'.
+        Oletus STUN-palvelin STUN- ja ICE-protokollille on \'stun:stun.l.google.com:19302\', joka osoittaa Google:n
+        julkiseen STUN-palvelimeen. TURN-palvelimella ei ole oletusarvoa.</string>
     <string name="invalid_stun_server">Virheellinen STUN/TURN-palvelimen URI \'%1$s\'</string>
     <string name="stun_username">STUN/TURN-käyttäjätunnus</string>
     <string name="stun_username_help">Käyttäjätunnus jos STUN/TURN-palvelin vaatii sellaisen</string>
@@ -256,13 +258,14 @@
     <string name="accounts">Tilit</string>
     <string name="new_account">Uuden tilin SIP URI</string>
     <string name="accounts_help">Uuden tilin SIP URI muotoa
-        &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls].
+        &lt;käyttäjä&gt;@&lt;domain&gt;[:&lt;portti&gt;][;transport=udp|tcp|tls|wss].
         Jos &lt;portti&gt; on annettu, mutta protokollaa ei ole annettu, protokolla on udp.
-        Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 tai 5061 (tls).
-        Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
+        Jos &lt;portti&gt; ei ole annettu, mutta protokolla on annettu, portti on joko 5060 (udp, tcp), 5061 (tls) tai
+        443 (wss). Jos kumpaakaan ei ole annettu eikä välityspalvelinta ole määritelty, tilin mahdollinen
         rekisteröintipalvelin päätellään pelkästään domainin DNS-informaation perusteella.
+        \nEsimerkki: user@example.com
     </string>
-    <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls] \'%1$s\'
+    <string name="invalid_aor">Virheellinen käyttäjä@domain[:portti][;transport=udp|tcp|tls|wss] \'%1$s\'
     </string>
     <string name="account_exists">Tili \'%1$s\' on jo olemassa.</string>
     <string name="account_allocation_failure">Uuden tilin luonti epäonnistui.</string>
@@ -639,6 +642,7 @@
     <string name="no_notifications">Et voi käyttää tätä sovellusta ilman Ilmoitukset-lupaa.</string>
     <string name="airplane_mode">Laite on lentotilassa. Poista lentotila, jos haluat käyttää
         mobiilitiliä.</string>
+    <string name="mobile_service_not_available">Mobiilipalvelu ei ole käytettävissä.</string>
     <string name="no_calls">Et voi soittaa puheluita tai vastata niihin ilman Mikrofoni-lupaa.</string>
     <string name="no_video_calls">Salli Kamera-lupa jotta voit soittaa videopuheluita ja vastata niihin.</string>
     <string name="no_backup">Et voi tallentaa sovelluksen tietoja ilman Tallennustila-lupaa.</string>

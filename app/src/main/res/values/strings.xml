@@ -17,8 +17,8 @@
         <ul>
             <li>Check that default values in baresip\'s Settings meet your needs
                 (touch item titles for help).</li>
-            <li>If you want use baresip for mobile calling, turn on Default Phone App setting. It will
-                 create Mobile account for mobile calling.</li>
+            <li>If your device has SIM and you want use baresip for mobile calling, turn on Default Phone App setting.
+                It will create Mobile account for mobile calling.</li>
             <li>Then in Accounts, create one or more SIP accounts (again touch item titles for help).</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
                 succeeded), yellow (registration is in progress), red (registration failed),
@@ -68,8 +68,8 @@
         <ul>
             <li>Check that default values in baresip+\'s Settings meet your needs
                 (touch item titles for help).</li>
-            <li>If you want use baresip+ for mobile calling, turn on Default Phone App setting. It will
-                create Mobile account for mobile calling.</li>
+            <li>If your device has SIM and you want use baresip for mobile calling, turn on Default Phone App setting.
+                It will create Mobile account for mobile calling.</li>
             <li>Then in Accounts, create one or more SIP accounts (again touch item titles for help).</li>
             <li>Registration status of an account is shown with a colored dot: green (registration
                 succeeded), yellow (registration is in progress), red (registration failed), white (registration
@@ -147,12 +147,14 @@
     <string name="outbound_proxies_help">SIP URI of one or two proxies that must be used when sending requests.
         If two is given, REGISTER requests are sent to both and other requests are sent to
         one that responds.  If no outbound proxy is given, requests are sent based on
-        DNS NAPTR/SRV/A record lookup of callee URI hostpart. If hostpart of SIP URI is an IPv6
-        address, the address must be written inside brackets [].
+        DNS NAPTR/SRV/A record lookup of request URI hostpart. SIP URI is of the form
+        sip:&lt;host&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss].
+        If &lt;port&gt; is not given and transport protocol is given, &lt;port&gt; defaults to 5060 (udp, tcp), 5061 (tls),
+        or 443 (wss). If &lt;host&gt; is an IPv6 address, the address must be written inside brackets [].
 \nExamples:
-\n • sip:example.com:5061;transport=tls
+\n • sip:example.com;transport=tls
 \n • sip:[2001:67c:223:777::10];transport=tcp
-\n • sip:192.168.43.50:443;transport=wss
+\n • sip:192.168.43.50:4430;transport=wss
     </string>
     <string name="sip_uri_of_proxy_server">SIP URI of Proxy Server</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI of another Proxy Server</string>
@@ -174,7 +176,7 @@
         Establishment, RFC 5245).
     </string>
     <string name="stun_server">STUN/TURN Server</string>
-    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port][?transport=udp|tcp],
+    <string name="stun_server_help">A STUN/TURN Server URI of form scheme:host[:port][;transport=udp|tcp],
         where scheme is \'stun\', \'stuns\', \'turn\', or \'turns\'. Factory default STUN Server
         for STUN and ICE protocols is \'stun:stun.l.google.com:19302\' pointing to public Google
         STUN server. There is no factory default TURN server.
@@ -248,14 +250,14 @@
     <!-- Accounts Activity -->
     <string name="accounts">Accounts</string>
     <string name="new_account">SIP URI of New Account</string>
-    <string name="accounts_help">SIP URI of new account of form
-        &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls].
-        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to UDP.
-        If &lt;port&gt; is not given and transport protocol is given, &lt;port&gt; defaults to 5060 or 5061 (TLS).
-        If neither is given and no outbound proxy is specified, account\'s registrar (if any) is
+    <string name="accounts_help">SIP URI of new account of form &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss].
+        If &lt;port&gt; is given and transport protocol is not given, transport protocol defaults to udp.
+        If &lt;port&gt; is not given and transport protocol is given, &lt;port&gt; defaults to 5060 (udp, tcp), 5061 (tls),
+        or 443 (wss). If neither is given and no outbound proxy is specified, account\'s registrar (if any) is
         determined solely based on domain\'s DNS information.
+        \nExample: user@example.com
     </string>
-    <string name="invalid_aor">Invalid user@domain[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
+    <string name="invalid_aor">Invalid user@domain[:port][;transport=udp|tcp|tls|wss] \'%1$s\'</string>
     <string name="account_exists">Account \'%1$s\' already exists.</string>
     <string name="account_allocation_failure">Failed to allocate new account.</string>
     <string name="encrypt_password">Encrypt Password</string>
@@ -625,6 +627,7 @@
     <string name="no_notifications">You are not able to use this application without \"Notifications\"
         permission.</string>
     <string name="airplane_mode">Airplane mode is ON. Turn it OFF to use mobile account.</string>
+    <string name="mobile_service_not_available">Mobile service is not available.</string>
     <string name="no_calls">baresip needs \"Microphone\" permission for voice calls.</string>
     <string name="no_video_calls">Grant \"Camera\" permission to make or answer video calls.</string>
     <string name="no_backup">You are not able create backup without \"Storage\" permission.</string>
