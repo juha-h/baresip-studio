@@ -258,7 +258,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
         return if (nickName != "")
             nickName
         else
-            aor.split(":")[1].substringBefore(";")
+            luri.removePrefix("sip:")
     }
 
     private fun removeAudioCodecsStartingWith(prefix: String) {

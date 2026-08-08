@@ -18,7 +18,16 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
     fun add() {
         synchronized(uas) {
             val updatedUas = uas.value.toMutableList()
-            updatedUas.add(this)
+            val index = updatedUas.indexOfFirst { Utils.uriMatch(it.account.aor, this.account.aor) }
+            if (index == -1) {
+                updatedUas.add(this)
+            } else {
+                if (updatedUas[index].uap == 0L && this.uap != 0L) {
+                    updatedUas[index] = this
+                } else {
+                    return
+                }
+            }
             uas.value = updatedUas.toList()
             uasStatus.value = statusMap()
         }
@@ -98,11 +107,10 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
             return null
         }
 
-        fun uaAlloc(uri: String): UserAgent? {
+        fun uaAlloc(uri: String): Long {
             val uap = Api.ua_alloc(uri)
-            if (uap != 0L) return UserAgent(uap)
-            Log.e(TAG, "Failed to allocate UserAgent for $uri")
-            return null
+            if (uap == 0L) Log.e(TAG, "Failed to allocate UserAgent for $uri")
+            return uap
         }
 
         fun findAorIndex(aor: String): Int? {
