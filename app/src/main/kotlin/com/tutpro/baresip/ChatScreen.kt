@@ -488,7 +488,6 @@ private fun NewMessage(
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
 
-    val airplaneMode = stringResource(R.string.airplane_mode)
     val messageFailed = stringResource(R.string.message_failed)
     val noTelephonyProvider = stringResource(R.string.no_telephony_provider)
 
@@ -570,7 +569,7 @@ private fun NewMessage(
                     addMessage(msg)
                     if (ua.account.isMobile) {
                         if (ua.status != circleGreen.getValue(colorblind)) {
-                            dialogMessage.value = airplaneMode
+                            dialogMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
                             showDialog.value = true
                         }
                         else {

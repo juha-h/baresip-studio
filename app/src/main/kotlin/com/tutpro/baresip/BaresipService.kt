@@ -588,6 +588,8 @@ class BaresipService: Service() {
                         CallHistoryNew.clearRecordings()
                         CallHistoryNew.save()
                         Message.save()
+                        Blocked.save()
+                        BlockRule.save()
                         if (recordings.exists())
                             recordings.deleteRecursively()
                         restored.delete()
@@ -595,28 +597,21 @@ class BaresipService: Service() {
 
                     File(filesDir, "recordings").mkdir()
                     File(filesDir, "tmp").mkdir()
-                }.start()
 
-                hotSpotAddresses = Utils.hotSpotAddresses()
-                linkAddresses = linkAddresses()
-                var addresses = ""
-                for (la in linkAddresses)
-                    addresses = "$addresses;${la.key};${la.value}"
-                Log.i(TAG, "Link addresses: $addresses")
-                activeNetwork = cm.activeNetwork
-                Log.i(TAG, "Active network: $activeNetwork")
+                    hotSpotAddresses = Utils.hotSpotAddresses()
+                    linkAddresses = linkAddresses()
+                    var addresses = ""
+                    for (la in linkAddresses)
+                        addresses = "$addresses;${la.key};${la.value}"
+                    Log.i(TAG, "Link addresses: $addresses")
 
-                registerPhoneAccount()
+                    val userAgent = Config.variable("user_agent")
+                    val software = if (userAgent != "")
+                        userAgent
+                    else
+                        "baresip v${BuildConfig.VERSION_NAME} " +
+                                "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
 
-                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
-
-                val userAgent = Config.variable("user_agent")
-                val software = if (userAgent != "")
-                    userAgent
-                else
-                    "baresip v${BuildConfig.VERSION_NAME} " +
-                            "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
-                Thread {
                     baresipStart(
                         filesPath,
                         addresses.removePrefix(";"),
@@ -624,6 +619,15 @@ class BaresipService: Service() {
                         software
                     )
                 }.start()
+
+                isServiceRunning = true
+
+                activeNetwork = cm.activeNetwork
+                Log.i(TAG, "Active network: $activeNetwork")
+
+                registerPhoneAccount()
+
+                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
                 isServiceRunning = true
 
@@ -1796,11 +1800,15 @@ class BaresipService: Service() {
     @Keep
     fun started() {
         Log.d(TAG, "Received 'started' from baresip")
-        isNativeReady = true
 
         Handler(Looper.getMainLooper()).post {
+            isNativeReady = true
             addMobileUserAgent()
             Account.saveAccounts()
+            CallHistoryNew.save()
+            Message.save()
+            Blocked.save()
+            BlockRule.save()
             if (VERSION.SDK_INT >= 29)
                 updateMobileStatus()
 
@@ -2400,15 +2408,13 @@ class BaresipService: Service() {
 
         mobileUa.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus ?: if (ua.status == circleGreen.getValue(colorblind))
-                ua.status
-            else if (isAirplaneModeOn)
+            val status = newStatus ?: if (isAirplaneModeOn)
                 R.drawable.circle_white
-            else if (ua.status == R.drawable.circle_white)
-                // Show "Red" (not yet in service)
-                circleRed.getValue(colorblind)
+            else if (previousMobileServiceState == ServiceState.STATE_IN_SERVICE)
+                circleGreen.getValue(colorblind)
             else
-                ua.status
+                circleRed.getValue(colorblind)
+
             if (ua.status != status) {
                 Log.d(TAG, "Updating Mobile status to $status")
                 ua.updateStatus(status)
@@ -3221,6 +3227,8 @@ class BaresipService: Service() {
         var contactAction by mutableStateOf("call")
         var addressFamily = ""
         var dnsServers = listOf<InetAddress>()
+
+        val messagesLock = Any()
 
         // <aor, password> of those accounts that have auth username without auth password
         val aorPasswords = mutableMapOf<String, String>()

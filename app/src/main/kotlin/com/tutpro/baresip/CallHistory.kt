@@ -76,6 +76,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
         }
 
         fun save() {
+            if (!BaresipService.isNativeReady) return
             val historyCopy = synchronized(BaresipService.callHistory) {
                 ArrayList(BaresipService.callHistory)
             }
@@ -105,7 +106,10 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                 if (content.startsWith("[")) {
                     try {
                         val restoredHistory = Json.decodeFromString<List<CallHistoryNew>>(content)
-                        BaresipService.callHistory = ArrayList(restoredHistory)
+                        synchronized(BaresipService.callHistory) {
+                            BaresipService.callHistory.clear()
+                            BaresipService.callHistory.addAll(restoredHistory)
+                        }
                         Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls from JSON")
                         return
                     } catch (e: Exception) {
@@ -118,7 +122,10 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                     @Suppress("UNCHECKED_CAST")
                     val restoredHistory = ois.readObject() as? List<CallHistoryNew>
                     if (restoredHistory != null) {
-                        BaresipService.callHistory = ArrayList(restoredHistory)
+                        synchronized(BaresipService.callHistory) {
+                            BaresipService.callHistory.clear()
+                            BaresipService.callHistory.addAll(restoredHistory)
+                        }
                         Log.d(TAG, "Restored history of ${BaresipService.callHistory.size} calls from Java")
                         save()
                     }

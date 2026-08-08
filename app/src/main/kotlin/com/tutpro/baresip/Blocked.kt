@@ -33,6 +33,7 @@ class Blocked (
         }
 
         fun save() {
+            if (!BaresipService.isNativeReady) return
             Log.d(TAG, "Saving ${BaresipService.blocked.size} blocked calls and messages")
             val file = File(BaresipService.filesPath + "/blocked")
             try {
@@ -54,7 +55,10 @@ class Blocked (
                 try {
                     val jsonString = file.readText()
                     val blockedList = Json.decodeFromString<List<Blocked>>(jsonString)
-                    BaresipService.blocked = ArrayList(blockedList)
+                    synchronized(BaresipService.blocked) {
+                        BaresipService.blocked.clear()
+                        BaresipService.blocked.addAll(blockedList)
+                    }
                     Log.d(TAG, "Restored ${BaresipService.blocked.size} blocked calls and messages")
                 } catch (e: Exception) {
                     Log.e(TAG, "Deserialization exception: $e")

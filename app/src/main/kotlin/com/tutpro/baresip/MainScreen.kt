@@ -2119,7 +2119,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
     }
     else if (ua.account.isMobile && ua.status != circleGreen.getValue(colorblind)) {
         alertTitle.value = ctx.getString(R.string.notice)
-        alertMessage.value = ctx.getString(R.string.airplane_mode)
+        alertMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
         showAlert.value = true
         return
     }
