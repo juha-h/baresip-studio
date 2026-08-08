@@ -301,53 +301,7 @@
     <string name="proximity_sensing_help">Při hovorech používat snímač přiblížení (automatické vypnutí displeje).</string>
     <string name="dynamic_colors">Dynamické barvy</string>
     <string name="dynamic_colors_help">Použijí se dynamické barvy, pokud jsou povoleny v nastavení Androidu</string>
-    <string name="about_text"><![CDATA[
-     <h1>SIP klient založený na knihovně <a href="https://github.com/baresip/baresip">baresip</a></h1>
-        <br>
-        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
-        <p>Verze %1$s</p>
-        <br>
-        <h2>Nápověda</h2>
-        <ul>
-            <li>Zkontrolujte, zda výchozí hodnoty nastavení vyhovují vašim potřebám
-                (nápovědu zobrazíte klepnutím na názvy položek).</li>
-            <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět klepněte na názvy položek).</li>
-            <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace
-                      proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace 
-                      nezačala).</li>
-            <li>Klepnutím na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.</li>
-            <li>Dlouhým dotykem na ikony na liště baresip zobrazíte informace o ikonách.</li>
-            <li>Přejetí prstem dolů po obrazovce (gesto) zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>
-            <li>Dlouhým dotykem na aktuálně zobrazený název účtu povolíte nebo zakážete jeho registraci.</li>
-            <li>Mezi účty se můžete přepnout přejetím prstem vlevo/vpravo po obrazovce (gesto).</li>
-            <li>Poslední volaný kontakt lze znovu rychle vybrat klepnutím na ikonu hovoru, pokud je pole "Zavolat na ..." prázdné.</li>
-            <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhým podržením.</li>
-            <li>Dlouhým podržením lze také odstraňovat hovory, chaty, zprávy a kontakty.</li>
-            <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>
-            <li>Dlouhým dotykem na zvukový kodek lze kodek povolit/zakázat.</li>
-            <li>Navštivte <a href="https://github.com/juha-h/baresip-studio/wiki">Wiki</a> pro více informací.</li>
-        </ul>
-        <h2>Zásady ochrany osobních údajů</h2>
-            <p>Zásady ochrany osobních údajů jsou k dispozici <a href="https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt">zde</a>.</p>
-        <br>
-        <h2>Zdrojový kód</h2>
-            <p>Zdrojový kód je k dispozici na <a href="https://github.com/juha-h/baresip-studio">GitHubu</a>,
-            kde je také možno nahlásit problémy, náměty a požadavky.</p>
-        <br>
-        <h2>Překlady aplikace do jiných jazyků</h2>
-            <p>Překlady jsou realizovány skrze projekt baresip
-                <a href="https://hosted.weblate.org/projects/baresip/">Weblate</a>.</p>
-        <br>
-        <h2>Licence</h2>
-        <ul>
-            <li><b>BSD-3-Clause</b> kromě následujících:</li>
-            <li><b>Apache 2.0</b> AMR kodeky a TLS zabezpečení</li>
-            <li><b>AGPLv4</b> ZRTP šifrování médií</li>
-            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
-            <li><b>Free</b> G.722 codec</li>
-            <li><b>GNU GPLv3</b> G.729 kodek</li>
-        </ul>
-        ]]></string>
+    <string name="about_text"><![CDATA["\n     <h1>SIP klient založený na knihovně <a href=\"https://github.com/baresip/baresip\">baresip</a></h1>\n        <br>\n        <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n        <p>Verze %1$s</p>\n        <br>\n        <h2>Nápověda</h2>\n        <ul>\n            <li>Zkontrolujte, zda výchozí hodnoty nastavení vyhovují vašim potřebám\n                (nápovědu zobrazíte klepnutím na názvy položek).</li>\n            <li>Poté v sekci Účty vytvořte jeden nebo více účtů (pro nápovědu opět klepněte na názvy položek).</li>\n            <li>Stav registrace účtu je indikován barevnou tečkou: zelená (registrace\n                      proběhla úspěšně), žlutá (registrace probíhá), červená (registrace se nezdařila), bílá (registrace \n                      nezačala).</li>\n            <li>Klepnutím na stavovou ikonu (nalevo od názvu účtu) spustí konfiguraci účtu.</li>\n            <li>Dlouhým dotykem na ikony na liště baresip zobrazíte informace o ikonách.</li>\n            <li>Přejetí prstem dolů po obrazovce (gesto) zahájí opětovnou registraci aktuálně zobrazeného účtu.</li>\n            <li>Dlouhým dotykem na aktuálně zobrazený název účtu povolíte nebo zakážete jeho registraci.</li>\n            <li>Mezi účty se můžete přepnout přejetím prstem vlevo/vpravo po obrazovce (gesto).</li>\n            <li>Poslední volaný kontakt lze znovu rychle vybrat klepnutím na ikonu hovoru, pokud je pole \"Zavolat na ...\" prázdné.</li>\n            <li>Účastníky hovorů a zpráv lze přidávat do kontaktů dlouhým podržením.</li>\n            <li>Dlouhým podržením lze také odstraňovat hovory, chaty, zprávy a kontakty.</li>\n            <li>Dotyk/dlouhý dotyk na ikonu kontaktu lze použít k přidání/odstranění obrázkového avatara.</li>\n            <li>Dlouhým dotykem na zvukový kodek lze kodek povolit/zakázat.</li>\n            <li>Navštivte <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> pro více informací.</li>\n        </ul>\n        <h2>Zásady ochrany osobních údajů</h2>\n            <p>Zásady ochrany osobních údajů jsou k dispozici <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">zde</a>.</p>\n        <br>\n        <h2>Zdrojový kód</h2>\n            <p>Zdrojový kód je k dispozici na <a href=\"https://github.com/juha-h/baresip-studio\">GitHubu</a>,\n            kde je také možno nahlásit problémy, náměty a požadavky.</p>\n        <br>\n        <h2>Překlady aplikace do jiných jazyků</h2>\n            <p>Překlady jsou realizovány skrze projekt baresip\n                <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>.</p>\n        <br>\n        <h2>Licence</h2>\n        <ul>\n            <li><b>BSD-3-Clause</b> kromě následujících:</li>\n            <li><b>Apache 2.0</b> AMR kodeky a TLS zabezpečení</li>\n            <li><b>AGPLv4</b> ZRTP šifrování médií</li>\n            <li><b>GNU LGPL 2.1</b> Codec2 codec</li>\n            <li><b>Free</b> G.722 codec</li>\n            <li><b>GNU GPLv3</b> G.729 kodek</li>\n        </ul>\n        "]]></string>
     <string name="check_origin">Ověřovat požadavky na registraci</string>
     <string name="check_origin_help">Pokud je tato volba zapnutá, příchozí požadavky jsou povoleny pouze z IP adres, na které byly odeslány registrační požadavky.</string>
     <string name="block_unknown">Blokovat neznámé kontakty</string>
