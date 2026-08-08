@@ -874,7 +874,8 @@ class BaresipService: Service() {
                 if (VERSION.SDK_INT < 29) {
                     Log.d(TAG, "Removing Mobile account on API < 29")
                     removeMobile = true
-                } else if (Utils.pstnAccountHandle(this) == null || !isSimReady()) {
+                }
+                else if (Utils.pstnAccountHandle(this) == null || !isSimReady()) {
                     Log.d(TAG, "Removing Mobile account (SIM not ready or not default dialer)")
                     removeMobile = true
                 }
