@@ -13,8 +13,8 @@ configure<ApplicationExtension> {
         applicationId = "com.tutpro.baresip"
         minSdk = 28
         targetSdk = 36
-        versionCode = 537
-        versionName = "88.1.2"
+        versionCode = 538
+        versionName = "88.1.3"
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
@@ -30,9 +30,7 @@ configure<ApplicationExtension> {
     }
     buildTypes {
         debug {
-            ndk {
-                abiFilters.add("x86_64")
-            }
+            ndk { abiFilters.add("x86_64") }
         }
         release {
             isMinifyEnabled = true

@@ -1,0 +1,7 @@
+- Create Mobile account only if SIM is present
+- Make sure that SIP user agent is allocated only once
+- Added wss to account's transport protocols
+- Improved About. Accounts, Outbound Proxies help texts
+- Introduced new string mobile_service_not_available and corresponding alert
+- Improved alert dialog
+- New translations (several languages)
