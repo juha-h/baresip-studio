@@ -19,15 +19,12 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
         synchronized(uas) {
             val updatedUas = uas.value.toMutableList()
             val index = updatedUas.indexOfFirst { Utils.uriMatch(it.account.aor, this.account.aor) }
-            if (index == -1) {
+            if (index == -1)
                 updatedUas.add(this)
-            } else {
-                if (updatedUas[index].uap == 0L && this.uap != 0L) {
-                    updatedUas[index] = this
-                } else {
-                    return
-                }
-            }
+            else if (updatedUas[index].uap == 0L && this.uap != 0L)
+                updatedUas[index] = this
+            else
+                return
             uas.value = updatedUas.toList()
             uasStatus.value = statusMap()
         }
@@ -61,8 +58,7 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
     fun currentCall(): Call? {
         synchronized(BaresipService.calls) {
             for (c in BaresipService.calls.reversed())
-                if (c.ua == this)
-                    return c
+                if (c.ua == this) return c
         }
         return null
     }
@@ -114,19 +110,16 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
         }
 
         fun findAorIndex(aor: String): Int? {
-            for (i in uas.value.indices) {
+            for (i in uas.value.indices)
                 if (uas.value[i].account.aor == aor) return i
-            }
             return null
         }
 
         fun register() {
-            for (ua in uas.value) {
-                if (ua.account.regint > 0) {
+            for (ua in uas.value)
+                if (ua.account.regint > 0)
                     if (Api.ua_register(ua.uap) != 0)
                         Log.d(TAG, "Failed to register ${ua.account.aor}")
-                }
-            }
         }
 
         fun updateColorblindStatus() {
