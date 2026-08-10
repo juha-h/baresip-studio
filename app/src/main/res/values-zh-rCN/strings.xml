@@ -17,7 +17,7 @@
     <string name="authentication_password_help">身份验证密码最多 64 个字符。如果提供了身份验证用户名，但未提供密码，则在启动 baresip 时会询问。</string>
     <string name="invalid_authentication_password">身份验证密码“%1$s”无效</string>
     <string name="outbound_proxies">出站代理</string>
-    <string name="outbound_proxies_help">当发送请求时，必须使用一个或两个代理的 SIP URI。如果指定两个，则 REGISTER 请求将同时发送给二者，其他请求则发送给最先响应的一方。如果没有指定出站代理，则根据被叫 URI 主机部分的 DNS NAPTR/SRV/A 记录查找发送请求。如果 SIP URI 的主机部分是 IPv6 地址，则该地址必须写在方括号 [] 内。\n示例：\n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">当发送请求时，必须使用一个或两个代理的 SIP URI。如果指定两个，则 REGISTER 请求将同时发送给二者，其他请求则发送给最先响应的一方。如果没有指定出站代理，则根据请求 URI 主机部分的 DNS NAPTR/SRV/A 记录查找发送请求。SIP URI 的格式为 sip:&lt;host&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss]。如果未指定 &lt;port&gt; 但指定了传输协议，则 &lt;port&gt; 默认为 5060（udp、tcp）、5061（tls）或 443（wss）。如果 &lt;host&gt; 是 IPv6 地址，则必须将地址写在方括号 [] 内。\n示例：\n • sip:example.com;transport=tls\n • sip:[2001:67c:223:777::10];transport=tcp\n • sip:192.168.43.50:4430;transport=wss</string>
     <string name="sip_uri_of_proxy_server">代理服务器的 SIP URI</string>
     <string name="sip_uri_of_another_proxy_server">另一个代理服务器的 SIP URI</string>
     <string name="invalid_proxy_server_uri">代理服务器 URI“%1$s”无效</string>
@@ -29,7 +29,7 @@
     <string name="media_nat">媒体 NAT 穿越</string>
     <string name="media_nat_help">选择媒体 NAT 穿越协议（如果有）。可能的选择是 STUN（ NAT 会话穿越实用程序，RFC 5389）和 ICE（交互式连接建立，RFC 5245）。</string>
     <string name="stun_server">STUN/TURN 服务器</string>
-    <string name="stun_server_help">STUN/TURN 服务器 URI 的格式为 scheme:host[:port][?transport=udp|tcp]，其中 scheme 为“stun”、“stuns”、“turn”或“turns”。STUN 和 ICE 协议的出厂默认 STUN 服务器是指向公共 Google STUN 服务器的“stun:stun.l.google.com:19302”。没有出厂默认的 TURN 服务器。</string>
+    <string name="stun_server_help">STUN/TURN 服务器 URI 的格式为 scheme:host[:port][;transport=udp|tcp]，其中 scheme 为“stun”、“stuns”、“turn”或“turns”。STUN 和 ICE 协议的出厂默认 STUN 服务器是指向公共 Google STUN 服务器的“stun:stun.l.google.com:19302”。没有出厂默认的 TURN 服务器。</string>
     <string name="invalid_stun_server">STUN/TURN 服务器 URI“%1$s”无效</string>
     <string name="stun_username">STUN/TURN 用户名</string>
     <string name="stun_username_help">用户名（如果 STUN/TURN 服务器需要）</string>
@@ -68,8 +68,8 @@
     <string name="default_account_help">如果选中，则在启动 baresip 时选择此账号。</string>
     <string name="accounts">账号</string>
     <string name="new_account">新账号的 SIP URI</string>
-    <string name="accounts_help">新账号的 SIP URI 格式为 &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]。如果指定了 &lt;port&gt;，但未指定传输协议，则传输协议默认为 UDP。如果未指定 &lt;port&gt;，但指定了传输协议，则 &lt;port&gt; 默认为 5060 或 5061（TLS）。如果二者均未指定，也没有指定出站代理，则将仅根据域名的 DNS 信息确定账号的注册服务器（如果有）。</string>
-    <string name="invalid_aor">user@domain[:port][;transport=udp|tcp|tls]“%1$s”无效</string>
+    <string name="accounts_help">新账号的 SIP URI 格式为 &lt;user&gt;@&lt;domain&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss]。如果指定了 &lt;port&gt;，但未指定传输协议，则传输协议默认为 UDP。如果未指定 &lt;port&gt;，但指定了传输协议，则 &lt;port&gt; 默认为 5060（UDP、TCP）、5061（TLS）或 443（WSS）。如果二者均未指定，也没有指定出站代理，则将仅根据域名的 DNS 信息确定账号的注册服务器（如果有）。\n示例：user@example.com</string>
+    <string name="invalid_aor">user@domain[:port][;transport=udp|tcp|tls|wss]“%1$s”无效</string>
     <string name="account_exists">账号“%1$s”已存在。</string>
     <string name="account_allocation_failure">无法分配新账号。</string>
     <string name="encrypt_password">加密密码</string>
@@ -385,4 +385,5 @@
     <string name="permission_denied">权限被拒绝</string>
     <string name="show_call">显示通话</string>
     <string name="blocking_rules">屏蔽规则</string>
+    <string name="mobile_service_not_available">移动服务不可用。</string>
 </resources>

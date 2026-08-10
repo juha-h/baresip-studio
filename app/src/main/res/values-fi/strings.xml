@@ -413,9 +413,10 @@
     </string>
     <string name="no_read_permission">Ei ulkoisen muistin lukuoikeutta</string>
     <string name="unique_contact_uri">Uniikki kontakti-URI</string>
-    <string name="unique_contact_uri_help">Jos merkitty, kontakti-URI:n taataan olevan uniikki.
+    <string name="unique_contact_uri_help">Jos merkitty, Contact URI:n taataan olevan uniikki.
         Merkittävä, jos on useammalla tilillä on sama SIP URI:n käyttäjäosa, mutta se myös
-        parantaa tilien suojaa hyökkäyksiltä.
+        parantaa tilien suojaa hyökkäyksiltä.  Älä merkitse, jos palvelun tarjoajasi
+        vaatii, että Contact URI:n käyttäjäosa on sama kuin SIP URI:n käyttäjäosa.
     </string>
     <string name="audio_settings">Audio-asetukset</string>
     <string name="speaker_phone">Kaiutin</string>

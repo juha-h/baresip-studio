@@ -399,7 +399,8 @@
     <string name="unique_contact_uri">Unique Contact URI</string>
     <string name="unique_contact_uri_help">If checked, Contact URI is guaranteed to be unique.
         Needs to be checked if there is more than one account with the same SIP URI userpart,
-        but also improves protection of the accounts from attacks.</string>
+        but also improves protection of the accounts from attacks. Disable if your provider
+        requires that Contact URI userpart is the same as SIP URI userpart.</string>
     <string name="audio_settings">Audio Settings</string>
     <string name="speaker_phone">Speaker Phone</string>
     <string name="speaker_phone_help">If checked, speaker phone is turned automatically on
