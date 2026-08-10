@@ -1,0 +1,4 @@
+- Do not create Mobile account if SIM is data-only
+- Improved Unique Contact URI help text
+- Avoid bogus "No network connection" notice
+- New translations (Chinese)
