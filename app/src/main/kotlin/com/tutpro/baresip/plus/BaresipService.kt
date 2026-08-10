@@ -608,6 +608,8 @@ class BaresipService: Service() {
 
                     hotSpotAddresses = Utils.hotSpotAddresses()
                     linkAddresses = linkAddresses()
+                    if (linkAddresses.isEmpty())
+                        toast(getString(R.string.no_network), Toast.LENGTH_LONG)
                     var addresses = ""
                     for (la in linkAddresses)
                         addresses = "$addresses;${la.key};${la.value}"
@@ -636,11 +638,6 @@ class BaresipService: Service() {
                 registerPhoneAccount()
 
                 Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
-
-                isServiceRunning = true
-
-                if (linkAddresses.isEmpty())
-                    toast(getString(R.string.no_network), Toast.LENGTH_LONG)
 
                 if (!aecAvailable)
                     toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
