@@ -1,0 +1,3 @@
+- Do not create Mobile account if SIM is data-only
+- Improved Unique Contact URI help text
+- New translations (Chinese)
