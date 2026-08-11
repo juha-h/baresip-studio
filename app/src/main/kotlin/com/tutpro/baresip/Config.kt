@@ -121,6 +121,16 @@ object Config {
         if (userAgent != "")
             config = "${config}user_agent $userAgent\n"
 
+        val mobileAccount = previousVariable("mobile_account")
+        if (mobileAccount != "") {
+            config = "${config}mobile_account $mobileAccount\n"
+            BaresipService.mobileAccount = mobileAccount != "no"
+        }
+        else {
+            config = "${config}mobile_account yes\n"
+            BaresipService.mobileAccount = true
+        }
+
         val sipCuserRandom = previousVariable("sip_cuser_random")
         config = if (sipCuserRandom != "")
             "${config}sip_cuser_random $sipCuserRandom\n"

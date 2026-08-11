@@ -357,6 +357,8 @@
     <string name="default_phone_app">Oletus puhelusovellus</string>
     <string name="dialer_role_not_available">Oletus puhelusovellusrooli ei ole saatavana</string>
     <string name="default_phone_app_help">Jos merkitty, baresip on oletus puhelusovellus</string>
+    <string name="create_mobile_account">Luo Mobile-tili</string>
+    <string name="create_mobile_account_help">Jos merkitty, mobiilipuheluita varten luodaan virtuaalinen Mobile-tili.</string>
     <string name="default_messaging_app">Oletus tekstiviestisovellus</string>
     <string name="default_messaging_app_help">Jos merkitty, baresip on tekstiviestien
         oletussovellus</string>

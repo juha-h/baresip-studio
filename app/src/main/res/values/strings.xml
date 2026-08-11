@@ -349,6 +349,8 @@
     <string name="default_phone_app">Default Phone App</string>
     <string name="dialer_role_not_available">Default phone app role is not available</string>
     <string name="default_phone_app_help">If checked, baresip is the default phone app.</string>
+    <string name="create_mobile_account">Create Mobile Account</string>
+    <string name="create_mobile_account_help">If checked, virtual Mobile account is created for mobile calling.</string>
     <string name="default_messaging_app">Default Messaging App</string>
     <string name="default_messaging_app_help">If checked, baresip is the default messaging app for SMS/MMS.</string>
     <string name="messaging_role_not_available">Default messaging app role is not available</string>
