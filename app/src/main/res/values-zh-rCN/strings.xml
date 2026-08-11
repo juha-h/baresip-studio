@@ -386,4 +386,6 @@
     <string name="show_call">显示通话</string>
     <string name="blocking_rules">屏蔽规则</string>
     <string name="mobile_service_not_available">移动服务不可用。</string>
+    <string name="create_mobile_account">创建移动账号</string>
+    <string name="create_mobile_account_help">如果选中，将为移动通话创建虚拟移动账号。</string>
 </resources>
