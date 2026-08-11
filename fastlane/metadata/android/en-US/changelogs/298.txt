@@ -1,0 +1,1 @@
+- Added "Create Mobile Account" sub-setting to "Default Phone App" setting because it is not possible to detect reliably if device has SIM that allows placing calls/SMS messages
