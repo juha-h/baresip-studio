@@ -424,7 +424,7 @@ private fun AccountContent(
         val authenticationPasswordHelp = stringResource(R.string.authentication_password_help)
         val showPassword = remember { mutableStateOf(false) }
         Row(
-            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -572,7 +572,7 @@ private fun AccountContent(
         val regIntTitle = stringResource(R.string.reg_int)
         val regIntHelp = stringResource(R.string.reg_int_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -601,7 +601,7 @@ private fun AccountContent(
         val checkOriginTitle = stringResource(R.string.check_origin)
         val checkOriginHelp = stringResource(R.string.check_origin_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -776,7 +776,7 @@ private fun AccountContent(
         val stunServerTitle = stringResource(R.string.stun_server)
         val stunServerHelp = stringResource(R.string.stun_server_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -804,7 +804,7 @@ private fun AccountContent(
         val stunUsernameTitle = stringResource(R.string.stun_username)
         val stunUsernameHelp = stringResource(R.string.stun_username_help)
         Row(
-            Modifier.fillMaxWidth().padding(top = 8.dp, end = 10.dp),
+            Modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -833,7 +833,7 @@ private fun AccountContent(
         val stunPasswordHelp = stringResource(R.string.stun_password_help)
         val showPassword = remember { mutableStateOf(false) }
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
