@@ -64,13 +64,16 @@ sealed class Contact {
 
         // Return contact name of uri or uri itself if contact with uri is not found
         // Return contact name of uri or uri itself if contact with uri is not found
-        fun contactName(uri: String, includeLabel: Boolean = false): String {
+        fun contactName(uri: String, includeLabel: Boolean = false, unique: Boolean = false): String {
             val contactWithUri = findContactWithUri(uri)
             if (contactWithUri != null) {
                 val name = contactWithUri.first.name()
                 if (includeLabel) {
                     val label = contactWithUri.second.label
-                    return if (label.isNotEmpty()) "$name $label" else name
+                    if (label.isNotEmpty()) return "$name $label"
+                    if (unique && contactWithUri.first.uris().size > 1)
+                        return "$name ${uri.substringAfter(":")}"
+                    return name
                 }
                 return name
             }
@@ -81,7 +84,10 @@ sealed class Contact {
                     val name = telContactWithUri.first.name()
                     if (includeLabel) {
                         val label = telContactWithUri.second.label
-                        return if (label.isNotEmpty()) "$name $label" else name
+                        if (label.isNotEmpty()) return "$name $label"
+                        if (unique && telContactWithUri.first.uris().size > 1)
+                            return "$name $userPart"
+                        return name
                     }
                     return name
                 }
@@ -127,25 +133,23 @@ sealed class Contact {
 
         fun contactContactUris(name: String, tel: Boolean = false): List<ContactUri> {
             synchronized(BaresipService.contacts) {
-                for (c in BaresipService.contacts)
-                    when (c) {
-                        is BaresipContact -> {
-                            if (c.name.equals(name, ignoreCase = true)) {
-                                return if (tel)
-                                    c.uris.filter { it.uri.startsWith("tel:") }
-                                else
-                                    c.uris
-                            }
-                        }
-                        is AndroidContact -> {
-                            if (c.name == name) {
-                                return if (tel)
-                                    c.uris.filter { it.uri.startsWith("tel:") }
-                                else
-                                    c.uris
-                            }
-                        }
+                for (c in BaresipService.contacts) {
+                    val contactUris = if (tel)
+                        c.uris().filter { it.uri.startsWith("tel:") }
+                    else
+                        c.uris()
+                    if (c.name().equals(name, ignoreCase = true))
+                        return contactUris
+                    for (u in contactUris) {
+                        val label = u.label
+                        val nameWithLabel = if (label.isNotEmpty()) "${c.name()} $label" else c.name()
+                        if (nameWithLabel.equals(name, ignoreCase = true))
+                            return listOf(u)
+                        val nameWithUri = "${c.name()} ${u.uri.substringAfter(":")}"
+                        if (nameWithUri.equals(name, ignoreCase = true))
+                            return listOf(u)
                     }
+                }
             }
             return emptyList()
         }

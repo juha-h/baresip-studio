@@ -140,7 +140,7 @@ object Config {
         config = if (sipCuserRandom != "")
             "${config}sip_cuser_random $sipCuserRandom\n"
         else
-            "${config}sip_cuser_random yes\n"
+            "${config}sip_cuser_random no\n"
 
         val darkTheme = previousVariable("dark_theme")
         Preferences(ctx).displayTheme = if (darkTheme == "yes") {

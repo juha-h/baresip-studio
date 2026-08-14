@@ -1237,7 +1237,10 @@ private fun SettingsContent(
             val debug by viewModel.debug.collectAsState()
             Switch(
                 checked = debug,
-                onCheckedChange = { viewModel.debug.value = it }
+                onCheckedChange = {
+                    viewModel.debug.value = it
+                    if (!it) viewModel.sipTrace.value = false
+                }
             )
         }
     }
@@ -1247,7 +1250,7 @@ private fun SettingsContent(
         val sipTraceTitle = stringResource(R.string.sip_trace)
         val sipTraceHelp = stringResource(R.string.sip_trace_help)
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -1349,7 +1352,9 @@ private fun SettingsContent(
         ColorBlind()
         ProximitySensing()
         Debug()
-        SipTrace()
+        val debug by viewModel.debug.collectAsState()
+        if (debug)
+            SipTrace()
         Reset(onRestartApp)
     }
 }
@@ -1526,7 +1531,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         save = true
     }
 
-    val sipTrace = viewModel.sipTrace.value
+    val sipTrace = if (debug) viewModel.sipTrace.value else false
     if (BaresipService.sipTrace != sipTrace) {
         BaresipService.sipTrace = sipTrace
         Api.uag_enable_sip_trace(sipTrace)
