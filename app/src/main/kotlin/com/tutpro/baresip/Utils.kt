@@ -152,14 +152,24 @@ object Utils {
     }
 
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
-        val first = firstUri.removePrefix("<").removeSuffix(">")
-        val second = secondUri.removePrefix("<").removeSuffix(">")
-        if (first.startsWith("tel:", ignoreCase = true))
-            return first.equals(second, ignoreCase = true) ||
-                    first.substringAfter(":").equals(uriUserPart(second), ignoreCase = true)
-        if (first.startsWith("sip:", ignoreCase = true))
-            return uriUserPart(first).equals(uriUserPart(second), ignoreCase = true) &&
-                    uriHostPart(first).equals(uriHostPart(second), ignoreCase = true)
+        val first = uriUnescape(firstUri.removePrefix("<").removeSuffix(">"))
+        val second = uriUnescape(secondUri.removePrefix("<").removeSuffix(">"))
+        val mobileAor = "sip:mobile@pstn"
+        if (first.startsWith("tel:", ignoreCase = true)) {
+            if (first.equals(second, ignoreCase = true)) return true
+            val firstUser = uriUserPart(first)
+            if (second == mobileAor && BaresipService.mobileNumber != "")
+                return firstUser == BaresipService.mobileNumber || firstUser == uriUserPart(BaresipService.mobileNumber)
+            return firstUser.equals(uriUserPart(second), ignoreCase = true)
+        }
+        if (first.startsWith("sip:", ignoreCase = true)) {
+            val firstUser = uriUserPart(first)
+            val firstHost = uriHostPart(first)
+            if (second == mobileAor && BaresipService.mobileNumber != "")
+                return firstUser == BaresipService.mobileNumber || firstUser == uriUserPart(BaresipService.mobileNumber)
+            return firstUser.equals(uriUserPart(second), ignoreCase = true) &&
+                    firstHost.equals(uriHostPart(second), ignoreCase = true)
+        }
         return false
     }
 
@@ -169,20 +179,20 @@ object Utils {
     }
 
     fun friendlyUri(ctx: Context, uri: String, account: Account, e164Check: Boolean = true,
-                    includeLabel: Boolean = true): String {
-        return friendlyUri(uri, account, e164Check, includeLabel,
+                    includeLabel: Boolean = true, unique: Boolean = false): String {
+        return friendlyUri(uri, account, e164Check, includeLabel, unique,
             ctx.getString(R.string.anonymous), ctx.getString(R.string.unknown))
     }
 
     fun friendlyUri(uri: String, account: Account, e164Check: Boolean = true,
-                    includeLabel: Boolean = true, anonymous: String = "Anonymous",
-                    unknown: String = "Unknown"): String {
-        var u = Contact.contactName(uri, includeLabel)
+                    includeLabel: Boolean = true, unique: Boolean = false,
+                    anonymous: String = "Anonymous", unknown: String = "Unknown"): String {
+        var u = Contact.contactName(uri, includeLabel, unique)
         if (u != uri)
             return u
         if (e164Check) {
             val e164Uri = e164Uri(uri, account.countryCode)
-            u = Contact.contactName(e164Uri, includeLabel)
+            u = Contact.contactName(e164Uri, includeLabel, unique)
             if (u != e164Uri)
                 return u
         }

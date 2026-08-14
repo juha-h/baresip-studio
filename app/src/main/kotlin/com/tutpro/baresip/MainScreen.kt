@@ -1218,12 +1218,13 @@ private fun CallUriRow(
                             if (input.length > 1) {
                                 val normalizedInput = Utils.unaccent(input)
                                 val numericInput = input.filter { c -> c.isDigit() || c == '+' }
+                                val currentAor = viewModel.selectedAor.value
                                 filteredSuggestions = BaresipService.contacts.flatMap { contact ->
                                     val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
-                                    val uris = contact.uris()
+                                    val uris = contact.uris().filter { !Utils.uriMatch(it.uri, currentAor) }
                                     val matchingUris = uris.filter { u ->
                                         (u.uri.startsWith("tel:") && numericInput.isNotEmpty() && u.uri.substring(4).contains(numericInput)) ||
-                                                (u.uri.startsWith("sip:") && u.uri.substring(4).contains(normalizedInput, ignoreCase = true))
+                                                (u.uri.startsWith("sip:") && Utils.uriUserPart(u.uri).contains(normalizedInput, ignoreCase = true))
                                     }
                                     if (nameMatch) {
                                         val annotatedName = Utils.buildAnnotatedStringWithHighlight(contact.name(), input)
@@ -1342,7 +1343,7 @@ private fun CallUriRow(
                                             val aor = viewModel.selectedAor.value
                                             val account = Account.ofAor(aor)
                                             if (account != null) {
-                                                dialerState.callUri.value = Utils.friendlyUri(ctx, uri, account)
+                                                dialerState.callUri.value = Utils.friendlyUri(ctx, uri, account, unique = true)
                                                 dialerState.redialUri = uri
                                             } else {
                                                 dialerState.callUri.value = uri.substringAfter(":")
@@ -1359,14 +1360,21 @@ private fun CallUriRow(
                                         )
                                         if (matchingUri != null) {
                                             val uriPart = matchingUri.uri.substringAfter(":")
-                                            val highlightPart = if (matchingUri.uri.startsWith("tel:"))
-                                                dialerState.callUri.value.filter { c -> c.isDigit() || c == '+' }
-                                            else
-                                                dialerState.callUri.value
-                                            val annotatedUri = Utils.buildAnnotatedStringWithHighlight(uriPart, highlightPart)
+                                            val annotatedUri = if (matchingUri.uri.startsWith("sip:")) {
+                                                val userPart = Utils.uriUserPart(matchingUri.uri)
+                                                val restPart = uriPart.substring(userPart.length)
+                                                buildAnnotatedString {
+                                                    append(Utils.buildAnnotatedStringWithHighlight(userPart, dialerState.callUri.value))
+                                                    append(restPart)
+                                                }
+                                            } else {
+                                                val highlightPart = dialerState.callUri.value.filter { c -> c.isDigit() || c == '+' }
+                                                Utils.buildAnnotatedStringWithHighlight(uriPart, highlightPart)
+                                            }
                                             Text(
                                                 text = buildAnnotatedString {
-                                                    if (matchingUri.label.isNotEmpty())
+                                                    if (matchingUri.label.isNotEmpty() &&
+                                                        !listOf("SIP", "TEL").contains(matchingUri.label.uppercase()))
                                                         append("${matchingUri.label} ")
                                                     append(annotatedUri)
                                                 },
@@ -1682,12 +1690,13 @@ private fun CallRow(
                                             if (input.length > 1) {
                                                 val normalizedInput = Utils.unaccent(input)
                                                 val numericInput = input.filter { c -> c.isDigit() || c == '+' }
+                                                val currentAor = call.ua.account.aor
                                                 filteredSuggestions = BaresipService.contacts.flatMap { contact ->
                                                     val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
-                                                    val uris = contact.uris()
+                                                    val uris = contact.uris().filter { !Utils.uriMatch(it.uri, currentAor) }
                                                     val matchingUris = uris.filter { u ->
                                                         (u.uri.startsWith("tel:") && numericInput.isNotEmpty() && u.uri.substring(4).contains(numericInput)) ||
-                                                                (u.uri.startsWith("sip:") && u.uri.substring(4).contains(normalizedInput, ignoreCase = true))
+                                                                (u.uri.startsWith("sip:") && Utils.uriUserPart(u.uri).contains(normalizedInput, ignoreCase = true))
                                                     }
                                                     if (nameMatch) {
                                                         val annotatedName = Utils.buildAnnotatedStringWithHighlight(contact.name(), input)
@@ -1759,7 +1768,7 @@ private fun CallRow(
                                                             .fillMaxWidth()
                                                             .clickable {
                                                                 val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
-                                                                transferUri = Utils.friendlyUri(ctx, uri, call.ua.account)
+                                                                transferUri = Utils.friendlyUri(ctx, uri, call.ua.account, unique = true)
                                                                 call.showSuggestions.value = false
                                                             }
                                                             .padding(12.dp)
@@ -1772,14 +1781,21 @@ private fun CallRow(
                                                             )
                                                             if (matchingUri != null) {
                                                                 val uriPart = matchingUri.uri.substringAfter(":")
-                                                                val highlightPart = if (matchingUri.uri.startsWith("tel:"))
-                                                                    transferUri.filter { c -> c.isDigit() || c == '+' }
-                                                                else
-                                                                    transferUri
-                                                                val annotatedUri = Utils.buildAnnotatedStringWithHighlight(uriPart, highlightPart)
+                                                                val annotatedUri = if (matchingUri.uri.startsWith("sip:")) {
+                                                                    val userPart = Utils.uriUserPart(matchingUri.uri)
+                                                                    val restPart = uriPart.substring(userPart.length)
+                                                                    buildAnnotatedString {
+                                                                        append(Utils.buildAnnotatedStringWithHighlight(userPart, transferUri))
+                                                                        append(restPart)
+                                                                    }
+                                                                } else {
+                                                                    val highlightPart = transferUri.filter { c -> c.isDigit() || c == '+' }
+                                                                    Utils.buildAnnotatedStringWithHighlight(uriPart, highlightPart)
+                                                                }
                                                                 Text(
                                                                     text = buildAnnotatedString {
-                                                                        if (matchingUri.label.isNotEmpty())
+                                                                        if (matchingUri.label.isNotEmpty() &&
+                                                                            !listOf("SIP", "TEL").contains(matchingUri.label.uppercase()))
                                                                             append("${matchingUri.label} ")
                                                                         append(annotatedUri)
                                                                     },
@@ -2053,7 +2069,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                 val aor = viewModel.selectedAor.value
                 val ua = UserAgent.ofAor(aor)
                 val uriToCall = if (dialerState.redialUri != "" &&
-                        uriText == Utils.friendlyUri(ctx, dialerState.redialUri, ua!!.account))
+                        uriText == Utils.friendlyUri(ctx, dialerState.redialUri, ua!!.account, unique = true))
                     dialerState.redialUri
                 else {
                     val uris = Contact.contactContactUris(uriText, ua?.account?.isMobile ?: false)
@@ -2092,7 +2108,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
             val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
             if (latestPeerUri != null) {
                 dialerState.redialUri = latestPeerUri
-                dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account)
+                dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account, unique = true)
             }
         }
     }
@@ -2318,7 +2334,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     ctx.getString(R.string.incoming_call_from_dots)
                 else
                     ctx.getString(R.string.outgoing_call_to_dots)
-                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account, unique = true)
                 call.callUri2.value = ""
                 call.showCallTimer.value = false
                 call.securityIconTint.value = -1
@@ -2333,11 +2349,11 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                 call.showCallTimer.value = false
                 call.securityIconTint.value = -1
                 call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account, unique = true)
                 val uri = call.diverterUri()
                 if (uri != "") {
                     call.callUriLabel2.value = ctx.getString(R.string.diverted_by_dots)
-                    call.callUri2.value = Utils.friendlyUri(ctx, uri, ua.account)
+                    call.callUri2.value = Utils.friendlyUri(ctx, uri, ua.account, unique = true)
                 }
                 else
                     call.callUri2.value = ""
@@ -2351,7 +2367,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             "connected" -> {
                 if (call.referTo != "") {
                     call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
-                    call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.referTo, ua.account, unique = true)
                     call.transferButtonEnabled.value = false
                 }
                 else {
@@ -2359,7 +2375,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                         call.callUriLabel.value = ctx.getString(R.string.outgoing_call_to_dots)
                     else
                         call.callUriLabel.value = ctx.getString(R.string.incoming_call_from_dots)
-                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account)
+                    call.callUri.value = Utils.friendlyUri(ctx, call.peerUri, ua.account, unique = true)
                     call.transferButtonEnabled.value = !ua.account.isMobile
                 }
                 call.callUri2.value = ""
@@ -2671,7 +2687,7 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             }
             viewModel.navigateToHome()
             val peer = intent.getStringExtra("peer")!!
-            viewModel.dialerState.callUri.value = Utils.friendlyUri(ctx, peer, ua.account)
+            viewModel.dialerState.callUri.value = Utils.friendlyUri(ctx, peer, ua.account, unique = true)
             viewModel.dialerState.redialUri = peer
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {

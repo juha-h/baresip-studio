@@ -1083,13 +1083,13 @@ class BaresipService: Service() {
                         val toastMsg = if (Call.isAnyCallActive(this))
                             String.format(
                                 getString(R.string.call_auto_rejected),
-                                Utils.friendlyUri(this, peerUri, ua.account)
+                                Utils.friendlyUri(this, peerUri, ua.account, unique = true)
                             )
                         else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
                             blockedCall = true
                             String.format(
                                 getString(R.string.call_blocked),
-                                Utils.friendlyUri(this, peerUri, ua.account)
+                                Utils.friendlyUri(this, peerUri, ua.account, unique = true)
                             )
                         }
                         else if (ua.account.blockHidden && peerUri.contains("anonymous")) {
@@ -1100,7 +1100,7 @@ class BaresipService: Service() {
                             blockedCall = true
                             String.format(
                                 getString(R.string.call_blocked),
-                                Utils.friendlyUri(this, peerUri, ua.account)
+                                Utils.friendlyUri(this, peerUri, ua.account, unique = true)
                             )
                         }
                         else if (!Utils.checkPermissions(this, arrayOf(RECORD_AUDIO)))
@@ -1286,7 +1286,7 @@ class BaresipService: Service() {
                                 piFlags
                             )
                             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-                            val target = Utils.friendlyUri(this, ev[1], ua.account)
+                            val target = Utils.friendlyUri(this, ev[1], ua.account, unique = true)
                             nb.setSmallIcon(R.drawable.ic_notification_call)
                                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                 .setContentIntent(pi)
@@ -1509,7 +1509,7 @@ class BaresipService: Service() {
             else
                 String.format(
                     getString(R.string.message_blocked),
-                    Utils.friendlyUri(this, peerUri, ua.account)
+                    Utils.friendlyUri(this, peerUri, ua.account, unique = true)
                 )
             )
             return
@@ -1553,7 +1553,7 @@ class BaresipService: Service() {
                 else
                     String.format(
                         getString(R.string.message_blocked),
-                        Utils.friendlyUri(this, peerUri, ua.account)
+                        Utils.friendlyUri(this, peerUri, ua.account, unique = true)
                     )
             )
             Blocked(
@@ -2003,7 +2003,7 @@ class BaresipService: Service() {
 
             if (activeCall != null) {
                 val peerUri = activeCall.peerUri
-                val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account)
+                val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account, unique = true)
                 val person = Person.Builder().setName(caller).build()
 
                 val hangupIntent = Intent(this, BaresipService::class.java)
@@ -2176,7 +2176,7 @@ class BaresipService: Service() {
                 telecomCall.disconnect()
                 toast(
                     String.format(getString(R.string.call_auto_rejected),
-                        Utils.friendlyUri(this, uri, ua.account))
+                        Utils.friendlyUri(this, uri, ua.account, unique = true))
                 )
                 if (ua.account.callHistory) {
                     CallHistoryNew(ua.account.aor, uri, "in").add()
@@ -2206,7 +2206,7 @@ class BaresipService: Service() {
                 telecomCall.disconnect()
                 toast(
                     String.format(getString(R.string.call_blocked),
-                    Utils.friendlyUri(this, uri, ua.account))
+                    Utils.friendlyUri(this, uri, ua.account, unique = true))
                 )
                 if (ua.account.callHistory)
                     Blocked(
@@ -2222,7 +2222,7 @@ class BaresipService: Service() {
                 telecomCall.disconnect()
                 toast(
                     String.format(getString(R.string.call_blocked),
-                        Utils.friendlyUri(this, uri, ua.account))
+                        Utils.friendlyUri(this, uri, ua.account, unique = true))
                 )
                 if (ua.account.callHistory)
                     Blocked(
@@ -2347,6 +2347,7 @@ class BaresipService: Service() {
             else
                 telephonyManager.isVoiceCapable
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
+            mobileNumber = Utils.getLine1Number(this, voiceSubId) ?: ""
             val existingMobileUa = uas.value.find { it.account.isMobile || Utils.uriMatch(it.account.aor, "sip:mobile@pstn") }
 
             if (mobileAccountHandle == null || !isSimReady || !isVoiceCapable ||
@@ -3229,6 +3230,7 @@ class BaresipService: Service() {
         var isServiceRunning = false
         var isNativeReady = false
         var mobileAccount = false
+        var mobileNumber = ""
         var isStartReceived = false
         var isConfigInitialized = false
         var libraryLoaded = false
