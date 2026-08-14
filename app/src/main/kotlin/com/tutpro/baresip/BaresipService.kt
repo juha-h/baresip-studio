@@ -2171,6 +2171,19 @@ class BaresipService: Service() {
         }
 
         if (isIncoming) {
+            if (Call.isAnyCallActive(this)) {
+                Log.d(TAG, "Auto-rejecting incoming PSTN call while another call is active")
+                telecomCall.disconnect()
+                toast(
+                    String.format(getString(R.string.call_auto_rejected),
+                        Utils.friendlyUri(this, uri, ua.account))
+                )
+                if (ua.account.callHistory) {
+                    CallHistoryNew(ua.account.aor, uri, "in").add()
+                    ua.account.missedCalls = true
+                }
+                return
+            }
             val e164Uri = e164Uri(uri, ua.account.countryCode)
             val presentation = telecomCall.details.handlePresentation
             if (ua.account.blockHidden &&
