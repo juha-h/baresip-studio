@@ -219,6 +219,7 @@ object Utils {
         val digitsOnlyUserPart = userPart.filter { it.isDigit() }
         return if (digitsOnlyUserPart.isNotEmpty() && digitsOnlyUserPart.length == userPart.filterNot { it == ' ' || it == '-' || it == '(' || it == ')' || it == '+' }.length)
             when {
+                userPart.startsWith("+") -> uri
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
                         scheme + "+" + userPart.substring(2))
                 countryCode == "" -> uri
