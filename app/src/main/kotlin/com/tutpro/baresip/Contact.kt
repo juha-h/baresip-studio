@@ -126,25 +126,20 @@ sealed class Contact {
 
         fun contactContactUris(name: String, tel: Boolean = false): List<ContactUri> {
             synchronized(BaresipService.contacts) {
-                for (c in BaresipService.contacts)
-                    when (c) {
-                        is BaresipContact -> {
-                            if (c.name.equals(name, ignoreCase = true)) {
-                                return if (tel)
-                                    c.uris.filter { it.uri.startsWith("tel:") }
-                                else
-                                    c.uris
-                            }
-                        }
-                        is AndroidContact -> {
-                            if (c.name == name) {
-                                return if (tel)
-                                    c.uris.filter { it.uri.startsWith("tel:") }
-                                else
-                                    c.uris
-                            }
-                        }
+                for (c in BaresipService.contacts) {
+                    val contactUris = if (tel)
+                        c.uris().filter { it.uri.startsWith("tel:") }
+                    else
+                        c.uris()
+                    if (c.name().equals(name, ignoreCase = true))
+                        return contactUris
+                    for (u in contactUris) {
+                        val label = u.label
+                        val nameWithLabel = if (label.isNotEmpty()) "${c.name()} $label" else c.name()
+                        if (nameWithLabel.equals(name, ignoreCase = true))
+                            return listOf(u)
                     }
+                }
             }
             return emptyList()
         }

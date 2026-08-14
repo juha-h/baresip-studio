@@ -540,7 +540,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                                         .fillMaxWidth()
                                         .clickable {
                                             val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
-                                            newPeer = uri.substringAfter(":")
+                                            newPeer = Utils.friendlyUri(uri, account)
                                             showSuggestions = false
                                         }
                                         .padding(12.dp)

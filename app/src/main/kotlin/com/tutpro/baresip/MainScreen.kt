@@ -1339,7 +1339,14 @@ private fun CallUriRow(
                                         .fillMaxWidth()
                                         .clickable {
                                             val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
-                                            dialerState.callUri.value = uri.substringAfter(":")
+                                            val aor = viewModel.selectedAor.value
+                                            val account = Account.ofAor(aor)
+                                            if (account != null) {
+                                                dialerState.callUri.value = Utils.friendlyUri(ctx, uri, account)
+                                                dialerState.redialUri = uri
+                                            } else {
+                                                dialerState.callUri.value = uri.substringAfter(":")
+                                            }
                                             dialerState.showSuggestions.value = false
                                         }
                                         .padding(12.dp)
@@ -1752,7 +1759,7 @@ private fun CallRow(
                                                             .fillMaxWidth()
                                                             .clickable {
                                                                 val uri = matchingUri?.uri ?: contact.uris().firstOrNull()?.uri ?: contact.name()
-                                                                transferUri = uri.substringAfter(":")
+                                                                transferUri = Utils.friendlyUri(ctx, uri, call.ua.account)
                                                                 call.showSuggestions.value = false
                                                             }
                                                             .padding(12.dp)
