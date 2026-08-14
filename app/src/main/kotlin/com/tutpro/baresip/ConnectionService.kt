@@ -44,11 +44,10 @@ class ConnectionService : ConnectionService() {
                 @Suppress("DEPRECATION")
                 val currentRoute = it.callAudioState?.route ?: CallAudioState.ROUTE_EARPIECE
                 @Suppress("DEPRECATION")
-                if (speaker) {
+                if (speaker)
                     it.setAudioRoute(CallAudioState.ROUTE_SPEAKER)
-                } else if (currentRoute == CallAudioState.ROUTE_SPEAKER) {
+                else if (currentRoute == CallAudioState.ROUTE_SPEAKER)
                     it.setAudioRoute(CallAudioState.ROUTE_EARPIECE)
-                }
             }
         }
     }
@@ -72,6 +71,8 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
+        if (request?.accountHandle?.id == BaresipService.SIP_ACCOUNT_ID)
+            connection.connectionProperties = Connection.PROPERTY_SELF_MANAGED
         connection.audioModeIsVoip = true
 
         val call = Call.ofCallp(callp)
@@ -110,8 +111,13 @@ class ConnectionService : ConnectionService() {
         val rootExtras = request?.extras
         val nestedExtras = rootExtras?.getBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS)
 
-        val uap = rootExtras?.getLong("uap", 0L).takeIf { it != 0L }
+        var uap = rootExtras?.getLong("uap", 0L).takeIf { it != 0L }
             ?: nestedExtras?.getLong("uap") ?: 0L
+
+        if (uap == 0L && BaresipService.uas.value.isNotEmpty()) {
+            uap = BaresipService.uas.value[0].uap
+            Log.d(TAG, "Outgoing connection request from system, using default uap $uap")
+        }
 
         val conferenceCall = rootExtras?.getBoolean("conferenceCall", false) ?:
         nestedExtras?.getBoolean("conferenceCall") ?: false
@@ -122,7 +128,7 @@ class ConnectionService : ConnectionService() {
         val onHoldCallp = rootExtras?.getLong("onHoldCallp", 0L).takeIf { it != 0L }
             ?: nestedExtras?.getLong("onHoldCallp") ?: 0L
 
-        val destination = request?.address?.encodedSchemeSpecificPart ?: ""
+        val destination = request?.address?.schemeSpecificPart ?: ""
 
         Log.d(TAG, "onCreateOutgoingConnection to $destination (uap=$uap)")
 
@@ -143,6 +149,8 @@ class ConnectionService : ConnectionService() {
                 Connection.CAPABILITY_HOLD or
                 Connection.CAPABILITY_MERGE_CONFERENCE or
                 Connection.CAPABILITY_SWAP_CONFERENCE
+        if (request?.accountHandle?.id == BaresipService.SIP_ACCOUNT_ID)
+            connection.connectionProperties = Connection.PROPERTY_SELF_MANAGED
 
         if (!pstnCall) {
             connection.audioModeIsVoip = true
@@ -225,9 +233,9 @@ class ConnectionService : ConnectionService() {
             if (callp != 0L) {
                 Api.ua_hangup(uap, callp, 0, "")
                 connections.remove(callp)
-            } else {
-                pendingOutgoingConnection = null
             }
+            else
+                pendingOutgoingConnection = null
             setDisconnected(DisconnectCause(DisconnectCause.CANCELED))
             destroy()
         }
@@ -281,9 +289,9 @@ class ConnectionService : ConnectionService() {
                     call.showOnHoldNotice.value = true
                     // 3. Tell Telecom the move is complete
                     setOnHold()
-                } else {
-                    Log.e(TAG, "SIP Hold failed for $callp")
                 }
+                else
+                    Log.e(TAG, "SIP Hold failed for $callp")
             }
         }
 
@@ -299,9 +307,9 @@ class ConnectionService : ConnectionService() {
                     call.showOnHoldNotice.value = false
                     // 3. Tell Telecom we are active
                     setActive()
-                } else {
-                    Log.e(TAG, "SIP Resume failed for $callp")
                 }
+                else
+                    Log.e(TAG, "SIP Resume failed for $callp")
             }
         }
 

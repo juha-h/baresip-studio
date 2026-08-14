@@ -460,7 +460,8 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                         String.format(noTelephonyProviderText, account.aor)
                     showAlert.value = true
                     ""
-                } else
+                }
+                else
                     Utils.telToSip(peerUri, account)
         }
         else
@@ -532,7 +533,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                         ) {
                             items(
                                 items = filteredSuggestions,
-                                key = { (contact, _, _) -> "${contact.id()}" }
+                                key = { (contact, _, matchingUri) -> "${contact.id()}:${matchingUri?.uri ?: ""}" }
                             ) { (contact, annotatedName, matchingUri) ->
                                 Box(
                                     modifier = Modifier
@@ -551,15 +552,17 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                                             fontSize = 18.sp
                                         )
                                         if (matchingUri != null) {
-                                            val tel = matchingUri.uri.substring(4)
-                                            val annotatedTel = Utils.buildAnnotatedStringWithHighlight(
-                                                tel,
-                                                newPeer.filter { c -> c.isDigit() || c == '+' })
+                                            val uriPart = matchingUri.uri.substringAfter(":")
+                                            val highlightPart = if (matchingUri.uri.startsWith("tel:"))
+                                                newPeer.filter { c -> c.isDigit() || c == '+' }
+                                            else
+                                                newPeer
+                                            val annotatedUri = Utils.buildAnnotatedStringWithHighlight(uriPart, highlightPart)
                                             Text(
                                                 text = buildAnnotatedString {
                                                     if (matchingUri.label.isNotEmpty())
                                                         append("${matchingUri.label} ")
-                                                    append(annotatedTel)
+                                                    append(annotatedUri)
                                                 },
                                                 fontSize = 14.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -576,31 +579,32 @@ private fun NewChatPeer(navController: NavController, account: Account) {
             OutlinedTextField(
                 value = newPeer,
                 placeholder = { Text(stringResource(R.string.new_chat_peer)) },
-                onValueChange = {
-                    newPeer = it
+                onValueChange = { input ->
+                    newPeer = input
                     showSuggestions = newPeer.length > 1
-                    filteredSuggestions = if (it.isEmpty())
+                    filteredSuggestions = if (input.length <= 1)
                         emptyList()
                     else {
-                        val normalizedInput = Utils.unaccent(it)
-                        val numericInput = it.filter { c -> c.isDigit() || c == '+' }
-                        BaresipService.contacts.mapNotNull { contact ->
+                        val normalizedInput = Utils.unaccent(input)
+                        val numericInput = input.filter { c -> c.isDigit() || c == '+' }
+                        BaresipService.contacts.flatMap { contact ->
                             val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
-                            var matchingUri: Contact.ContactUri? = null
-                            if (numericInput.isNotEmpty()) {
-                                matchingUri = contact.uris().find { u ->
-                                    u.uri.startsWith("tel:") && u.uri.substring(4).contains(numericInput)
-                                }
+                            val uris = contact.uris()
+                            val matchingUris = uris.filter { u ->
+                                (u.uri.startsWith("tel:") && numericInput.isNotEmpty() && u.uri.substring(4).contains(numericInput)) ||
+                                        (u.uri.startsWith("sip:") && u.uri.substring(4).contains(normalizedInput, ignoreCase = true))
                             }
-                            if (nameMatch || matchingUri != null) {
-                                val annotatedName = if (nameMatch)
-                                    Utils.buildAnnotatedStringWithHighlight(contact.name(), it)
+                            if (nameMatch) {
+                                val annotatedName = Utils.buildAnnotatedStringWithHighlight(contact.name(), input)
+                                if (uris.isEmpty())
+                                    listOf(Triple(contact, annotatedName, null))
                                 else
-                                    AnnotatedString(contact.name())
-                                Triple(contact, annotatedName, matchingUri)
-                            } else {
-                                null
+                                    uris.map { Triple(contact, annotatedName, it) }
                             }
+                            else if (matchingUris.isNotEmpty())
+                                matchingUris.map { Triple(contact, AnnotatedString(contact.name()), it) }
+                            else
+                                emptyList()
                         }
                     }
                 },
@@ -643,9 +647,9 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                             else
                                 String.format(contactNoSipOrTelUriText, peerText)
                             showAlert.value = true
-                        } else {
-                            makeChat(navController, account, peerText)
                         }
+                        else
+                            makeChat(navController, account, peerText)
                     }
                     else if (uris.size == 1)
                         makeChat(navController, account, uris[0].uri)

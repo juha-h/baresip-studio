@@ -18,9 +18,10 @@ class InCallService : InCallService() {
         Log.d(TAG, "InCallService: Call added")
 
         val handle = call.details.accountHandle
-        val baresipHandle = BaresipService.getPhoneAccountHandle(this)
+        val baresipSipHandle = BaresipService.getPhoneAccountHandle(this, BaresipService.SIP_ACCOUNT_ID)
+        val baresipPstnHandle = BaresipService.getPhoneAccountHandle(this, BaresipService.PSTN_ACCOUNT_ID)
 
-        if (handle == baresipHandle) {
+        if (handle == baresipSipHandle || handle == baresipPstnHandle) {
             Log.d(TAG, "InCallService: Identified as SIP call")
             // SIP call is already managed by ConnectionService/BaresipService
         }

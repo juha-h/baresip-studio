@@ -212,10 +212,12 @@ object Utils {
         return u
     }
 
-    fun e164Uri(uri: String, countryCode: String): String {
+    fun e164Uri(uriText: String, countryCode: String): String {
+        val uri = uriUnescape(uriText)
         val scheme = uri.take(4)
         val userPart = uriUserPart(uri)
-        return if (userPart.isNotEmpty() && userPart.isDigitsOnly())
+        val digitsOnlyUserPart = userPart.filter { it.isDigit() }
+        return if (digitsOnlyUserPart.isNotEmpty() && digitsOnlyUserPart.length == userPart.filterNot { it == ' ' || it == '-' || it == '(' || it == ')' || it == '+' }.length)
             when {
                 userPart.startsWith("00") -> uri.replace("$scheme$userPart",
                         scheme + "+" + userPart.substring(2))
@@ -238,7 +240,7 @@ object Utils {
 
     fun uriUnescape(uri: String): String {
         return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=",
-            "%23" to "#", "%2A" to "*")
+            "%23" to "#", "%2A" to "*", "%20" to "")
     }
 
     fun aorDomain(aor: String): String {
