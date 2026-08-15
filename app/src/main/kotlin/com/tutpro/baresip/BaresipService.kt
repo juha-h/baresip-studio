@@ -3073,6 +3073,13 @@ class BaresipService: Service() {
         val sipHandle = getPhoneAccountHandle(this, SIP_ACCOUNT_ID)
         val pstnHandle = getPhoneAccountHandle(this, PSTN_ACCOUNT_ID)
 
+        try {
+            tm.unregisterPhoneAccount(sipHandle)
+            tm.unregisterPhoneAccount(pstnHandle)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to unregister phone accounts: $e")
+        }
+
         val sipAccount = android.telecom.PhoneAccount.builder(sipHandle, getString(R.string.app_name))
             .setCapabilities(android.telecom.PhoneAccount.CAPABILITY_SELF_MANAGED or
                     android.telecom.PhoneAccount.CAPABILITY_SUPPORTS_VIDEO_CALLING)
