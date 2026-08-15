@@ -1120,6 +1120,11 @@ private fun SettingsContent(
                                 )
                         }
                         else {
+                            try {
+                                dialerRoleRequest.launch(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
+                            } catch (e: ActivityNotFoundException) {
+                                Log.e(TAG, "ActivityNotFound exception: ${e.message}")
+                            }
                             BaresipService.instance?.addMobileUserAgent()
                             restart = true
                         }
@@ -1189,6 +1194,7 @@ private fun SettingsContent(
             ) { _ ->
                 val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
                 viewModel.defaultMessaging.value = isHeld
+                restart = true
             }
             Switch(
                 checked = defaultMessaging,
