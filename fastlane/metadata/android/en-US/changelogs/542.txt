@@ -1,0 +1,2 @@
+- Prevent crash at start when baresip is not default phone app
+- According to help text. apply account's Country Code setting only to contact lookup
