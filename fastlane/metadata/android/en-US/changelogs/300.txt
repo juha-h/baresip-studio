@@ -1,0 +1,9 @@
+- Prevent crash at start when baresip is not default phone app
+- Mobile account and calling related fixes and enhancements
+- Search also contact TEL URIs and SIP URI userparts for suggestions
+- In addition to contact name, show also contact's URI or label in suggestions
+- Reject incoming mobile call if SIP call is already active and vice versa
+- Apply account's Country Code setting only to contact lookup
+- Unique Contact URI setting is now by default disabled
+- Made SIP Trace setting sub-setting of Debug setting
+- New translations (Chinese)
