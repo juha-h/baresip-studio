@@ -560,7 +560,8 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                                                     append(Utils.buildAnnotatedStringWithHighlight(userPart, newPeer))
                                                     append(restPart)
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 val highlightPart = newPeer.filter { c -> c.isDigit() || c == '+' }
                                                 Utils.buildAnnotatedStringWithHighlight(uriPart, highlightPart)
                                             }
@@ -595,12 +596,19 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                         val normalizedInput = Utils.unaccent(input)
                         val numericInput = input.filter { c -> c.isDigit() || c == '+' }
                         val currentAor = account.aor
+                        val e164Input = if (numericInput.isNotEmpty())
+                            Utils.e164Uri("tel:$numericInput", account.countryCode).substring(4)
+                        else
+                            ""
                         BaresipService.contacts.flatMap { contact ->
                             val nameMatch = Utils.unaccent(contact.name()).contains(normalizedInput, ignoreCase = true)
                             val uris = contact.uris().filter { !Utils.uriMatch(it.uri, currentAor) }
                             val matchingUris = uris.filter { u ->
-                                (u.uri.startsWith("tel:") && numericInput.isNotEmpty() && u.uri.substring(4).contains(numericInput)) ||
-                                        (u.uri.startsWith("sip:") && Utils.uriUserPart(u.uri).contains(normalizedInput, ignoreCase = true))
+                                (u.uri.startsWith("tel:") && numericInput.isNotEmpty() &&
+                                        (u.uri.substring(4).contains(numericInput) ||
+                                                (e164Input != "" && u.uri.substring(4).contains(e164Input)))) ||
+                                        (u.uri.startsWith("sip:") &&
+                                                Utils.uriUserPart(u.uri).contains(normalizedInput, ignoreCase = true))
                             }
                             if (nameMatch) {
                                 val annotatedName = Utils.buildAnnotatedStringWithHighlight(contact.name(), input)
@@ -646,7 +654,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                 showSuggestions = false
                 val peerText = newPeer.trim()
                 if (peerText.isNotEmpty()) {
-                    val uris = Contact.contactContactUris(peerText, account.isMobile)
+                    val uris = Contact.contactUrisOfNameOrNumber(peerText, account)
                     if (uris.isEmpty()) {
                         if (Contact.nameExists(peerText, BaresipService.contacts, true)) {
                             alertTitle.value = noticeText

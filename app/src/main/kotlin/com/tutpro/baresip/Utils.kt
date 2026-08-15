@@ -597,7 +597,8 @@ object Utils {
                 if (DocumentsContract.deleteDocument(contentResolver, uri)) {
                     Log.d(TAG, "File deleted successfully: $uri")
                     return true
-                } else {
+                }
+                else {
                     Log.d(TAG, "File not found or could not be deleted: $uri")
                     return false
                 }
@@ -1333,7 +1334,8 @@ object Utils {
                     if (i + 1 < bytesRead1) {
                         stereoBuffer[outIndex++] = buffer1[i]
                         stereoBuffer[outIndex++] = buffer1[i+1]
-                    } else {
+                    }
+                    else {
                         // Padding if file1 ended
                         stereoBuffer[outIndex++] = 0
                         stereoBuffer[outIndex++] = 0
@@ -1343,7 +1345,8 @@ object Utils {
                     if (i + 1 < bytesRead2) {
                         stereoBuffer[outIndex++] = buffer2[i]
                         stereoBuffer[outIndex++] = buffer2[i+1]
-                    } else {
+                    }
+                    else {
                         // Padding if file2 ended
                         stereoBuffer[outIndex++] = 0
                         stereoBuffer[outIndex++] = 0

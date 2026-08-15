@@ -130,7 +130,7 @@ sealed class Contact {
             return null
         }
 
-        fun contactContactUris(name: String, tel: Boolean = false): List<ContactUri> {
+        fun contactUris(name: String, tel: Boolean = false): List<ContactUri> {
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts) {
                     val contactUris = if (tel)
@@ -151,6 +151,19 @@ sealed class Contact {
                 }
             }
             return emptyList()
+        }
+
+        fun contactUrisOfNameOrNumber(nameOrNumber: String, account: Account): List<ContactUri> {
+            var uris = contactUris(nameOrNumber, account.isMobile)
+            if (uris.isEmpty() && Utils.isTelNumber(nameOrNumber)) {
+                val contactWithUri = findContactWithUri("tel:$nameOrNumber")
+                    ?: findContactWithUri(Utils.e164Uri("tel:$nameOrNumber", account.countryCode))
+                if (contactWithUri != null)
+                    uris = contactWithUri.first.uris().filter {
+                        if (account.isMobile) it.uri.startsWith("tel:") else true
+                    }
+            }
+            return uris
         }
 
         fun findContactWithUri(uri: String): Pair<Contact, ContactUri>? {
@@ -309,9 +322,9 @@ sealed class Contact {
                             val uri = uPart.substringBeforeLast("[")
                             val label = uPart.substringAfterLast("[").substringBeforeLast("]")
                             uris.add(ContactUri(uri, label))
-                        } else {
-                            uris.add(ContactUri(uPart, ""))
                         }
+                        else
+                            uris.add(ContactUri(uPart, ""))
                     }
                     val params = uriParams.substringAfter(">;")
                     val email = Utils.paramValue(params, "email")

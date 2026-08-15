@@ -1085,7 +1085,9 @@ class BaresipService: Service() {
                                 getString(R.string.call_auto_rejected),
                                 Utils.friendlyUri(this, peerUri, ua.account, unique = true)
                             )
-                        else if (ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) {
+                        else if (ua.account.blockUnknown &&
+                                Contact.contactName(e164Uri(peerUri, ua.account.countryCode)) ==
+                                    e164Uri(peerUri, ua.account.countryCode)) {
                             blockedCall = true
                             String.format(
                                 getString(R.string.call_blocked),
@@ -1494,7 +1496,9 @@ class BaresipService: Service() {
         }
 
         val blockedHidden = ua.account.blockHidden && peerUri.contains("anonymous")
-        val blockedUnknown = ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri
+        val blockedUnknown = ua.account.blockUnknown &&
+                Contact.contactName(e164Uri(peerUri, ua.account.countryCode)) ==
+                    e164Uri(peerUri, ua.account.countryCode)
 
         if (blockedHidden || blockedUnknown) {
             Log.d(TAG, "Auto-rejecting incoming message by $uap from $peerUri")
@@ -1543,7 +1547,9 @@ class BaresipService: Service() {
 
         val aor = ua.account.aor
 
-        if ((ua.account.blockUnknown && Contact.contactName(peerUri) == peerUri) ||
+        if ((ua.account.blockUnknown &&
+                Contact.contactName(e164Uri(peerUri, ua.account.countryCode)) ==
+                        e164Uri(peerUri, ua.account.countryCode)) ||
                 (ua.account.blockHidden && peerUri.contains("anonymous")) ||
                     isBlocked(aor, peerUri)) {
             Log.d(TAG, "Auto-rejecting blocked message from $peerUri")
@@ -2311,8 +2317,7 @@ class BaresipService: Service() {
             stopRinging()
             stopMediaPlayer()
             if (call.ua.account.callHistory) {
-                val historyPeerUri = e164Uri(call.peerUri, call.ua.account.countryCode)
-                val history = CallHistoryNew(call.ua.account.aor, historyPeerUri, call.dir)
+                val history = CallHistoryNew(call.ua.account.aor, call.peerUri, call.dir)
                 history.stopTime = GregorianCalendar()
                 history.startTime = call.startTime
                 history.rejected = call.rejected
