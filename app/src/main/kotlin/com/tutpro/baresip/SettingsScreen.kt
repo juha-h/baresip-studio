@@ -89,9 +89,7 @@ import java.io.FileInputStream
 import java.util.Locale
 import androidx.core.net.toUri
 
-private var restart = false
 private val showRestartDialog = mutableStateOf(false)
-private var save = false
 
 fun NavGraphBuilder.settingsScreenRoute(
     navController: NavController,
@@ -105,14 +103,14 @@ fun NavGraphBuilder.settingsScreenRoute(
             navController = navController,
             settingsViewModel = viewModel,
             onBack = {
-                if (restart)
+                if (viewModel.restart)
                     showRestartDialog.value = true
                 else
                     navController.navigateUp()
             },
             checkOnClick = {
                 if (checkOnClick(ctx, viewModel)) {
-                    if (restart)
+                    if (viewModel.restart)
                         showRestartDialog.value = true
                     else
                         navController.navigateUp()
@@ -142,19 +140,23 @@ private fun SettingsScreen(
         ?.observeAsState()
 
     LaunchedEffect(audioResult?.value) {
+        Log.d(TAG, "audio_settings_result observed: ${audioResult?.value}")
         if (audioResult?.value == true) {
             Log.d(TAG, "Got result from AudioSettings: true")
-            restart = true
+            settingsViewModel.restart = true
+            showRestartDialog.value = true
             navController.currentBackStackEntry
                 ?.savedStateHandle
                 ?.remove<Boolean>("audio_settings_result")
         }
     }
 
-    LaunchedEffect(null) {
-        save = false
-        restart = false
-        settingsViewModel.loadSettings(ctx)
+    LaunchedEffect(Unit) {
+        if (!settingsViewModel.restart) {
+            settingsViewModel.save = false
+            settingsViewModel.restart = false
+            settingsViewModel.loadSettings(ctx)
+        }
         areSettingsLoaded = true
     }
 
@@ -502,8 +504,8 @@ private fun SettingsContent(
                         inputStream.close()
                         Config.replaceVariable("sip_certificate", certPath)
                         viewModel.tlsCertificateFile.value = true
-                        save = true
-                        restart = true
+                        viewModel.save = true
+                        viewModel.restart = true
                     } catch (e: Error) {
                         alertTitle.value = errorTitleText
                         alertMessage.value = readCertError + ": " + e.message
@@ -561,8 +563,8 @@ private fun SettingsContent(
                                     Utils.putFileContents(certPath, content)
                                     Config.replaceVariable("sip_certificate", certPath)
                                     viewModel.tlsCertificateFile.value = true
-                                    save = true
-                                    restart = true
+                                    viewModel.save = true
+                                    viewModel.restart = true
                                 }
                                 shouldShowRequestPermissionRationale(activity, permission) ->
                                     showAlertDialog.value = true
@@ -575,8 +577,8 @@ private fun SettingsContent(
                     else {
                         Config.removeVariable("sip_certificate")
                         Utils.deleteFile(File(BaresipService.filesPath + "/cert.pem"))
-                        save = true
-                        restart = true
+                        viewModel.save = true
+                        viewModel.restart = true
                     }
                 }
             )
@@ -645,7 +647,7 @@ private fun SettingsContent(
                         val inputStream = ctx.contentResolver.openInputStream(uri) as FileInputStream
                         caCertsFile.copyInputStreamToFile(inputStream)
                         inputStream.close()
-                        restart = true
+                        viewModel.restart = true
                     } catch (e: Error) {
                         alertTitle.value = errorTitleText
                         alertMessage.value = readCaCertsError + ": " + e.message
@@ -696,7 +698,7 @@ private fun SettingsContent(
                                     }
                                     File(BaresipService.filesPath + "/ca_certs.crt").writeBytes(content)
                                     viewModel.caFile.value = true
-                                    restart = true
+                                    viewModel.restart = true
                                 }
                                 shouldShowRequestPermissionRationale(activity, permission) -> {
                                     dialogTitle.value = noticeTitleText
@@ -716,7 +718,7 @@ private fun SettingsContent(
                             Utils.selectInputFile(caCertsRequest)
                     else {
                         Utils.deleteFile(File(BaresipService.filesPath + "/ca_certs.crt"))
-                        restart = true
+                        viewModel.restart = true
                     }
                 }
             )
@@ -991,7 +993,7 @@ private fun SettingsContent(
                     if (results[Manifest.permission.READ_PHONE_NUMBERS] == true)
                         Log.d(TAG, "READ_PHONE_NUMBERS permission granted")
                     BaresipService.instance?.addMobileUserAgent()
-                    restart = true
+                    viewModel.restart = true
                 }
 
                 val dialerRoleRequest = rememberLauncherForActivityResult(
@@ -1006,14 +1008,14 @@ private fun SettingsContent(
                         )
                         if (Utils.checkPermissions(ctx, permissions)) {
                             BaresipService.instance?.addMobileUserAgent()
-                            restart = true
+                            viewModel.restart = true
                         }
                         else
                             requestPermissionLauncher.launch(permissions)
                     }
                     else
                         BaresipService.instance?.addMobileUserAgent()
-                    restart = true
+                    viewModel.restart = true
                 }
                 Switch(
                     checked = defaultDialer,
@@ -1037,7 +1039,7 @@ private fun SettingsContent(
                                 Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                             }
                             BaresipService.instance?.addMobileUserAgent()
-                            restart = true
+                            viewModel.restart = true
                         }
                     }
                 )
@@ -1067,7 +1069,7 @@ private fun SettingsContent(
                             Config.replaceVariable("mobile_account", if (it) "yes" else "no")
                             Config.save()
                             BaresipService.instance?.addMobileUserAgent()
-                            restart = true
+                            viewModel.restart = true
                         }
                     )
                 }
@@ -1105,7 +1107,7 @@ private fun SettingsContent(
             ) { _ ->
                 val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
                 viewModel.defaultMessaging.value = isHeld
-                restart = true
+                viewModel.restart = true
             }
             Switch(
                 checked = defaultMessaging,
@@ -1280,7 +1282,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
     if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
         Config.replaceVariable("auto_start", if (viewModel.autoStart.value) "yes" else "no")
-        save = true
+        viewModel.save = true
     }
 
     val listenAddr = viewModel.listenAddress.value.trim()
@@ -1292,14 +1294,14 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             return false
         }
         Config.replaceVariable("sip_listen", listenAddr)
-        save = true
-        restart = true
+        viewModel.save = true
+        viewModel.restart = true
     }
 
     if (Config.variable("net_af").lowercase() != viewModel.addressFamily.value) {
         Config.replaceVariable("net_af", viewModel.addressFamily.value)
-        save = true
-        restart = true
+        viewModel.save = true
+        viewModel.restart = true
     }
 
     val transportProtocols = viewModel.transportProtocols.value
@@ -1315,8 +1317,8 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         Config.removeVariable("sip_transports")
         if (transportProtocols.isNotEmpty())
             Config.replaceVariable("sip_transports", transportProtocols)
-        save = true
-        restart = true
+        viewModel.save = true
+        viewModel.restart = true
     }
 
     val dnsServers = addMissingPorts(viewModel.dnsServers.value
@@ -1345,13 +1347,13 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             Config.updateDnsServers(BaresipService.dnsServers)
         }
         // Api.net_dns_debug()
-        save = true
+        viewModel.save = true
     }
 
     if ((Config.variable("sip_verify_server") == "yes") != viewModel.verifyServer.value) {
         Config.replaceVariable("sip_verify_server", if (viewModel.verifyServer.value) "yes" else "no")
         Api.config_verify_server_set(viewModel.verifyServer.value)
-        save = true
+        viewModel.save = true
     }
 
     val userAgent = viewModel.userAgent.value.trim()
@@ -1367,14 +1369,14 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             Config.replaceVariable("user_agent", userAgent)
         else
             Config.removeVariable("user_agent")
-        save = true
-        restart = true
+        viewModel.save = true
+        viewModel.restart = true
     }
 
     if ((Config.variable("sip_cuser_random") == "yes") != viewModel.uniqueContactUri.value) {
         Config.replaceVariable("sip_cuser_random", if (viewModel.uniqueContactUri.value) "yes" else "no")
-        save = true
-        restart = true
+        viewModel.save = true
+        viewModel.restart = true
     }
 
     val darkTheme = viewModel.darkTheme.value
@@ -1387,14 +1389,14 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         BaresipService.darkTheme.value = darkTheme
         AppCompatDelegate.setDefaultNightMode(newDisplayTheme)
         Config.replaceVariable("dark_theme", if (darkTheme) "yes" else "no")
-        save = true
+        viewModel.save = true
     }
 
     val dynamicColors = viewModel.dynamicColors.value
     if (BaresipService.dynamicColors.value != dynamicColors) {
         BaresipService.dynamicColors.value = dynamicColors
         Config.replaceVariable("dynamic_colors", if (dynamicColors) "yes" else "no")
-        save = true
+        viewModel.save = true
     }
 
     val colorblind = viewModel.colorblind.value
@@ -1405,14 +1407,14 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         val baresipService = Intent(ctx, BaresipService::class.java)
         baresipService.action = "Update Notification"
         ContextCompat.startForegroundService(ctx, baresipService)
-        save = true
+        viewModel.save = true
     }
 
     val proximitySensing = viewModel.proximitySensing.value
     if ((Config.variable("proximity_sensing") == "yes") != proximitySensing) {
         Config.replaceVariable("proximity_sensing", if (proximitySensing) "yes" else "no")
         BaresipService.proximitySensing = proximitySensing
-        save = true
+        viewModel.save = true
     }
 
     val debug = viewModel.debug.value
@@ -1421,7 +1423,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         Config.replaceVariable("log_level", logLevelString)
         Api.log_level_set(logLevelString.toInt())
         Log.logLevelSet(logLevelString.toInt())
-        save = true
+        viewModel.save = true
     }
 
     val sipTrace = if (debug) viewModel.sipTrace.value else false
@@ -1430,7 +1432,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         Api.uag_enable_sip_trace(sipTrace)
     }
 
-    if (save) Config.save()
+    if (viewModel.save) Config.save()
 
     return true
 }

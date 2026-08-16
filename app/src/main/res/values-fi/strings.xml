@@ -450,6 +450,9 @@
     <string name="audio_delay_help">Audion odotusviive (millisekunneissa) soitetun puhelun alkaessa.
         Aseta korkeampi arvo, jos et kuule vastaajan ääntä heti, kun puhelu alkaa.</string>
     <string name="invalid_audio_delay">Virheellinen audioviive \'%1$s\'. Sallittu arvo on välillä 100–3000.</string>
+    <string name="ilbc_mode">iLBC-moodi</string>
+    <string name="ilbc_mode_help">Valitsee iLBC-koodekin kehyksen keston.
+        30ms tarjoaa paremman äänenlaadun alhaisilla bittinopeuksilla, kun taas 20ms:ssä on pienempi viive.</string>
     <string name="default_call_volume">Oletus äänen voimakkuus</string>
     <string name="default_call_volume_help">Jos valittu, puhelun äänen voimakkuus
         asteikolla 1–10.</string>

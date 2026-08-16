@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
 object Config {
 
     private val configPath = BaresipService.filesPath + "/config"
-    val audioModules = listOf("opus", "amr", "libg722", "g7221", "g729", "codec2", "g711")
+    val audioModules = listOf("opus", "amr", "ilbc", "libg722", "g7221", "g729", "codec2", "g711")
     private lateinit var config: String
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
@@ -213,8 +213,9 @@ object Config {
         val previousModules = previousVariables("module")
         for (module in audioModules)
             if ("${module}.so" in previousModules ||
-                (module == "libg722" && "g722.so" in previousModules))
-                    config = "${config}module ${module}.so\n"
+                    (module == "libg722" && "g722.so" in previousModules) ||
+                    module == "ilbc")
+                config = "${config}module ${module}.so\n"
 
         Utils.aecAgcNsCheck()
 
@@ -235,6 +236,12 @@ object Config {
             "${config}opus_packet_loss 1\n"
         else
             "${config}opus_packet_loss $opusPacketLoss\n"
+
+        val ilbcMode = previousVariable("ilbc_mode")
+        config = if (ilbcMode == "")
+            "${config}ilbc_mode 30\n"
+        else
+            "${config}ilbc_mode $ilbcMode\n"
 
         val audioDelay = previousVariable("audio_delay")
         if (audioDelay != "") {
