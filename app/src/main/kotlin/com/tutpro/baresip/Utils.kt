@@ -154,6 +154,7 @@ object Utils {
     fun uriMatch(firstUri: String, secondUri: String): Boolean {
         val first = uriUnescape(firstUri.removePrefix("<").removeSuffix(">"))
         val second = uriUnescape(secondUri.removePrefix("<").removeSuffix(">"))
+        if (first.equals(second, ignoreCase = true)) return true
         val mobileAor = "sip:mobile@pstn"
         if (first.startsWith("tel:", ignoreCase = true)) {
             if (first.equals(second, ignoreCase = true)) return true
