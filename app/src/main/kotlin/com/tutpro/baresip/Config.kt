@@ -237,12 +237,6 @@ object Config {
         else
             "${config}opus_packet_loss $opusPacketLoss\n"
 
-        val ilbcMode = previousVariable("ilbc_mode")
-        config = if (ilbcMode == "")
-            "${config}ilbc_mode 30\n"
-        else
-            "${config}ilbc_mode $ilbcMode\n"
-
         val audioDelay = previousVariable("audio_delay")
         if (audioDelay != "") {
             config = "${config}audio_delay $audioDelay\n"

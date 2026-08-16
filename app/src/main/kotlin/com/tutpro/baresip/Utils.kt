@@ -566,7 +566,7 @@ object Utils {
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
         try {
-            context.assets.open(asset).use { `is` ->
+            context.applicationContext.assets.open(asset).use { `is` ->
                 FileOutputStream(path).use { os ->
                     val buffer = ByteArray(512)
                     var byteRead: Int = `is`.read(buffer)

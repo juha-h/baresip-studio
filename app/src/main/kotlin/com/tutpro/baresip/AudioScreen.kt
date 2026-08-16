@@ -175,7 +175,6 @@ private fun AudioContent(viewModel: AudioViewModel, contentPadding: PaddingValue
         AudioModules(viewModel)
         OpusBitRate(viewModel)
         OpusPacketLoss(viewModel)
-        IlbcMode(viewModel)
         AudioDelay(viewModel)
     }
 }
@@ -497,65 +496,6 @@ private fun OpusPacketLoss(viewModel: AudioViewModel) {
             label = { Text(opusPacketLossTitle) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
-    }
-}
-
-@Composable
-private fun IlbcMode(viewModel: AudioViewModel) {
-    Row(
-        Modifier.fillMaxWidth().padding(end = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val ilbcModeTitle = stringResource(R.string.ilbc_mode)
-        val ilbcModeHelp = stringResource(R.string.ilbc_mode_help)
-        Text(
-            text = ilbcModeTitle,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    alertTitle.value = ilbcModeTitle
-                    alertMessage.value = ilbcModeHelp
-                    showAlert.value = true
-                },
-            fontSize = 18.sp
-        )
-        val currentIlbcMode by viewModel.ilbcMode.collectAsState()
-        val isDropDownExpanded = remember { mutableStateOf(false) }
-        val modeNames = listOf("20ms", "30ms")
-        val modeValues = listOf("20", "30")
-        val itemPosition = modeValues.indexOf(currentIlbcMode).let { if (it != -1) it else 1 }
-
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { isDropDownExpanded.value = true }
-            ) {
-                Text(text = modeNames[itemPosition])
-                Icon(
-                    imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp)
-                )
-            }
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = { isDropDownExpanded.value = false }
-            ) {
-                modeNames.forEachIndexed { index, name ->
-                    DropdownMenuItem(
-                        text = { Text(text = name) },
-                        onClick = {
-                            isDropDownExpanded.value = false
-                            viewModel.ilbcMode.value = modeValues[index]
-                        }
-                    )
-                    if (index < modeNames.size - 1)
-                        HorizontalDivider(thickness = 1.dp)
-                }
-            }
-        }
     }
 }
 

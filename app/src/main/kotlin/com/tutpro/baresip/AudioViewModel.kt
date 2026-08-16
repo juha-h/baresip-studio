@@ -14,7 +14,6 @@ class AudioViewModel : ViewModel() {
     val audioModules = MutableStateFlow(mutableMapOf<String, Boolean>())
     val opusBitrate = MutableStateFlow("")
     val opusPacketLoss = MutableStateFlow("")
-    val ilbcMode = MutableStateFlow("")
     val audioDelay = MutableStateFlow("")
     val toneCountry = MutableStateFlow("")
     val ringtoneUri = MutableStateFlow("")
@@ -26,7 +25,6 @@ class AudioViewModel : ViewModel() {
     var oldAudioModules = ArrayList<String>()
     var oldOpusBitrate = ""
     var oldOpusPacketLoss = ""
-    var oldIlbcMode = ""
     var oldAudioDelay = ""
     var oldToneCountry = ""
     var oldRingtoneUri = ""
@@ -57,9 +55,6 @@ class AudioViewModel : ViewModel() {
 
         oldOpusPacketLoss = Config.variable("opus_packet_loss")
         opusPacketLoss.value = oldOpusPacketLoss
-
-        oldIlbcMode = Config.variable("ilbc_mode")
-        ilbcMode.value = oldIlbcMode
 
         oldAudioDelay = Config.variable("audio_delay")
         if (oldAudioDelay == "") oldAudioDelay = BaresipService.audioDelay.toString()
@@ -149,12 +144,6 @@ class AudioViewModel : ViewModel() {
         if (opusPacketLoss.value != oldOpusPacketLoss) {
             if (!checkOpusPacketLoss(opusPacketLoss.value)) return Result.ERROR
             Config.replaceVariable("opus_packet_loss", opusPacketLoss.value)
-            restart = true
-            save = true
-        }
-
-        if (ilbcMode.value != oldIlbcMode) {
-            Config.replaceVariable("ilbc_mode", ilbcMode.value)
             restart = true
             save = true
         }
