@@ -7,7 +7,9 @@ import android.content.Context.ROLE_SERVICE
 import android.os.Build
 import android.os.PowerManager
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
@@ -37,6 +39,9 @@ class SettingsViewModel: ViewModel() {
     val debug = MutableStateFlow(false)
     val sipTrace = MutableStateFlow(false)
 
+    var restart by mutableStateOf(false)
+    var save by mutableStateOf(false)
+
     private var isLoaded = false
 
     fun loadSettings(ctx: Context) {
@@ -47,10 +52,7 @@ class SettingsViewModel: ViewModel() {
 
         listenAddress.value = Config.variable("sip_listen")
 
-        val familyValues = listOf("",  "ipv4", "ipv6")
-        val itemPosition =
-            mutableIntStateOf(familyValues.indexOf(Config.variable("net_af").lowercase()))
-        addressFamily.value = familyValues[itemPosition.intValue]
+        addressFamily.value = Config.variable("net_af").lowercase()
 
         transportProtocols.value = Config.variable("sip_transports")
 

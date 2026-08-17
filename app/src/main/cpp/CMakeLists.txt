@@ -90,6 +90,10 @@ add_library(lib_g729 STATIC IMPORTED)
 set_target_properties(lib_g729 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/g729/lib/${ANDROID_ABI}/libbcg729.a)
 
+add_library(lib_ilbc STATIC IMPORTED)
+set_target_properties(lib_ilbc PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ilbc/lib/${ANDROID_ABI}/libilbc.a)
+
 add_library(lib_codec2 STATIC IMPORTED)
 set_target_properties(lib_codec2 PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/codec2/lib/${ANDROID_ABI}/libcodec2.a)
@@ -163,6 +167,7 @@ target_link_libraries(
         lib_g722
         lib_g722_1
         lib_g729
+        lib_ilbc
         lib_codec2
         lib_amrnb
         lib_amrwb

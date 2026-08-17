@@ -566,19 +566,19 @@ class BaresipService: Service() {
                     file = File("${filesPath}/$a")
                     if (!file.exists() && a != "config") {
                         Log.i(TAG, "Copying asset '$a'")
-                        Utils.copyAssetToFile(this, a, "$filesPath/$a")
+                        Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
                     }
                     else
                         Log.i(TAG, "Asset '$a' already copied")
                     if (a == "config")
-                        Config.initialize(this)
+                        Config.initialize(applicationContext)
                 }
 
                 Thread {
                     if (contactsMode != "android")
                         Contact.restoreBaresipContacts()
                     if (contactsMode != "baresip") {
-                        Contact.loadAndroidContacts(this)
+                        Contact.loadAndroidContacts(applicationContext)
                         registerAndroidContactsObserver()
                     }
                     Contact.contactsUpdate()
@@ -1161,7 +1161,7 @@ class BaresipService: Service() {
                             }
                             else {
                                 val name = "callwaiting_$toneCountry"
-                                val resourceId = resources.getIdentifier(
+                                val resourceId = applicationContext.resources.getIdentifier(
                                     name,
                                     "raw",
                                     packageName
@@ -2818,7 +2818,7 @@ class BaresipService: Service() {
     private fun playRingBack() {
         if (mediaPlayer == null) {
             val name = "ringback_$toneCountry"
-            val resourceId = resources.getIdentifier(name, "raw", packageName)
+            val resourceId = applicationContext.resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
                 val audioAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
@@ -2826,7 +2826,7 @@ class BaresipService: Service() {
                     .build()
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(audioAttributes)
-                    val afd = resources.openRawResourceFd(resourceId)
+                    val afd = applicationContext.resources.openRawResourceFd(resourceId)
                     setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     afd.close()
                     isLooping = true
@@ -2843,7 +2843,7 @@ class BaresipService: Service() {
     private fun playBusy() {
         if (mediaPlayer == null) {
             val name = "busy_$toneCountry"
-            val resourceId = resources.getIdentifier(name, "raw", packageName)
+            val resourceId = applicationContext.resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
                 val audioAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
@@ -2851,7 +2851,7 @@ class BaresipService: Service() {
                     .build()
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(audioAttributes)
-                    val afd = resources.openRawResourceFd(resourceId)
+                    val afd = applicationContext.resources.openRawResourceFd(resourceId)
                     setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     afd.close()
                     setOnCompletionListener {

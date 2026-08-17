@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets
 object Config {
 
     private val configPath = BaresipService.filesPath + "/config"
-    val audioModules = listOf("opus", "amr", "libg722", "g7221", "g729", "codec2", "g711")
+    val audioModules = listOf("opus", "amr", "ilbc", "libg722", "g7221", "g729", "codec2", "g711")
     private lateinit var config: String
     private lateinit var previousConfig: String
     private lateinit var previousLines: List<String>
@@ -218,8 +218,9 @@ object Config {
         val previousModules = previousVariables("module")
         for (module in audioModules)
             if ("${module}.so" in previousModules ||
-                (module == "libg722" && "g722.so" in previousModules))
-                    config = "${config}module ${module}.so\n"
+                    (module == "libg722" && "g722.so" in previousModules) ||
+                    module == "ilbc")
+                config = "${config}module ${module}.so\n"
 
         Utils.aecAgcNsCheck()
 
