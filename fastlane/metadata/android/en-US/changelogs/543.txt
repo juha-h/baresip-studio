@@ -1,0 +1,3 @@
+- Fixed bug that in some cases created two mobile account instances
+- Added iLBC audio codec (currently only mode 20 is supported)
+- Fixed restart notice after audio settings changes
