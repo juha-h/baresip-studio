@@ -16,6 +16,7 @@ class AudioViewModel : ViewModel() {
     val opusPacketLoss = MutableStateFlow("")
     val audioDelay = MutableStateFlow("")
     val toneCountry = MutableStateFlow("")
+    val ilbcMode = MutableStateFlow("")
     val ringtoneUri = MutableStateFlow("")
 
     private var isLoaded = false
@@ -27,6 +28,7 @@ class AudioViewModel : ViewModel() {
     var oldOpusPacketLoss = ""
     var oldAudioDelay = ""
     var oldToneCountry = ""
+    var oldIlbcMode = ""
     var oldRingtoneUri = ""
 
     fun loadSettings(ctx: Context) {
@@ -62,6 +64,9 @@ class AudioViewModel : ViewModel() {
 
         oldToneCountry = BaresipService.toneCountry
         toneCountry.value = oldToneCountry
+
+        oldIlbcMode = Config.variable("ilbc_mode")
+        ilbcMode.value = oldIlbcMode
 
         oldRingtoneUri = Preferences(ctx).ringtoneUri ?: ""
         ringtoneUri.value = oldRingtoneUri
@@ -153,6 +158,12 @@ class AudioViewModel : ViewModel() {
             if (!checkAudioDelay(delay)) return Result.ERROR
             Config.replaceVariable("audio_delay", delay)
             BaresipService.audioDelay = delay.toLong()
+            save = true
+        }
+
+        if (ilbcMode.value != oldIlbcMode) {
+            Config.replaceVariable("ilbc_mode", ilbcMode.value)
+            restart = true
             save = true
         }
 

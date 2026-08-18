@@ -455,6 +455,9 @@
         asteikolla 1–10.</string>
     <string name="tone_country">Puheluäänien maa</string>
     <string name="tone_country_help">Soitto-, odotus- ja varattuäänien maa</string>
+    <string name="ilbc_mode">iLBC-moodi</string>
+    <string name="ilbc_mode_help">Valitsee iLBC-koodekin kehyksen keston.
+        30ms tarjoaa paremman äänenlaadun alhaisilla bittinopeuksilla, kun taas 20ms:ssä on pienempi viive.</string>
     <string name="dark_theme">Tumma teema</string>
     <string name="dark_theme_help">Käytä aina tummaa näyttöteemaa</string>
     <string name="dynamic_colors">Dynaamiset värit</string>
