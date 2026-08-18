@@ -1,0 +1,2 @@
+- Show contact name and SIP URI in call URI field if label has not been given
+- iLBC audio codec now supports both 20 and 30 modes
