@@ -296,6 +296,12 @@ object Config {
             BaresipService.toneCountry = toneCountry
         config = "${config}tone_country ${BaresipService.toneCountry}\n"
 
+        val ilbcMode = previousVariable("ilbc_mode")
+        config = if (ilbcMode != "")
+            "${config}ilbc_mode $ilbcMode\n"
+        else
+            "${config}ilbc_mode 20\n"
+
         save()
         BaresipService.isConfigInitialized = true
 
