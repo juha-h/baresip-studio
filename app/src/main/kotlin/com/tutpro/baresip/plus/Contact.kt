@@ -70,8 +70,9 @@ sealed class Contact {
                 val name = contactWithUri.first.name()
                 if (includeLabel) {
                     val label = contactWithUri.second.label
-                    if (label.isNotEmpty()) return "$name $label"
-                    if (unique && contactWithUri.first.uris().size > 1)
+                    if (label.isNotEmpty() && !listOf("SIP", "TEL").contains(label.uppercase()))
+                        return "$name $label"
+                    if (unique || contactWithUri.first.uris().size > 1)
                         return "$name ${uri.substringAfter(":")}"
                     return name
                 }
@@ -84,8 +85,9 @@ sealed class Contact {
                     val name = telContactWithUri.first.name()
                     if (includeLabel) {
                         val label = telContactWithUri.second.label
-                        if (label.isNotEmpty()) return "$name $label"
-                        if (unique && telContactWithUri.first.uris().size > 1)
+                        if (label.isNotEmpty() && !listOf("SIP", "TEL").contains(label.uppercase()))
+                            return "$name $label"
+                        if (unique || telContactWithUri.first.uris().size > 1)
                             return "$name $userPart"
                         return name
                     }
