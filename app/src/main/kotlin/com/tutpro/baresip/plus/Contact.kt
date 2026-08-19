@@ -67,12 +67,18 @@ sealed class Contact {
         fun contactName(uri: String, includeLabel: Boolean = false, unique: Boolean = false): String {
             val contactWithUri = findContactWithUri(uri)
             if (contactWithUri != null) {
-                val name = contactWithUri.first.name()
+                val contact = contactWithUri.first
+                val name = contact.name()
                 if (includeLabel) {
                     val label = contactWithUri.second.label
                     if (label.isNotEmpty() && !listOf("SIP", "TEL").contains(label.uppercase()))
                         return "$name $label"
-                    if (unique || contactWithUri.first.uris().size > 1)
+                    if (contact.uris().size > 1 ||
+                            (unique &&
+                                    synchronized(BaresipService.contacts) {
+                                        nameExists(name, BaresipService.contacts.filter { it.id() != contact.id() }, true)
+                                    }
+                            ))
                         return "$name ${uri.substringAfter(":")}"
                     return name
                 }
@@ -82,12 +88,18 @@ sealed class Contact {
             if (Utils.isTelNumber(userPart)) {
                 val telContactWithUri = findContactWithUri("tel:$userPart")
                 if (telContactWithUri != null) {
-                    val name = telContactWithUri.first.name()
+                    val contact = telContactWithUri.first
+                    val name = contact.name()
                     if (includeLabel) {
                         val label = telContactWithUri.second.label
                         if (label.isNotEmpty() && !listOf("SIP", "TEL").contains(label.uppercase()))
                             return "$name $label"
-                        if (unique || telContactWithUri.first.uris().size > 1)
+                        if (contact.uris().size > 1 ||
+                                (unique &&
+                                        synchronized(BaresipService.contacts) {
+                                            nameExists(name, BaresipService.contacts.filter { it.id() != contact.id() }, true)
+                                        }
+                                ))
                             return "$name $userPart"
                         return name
                     }
