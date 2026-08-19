@@ -33,7 +33,8 @@ class TaskReceiver : BroadcastReceiver() {
                     Api.ua_register(ua.uap)
                     acc.regint = Api.account_regint(acc.accp)
                     Account.saveAccounts()
-                } else {
+                }
+                else {
                     Log.d(TAG, "TaskReceiver: un-registering $aor")
                     Api.account_set_regint(acc.accp, 0)
                     Api.ua_unregister(ua.uap)
