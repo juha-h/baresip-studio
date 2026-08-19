@@ -119,7 +119,8 @@ fun AppTheme(
                         statusBarStyle = barStyle,
                         navigationBarStyle = barStyle
                     )
-                } else {
+                }
+                else {
                     val controller = WindowCompat.getInsetsController(activity.window, view)
                     controller.isAppearanceLightStatusBars = !isDark
                     controller.isAppearanceLightNavigationBars = !isDark
