@@ -388,4 +388,6 @@
     <string name="mobile_service_not_available">移动服务不可用。</string>
     <string name="create_mobile_account">创建移动账号</string>
     <string name="create_mobile_account_help">如果选中，将为移动通话创建虚拟移动账号。</string>
+    <string name="ilbc_mode">iLBC 模式</string>
+    <string name="ilbc_mode_help">选择默认 iLBC 帧时长。30 毫秒可提供更好的低比特率质量，而 20 毫秒具有更低的延迟。</string>
 </resources>
