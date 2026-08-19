@@ -104,8 +104,10 @@ import kotlinx.serialization.encoding.Encoder
 
 object Utils {
 
-    val BARESIP_FILES = listOf("accounts", "call_history", "blocked", "blocking", "config",
-        "contacts", "messages", "uuid", "gzrtp.zid", "cert.pem", "ca_certs.crt")
+    val BARESIP_FILES = listOf(
+        "accounts", "call_history", "blocked", "blocking", "config", "contacts", "messages", "uuid",
+        "gzrtp.zid", "cert.pem", "ca_certs.crt"
+    )
 
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
@@ -297,15 +299,15 @@ object Utils {
     fun checkUriUser(user: String): Boolean {
         val escaped = """%([\dABCDEFabcdef]){2}""".toRegex()
         escaped.replace(user, "").forEach {
-            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+$,;?/".contains(it))) return false }
+            if (!(it.isLetterOrDigit() || "-_.!~*\'()&=+$,;?/".contains(it))) return false
+        }
         return user.isNotEmpty() && !checkIpV4(user) && !checkIpV6(user)
     }
 
     fun checkDomain(domain: String): Boolean {
         val parts = domain.split(".")
         for (p in parts)
-            if (p.endsWith("-") || p.startsWith("-") ||
-                    !Regex("^[-a-zA-Z0-9]+$").matches(p))
+            if (p.endsWith("-") || p.startsWith("-") || !Regex("^[-a-zA-Z0-9]+$").matches(p))
                 return false
         return true
     }
@@ -426,8 +428,7 @@ object Utils {
             aorDomain(account.aor)
         return "sip:" + telUri.substring(4)
             .filterNot{setOf('-', ' ', '(', ')').contains(it)}
-            .replace("#", "%23") +
-                "@" + hostPart + ";user=phone"
+            .replace("#", "%23") + "@" + hostPart + ";user=phone"
     }
 
     fun sipToTel(sipUri: String): String {
@@ -453,8 +454,7 @@ object Utils {
         val parts = server.replace(Regex("[(][^()\\\\]+[)]"), "")
             .trim().split("\\s+".toRegex())
         for (part in parts)
-            if (!checkProduct(part))
-                return false
+            if (!checkProduct(part)) return false
         return true
     }
 
@@ -673,8 +673,8 @@ object Utils {
     }
 
     fun downloadsPath(fileName: String): String {
-        return Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_DOWNLOADS).path + "/$fileName"
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path +
+                "/$fileName"
     }
 
     fun fileNameOfUri(ctx: Context, uri: Uri): String {
@@ -795,8 +795,7 @@ object Utils {
         var plainData: ByteArray? = null
         var stream: InputStream
         try {
-            stream = ctx.contentResolver.openInputStream(uri)
-                ?: return null
+            stream = ctx.contentResolver.openInputStream(uri) ?: return null
         } catch(e: Exception) {
             Log.w(TAG, "decryptFromUri could not open stream: $e")
             return null
@@ -902,7 +901,6 @@ object Utils {
     fun requestDismissKeyguard(activity: Activity) {
         val kgm = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         kgm.requestDismissKeyguard(activity, null)
-
     }
 
     fun isThemeDark(ctx: Context) : Boolean {
@@ -914,7 +912,8 @@ object Utils {
     fun isAirplaneModeOn(ctx: Context): Boolean {
         return android.provider.Settings.Global.getInt(
             ctx.contentResolver,
-            android.provider.Settings.Global.AIRPLANE_MODE_ON, 0
+            android.provider.Settings.Global.AIRPLANE_MODE_ON,
+            0
         ) != 0
     }
 
@@ -1420,8 +1419,7 @@ object Utils {
                 roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
             val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
-            if (preferredHandle != null)
-                return preferredHandle
+            if (preferredHandle != null) return preferredHandle
             val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
             val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
             return if (phoneAccounts.isNotEmpty())
