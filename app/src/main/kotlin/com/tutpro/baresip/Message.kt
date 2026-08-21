@@ -24,8 +24,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     break
                 }
             }
-        if (remove != null)
-            updatedMessages.remove(remove)
+        if (remove != null) updatedMessages.remove(remove)
         synchronized(BaresipService.messagesLock) {
             BaresipService.messages = updatedMessages.toList()
         }

@@ -97,9 +97,7 @@ import java.util.Locale
 const val avatarSize: Int = 96
 
 fun NavGraphBuilder.contactsScreenRoute(navController: NavController) {
-    composable("contacts") { _ ->
-        ContactsScreen(navController = navController)
-    }
+    composable("contacts") { _ -> ContactsScreen(navController = navController) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -217,8 +215,7 @@ private fun ContactsScreen(navController: NavController) {
                                 name = line.substring(2).trim().replace(";", " ").trim()
                             }
                             line.startsWith("EMAIL", ignoreCase = true) -> {
-                                if (email.isEmpty())
-                                    email = line.substringAfter(":").trim()
+                                if (email.isEmpty()) email = line.substringAfter(":").trim()
                             }
                             line.startsWith("TEL", ignoreCase = true) -> {
                                 val label = if (line.contains("X-")) line.substringAfter("X-").substringBefore(":") else ""
@@ -360,8 +357,7 @@ private fun ContactsScreen(navController: NavController) {
     ) { permissions ->
         if (permissions[Manifest.permission.READ_CONTACTS] == true &&
                 permissions[Manifest.permission.WRITE_CONTACTS] == true)
-            if (pendingMode.isNotEmpty())
-                setContactsMode(pendingMode)
+            if (pendingMode.isNotEmpty()) setContactsMode(pendingMode)
         pendingMode = ""
     }
 
@@ -572,8 +568,7 @@ private fun BottomBar(
             value = searchContactName,
             onValueChange = {
                 onSearchContactNameChange(it)
-                if (it.isBlank())
-                    keyboardController?.hide()
+                if (it.isBlank()) keyboardController?.hide()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -581,9 +576,9 @@ private fun BottomBar(
             singleLine = true,
             leadingIcon = if (!isFocused && searchContactName.isEmpty()) {
                 { Icon(Icons.Filled.Search, contentDescription = null) }
-            } else {
-                null
-            },
+            }
+            else
+                null,
             trailingIcon = {
                 if (searchContactName.isNotEmpty())
                     Icon(
@@ -658,9 +653,9 @@ private fun ContactsContent(
                     else
                         AnnotatedString(contact.name())
                     Triple(contact, annotatedName, matchingUri)
-                } else {
-                    null
                 }
+                else
+                    null
             }
         }
     }
@@ -668,8 +663,7 @@ private fun ContactsContent(
     LaunchedEffect(scrollToContact?.value, filteredContacts) {
         scrollToContact?.value?.let { name ->
             val index = filteredContacts.indexOfFirst { it.first.name() == name }
-            if (index != -1)
-                lazyListState.scrollToItem(index)
+            if (index != -1) lazyListState.scrollToItem(index)
             navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scrollToContact")
         }
     }
@@ -741,13 +735,12 @@ private fun ContactsContent(
                                             }
                                         Contact.removeBaresipContact(contact)
                                     }
-                                    is Contact.AndroidContact -> {
+                                    is Contact.AndroidContact ->
                                         ctx.contentResolver.delete(
                                             ContactsContract.RawContacts.CONTENT_URI,
                                             ContactsContract.Contacts.DISPLAY_NAME + "='" + contact.name() + "'",
                                             null
                                         )
-                                    }
                                 }
                             }
                             showDialog.value = true
@@ -769,7 +762,8 @@ private fun ContactsContent(
                         val tel = matchingUri.uri.substring(4)
                         val annotatedTel = Utils.buildAnnotatedStringWithHighlight(
                             tel,
-                            searchQuery.filter { it.isDigit() || it == '+' })
+                            searchQuery.filter { it.isDigit() || it == '+' }
+                        )
                         Text(
                             text = buildAnnotatedString {
                                 if (matchingUri.label.isNotEmpty())

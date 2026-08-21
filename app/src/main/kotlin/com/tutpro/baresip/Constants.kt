@@ -41,8 +41,9 @@ const val CALL_DOWN_RED = 2131165317
 const val CALL_MISSED_OUT = 2131165320
 const val CALL_MISSED_IN = 2131165319
 
-val mediaEncMap = mapOf("zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF", "srtp-mand" to "SRTP-MAND",
-    "srtp" to "SRTP", "" to "--")
+val mediaEncMap = mapOf(
+    "zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF", "srtp-mand" to "SRTP-MAND", "srtp" to "SRTP", "" to "--"
+)
 
 val mediaNatMap = mapOf("stun" to "STUN", "turn" to "TURN", "ice" to "ICE", "" to "--")
 

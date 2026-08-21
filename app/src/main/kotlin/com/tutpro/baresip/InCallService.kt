@@ -21,10 +21,9 @@ class InCallService : InCallService() {
         val baresipSipHandle = BaresipService.getPhoneAccountHandle(this, BaresipService.SIP_ACCOUNT_ID)
         val baresipPstnHandle = BaresipService.getPhoneAccountHandle(this, BaresipService.PSTN_ACCOUNT_ID)
 
-        if (handle == baresipSipHandle || handle == baresipPstnHandle) {
+        if (handle == baresipSipHandle || handle == baresipPstnHandle)
             Log.d(TAG, "InCallService: Identified as SIP call")
             // SIP call is already managed by ConnectionService/BaresipService
-        }
         else {
             Log.d(TAG, "InCallService: Identified as PSTN call from $handle")
             val aor = call.details.intentExtras?.getString("aor")
@@ -56,8 +55,6 @@ class InCallService : InCallService() {
         private var _instance = WeakReference<InCallService>(null)
         var instance: InCallService?
             get() = _instance.get()
-            set(value) {
-                _instance = WeakReference(value)
-            }
+            set(value) { _instance = WeakReference(value) }
     }
 }

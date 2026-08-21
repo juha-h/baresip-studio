@@ -152,8 +152,11 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
         @Suppress("UNUSED")
         fun print() {
             for (h in BaresipService.callHistory)
-                Log.d(TAG, "[${h.aor}, ${h.peerUri}, ${h.direction}, ${h.startTime}," +
-                        "${h.stopTime}, ${h.rejected}, ${h.recording}")
+                Log.d(
+                    TAG,
+                    "[${h.aor}, ${h.peerUri}, ${h.direction}, ${h.startTime}," +
+                        "${h.stopTime}, ${h.rejected}, ${h.recording}"
+                )
         }
 
     }

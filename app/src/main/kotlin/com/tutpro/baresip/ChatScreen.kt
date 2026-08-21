@@ -140,8 +140,7 @@ private fun ChatScreen(
     val reloadMessages = {
         Log.d(TAG, "Reloading messages for $aor peer $peerUri")
         chatMessages = loadPeerMessages(aor, peerUri)
-        if (!areMessagesLoaded)
-            areMessagesLoaded = true
+        if (!areMessagesLoaded) areMessagesLoaded = true
     }
 
     val addMessage = { newMessage: Message ->
@@ -182,7 +181,7 @@ private fun ChatScreen(
         },
         bottomBar = {
             NewMessage(
-                viewModel,
+                viewModel = viewModel,
                 account = account,
                 peerUri = peerUri,
                 addMessage = addMessage
@@ -265,10 +264,7 @@ private fun TopAppBar(
                         Log.w(TAG, "Call button onClick listener did not find UA for $aor")
                 }
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Call,
-                    contentDescription = "Call",
-                )
+                Icon(imageVector = Icons.Outlined.Call, contentDescription = "Call")
             }
             val contact = Contact.findContact(peerUri)
             if (contact != null && contact is Contact.BaresipContact && contact.email.isNotEmpty())
@@ -368,8 +364,7 @@ private fun Messages(
 
     LaunchedEffect(messages) {
         // Scroll to the bottom when new messages are added
-        if (messages.isNotEmpty())
-            coroutineScope.launch { lazyListState.scrollToItem(0) }
+        if (messages.isNotEmpty()) coroutineScope.launch { lazyListState.scrollToItem(0) }
     }
 
     LazyColumn(
@@ -420,8 +415,7 @@ private fun Messages(
                         }
                         showDialog.value = true
                     },
-                    onLongClick = {
-                    },
+                    onLongClick = {},
                     shape = if (message.direction == MESSAGE_DOWN)
                         RoundedCornerShape(50.dp, 20.dp, 20.dp, 10.dp)
                     else
@@ -455,7 +449,9 @@ private fun Messages(
                                     text = message.message,
                                     color = textColor,
                                     fontWeight = if (message.direction == MESSAGE_DOWN && message.new)
-                                        FontWeight.Bold else FontWeight.Normal
+                                        FontWeight.Bold
+                                    else
+                                        FontWeight.Normal
                                 )
                             }
                         }
@@ -518,14 +514,13 @@ private fun NewMessage(
                 .verticalScroll(rememberScrollState())
                 .focusRequester(focusRequester)
                 .onGloballyPositioned {
-                    if (!textFieldLoaded)
-                        textFieldLoaded = true
+                    if (!textFieldLoaded) textFieldLoaded = true
                 },
             singleLine = false,
             trailingIcon = {
-                if (newMessage.value.text.isNotEmpty()) {
+                if (newMessage.value.text.isNotEmpty())
                     Icon(
-                        Icons.Outlined.Clear,
+                        imageVector = Icons.Outlined.Clear,
                         contentDescription = "Clear",
                         modifier = Modifier.clickable {
                             newMessage.value = TextFieldValue("")
@@ -533,7 +528,6 @@ private fun NewMessage(
                         },
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
             },
             label = { Text(stringResource(R.string.new_message)) },
             textStyle = TextStyle(fontSize = 18.sp),
@@ -544,8 +538,7 @@ private fun NewMessage(
             )
         )
         LaunchedEffect(Unit) {
-            if (newMessage.value.text.isNotEmpty())
-                focusRequester.requestFocus()
+            if (newMessage.value.text.isNotEmpty()) focusRequester.requestFocus()
         }
         SmallFloatingActionButton(
             modifier = Modifier.offset(y = 2.dp),
@@ -606,10 +599,7 @@ private fun NewMessage(
                             msgUri = peerUri
                         if (msgUri != "") {
                             if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
-                                Toast.makeText(
-                                    ctx, "$messageFailed!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
                                 msg.direction = MESSAGE_UP_FAIL
                                 msg.responseReason = messageFailed
                             }

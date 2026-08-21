@@ -483,8 +483,7 @@ private fun Calls(
                             )
                             count++
                         }
-                        if (count > 3)
-                            Text(ctx.getString(R.string.dots), color = MaterialTheme.colorScheme.onBackground)
+                        if (count > 3) Text(ctx.getString(R.string.dots), color = MaterialTheme.colorScheme.onBackground)
                         Text(
                             text = Utils.friendlyUri(ctx, peerUri, ua.account),
                             modifier = Modifier.padding(start = 8.dp),
