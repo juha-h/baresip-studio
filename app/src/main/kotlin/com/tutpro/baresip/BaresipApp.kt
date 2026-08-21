@@ -28,8 +28,7 @@ class BaresipApp : Application() {
         var cause: Throwable? = throwable
         while (cause != null) {
             if (cause is DeadObjectException)
-                if (cause.stackTrace.any { it.methodName == "updateCursorAnchorInfo" })
-                    return true
+                if (cause.stackTrace.any { it.methodName == "updateCursorAnchorInfo" }) return true
             cause = cause.cause
         }
         return false

@@ -35,9 +35,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
 fun NavGraphBuilder.aboutScreenRoute(navController: NavController) {
-    composable("about") {
-        AboutScreen(onBack = { navController.navigateUp() })
-    }
+    composable("about") { AboutScreen(onBack = { navController.navigateUp() }) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

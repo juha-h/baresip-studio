@@ -336,14 +336,13 @@ fun NewRule(aor: String, onRuleAdded: () -> Unit) {
                     },
                 singleLine = true,
                 trailingIcon = {
-                    if (pattern.isNotEmpty()) {
+                    if (pattern.isNotEmpty())
                         Icon(
                             Icons.Outlined.Clear,
                             contentDescription = "Clear",
                             modifier = Modifier.clickable { pattern = "" },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    }
                 },
                 label = { Text(stringResource(R.string.new_blocking_rule)) },
                 textStyle = TextStyle(fontSize = 18.sp),

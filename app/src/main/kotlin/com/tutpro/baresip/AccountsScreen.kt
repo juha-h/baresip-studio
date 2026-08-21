@@ -73,9 +73,7 @@ fun AccountsScreen(navController: NavController) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
-                    title = {
-                        Text(text = stringResource(R.string.accounts), fontWeight = FontWeight.Bold)
-                    },
+                    title = { Text(text = stringResource(R.string.accounts), fontWeight = FontWeight.Bold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -182,13 +180,12 @@ fun NewAccount(navController: NavController) {
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
 
-    if (showAlert.value)
-        AlertDialog(
-            showDialog = showAlert,
-            title = alertTitle.value,
-            message = alertMessage.value,
-            lastButtonText = stringResource(R.string.ok),
-        )
+    AlertDialog(
+        showDialog = showAlert,
+        title = alertTitle.value,
+        message = alertMessage.value,
+        lastButtonText = stringResource(R.string.ok),
+    )
 
     fun createNew(ctx: Context, newAor: String): Account? {
 
@@ -207,8 +204,7 @@ fun NewAccount(navController: NavController) {
 
         if (Account.ofAor(aor) != null) {
             alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value =
-                String.format(ctx.getString(R.string.account_exists), aor.split(":")[1])
+            alertMessage.value = String.format(ctx.getString(R.string.account_exists), aor.split(":")[1])
             showAlert.value = true
             return null
         }

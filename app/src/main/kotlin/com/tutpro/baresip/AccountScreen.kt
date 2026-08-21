@@ -140,8 +140,7 @@ private fun AccountScreen(
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME)
-                resumeToggle = System.currentTimeMillis()
+            if (event == Lifecycle.Event.ON_RESUME) resumeToggle = System.currentTimeMillis()
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -605,7 +604,8 @@ private fun AccountContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = checkOriginTitle,
+            Text(
+                text = checkOriginTitle,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -706,8 +706,7 @@ private fun AccountContent(
                                 viewModel.mediaEnc.value = it.key
                             }
                         )
-                        if (index < 4)
-                            HorizontalDivider(thickness = 1.dp)
+                        if (index < 4) HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -762,8 +761,7 @@ private fun AccountContent(
                                 viewModel.mediaNat.value = it.key
                             }
                         )
-                        if (index < 3)
-                            HorizontalDivider(thickness = 1.dp)
+                        if (index < 3) HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -986,8 +984,7 @@ private fun AccountContent(
                                 viewModel.dtmfMode.value = it.key
                             }
                         )
-                        if (index < 2)
-                            HorizontalDivider(thickness = 1.dp)
+                        if (index < 2) HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -1044,8 +1041,7 @@ private fun AccountContent(
                                 isDropDownExpanded.value = false
                                 viewModel.answerMode.value = it.key
                             })
-                        if (index < 1)
-                            HorizontalDivider(thickness = 1.dp)
+                        if (index < 1) HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -1101,8 +1097,7 @@ private fun AccountContent(
                                 viewModel.autoRedirect.value = it.key
                             }
                         )
-                        if (index < 1)
-                            HorizontalDivider(thickness = 1.dp)
+                        if (index < 1) HorizontalDivider(thickness = 1.dp)
                         index++
                     }
                 }
@@ -1306,14 +1301,12 @@ private fun AccountContent(
     ) {
         AoR(resumeToggle)
         Nickname()
-        if (ua.account.isMobile)
-            SimManager()
+        if (ua.account.isMobile) SimManager()
         if (!ua.account.isMobile) {
             DisplayName()
             AuthUser()
             AuthPass()
-            if (showPasswordDialog.value)
-                AskPassword(ctx, navController, ua)
+            if (showPasswordDialog.value) AskPassword(ctx, navController, ua)
             Outbound()
             Register()
             if (viewModel.register.collectAsState().value) {
@@ -1339,12 +1332,10 @@ private fun AccountContent(
         Answer()
         Voicemail()
         CountryCode()
-        if (!ua.account.isMobile)
-            TelProvider()
+        if (!ua.account.isMobile) TelProvider()
         NumericKeypad()
         DefaultAccount()
-        if (!ua.account.isMobile)
-            CustomParams()
+        if (!ua.account.isMobile) CustomParams()
     }
 }
 
@@ -1485,8 +1476,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
             Api.account_set_sipnat(acc.accp, "")
         else
             Api.account_set_sipnat(acc.accp, "outbound")
-        if (acc.regint > 0)
-            reRegister = true
+        if (acc.regint > 0) reRegister = true
     }
 
     val regInt = try {
@@ -1668,8 +1658,7 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
                 if (!newVmUri.startsWith("tel:")) newVmUri = "tel:$newVmUri"
             }
             else {
-                if (Utils.isTelNumber(newVmUri))
-                    newVmUri = "tel:$newVmUri"
+                if (Utils.isTelNumber(newVmUri)) newVmUri = "tel:$newVmUri"
                 if (Utils.isTelUri(newVmUri)) {
                     if (ua.account.telProvider == "")
                         error = String.format(
@@ -1795,12 +1784,10 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
                     XmlPullParser.END_TAG ->
                         when (tag) {
                             "outbound-proxy-1" ->
-                                if (text.isNotEmpty())
-                                    acc.outbound.add(text)
+                                if (text.isNotEmpty()) acc.outbound.add(text)
 
                             "outbound-proxy-2" ->
-                                if (text.isNotEmpty())
-                                    acc.outbound.add(text)
+                                if (text.isNotEmpty()) acc.outbound.add(text)
 
                             "registration-interval" ->
                                 acc.configuredRegInt = try {
@@ -1811,36 +1798,29 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
 
                             "register" -> {
                                 acc.regint = if (text == "yes") acc.configuredRegInt else 0
-                                if (acc.regint > 0)
-                                    acc.checkOrigin = true
+                                if (acc.regint > 0) acc.checkOrigin = true
                             }
 
                             "audio-codec" ->
-                                if (text in audioCodecs)
-                                    acc.audioCodec.add(text)
+                                if (text in audioCodecs) acc.audioCodec.add(text)
 
                             "video-codec" ->
-                                if (text in videoCodecs)
-                                    acc.videoCodec.add(text)
+                                if (text in videoCodecs) acc.videoCodec.add(text)
 
                             "media-encoding" -> {
                                 val enc = text.lowercase(Locale.ROOT)
-                                if (enc in mediaEncMap.keys && enc.isNotEmpty())
-                                    acc.mediaEnc = enc
+                                if (enc in mediaEncMap.keys && enc.isNotEmpty()) acc.mediaEnc = enc
                             }
 
                             "media-nat" -> {
                                 val nat = text.lowercase(Locale.ROOT)
-                                if (nat in mediaNatMap.keys && nat.isNotEmpty())
-                                    acc.mediaNat = nat
+                                if (nat in mediaNatMap.keys && nat.isNotEmpty()) acc.mediaNat = nat
                             }
 
                             "stun-turn-server" ->
-                                if (text.isNotEmpty())
-                                    acc.stunServer = text
+                                if (text.isNotEmpty()) acc.stunServer = text
 
-                            "rtcp-mux" ->
-                                acc.rtcpMux = text == "yes"
+                            "rtcp-mux" -> acc.rtcpMux = text == "yes"
 
                             "100rel-mode" ->
                                 acc.rel100Mode = if (text == "yes")
@@ -1867,8 +1847,7 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
                                 acc.autoRedirect = text == "yes"
 
                             "voicemail-uri" ->
-                                if (text.isNotEmpty())
-                                    acc.vmUri = text
+                                if (text.isNotEmpty()) acc.vmUri = text
 
                             "country-code" ->
                                 acc.countryCode = text

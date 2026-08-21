@@ -51,7 +51,7 @@ class Blocked (
                 Log.i(TAG, "Migrating blocked.json to blocked")
                 oldFile.renameTo(file)
             }
-            if (file.exists()) {
+            if (file.exists())
                 try {
                     val jsonString = file.readText()
                     val blockedList = Json.decodeFromString<List<Blocked>>(jsonString)
@@ -63,7 +63,6 @@ class Blocked (
                 } catch (e: Exception) {
                     Log.e(TAG, "Deserialization exception: $e")
                 }
-            }
         }
     }
 }
