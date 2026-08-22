@@ -356,8 +356,9 @@ private fun ContactsScreen(navController: NavController) {
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[Manifest.permission.READ_CONTACTS] == true &&
-                permissions[Manifest.permission.WRITE_CONTACTS] == true)
-            if (pendingMode.isNotEmpty()) setContactsMode(pendingMode)
+            permissions[Manifest.permission.WRITE_CONTACTS] == true &&
+            pendingMode.isNotEmpty()
+        ) setContactsMode(pendingMode)
         pendingMode = ""
     }
 
@@ -766,8 +767,7 @@ private fun ContactsContent(
                         )
                         Text(
                             text = buildAnnotatedString {
-                                if (matchingUri.label.isNotEmpty())
-                                    append("${matchingUri.label} ")
+                                if (matchingUri.label.isNotEmpty()) append("${matchingUri.label} ")
                                 append(annotatedTel)
                             },
                             fontSize = 16.sp,
