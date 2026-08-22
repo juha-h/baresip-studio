@@ -64,9 +64,7 @@ import androidx.navigation.compose.composable
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 
-enum class Result {
-    OK, ERROR, RESTART
-}
+enum class Result { OK, ERROR, RESTART }
 
 fun NavGraphBuilder.audioScreenRoute(navController: NavController) {
     composable("audio") {
@@ -148,13 +146,12 @@ private val showAlert = mutableStateOf(false)
 @Composable
 private fun AudioContent(viewModel: AudioViewModel, contentPadding: PaddingValues) {
 
-    if (showAlert.value)
-        AlertDialog(
-            showDialog = showAlert,
-            title = alertTitle.value,
-            message = alertMessage.value,
-            lastButtonText = stringResource(R.string.ok),
-        )
+    AlertDialog(
+        showDialog = showAlert,
+        title = alertTitle.value,
+        message = alertMessage.value,
+        lastButtonText = stringResource(R.string.ok),
+    )
 
     val scrollState = rememberScrollState()
 
@@ -195,9 +192,7 @@ private fun Ringtone(viewModel: AudioViewModel) {
             else
                 @Suppress("DEPRECATION")
                 result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            if (uri != null) {
-                viewModel.ringtoneUri.value = uri.toString()
-            }
+            if (uri != null) viewModel.ringtoneUri.value = uri.toString()
         }
     }
     Row(
@@ -369,8 +364,7 @@ private fun CallVolume(viewModel: AudioViewModel) {
                             isDropDownExpanded.value = false
                             viewModel.callVolume.value = volValues[index]
                         })
-                    if (index < 10)
-                        HorizontalDivider(thickness = 1.dp)
+                    if (index < 10) HorizontalDivider(thickness = 1.dp)
                 }
             }
         }
@@ -423,7 +417,7 @@ private fun AudioModules(viewModel: AudioViewModel) {
                 alertMessage.value = audioModulesHelp
                 showAlert.value = true
             })
-        for (module in Config.audioModules) {
+        for (module in Config.audioModules)
             Row(horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 18.dp, end = 10.dp)
@@ -440,7 +434,6 @@ private fun AudioModules(viewModel: AudioViewModel) {
                     }
                 )
             }
-        }
     }
 }
 
@@ -577,8 +570,7 @@ private fun IlbcMode(viewModel: AudioViewModel) {
                             isDropDownExpanded.value = false
                             viewModel.ilbcMode.value = modeValues[index]
                         })
-                    if (index < 1)
-                        HorizontalDivider(thickness = 1.dp)
+                    if (index < 1) HorizontalDivider(thickness = 1.dp)
                 }
             }
         }

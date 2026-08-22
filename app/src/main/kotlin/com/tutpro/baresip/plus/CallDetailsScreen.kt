@@ -260,24 +260,22 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
         startTimeText = stopText
         durationText = "?"
     }
-    else {
-        if (startTime == null  || detail.direction == CALL_DOWN_BLUE) {
+    else if (startTime == null  || detail.direction == CALL_DOWN_BLUE) {
             startTimeText = stopText
             durationText = ""
+    }
+    else {
+        val startText = if (DateUtils.isToday(startTime.timeInMillis)) {
+            val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
+            stringResource(R.string.today) + " " + fmt.format(startTime.time)
         }
         else {
-            val startText = if (DateUtils.isToday(startTime.timeInMillis)) {
-                val fmt = DateFormat.getTimeInstance(DateFormat.MEDIUM)
-                stringResource(R.string.today) + " " + fmt.format(startTime.time)
-            }
-            else {
-                val fmt = DateFormat.getDateTimeInstance()
-                fmt.format(startTime.time)
-            }
-            startTimeText = startText
-            val duration = (stopTime.time.time - startTime.time.time) / 1000
-            durationText = DateUtils.formatElapsedTime(duration)
+            val fmt = DateFormat.getDateTimeInstance()
+            fmt.format(startTime.time)
         }
+        startTimeText = startText
+        val duration = (stopTime.time.time - startTime.time.time) / 1000
+        durationText = DateUtils.formatElapsedTime(duration)
     }
     val showDialog = remember { mutableStateOf(false) }
 
@@ -462,22 +460,20 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                         }
                                     }
                                 }
-                                else {
-                                    if (currentIsMerged) {
-                                        val f = File(currentRecording[0])
-                                        if (f.exists()) {
-                                            Log.d(
-                                                TAG,
-                                                "Using already merged file: ${currentRecording[0]}"
-                                            )
-                                            finalFile = f
-                                        }
-                                        else
-                                            Log.e(
-                                                TAG,
-                                                "Merged file record exists but file is missing: ${currentRecording[0]}"
-                                            )
+                                else if (currentIsMerged) {
+                                    val f = File(currentRecording[0])
+                                    if (f.exists()) {
+                                        Log.d(
+                                            TAG,
+                                            "Using already merged file: ${currentRecording[0]}"
+                                        )
+                                        finalFile = f
                                     }
+                                    else
+                                        Log.e(
+                                            TAG,
+                                            "Merged file record exists but file is missing: ${currentRecording[0]}"
+                                        )
                                 }
 
                                 withContext(Dispatchers.Main) {

@@ -32,9 +32,9 @@ object Config {
             for (module in audioModules)
                 config = "${config}module ${module}.so\n"
             previousConfig = config
-        } else {
-            previousConfig = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
         }
+        else
+            previousConfig = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
         previousLines = previousConfig.split("\n")
         initialized = true
 
@@ -42,7 +42,8 @@ object Config {
         if (logLevel == "") {
             config = "${config}log_level 2\n"
             Log.logLevel = Log.LogLevel.WARN
-        } else {
+        }
+        else {
             config = "${config}log_level $logLevel\n"
             BaresipService.logLevel = logLevel.toInt()
             Log.logLevelSet(BaresipService.logLevel)
@@ -55,8 +56,7 @@ object Config {
             "${config}auto_start no\n"
 
         val sipListen = previousVariable("sip_listen")
-        if (sipListen != "")
-            config = "${config}sip_listen $sipListen\n"
+        if (sipListen != "") config = "${config}sip_listen $sipListen\n"
 
         val addressFamily = previousVariable("net_af")
         if (addressFamily != "") {
@@ -65,16 +65,13 @@ object Config {
         }
 
         val transportProtocols = previousVariable("sip_transports")
-        if (transportProtocols != "")
-            config = "${config}sip_transports $transportProtocols\n"
+        if (transportProtocols != "") config = "${config}sip_transports $transportProtocols\n"
 
         val sipCertificate = previousVariable("sip_certificate")
-        if (sipCertificate != "")
-            config = "${config}sip_certificate $sipCertificate\n"
+        if (sipCertificate != "") config = "${config}sip_certificate $sipCertificate\n"
 
         val sipVerifyServer = previousVariable("sip_verify_server")
-        if (sipVerifyServer != "")
-            config = "${config}sip_verify_server $sipVerifyServer\n"
+        if (sipVerifyServer != "") config = "${config}sip_verify_server $sipVerifyServer\n"
 
         val caBundlePath = "${BaresipService.filesPath}/ca_bundle.crt"
         val caBundleFile = File(caBundlePath)
@@ -101,9 +98,9 @@ object Config {
                 }
             }
             Log.d(TAG, "Added $caCount ca certificates from $cacertsPath")
-        } else {
-            Log.w(TAG, "Directory $cacertsDir does not exist!")
         }
+        else
+            Log.w(TAG, "Directory $cacertsDir does not exist!")
         Log.d(TAG, "Size of caBundleFile = ${caBundleFile.length()}")
         config = "${config}sip_cafile $caBundlePath\n"
 
@@ -112,7 +109,8 @@ object Config {
             config = "${config}dyn_dns no\n"
             for (server in previousVariables("dns_server"))
                 config = "${config}dns_server $server\n"
-        } else {
+        }
+        else {
             config = "${config}dyn_dns yes\n"
             for (dnsServer in BaresipService.dnsServers)
                 config = if (Utils.checkIpV4(dnsServer.hostAddress!!))
@@ -123,8 +121,7 @@ object Config {
         }
 
         val userAgent = previousVariable("user_agent")
-        if (userAgent != "")
-            config = "${config}user_agent $userAgent\n"
+        if (userAgent != "") config = "${config}user_agent $userAgent\n"
 
         val mobileAccount = previousVariable("mobile_account")
         if (mobileAccount != "") {
@@ -147,7 +144,8 @@ object Config {
             config = "${config}dark_theme yes\n"
             BaresipService.darkTheme.value = true
             AppCompatDelegate.MODE_NIGHT_YES
-        } else {
+        }
+        else {
             BaresipService.darkTheme.value = false
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
@@ -156,7 +154,8 @@ object Config {
         BaresipService.dynamicColors.value = if (dynamicColors == "yes") {
             config = "${config}dynamic_colors yes\n"
             true
-        } else {
+        }
+        else {
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             false
         }
@@ -181,9 +180,9 @@ object Config {
                     !Utils.checkPermissions(ctx, arrayOf(Manifest.permission.READ_CONTACTS,
                             Manifest.permission.WRITE_CONTACTS)))
                 contactsMode = "baresip"
-        } else {
-            contactsMode = "baresip"
         }
+        else
+            contactsMode = "baresip"
         config = "${config}contacts_mode $contactsMode\n"
         BaresipService.contactsMode = contactsMode
 
@@ -200,9 +199,9 @@ object Config {
         if (callVolume != "") {
             config = "${config}call_volume $callVolume\n"
             BaresipService.callVolume = callVolume.toInt()
-        } else {
-            config = "${config}call_volume ${BaresipService.callVolume}\n"
         }
+        else
+            config = "${config}call_volume ${BaresipService.callVolume}\n"
 
         val speakerPhone = previousVariable("speaker_phone")
         if (speakerPhone != "") {
@@ -246,9 +245,9 @@ object Config {
         if (audioDelay != "") {
             config = "${config}audio_delay $audioDelay\n"
             BaresipService.audioDelay = audioDelay.toLong()
-        } else {
-            config = "${config}audio_delay ${BaresipService.audioDelay}\n"
         }
+        else
+            config = "${config}audio_delay ${BaresipService.audioDelay}\n"
 
         val cameraManager: CameraManager = ctx.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         val defaultSizes = arrayListOf("320x240", "640x480", "720x480", "720x720", "960x720", "1280x720",  "1920x1080")
@@ -310,8 +309,7 @@ object Config {
     private fun previousVariable(name: String): String {
         for (line in previousLines) {
             val nameValue = line.split(" ", limit = 2)
-            if (nameValue.size == 2 && nameValue[0] == name)
-                return nameValue[1].trim()
+            if (nameValue.size == 2 && nameValue[0] == name) return nameValue[1].trim()
         }
         return ""
     }
@@ -320,8 +318,7 @@ object Config {
         val result = ArrayList<String>()
         for (line in previousLines) {
             val nameValue = line.split(" ", limit = 2)
-            if (nameValue.size == 2 && nameValue[0] == name)
-                result.add(nameValue[1].trim())
+            if (nameValue.size == 2 && nameValue[0] == name) result.add(nameValue[1].trim())
         }
         return result
     }
@@ -330,8 +327,7 @@ object Config {
         if (!initialized) return ""
         for (line in config.split("\n")) {
             val nameValue = line.split(" ", limit = 2)
-            if (nameValue.size == 2 && nameValue[0] == name)
-                return nameValue[1].trim()
+            if (nameValue.size == 2 && nameValue[0] == name) return nameValue[1].trim()
         }
         return ""
     }
@@ -341,8 +337,7 @@ object Config {
         if (!initialized) return result
         for (line in config.split("\n")) {
             val nameValue = line.split(" ", limit = 2)
-            if (nameValue.size == 2 && nameValue[0] == name)
-                result.add(nameValue[1].trim())
+            if (nameValue.size == 2 && nameValue[0] == name) result.add(nameValue[1].trim())
         }
         return result
     }
@@ -364,8 +359,7 @@ object Config {
 
     fun replaceVariable(variable: String, value: String) {
         removeVariable(variable)
-        if (value != "")
-            addVariable(variable, value)
+        if (value != "") addVariable(variable, value)
     }
 
     fun reset() {

@@ -24,8 +24,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     break
                 }
             }
-        if (remove != null)
-            updatedMessages.remove(remove)
+        if (remove != null) updatedMessages.remove(remove)
         synchronized(BaresipService.messagesLock) {
             BaresipService.messages = updatedMessages.toList()
         }
@@ -48,7 +47,7 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         @Suppress("unused")
         const val serialVersionUID: Long = 434313168853691766L
 
-        const val MESSAGE_HISTORY_SIZE = 100
+        const val MESSAGE_HISTORY_SIZE = 256
 
         fun messages(): List<Message> {
             return BaresipService.messages

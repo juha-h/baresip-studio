@@ -331,9 +331,8 @@ private fun MainScreen(
                 password.value = ""
             },
             cancelAction = {
-                if (downloadsOutputUri != null) {
+                if (downloadsOutputUri != null)
                     Utils.deleteFile(ctx, downloadsOutputUri!!)
-                }
             }
         )
     }
@@ -358,11 +357,10 @@ private fun MainScreen(
                             BaresipService.aorPasswords[aor] = password.value
                         showPasswordsDialog.value = true
                     },
-                    cancelAction = {
-                        showPasswordsDialog.value = true
-                    }
+                    cancelAction = { showPasswordsDialog.value = true }
                 )
-            } else {
+            }
+            else {
                 showPasswordsDialog.value = false
                 showPasswordsDialog.value = true
             }
@@ -406,13 +404,11 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
     val hideKeyboard by viewModel.hideKeyboard.collectAsState()
 
     LaunchedEffect(showKeyboard) {
-        if (showKeyboard > 0)
-            keyboardController?.show()
+        if (showKeyboard > 0) keyboardController?.show()
     }
 
     LaunchedEffect(hideKeyboard) {
-        if (hideKeyboard > 0)
-            keyboardController?.hide()
+        if (hideKeyboard > 0) keyboardController?.hide()
     }
 
     val configuration = LocalConfiguration.current
@@ -582,9 +578,7 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
             }
         },
         bottomBar = { BottomBar(ctx, viewModel, navController) },
-        content = { contentPadding ->
-            MainContent(navController, viewModel, contentPadding)
-        }
+        content = { contentPadding -> MainContent(navController, viewModel, contentPadding) }
     )
 }
 
@@ -730,10 +724,7 @@ private fun TopAppBar(
                     .size(48.dp)
                     .clip(CircleShape)
                     .combinedClickable(
-                        onClick = {
-                            // Unified toggle via BaresipService
-                            BaresipService.instance?.toggleSpeakerphone()
-                        },
+                        onClick = { BaresipService.instance?.toggleSpeakerphone() },
                         onLongClick = {
                             alertTitle.value = speakerPhoneTitle
                             alertMessage.value = speakerPhoneMessage
@@ -959,8 +950,7 @@ private fun CallCard(
     Column {
         CallUriRow(ctx, viewModel, call, dialerState)
         CallRow(ctx, viewModel, call, dialerState)
-        if (call != null && call.showOnHoldNotice.value)
-            OnHoldNotice()
+        if (call != null && call.showOnHoldNotice.value) OnHoldNotice()
     }
 }
 
@@ -1051,9 +1041,7 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                             }
                         }
                     }
-                ) { _, dragAmount ->
-                    offset += dragAmount
-                }
+                ) { _, dragAmount -> offset += dragAmount }
             }
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
@@ -1096,15 +1084,12 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
         val selected = viewModel.selectedAor.value
         if (uas.value.isEmpty()) {
             if (selected != "") viewModel.updateSelectedAor("")
-        } else {
-            if (selected == "" || UserAgent.ofAor(selected) == null) {
-                viewModel.updateSelectedAor(uas.value.first().account.aor)
-            }
+        }
+        else if (selected == "" || UserAgent.ofAor(selected) == null) {
+            viewModel.updateSelectedAor(uas.value.first().account.aor)
         }
         val ua = UserAgent.ofAor(viewModel.selectedAor.value)
-        if (ua != null) {
-            showCall(ctx, viewModel, ua, viewModel.focusedCall.value)
-        }
+        if (ua != null) showCall(ctx, viewModel, ua, viewModel.focusedCall.value)
     }
 
     if (selected == "") {
@@ -1124,9 +1109,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             ),
             shape = RoundedCornerShape(12.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
-        ) {
-            Text(text = "")
-        }
+        ) { Text(text = "") }
     }
     else
         OutlinedButton(
@@ -1181,9 +1164,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 tint = Color.Unspecified,
                 modifier = Modifier
                     .padding(end = 10.dp)
-                    .clickable(onClick = {
-                        navController.navigate("account/$selected/old")
-                    })
+                    .clickable(onClick = { navController.navigate("account/$selected/old") })
             )
             Text(
                 text = Account.ofAor(selected)?.text() ?: "",
@@ -1350,8 +1331,7 @@ private fun CallUriRow(
                         if (isDialer) {
                             val account = Account.ofAor(viewModel.selectedAor.value)
                             if (account != null && account.numericKeypad)
-                                if (!isDialpadVisible)
-                                    viewModel.toggleDialpadVisibility()
+                                if (!isDialpadVisible) viewModel.toggleDialpadVisibility()
                         }
                     },
                 label = {
@@ -1389,12 +1369,7 @@ private fun CallUriRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
-                    label = {
-                        Text(
-                            text = call.callUriLabel2.value,
-                            fontSize = 18.sp
-                        )
-                    },
+                    label = { Text(text = call.callUriLabel2.value, fontSize = 18.sp) },
                     textStyle = TextStyle(fontSize = 18.sp)
                 )
             }
@@ -1625,8 +1600,7 @@ private fun CallRow(
                 }
 
             if (dialerState.showCallConferenceButton.value) {
-                if (dialerState.showCallButton.value)
-                    Spacer(modifier = Modifier.width(48.dp))
+                if (dialerState.showCallButton.value) Spacer(modifier = Modifier.width(48.dp))
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = dialerState.callButtonsEnabled.value,
@@ -2122,18 +2096,8 @@ private fun CallRow(
                             singleLine = true,
                             enabled = call.dtmfEnabled.value,
                             interactionSource = interactionSource,
-                            label = {
-                                Text(
-                                    stringResource(R.string.dtmf),
-                                    style = TextStyle(fontSize = 12.sp)
-                                )
-                            },
-                            contentPadding = PaddingValues(
-                                start = 4.dp,
-                                end = 4.dp,
-                                top = 8.dp,
-                                bottom = 8.dp
-                            ),
+                            label = { Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp)) },
+                            contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -2256,12 +2220,7 @@ private fun OnHoldNotice() {
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
             modifier = Modifier.padding(16.dp),
             shape = RoundedCornerShape(20)
-        ) {
-            Text(
-                text = stringResource(R.string.call_is_on_hold),
-                fontSize = 18.sp
-            )
-        }
+        ) { Text(text = stringResource(R.string.call_is_on_hold), fontSize = 18.sp) }
     }
 }
 
@@ -2746,9 +2705,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
                     else
                         uri.toUri()
                     tm.placeCall(telecomUri, extras)
-                } catch (e: SecurityException) {
-                    error = "placeCall failed: ${e.message}"
-                }
+                } catch (e: SecurityException) { error = "placeCall failed: ${e.message}" }
             }
             else
                 error = "no phone account"
@@ -2769,9 +2726,7 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
             try {
                 Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
                 tm.placeCall(uri.toUri(), extras)
-            } catch (e: SecurityException) {
-                error = "placeCall failed: ${e.message}"
-            }
+            } catch (e: SecurityException) { error = "placeCall failed: ${e.message}" }
         }
         if (error != "") {
             Log.e(TAG, error)
@@ -2889,9 +2844,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
         if (showVideoLayout.value || isLandscape || call.held || call.status.value != "connected") {
             call.focusDtmf.value = false
             call.dtmfEnabled.value = !call.held
-            Handler(Looper.getMainLooper()).postDelayed({
-                viewModel.requestHideKeyboard()
-            }, 25)
+            Handler(Looper.getMainLooper()).postDelayed({ viewModel.requestHideKeyboard() }, 25)
         }
         else {
             call.dtmfEnabled.value = true
@@ -2982,8 +2935,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
 fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params: ArrayList<Any>) {
 
     fun handleNextEvent(logMessage: String? = null) {
-        if (logMessage != null)
-            Log.w(TAG, logMessage)
+        if (logMessage != null) Log.w(TAG, logMessage)
         synchronized(BaresipService.serviceEvents) {
             if (BaresipService.serviceEvents.isNotEmpty()) {
                 val first = BaresipService.serviceEvents.removeAt(0)
@@ -3079,20 +3031,17 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         "call rejected" -> {}
         "call outgoing" -> {
             val callp = params[1] as Long
-            if (!BaresipService.isMainVisible)
-                viewModel.navigateToHome()
+            if (!BaresipService.isMainVisible) viewModel.navigateToHome()
             spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call incoming" -> {
             val callp = params[1] as Long
-            if (!BaresipService.isMainVisible)
-                viewModel.navigateToHome()
+            if (!BaresipService.isMainVisible) viewModel.navigateToHome()
             spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call answered" -> {
             val callp = params[1] as Long
-            if (!BaresipService.isMainVisible)
-                viewModel.navigateToHome()
+            if (!BaresipService.isMainVisible) viewModel.navigateToHome()
             spinToAor(viewModel, aor, Call.ofCallp(callp))
         }
         "call redirect", "video call redirect" -> {
@@ -3124,8 +3073,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
                 val call = Call.ofCallp(callp)
-                if (call != null)
-                    call.dtmfText.value = ""
+                if (call != null) call.dtmfText.value = ""
             }
         }
         "call update" -> {
@@ -3194,8 +3142,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                     R.color.colorTrafficGreen
                 }
                 call.zid = ev[2]
-                if (aor == viewModel.selectedAor.value)
-                    call.securityIconTint.value = call.security
+                if (aor == viewModel.selectedAor.value) call.securityIconTint.value = call.security
             }
             showDialog.value = true
         }
@@ -3206,9 +3153,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 handleNextEvent("Call $callp that is verified is not found")
                 return
             }
-            if (aor == viewModel.selectedAor.value) {
-                call.securityIconTint.value = call.security
-            }
+            if (aor == viewModel.selectedAor.value) call.securityIconTint.value = call.security
         }
         "call transfer", "transfer show" -> {
             if (!BaresipService.isMainVisible)
@@ -3227,8 +3172,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
             firstText.value = ""
             secondText.value = ctx.getString(R.string.no)
             onSecondClicked.value = {
-                if (call in Call.calls())
-                    call!!.notifySipfrag(603, "Decline")
+                if (call in Call.calls()) call!!.notifySipfrag(603, "Decline")
             }
             lastText.value = ctx.getString(R.string.yes)
             onLastClicked.value = {
@@ -3242,8 +3186,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         "transfer accept" -> {
             val callp = params[1] as Long
             val call = Call.ofCallp(callp)
-            if (call in Call.calls())
-                call!!.hangup(487, "Request Terminated")
+            if (call in Call.calls()) call!!.hangup(487, "Request Terminated")
             makeCall(ctx, viewModel, ev[1], viewModel.dialerState, false)
             showCall(ctx, viewModel, ua)
         }
@@ -3448,8 +3391,7 @@ fun callAction(ctx: Context, viewModel: ViewModel, uri: Uri?, action: String) {
 }
 
 private fun redirect(ctx: Context, viewModel: ViewModel, event: String, ua: UserAgent, redirectUri: String) {
-    if (ua.account.aor != viewModel.selectedAor.value)
-        spinToAor(viewModel, ua.account.aor)
+    if (ua.account.aor != viewModel.selectedAor.value) spinToAor(viewModel, ua.account.aor)
     viewModel.dialerState.callUri.value = redirectUri
     callClick(ctx, viewModel, viewModel.dialerState, event == "video call redirect")
 }
@@ -3477,8 +3419,7 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
 private fun backup(ctx: Context, password: String) {
     val files = ArrayList(Utils.BARESIP_FILES)
     File(BaresipService.filesPath).walk().forEach {
-        if (it.name.endsWith(".png"))
-            files.add(it.name)
+        if (it.name.endsWith(".png")) files.add(it.name)
     }
     val zipFile = ctx.getString(R.string.app_name_plus) + ".zip"
     val zipFilePath = BaresipService.filesPath + "/$zipFile"
@@ -3553,8 +3494,7 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     Utils.deleteFile(File(zipFilePath))
 
     File("${BaresipService.filesPath}/recordings").walk().forEach {
-        if (it.name.startsWith("dump"))
-            Utils.deleteFile(it)
+        if (it.name.startsWith("dump")) Utils.deleteFile(it)
     }
 
     Utils.createEmptyFile(BaresipService.filesPath + "/restored")

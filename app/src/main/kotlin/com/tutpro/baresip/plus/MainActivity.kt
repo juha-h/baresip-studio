@@ -314,9 +314,8 @@ class MainActivity : ComponentActivity() {
             intent.removeExtra("action")
             handleIntent(applicationContext, viewModel, intent, action)
         }
-        else if (isCallLogIntent(intent)) {
+        else if (isCallLogIntent(intent))
             handleCallLogIntent()
-        }
         else if (intent.action == Intent.ACTION_MAIN && !atStartup) {
             val activeNotifications = nm.activeNotifications
             if (activeNotifications.any { it.id == CALL_MISSED_NOTIFICATION_ID }) {
@@ -375,17 +374,14 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onNewIntent action/type/data: ${intent.action}/${intent.type}/${intent.data}")
 
         when {
-            isCallLogIntent(intent) -> {
-                handleCallLogIntent()
-            }
-            intent.action in listOf(ACTION_DIAL, ACTION_CALL, ACTION_VIEW) -> {
+            isCallLogIntent(intent) -> handleCallLogIntent()
+            intent.action in listOf(ACTION_DIAL, ACTION_CALL, ACTION_VIEW) ->
                 callAction(
                     applicationContext,
                     viewModel,
                     intent.data,
                     if (intent.action == ACTION_CALL) "call" else "dial"
                 )
-            }
             else -> {
                 val action = intent.getStringExtra("action")
                 if (action != null) {
@@ -424,13 +420,15 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Handling Call Log intent")
         val ua = BaresipService.uas.value.find { it.account.isMobile }
             ?: BaresipService.uas.value.firstOrNull()
-        if (ua != null)
-            viewModel.navigateToCalls(ua.account.aor)
+        if (ua != null) viewModel.navigateToCalls(ua.account.aor)
     }
 
     private fun quitRestart(reStart: Boolean) {
         Log.i(TAG, "quitRestart Restart = $reStart")
-        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        )
         if (BaresipService.isServiceRunning) {
             restart = reStart
             baresipService.action = "Stop"

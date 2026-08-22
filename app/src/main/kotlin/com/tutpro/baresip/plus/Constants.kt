@@ -6,8 +6,6 @@ const val LOW_CHANNEL_ID = "com.tutpro.baresip.plus.low"
 const val MEDIUM_CHANNEL_ID = "com.tutpro.baresip.plus.medium"
 const val HIGH_CHANNEL_ID = "com.tutpro.baresip.plus.high"
 
-const val KEY_TEXT_REPLY = "key_text_reply_baresip_plus"
-
 const val STATUS_NOTIFICATION_ID = 101
 const val CALL_NOTIFICATION_ID = 102
 const val CALL_MISSED_NOTIFICATION_ID = 103
@@ -42,8 +40,9 @@ const val CALL_DOWN_RED = 2131165317
 const val CALL_MISSED_OUT = 2131165320
 const val CALL_MISSED_IN = 2131165319
 
-val mediaEncMap = mapOf("zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF", "srtp-mand" to "SRTP-MAND",
-    "srtp" to "SRTP", "" to "--")
+val mediaEncMap = mapOf(
+    "zrtp" to "ZRTP", "dtls_srtp" to "DTLS-SRTPF", "srtp-mand" to "SRTP-MAND", "srtp" to "SRTP", "" to "--"
+)
 
 val mediaNatMap = mapOf("stun" to "STUN", "turn" to "TURN", "ice" to "ICE", "" to "--")
 

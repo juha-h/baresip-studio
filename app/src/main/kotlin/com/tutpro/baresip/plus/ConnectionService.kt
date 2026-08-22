@@ -76,8 +76,7 @@ class ConnectionService : ConnectionService() {
         connection.audioModeIsVoip = true
 
         val call = Call.ofCallp(callp)
-        if (call != null)
-            BaresipService.instance?.handleIncomingCall(call)
+        if (call != null) BaresipService.instance?.handleIncomingCall(call)
 
         val ua = UserAgent.ofUap(uap)
         if (ua != null) {
@@ -252,8 +251,11 @@ class ConnectionService : ConnectionService() {
                 if (BaresipService.isMicMuted != it.isMuted) {
                     BaresipService.setMicMute(it.isMuted)
                     BaresipService.postServiceEvent(
-                        ServiceEvent("mic muted,${it.isMuted}", arrayListOf(uap, callp),
-                            System.nanoTime())
+                        ServiceEvent(
+                            "mic muted,${it.isMuted}",
+                            arrayListOf(uap, callp),
+                            System.nanoTime()
+                        )
                     )
                 }
                 val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
@@ -262,7 +264,11 @@ class ConnectionService : ConnectionService() {
                 val hasPendingOrActiveConnection = connections.isNotEmpty() || pendingOutgoingConnection != null
                 if (isSpeaker != BaresipService.speakerPhone && (status != "connected" || hasPendingOrActiveConnection)) {
                     if (status != "connected") {
-                        Log.d(TAG, "Suppressing speaker update,$isSpeaker during call setup (status=$status, intent=${BaresipService.speakerPhone})")
+                        Log.d(
+                            TAG,
+                            "Suppressing speaker update,$isSpeaker during call setup " +
+                                "(status=$status, intent=${BaresipService.speakerPhone})"
+                        )
                         return@let
                     }
                 }
@@ -271,10 +277,7 @@ class ConnectionService : ConnectionService() {
                     BaresipService.speakerPhone = isSpeaker
                 }
                 BaresipService.postServiceEvent(
-                    ServiceEvent("speaker update,$isSpeaker",
-                        arrayListOf(uap, callp),
-                        System.nanoTime()
-                    )
+                    ServiceEvent("speaker update,$isSpeaker", arrayListOf(uap, callp), System.nanoTime())
                 )
             }
         }

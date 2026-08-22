@@ -2,9 +2,7 @@ package com.tutpro.baresip.plus
 
 object Log {
 
-    enum class LogLevel {
-        DEBUG, INFO, WARN, ERROR, OFF
-    }
+    enum class LogLevel { DEBUG, INFO, WARN, ERROR, OFF }
 
     var logLevel: LogLevel = LogLevel.INFO
 

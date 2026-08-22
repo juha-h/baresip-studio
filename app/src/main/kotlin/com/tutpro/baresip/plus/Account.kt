@@ -46,8 +46,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
     init {
         if (accp != 0L) {
-            if (authPass == "")
-                authPass = NO_AUTH_PASS
+            if (authPass == "") authPass = NO_AUTH_PASS
 
             var i = 0
             while (true) {
@@ -85,16 +84,13 @@ class Account(val accp: Long, virtualAor: String? = null) {
         }
 
         val extra = Api.account_extra(accp)
-        if (Utils.paramExists(extra, "nickname"))
-            nickName = Utils.paramValue(extra, "nickname")
+        if (Utils.paramExists(extra, "nickname")) nickName = Utils.paramValue(extra, "nickname")
         isMobile = Utils.paramExists(extra, "is_mobile")
-        if (Utils.paramExists(extra, "regint"))
-            configuredRegInt = Utils.paramValue(extra, "regint").toInt()
+        if (Utils.paramExists(extra, "regint")) configuredRegInt = Utils.paramValue(extra, "regint").toInt()
         callHistory = Utils.paramValue(extra, "call_history") == ""
         blockUnknown = Utils.paramExists(extra, "block_unknown")
         blockHidden = Utils.paramExists(extra, "block_hidden")
-        if (Utils.paramExists(extra, "country_code"))
-            countryCode = Utils.paramValue(extra, "country_code")
+        if (Utils.paramExists(extra, "country_code")) countryCode = Utils.paramValue(extra, "country_code")
         if (Utils.paramExists(extra, "tel_provider"))
             telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
         numericKeypad = Utils.paramExists(extra, "numeric_keypad")
@@ -108,7 +104,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
         else if (displayName != "")
             "\"${displayName}\" "
         else
-                ""
+            ""
 
         if (!isMobile) {
             res = "$res<$luri>"
@@ -327,8 +323,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
 
         fun uniqueNickName(nickName: String): Boolean {
             for (ua in BaresipService.uas.value)
-                if (ua.account.nickName == nickName)
-                    return false
+                if (ua.account.nickName == nickName) return false
             return true
         }
     }

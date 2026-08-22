@@ -123,8 +123,7 @@ private fun ChatsScreen(navController: NavController, aor: String) {
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME)
-                refreshTrigger++
+            if (event == Lifecycle.Event.ON_RESUME) refreshTrigger++
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -149,8 +148,7 @@ private fun ChatsScreen(navController: NavController, aor: String) {
         },
         bottomBar = { NewChatPeer(navController, account) },
         content = { contentPadding ->
-            if (areMessagesLoaded)
-                ChatsContent(navController, contentPadding, account, uaMessages)
+            if (areMessagesLoaded) ChatsContent(navController, contentPadding, account, uaMessages)
         },
     )
 }
@@ -202,9 +200,7 @@ private fun TopAppBar(
         },
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
-            IconButton(
-                onClick = { menuExpanded = !menuExpanded }
-            ) {
+            IconButton(onClick = { menuExpanded = !menuExpanded }) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
             }
             DropdownMenu (
@@ -351,27 +347,28 @@ private fun Chats(
                 CustomElements.Button(
                     onClick = { navController.navigate("chat/${aor}/${message.peerUri}") },
                     onLongClick = {
-                        val peerName = Utils.friendlyUri(message.peerUri, account, includeLabel = false, anonymous = anonymousText, unknown = unknownText)
-                        val peerNameWithLabel = Utils.friendlyUri(message.peerUri, account, anonymous = anonymousText, unknown = unknownText)
-                        val contactExists =
-                            Contact.nameExists(peerName, BaresipService.contacts, false)
+                        val peerName = Utils.friendlyUri(
+                            uri = message.peerUri,
+                            account = account,
+                            includeLabel = false,
+                            anonymous = anonymousText,
+                            unknown = unknownText
+                        )
+                        val peerNameWithLabel = Utils.friendlyUri(
+                            uri = message.peerUri,
+                            account = account,
+                            anonymous = anonymousText,
+                            unknown = unknownText
+                        )
+                        val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
                         if (contactExists) {
-                            dialogMessage.value = String.format(
-                                shortChatQuestion,
-                                peerNameWithLabel
-                            )
+                            dialogMessage.value = String.format(shortChatQuestion, peerNameWithLabel)
                             secondButtonText.value = ""
                             lastButtonText.value = deleteText
-                            lastAction.value = {
-                                deleteMessages(uaMessages, account, message.peerUri)
-                            }
+                            lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
                         }
                         else {
-                            dialogMessage.value =
-                                String.format(
-                                    longChatQuestion,
-                                    peerName
-                                )
+                            dialogMessage.value = String.format(longChatQuestion, peerName)
                             secondButtonText.value = addContactText
                             secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
                             thirdButtonText.value = blockText
@@ -394,7 +391,12 @@ private fun Chats(
                     else
                         MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    val peerName = Utils.friendlyUri(message.peerUri, account, anonymous = anonymousText, unknown = unknownText)
+                    val peerName = Utils.friendlyUri(
+                        uri =message.peerUri,
+                        account = account,
+                        anonymous = anonymousText,
+                        unknown = unknownText
+                    )
                     val cal = GregorianCalendar()
                     cal.timeInMillis = message.timeStamp
                     val fmt: DateFormat = if (isToday(message.timeStamp))
@@ -453,16 +455,15 @@ private fun NewChatPeer(navController: NavController, account: Account) {
         val uri = if (Utils.isTelUri(peerUri)) {
             if (account.isMobile)
                 peerUri
+            else if (account.telProvider == "") {
+                alertTitle.value = noticeText
+                alertMessage.value =
+                    String.format(noTelephonyProviderText, account.aor)
+                showAlert.value = true
+                ""
+            }
             else
-                if (account.telProvider == "") {
-                    alertTitle.value = noticeText
-                    alertMessage.value =
-                        String.format(noTelephonyProviderText, account.aor)
-                    showAlert.value = true
-                    ""
-                }
-                else
-                    Utils.telToSip(peerUri, account)
+                Utils.telToSip(peerUri, account)
         }
         else
             Utils.uriComplete(peerUri, account.aor)
@@ -632,8 +633,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                             Icons.Outlined.Clear,
                             contentDescription = null,
                             modifier = Modifier.clickable {
-                                if (showSuggestions)
-                                    showSuggestions = false
+                                if (showSuggestions) showSuggestions = false
                                 newPeer = ""
                             },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -671,9 +671,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                         makeChat(navController, account, uris[0].uri)
                     else {
                         items.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
-                        itemAction.value = { index ->
-                            makeChat(navController, account, uris[index].uri)
-                        }
+                        itemAction.value = { index -> makeChat(navController, account, uris[index].uri) }
                         showDialog.value = true
                     }
                 }
@@ -705,8 +703,7 @@ private fun loadMessages(account: Account) : List<Message> {
             }
         if (!found) {
             res.add(0, m)
-            if (m.new)
-                account.unreadMessages = true
+            if (m.new) account.unreadMessages = true
         }
     }
     return res.toList()

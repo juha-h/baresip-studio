@@ -110,8 +110,7 @@ private fun CodecsScreen(
         for (codec in accCodecs)
             currentCodecs.add(Codec(codec, mutableStateOf(true)))
         for (codec in allCodecs)
-            if (codec !in accCodecs)
-                currentCodecs.add(Codec(codec, mutableStateOf(false)))
+            if (codec !in accCodecs) currentCodecs.add(Codec(codec, mutableStateOf(false)))
         codecs.clear()
         codecs.addAll(currentCodecs)
     }
@@ -156,9 +155,7 @@ private fun CodecsScreen(
                 )
             }
         },
-        content = { contentPadding ->
-            CodecsContent(contentPadding, codecs)
-        },
+        content = { contentPadding -> CodecsContent(contentPadding, codecs) },
     )
 }
 
@@ -183,9 +180,7 @@ private fun CodecsContent(
 private fun Codecs(codecs: SnapshotStateList<Codec>) {
 
     val draggableState = rememberDraggableListState(
-        onMove = { fromIndex, toIndex ->
-            codecs.add(toIndex, codecs.removeAt(fromIndex))
-        }
+        onMove = { fromIndex, toIndex -> codecs.add(toIndex, codecs.removeAt(fromIndex)) }
     )
 
     LazyColumn(
@@ -206,7 +201,8 @@ private fun Codecs(codecs: SnapshotStateList<Codec>) {
                         Color.Transparent
                 ),
                 headlineContent = {
-                    Text(text = item.name,
+                    Text(
+                        text = item.name,
                         modifier = Modifier
                             .fillMaxWidth()
                             .alpha(if (item.enabled.value) 1.0f else 0.5f)

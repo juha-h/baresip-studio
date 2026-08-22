@@ -86,10 +86,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import kotlin.jvm.JvmName
 
-data class MenuItem(
-    val text: String,
-    val icon: ImageVector? = null
-)
+data class MenuItem(val text: String, val icon: ImageVector? = null)
 
 object CustomElements {
 
@@ -180,7 +177,8 @@ object CustomElements {
                                 Spacer(Modifier.size(24.dp))
                         }
                     }
-                    else null,
+                    else
+                        null,
                     onClick = { onItemClick(menuItem.text) }
                 )
                 if (itemsIterator.hasNext())
@@ -368,7 +366,7 @@ object CustomElements {
 
                             if (buttonCount > 0) {
 
-                                if (buttonCount >= 3) {
+                                if (buttonCount >= 3)
                                     // Use a Column for 3-4 buttons, aligned to the end (right)
                                     Column(
                                         modifier = Modifier.fillMaxWidth(),
@@ -430,7 +428,7 @@ object CustomElements {
                                                 )
                                             }
                                     }
-                                } else {
+                                else
                                     // Use the existing Row for 1 or 2 buttons
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -492,7 +490,6 @@ object CustomElements {
                                                 )
                                             }
                                     }
-                                }
                             }
                         }
                     }
@@ -515,9 +512,7 @@ object CustomElements {
             val configuration = LocalConfiguration.current
             val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
             BasicAlertDialog(
-                onDismissRequest = {
-                    openDialog.value = false
-                },
+                onDismissRequest = { openDialog.value = false },
                 properties = DialogProperties(usePlatformDefaultWidth = false),
                 content = {
                     Card(
@@ -643,9 +638,7 @@ object CustomElements {
                             colors = OutlinedTextFieldDefaults.colors(
                                 cursorColor = MaterialTheme.colorScheme.primary,
                             ),
-                            onValueChange = {
-                                password.value = it
-                            },
+                            onValueChange = { password.value = it },
                             visualTransformation = if (showPassword.value)
                                 VisualTransformation.None
                             else

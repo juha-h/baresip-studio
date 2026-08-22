@@ -56,7 +56,7 @@ class MmsReceiver : BroadcastReceiver() {
         val cursor = context.contentResolver.query(uri, null, "msg_id=$id", null, null)
         var addr: String? = null
         cursor?.use {
-            if (it.moveToFirst()) {
+            if (it.moveToFirst())
                 do {
                     val type = it.getInt(it.getColumnIndexOrThrow("type"))
                     if (type == 137) { // PDU_FROM
@@ -64,7 +64,6 @@ class MmsReceiver : BroadcastReceiver() {
                         break
                     }
                 } while (it.moveToNext())
-            }
         }
         return addr
     }

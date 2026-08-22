@@ -407,14 +407,13 @@ private fun ContactContent(
     screenState: ScreenState,
     onStateChange: (ScreenState) -> Unit
 ) {
-    if (showAlert.value) {
+    if (showAlert.value)
         AlertDialog(
             showDialog = showAlert,
             title = alertTitle.value,
             message = alertMessage.value,
             lastButtonText = stringResource(R.string.ok),
         )
-    }
 
     val scrollState = rememberScrollState()
     Column(
@@ -442,10 +441,7 @@ private fun ContactContent(
                 )
             },
             onAvatarColorChange = { newRandomColor ->
-                screenState.tmpAvatarFile?.let {
-                    if (it.exists())
-                        Utils.deleteFile(it)
-                }
+                screenState.tmpAvatarFile?.let { if (it.exists()) Utils.deleteFile(it) }
                 onStateChange(
                     screenState.copy(
                         color = newRandomColor,
@@ -601,9 +597,7 @@ private fun ContactNameSection(name: String, isEditing: Boolean, new: Boolean, o
                 capitalization = KeyboardCapitalization.Words
             )
         )
-        LaunchedEffect(new) {
-            if (new) focusRequester.requestFocus()
-        }
+        LaunchedEffect(new) { if (new) focusRequester.requestFocus() }
     }
     else
         Row(
@@ -1024,11 +1018,10 @@ private fun checkOnClick(
             }
         }
     }
+    else if (currentState.new)
+        Contact.addBaresipContact(contact)
     else
-        if (currentState.new)
-            Contact.addBaresipContact(contact)
-        else
-            Contact.updateBaresipContact(currentState.id, contact)
+        Contact.updateBaresipContact(currentState.id, contact)
     return true
 }
 
@@ -1267,7 +1260,5 @@ private fun bitmapToPNGByteArray(bitmap: Bitmap): ByteArray? {
         out.flush()
         out.close()
         out.toByteArray()
-    } catch (_: Exception) {
-        null
-    }
+    } catch (_: Exception) { null }
 }

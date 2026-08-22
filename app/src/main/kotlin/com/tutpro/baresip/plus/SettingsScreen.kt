@@ -255,9 +255,7 @@ private fun SettingsContent(
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     val alertTitleText = stringResource(R.string.alert)
@@ -1349,20 +1347,17 @@ private fun SettingsContent(
             DefaultMessaging()
             val defaultDialer by viewModel.defaultDialer.collectAsState()
             val defaultMessaging by viewModel.defaultMessaging.collectAsState()
-            if (!defaultDialer && !defaultMessaging)
-                BatteryOptimizations()
+            if (!defaultDialer && !defaultMessaging) BatteryOptimizations()
         }
         else
             BatteryOptimizations()
         DarkTheme()
-        if (VERSION.SDK_INT >= 31)
-            DynamicColors()
+        if (VERSION.SDK_INT >= 31) DynamicColors()
         ColorBlind()
         ProximitySensing()
         Debug()
         val debug by viewModel.debug.collectAsState()
-        if (debug)
-            SipTrace()
+        if (debug) SipTrace()
         Reset(onRestartApp)
     }
 }
