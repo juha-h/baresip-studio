@@ -372,8 +372,8 @@ private fun ContactsScreen(navController: NavController) {
     ) { permissions ->
         if (permissions[Manifest.permission.READ_CONTACTS] == true &&
                 permissions[Manifest.permission.WRITE_CONTACTS] == true &&
-                pendingMode.isNotEmpty())
-            setContactsMode(pendingMode)
+                pendingMode.isNotEmpty()
+        ) setContactsMode(pendingMode)
         pendingMode = ""
     }
 
@@ -512,8 +512,8 @@ private fun ContactsScreen(navController: NavController) {
                                         ) {
                                             Log.d(TAG, "Contacts permissions already granted")
                                             setContactsMode(mode)
-                                        } else {
-                                            if (shouldShowRequestPermissionRationale(
+                                        }
+                                        else if (shouldShowRequestPermissionRationale(
                                                     activity, Manifest.permission.READ_CONTACTS
                                                 ) ||
                                                 shouldShowRequestPermissionRationale(
@@ -522,16 +522,16 @@ private fun ContactsScreen(navController: NavController) {
                                             ) {
                                                 pendingMode = mode
                                                 showNoticeDialog.value = true
-                                            } else {
-                                                pendingMode = mode
-                                                requestPermissionsLauncher.launch(contactsPermissions)
                                             }
+                                        else {
+                                            pendingMode = mode
+                                            requestPermissionsLauncher.launch(contactsPermissions)
                                         }
                                     }
                                     showDialog.value = true
-                                } else {
-                                    setContactsMode(mode)
                                 }
+                                else
+                                    setContactsMode(mode)
                             }
                         )
                     },
@@ -661,8 +661,7 @@ private fun ContactsContent(
 
     var lastSearchQuery by remember { mutableStateOf("") }
     LaunchedEffect(searchQuery) {
-        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank())
-            lazyListState.scrollToItem(0)
+        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank()) lazyListState.scrollToItem(0)
         lastSearchQuery = searchQuery
     }
 
@@ -803,8 +802,7 @@ private fun ContactsContent(
                         )
                         Text(
                             text = buildAnnotatedString {
-                                if (matchingUri.label.isNotEmpty())
-                                    append("${matchingUri.label} ")
+                                if (matchingUri.label.isNotEmpty()) append("${matchingUri.label} ")
                                 append(annotatedTel)
                             },
                             fontSize = 16.sp,
