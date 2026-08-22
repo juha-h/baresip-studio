@@ -481,8 +481,7 @@ private fun ContactsScreen(navController: NavController) {
                                             Log.d(TAG, "Contacts permissions already granted")
                                             setContactsMode(mode)
                                         }
-                                        else {
-                                            if (shouldShowRequestPermissionRationale(
+                                        else if (shouldShowRequestPermissionRationale(
                                                     activity, Manifest.permission.READ_CONTACTS
                                                 ) ||
                                                 shouldShowRequestPermissionRationale(
@@ -492,10 +491,9 @@ private fun ContactsScreen(navController: NavController) {
                                                 pendingMode = mode
                                                 showNoticeDialog.value = true
                                             }
-                                            else {
-                                                pendingMode = mode
-                                                requestPermissionsLauncher.launch(contactsPermissions)
-                                            }
+                                        else {
+                                            pendingMode = mode
+                                            requestPermissionsLauncher.launch(contactsPermissions)
                                         }
                                     }
                                     showDialog.value = true
