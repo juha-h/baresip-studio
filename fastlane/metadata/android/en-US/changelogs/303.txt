@@ -1,0 +1,5 @@
+- Added iLBC Mode audio setting
+- Improved showing of contact name in call URI and new chat peer fields
+- Unique Contact URI setting defaults again to "enabled"
+- Increased message history size to 256
+- New translations (Chinese)
