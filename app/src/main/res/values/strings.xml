@@ -290,6 +290,7 @@
     <string name="blocked_delete_alert">Do you want to delete blocked requests of \'%1$s\'?</string>
     <string name="blocked_contact_question">Do you want to add peer \'%1$s\' to contacts?</string>
     <string name="blocked_action_question">Do you want to add peer \'%1$s\' to contacts or unblock it?</string>
+    <string name="blocked_unblock_question">Do you want to unblock peer \'%1$s\'?</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call_details">Call Details</string>

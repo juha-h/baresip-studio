@@ -296,6 +296,7 @@
     <string name="blocked_delete_alert">Haluatko poistaa tilin \'%1$s\' estetyt pyynnöt?</string>
     <string name="blocked_contact_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin?</string>
     <string name="blocked_action_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai poistaa sen eston?</string>
+    <string name="blocked_unblock_question">Haluatko poistaa URI:n \'%1$s\' eston?</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>

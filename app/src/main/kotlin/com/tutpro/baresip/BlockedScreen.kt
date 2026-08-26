@@ -265,27 +265,54 @@ private fun Blocked(
                     .clickable(
                         enabled = !peerUri.contains("anonymous") && peerUri != unknown,
                         onClick = {
+                            val peerName = Utils.friendlyUri(ctx, peerUri, acc, includeLabel = false)
+                            val peerNameWithLabel = Utils.friendlyUri(ctx, peerUri, acc)
+                            val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
                             val rule = BaresipService.blockRules.find { it.aor == acc.aor && it.pattern == peerUri }
-                            if (rule != null) {
-                                message.value = String.format(
-                                    ctx.getString(R.string.blocked_action_question), peerUri.substringAfter(":")
-                                )
-                                secondButtonText.value = ctx.getString(R.string.unblock)
-                                secondAction.value = {
-                                    BaresipService.blockRules.remove(rule)
-                                    BlockRule.save()
-                                    Blocked.remove(acc.aor, peerUri)
-                                    blocked.value = blocked.value.filter { it.peerUri != peerUri }
+                            if (contactExists) {
+                                if (rule != null) {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_unblock_question), peerNameWithLabel
+                                    )
+                                    secondButtonText.value = ""
+                                    lastButtonText.value = ctx.getString(R.string.unblock)
+                                    lastAction.value = {
+                                        BaresipService.blockRules.remove(rule)
+                                        BlockRule.save()
+                                    }
+                                }
+                                else {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_delete_alert), peerNameWithLabel
+                                    )
+                                    secondButtonText.value = ""
+                                    lastButtonText.value = ctx.getString(R.string.delete)
+                                    lastAction.value = {
+                                        Blocked.remove(acc.aor, peerUri)
+                                        blocked.value = blocked.value.filter { it.peerUri != peerUri }
+                                    }
                                 }
                             }
                             else {
-                                message.value = String.format(
-                                    ctx.getString(R.string.blocked_contact_question), peerUri.substringAfter(":")
-                                )
-                                secondButtonText.value = ""
+                                if (rule != null) {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_action_question), peerName
+                                    )
+                                    secondButtonText.value = ctx.getString(R.string.unblock)
+                                    secondAction.value = {
+                                        BaresipService.blockRules.remove(rule)
+                                        BlockRule.save()
+                                    }
+                                }
+                                else {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_contact_question), peerName
+                                    )
+                                    secondButtonText.value = ""
+                                }
+                                lastButtonText.value = ctx.getString(R.string.add_contact)
+                                lastAction.value = { navController.navigate("contact/$peerUri/new") }
                             }
-                            lastButtonText.value = ctx.getString(R.string.add_contact)
-                            lastAction.value = { navController.navigate("contact/$peerUri/new") }
                             showDialog.value = true
                         }
                     )
