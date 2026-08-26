@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -111,7 +112,12 @@ fun BlockingScreen(navController: NavController, viewModel: AccountViewModel, ua
                 )
             }
         },
-        bottomBar = { NewRule(acc.aor, onRuleAdded = { rules = BaresipService.blockRules.filter { it.aor == acc.aor || it.aor == "" } }) },
+        bottomBar = {
+            NewRule(
+                acc.aor,
+                onRuleAdded = { rules = BaresipService.blockRules.filter { it.aor == acc.aor || it.aor == "" } }
+            )
+        },
         content = { contentPadding ->
             BlockingContent(
                 contentPadding,
@@ -132,6 +138,7 @@ fun BlockingContent(
     acc: Account,
     onRuleDeleted: () -> Unit
 ) {
+    val ctx = LocalContext.current
     val alertTitle = remember { mutableStateOf("") }
     val alertMessage = remember { mutableStateOf("") }
     val showAlert = remember { mutableStateOf(false) }
@@ -247,6 +254,7 @@ fun BlockingContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 items(rules) { rule ->
+                    val ruleText = Utils.friendlyUri(ctx, rule.pattern, acc)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "\u2022",
@@ -256,7 +264,7 @@ fun BlockingContent(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = rule.pattern,
+                            text = ruleText,
                             fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -267,7 +275,7 @@ fun BlockingContent(
                             onClick = {
                                 message.value = String.format(
                                     deleteRuleMessage,
-                                    rule.pattern
+                                    ruleText
                                 )
                                 lastAction.value = {
                                     BaresipService.blockRules.remove(rule)
