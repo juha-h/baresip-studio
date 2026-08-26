@@ -289,6 +289,7 @@
     <string name="blocked_messages">Blocked Messages</string>
     <string name="blocked_delete_alert">Do you want to delete blocked requests of \'%1$s\'?</string>
     <string name="blocked_contact_question">Do you want to add peer \'%1$s\' to contacts?</string>
+    <string name="blocked_action_question">Do you want to add peer \'%1$s\' to contacts or unblock it?</string>
     <!-- Calls Activity -->
     <string name="call_history">Call History</string>
     <string name="call_details">Call Details</string>
@@ -301,6 +302,8 @@
     <string name="time">Time</string>
     <string name="calls_duration">Duration</string>
     <string name="calls_add_delete_question">Do you want to add \'%1$s\' to contacts, block it,
+        or delete %2$s from call history?</string>
+    <string name="calls_block_delete_question">Do you want to block \'%1$s\'
         or delete %2$s from call history?</string>
     <string name="calls_delete_question">Do you want to delete %2$s from call history?</string>
     <string name="disable_history">Disable</string>
@@ -330,6 +333,7 @@
     <string name="new_chat_peer">New Chat Peer</string>
     <string name="long_chat_question">Do you want to add \'%1$s\' to contacts, block it, or
         delete this chat?</string>
+    <string name="long_chat_block_delete_question">Do you want to block \'%1$s\' or delete this chat?</string>
     <string name="short_chat_question">Do you want to delete chat with \'%1$s\'?</string>
     <string name="delete_chats_alert">Do you want to delete chat history of account \'%1$s\'?</string>
     <!-- Codecs Activity -->
@@ -528,6 +532,7 @@
     <string name="add">Add</string>
     <string name="delete">Delete</string>
     <string name="block">Block</string>
+    <string name="unblock">Unblock</string>
     <string name="edit">Edit</string>
     <string name="copy_uri">Copy URI</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>

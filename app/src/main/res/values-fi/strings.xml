@@ -294,7 +294,8 @@
     <string name="blocked_calls">Estetyt puhelut</string>
     <string name="blocked_messages">Estetyt viestit</string>
     <string name="blocked_delete_alert">Haluatko poistaa tilin \'%1$s\' estetyt pyynnöt?</string>
-    <string name="blocked_contact_question">Haluatko lisätä osoitteen \'%1$s\' yhteystietoihin?</string>
+    <string name="blocked_contact_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin?</string>
+    <string name="blocked_action_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai poistaa sen eston?</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
     <string name="call">Soita</string>
@@ -305,10 +306,10 @@
     <string name="peer">Kumppani</string>
     <string name="time">Aika</string>
     <string name="calls_duration">Kesto</string>
-    <string name="calls_add_delete_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai
-        estolistaan tai poistaa %2$s puheluhistoriasta?
-    </string>
-    <string name="calls_delete_question">Haluatko poistaa %2$s puheluhistoriasta?</string>
+    <string name="calls_add_delete_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin, estää sen
+        tai poistaa %2$s:n puheluhistoriasta?</string>
+    <string name="calls_block_delete_question">Haluatko estää \'%1$s\`:n tai poistaa %2$s:n puheluhistoriasta?</string>
+    <string name="calls_delete_question">Haluatko poistaa %2$s:n puheluhistoriasta?</string>
     <string name="disable_history">Poista käytöstä</string>
     <string name="enable_history">Ota käyttöön</string>
     <string name="delete_history_alert">Haluatko tyhjentää tilin \'%1$s\' puheluhistorian?</string>
@@ -335,8 +336,9 @@
     <string name="you">Sinä</string>
     <string name="new_chat_peer">Uusi viestin kohde</string>
     <string name="long_chat_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai estolistaan
-        tai poistaa tämän viestiketjun?
-    </string>
+        tai poistaa tämän viestiketjun?</string>
+    <string name="long_chat_block_delete_question">Haluatko estää \'%1$s\':n tai
+        poistaa tämän viestiketjun?</string>
     <string name="short_chat_question">Haluatko poistaa viestiketjun \'%1$s\'?</string>
     <string name="delete_chats_alert">Haluatko tyhjentää tilin \'%1$s\' viestihistorian?</string>
     <!-- Codecs Activity -->
@@ -547,6 +549,7 @@
     <string name="add">Lisää</string>
     <string name="delete">Poista</string>
     <string name="block">Estä</string>
+    <string name="unblock">Poista esto</string>
     <string name="edit">Muokkaa</string>
     <string name="copy_uri">Kopioi URI</string>
     <string name="copied_to_clipboard">Kopioitu leikepöydälle</string>

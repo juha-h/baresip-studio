@@ -353,8 +353,7 @@ fun NewRule(aor: String, onRuleAdded: () -> Unit) {
                 onClick = {
                     if (pattern.trim().isNotEmpty()) {
                         if (!BlockRule.exists(aor, pattern.trim())) {
-                            BaresipService.blockRules.add(BlockRule(aor, pattern.trim()))
-                            BlockRule.save()
+                            BlockRule(aor, pattern.trim()).add()
                             onRuleAdded()
                         }
                         pattern = ""

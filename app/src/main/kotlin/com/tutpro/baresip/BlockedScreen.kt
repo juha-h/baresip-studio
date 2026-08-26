@@ -230,6 +230,8 @@ private fun Blocked(
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
+    val secondButtonText = remember { mutableStateOf("") }
+    val secondAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
     val unknown = stringResource(R.string.unknown)
@@ -239,6 +241,8 @@ private fun Blocked(
         title = stringResource(R.string.confirmation),
         message = message.value,
         firstButtonText = stringResource(R.string.cancel),
+        secondButtonText = secondButtonText.value,
+        onSecondClicked = secondAction.value,
         lastButtonText = lastButtonText.value,
         onLastClicked = lastAction.value,
     )
@@ -253,17 +257,33 @@ private fun Blocked(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(items = blocked.value, key = { blocked -> blocked.timeStamp }) { blocked ->
-            val peerUri = blocked.peerUri
+        items(items = blocked.value, key = { b -> b.timeStamp }) { b ->
+            val peerUri = b.peerUri
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
                     .clickable(
                         enabled = !peerUri.contains("anonymous") && peerUri != unknown,
                         onClick = {
-                            message.value = String.format(
-                                ctx.getString(R.string.blocked_contact_question), peerUri
-                            )
+                            val rule = BaresipService.blockRules.find { it.aor == acc.aor && it.pattern == peerUri }
+                            if (rule != null) {
+                                message.value = String.format(
+                                    ctx.getString(R.string.blocked_action_question), peerUri.substringAfter(":")
+                                )
+                                secondButtonText.value = ctx.getString(R.string.unblock)
+                                secondAction.value = {
+                                    BaresipService.blockRules.remove(rule)
+                                    BlockRule.save()
+                                    Blocked.remove(acc.aor, peerUri)
+                                    blocked.value = blocked.value.filter { it.peerUri != peerUri }
+                                }
+                            }
+                            else {
+                                message.value = String.format(
+                                    ctx.getString(R.string.blocked_contact_question), peerUri.substringAfter(":")
+                                )
+                                secondButtonText.value = ""
+                            }
                             lastButtonText.value = ctx.getString(R.string.add_contact)
                             lastAction.value = { navController.navigate("contact/$peerUri/new") }
                             showDialog.value = true
@@ -283,7 +303,7 @@ private fun Blocked(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 val calendar = GregorianCalendar()
-                calendar.timeInMillis = blocked.timeStamp
+                calendar.timeInMillis = b.timeStamp
                 Text(
                     text = Utils.relativeTime(ctx, calendar),
                     fontSize = 12.sp,
@@ -300,10 +320,11 @@ private fun Blocked(
 
 private fun loadBlocked(request: String, aor: String): MutableList<Blocked> {
     val res = mutableListOf<Blocked>()
-    for (i in BaresipService.blocked.indices.reversed()) {
-        val b = BaresipService.blocked[i]
-        if (b.aor == aor && b.request == request)
-            res.add(Blocked("", b.peerUri, "", b.timeStamp))
+    synchronized(BaresipService.blocked) {
+        for (i in BaresipService.blocked.indices.reversed()) {
+            val b = BaresipService.blocked[i]
+            if (b.aor == aor && b.request == request) res.add(b)
+        }
     }
     Log.d(TAG, "Loaded ${res.size} blocked $request requests")
     return res
