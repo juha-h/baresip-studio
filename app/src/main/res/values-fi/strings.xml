@@ -293,8 +293,8 @@
     <string name="blocked">Estetyt</string>
     <string name="blocked_calls">Estetyt puhelut</string>
     <string name="blocked_messages">Estetyt viestit</string>
-    <string name="blocked_history_delete_alert">Haluatko tyhjentää tilin \'%2$s\' %1$s -historian?</string>
-    <string name="blocked_peer_delete_alert">Haluatko poistaa URI:n \'%1$s\' %2$s -historiasta?</string>
+    <string name="blocked_history_delete_alert">Haluatko tyhjentää tilin \'%2$s\' %1$s-historian?</string>
+    <string name="blocked_peer_delete_alert">Haluatko poistaa URI:n \'%1$s\' %2$s-historiasta?</string>
     <string name="blocked_calls_history">estettyjen puheluiden</string>
     <string name="blocked_messages_history">estettyjen viestien</string>
     <string name="blocked_contact_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin?</string>
@@ -420,7 +420,7 @@
         nimeltään \'ca_certs.crt\' ladataan Download-kansiosta.
     </string>
     <string name="no_read_permission">Ei ulkoisen muistin lukuoikeutta</string>
-    <string name="unique_contact_uri">Uniikki kontakti-URI</string>
+    <string name="unique_contact_uri">Uniikki Contact URI</string>
     <string name="unique_contact_uri_help">Jos merkitty, Contact URI:n taataan olevan uniikki.
         Merkittävä, jos on useammalla tilillä on sama SIP URI:n käyttäjäosa, mutta se myös
         parantaa tilien suojaa hyökkäyksiltä.  Älä merkitse, jos palvelun tarjoajasi
@@ -562,7 +562,7 @@
     <string name="confirmation">Vahvistus</string>
     <string name="anonymous">Anonyymi</string>
     <string name="unknown">Tuntematon</string>
-    <string name="invalid_sip_or_tel_uri">Virheellinen SIP tai puh. URI \'%1$s\'</string>
+    <string name="invalid_sip_or_tel_uri">Virheellinen SIP tai TEL URI \'%1$s\'</string>
     <string name="permission_denied">Lupa evätty</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
