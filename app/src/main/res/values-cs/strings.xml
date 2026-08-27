@@ -312,7 +312,6 @@
     <string name="blocked">Zablokované aktivity</string>
     <string name="blocked_calls">Zablokované hovory</string>
     <string name="blocked_messages">Zablokované zprávy</string>
-    <string name="blocked_delete_alert">Smazat zablokované požadavky od \'%1$s\'?</string>
     <string name="blocked_contact_question">Přidat \'%1$s\' do kontaktů?</string>
     <string name="save_recording">Uložit nahrávku</string>
     <string name="save_recording_question">Uložit tuto nahrávku?</string>

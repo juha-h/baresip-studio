@@ -96,7 +96,6 @@
     <string name="blocked">Diblokir</string>
     <string name="blocked_calls">Panggilan yang Diblokir</string>
     <string name="blocked_messages">Pesan yang Diblokir</string>
-    <string name="blocked_delete_alert">Apakah Anda ingin menghapus permintaan yang diblokir dari \'%1$s\'?</string>
     <string name="blocked_contact_question">Apakah Anda ingin menambahkan rekan \'%1$s\' ke kontak?</string>
     <string name="call_history">Riwayat Panggilan</string>
     <string name="call_details">Detail Panggilan</string>

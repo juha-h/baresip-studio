@@ -331,7 +331,6 @@
     <string name="blocked">已屏蔽</string>
     <string name="blocked_calls">已屏蔽的通话</string>
     <string name="blocked_messages">已屏蔽的消息</string>
-    <string name="blocked_delete_alert">您要删除“%1$s”的屏蔽请求吗？</string>
     <string name="blocked_contact_question">您要将对方“%1$s”添加到联系人吗？</string>
     <string name="call_blocked">已自动拒绝来自 %1$s 的已屏蔽通话</string>
     <string name="message_blocked">已自动拒绝来自 %1$s 的已屏蔽消息</string>
