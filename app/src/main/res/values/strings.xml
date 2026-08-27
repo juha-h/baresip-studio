@@ -287,7 +287,10 @@
     <string name="blocked">Blocked</string>
     <string name="blocked_calls">Blocked Calls</string>
     <string name="blocked_messages">Blocked Messages</string>
-    <string name="blocked_delete_alert">Do you want to delete blocked requests of \'%1$s\'?</string>
+    <string name="blocked_history_delete_alert">Do you want to delete %1$s history of account \'%2$s\'?</string>
+    <string name="blocked_peer_delete_alert">Do you want to delete \'%1$s\' from %2$s history?</string>
+    <string name="blocked_calls_history">blocked calls</string>
+    <string name="blocked_messages_history">blocked messages</string>
     <string name="blocked_contact_question">Do you want to add peer \'%1$s\' to contacts?</string>
     <string name="blocked_action_question">Do you want to add peer \'%1$s\' to contacts or unblock it?</string>
     <string name="blocked_unblock_question">Do you want to unblock peer \'%1$s\'?</string>

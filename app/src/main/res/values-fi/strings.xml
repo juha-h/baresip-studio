@@ -293,7 +293,10 @@
     <string name="blocked">Estetyt</string>
     <string name="blocked_calls">Estetyt puhelut</string>
     <string name="blocked_messages">Estetyt viestit</string>
-    <string name="blocked_delete_alert">Haluatko poistaa tilin \'%1$s\' estetyt pyynnöt?</string>
+    <string name="blocked_history_delete_alert">Haluatko tyhjentää tilin \'%2$s\' %1$s -historian?</string>
+    <string name="blocked_peer_delete_alert">Haluatko poistaa URI:n \'%1$s\' %2$s -historiasta?</string>
+    <string name="blocked_calls_history">estettyjen puheluiden</string>
+    <string name="blocked_messages_history">estettyjen viestien</string>
     <string name="blocked_contact_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin?</string>
     <string name="blocked_action_question">Haluatko lisätä URI:n \'%1$s\' yhteystietoihin tai poistaa sen eston?</string>
     <string name="blocked_unblock_question">Haluatko poistaa URI:n \'%1$s\' eston?</string>
