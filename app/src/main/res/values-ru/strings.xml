@@ -353,7 +353,6 @@
     <string name="blocked">Заблокированные</string>
     <string name="blocked_calls">Заблокированные вызовы</string>
     <string name="blocked_messages">Заблокированные сообщения</string>
-    <string name="blocked_delete_alert">Удалить заблокированные запросы \'%1$s\'?</string>
     <string name="blocked_contact_question">Добавить собеседника \'%1$s\' в контакты?</string>
     <string name="show_call">Показать вызов</string>
     <string name="default_messaging_app">Приложение для сообщений по умолчанию</string>

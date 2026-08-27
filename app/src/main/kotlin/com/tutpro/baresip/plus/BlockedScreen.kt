@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -112,7 +112,7 @@ private fun BlockedScreen(navController: NavController, request: String, aor: St
         },
         content = { contentPadding ->
             if (isBlockedLoaded)
-                BlockedContent(LocalContext.current, navController, contentPadding, account, blocked)
+                BlockedContent(LocalContext.current, navController, contentPadding, account, request, blocked)
         },
     )
 }
@@ -129,11 +129,15 @@ private fun TopAppBar(
     val delete = stringResource(R.string.delete)
     val showDialog = remember { mutableStateOf(false) }
     val lastAction = remember { mutableStateOf({}) }
+    val historyName = if (request == "invite")
+        stringResource(R.string.blocked_calls_history)
+    else
+        stringResource(R.string.blocked_messages_history)
 
     AlertDialog(
         showDialog = showDialog,
         title = stringResource(R.string.confirmation),
-        message = String.format(stringResource(R.string.blocked_delete_alert), account.text()),
+        message = String.format(stringResource(R.string.blocked_history_delete_alert), historyName, account.text()),
         firstButtonText = stringResource(R.string.cancel),
         lastButtonText = stringResource(R.string.delete),
         onLastClicked = lastAction.value,
@@ -195,6 +199,7 @@ private fun BlockedContent(
     navController: NavController,
     contentPadding: PaddingValues,
     account: Account,
+    request: String,
     blocked: MutableState<List<Blocked>>
 ) {
     Column(
@@ -205,7 +210,7 @@ private fun BlockedContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Account(account)
-        Blocked(ctx, navController, account, blocked)
+        Blocked(ctx, navController, account, request, blocked)
     }
 }
 
@@ -226,10 +231,15 @@ private fun Blocked(
     ctx: Context,
     navController: NavController,
     acc: Account,
+    request: String,
     blocked: MutableState<List<Blocked>>
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
+    val secondButtonText = remember { mutableStateOf("") }
+    val secondAction = remember { mutableStateOf({}) }
+    val thirdButtonText = remember { mutableStateOf("") }
+    val thirdAction = remember { mutableStateOf({}) }
     val lastButtonText = remember { mutableStateOf("") }
     val lastAction = remember { mutableStateOf({}) }
     val unknown = stringResource(R.string.unknown)
@@ -239,9 +249,18 @@ private fun Blocked(
         title = stringResource(R.string.confirmation),
         message = message.value,
         firstButtonText = stringResource(R.string.cancel),
+        secondButtonText = secondButtonText.value,
+        onSecondClicked = secondAction.value,
+        thirdButtonText = thirdButtonText.value,
+        onThirdClicked = thirdAction.value,
         lastButtonText = lastButtonText.value,
         onLastClicked = lastAction.value,
     )
+
+    val historyName = if (request == "invite")
+        stringResource(R.string.blocked_calls_history)
+    else
+        stringResource(R.string.blocked_messages_history)
 
     val lazyListState = rememberLazyListState()
     LazyColumn(
@@ -253,19 +272,72 @@ private fun Blocked(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(items = blocked.value, key = { blocked -> blocked.timeStamp }) { blocked ->
-            val peerUri = blocked.peerUri
+        items(items = blocked.value, key = { b -> b.timeStamp }) { b ->
+            val peerUri = b.peerUri
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-                    .clickable(
+                    .combinedClickable(
                         enabled = !peerUri.contains("anonymous") && peerUri != unknown,
                         onClick = {
+                            val peerName = Utils.friendlyUri(ctx, peerUri, acc, includeLabel = false)
+                            val peerNameWithLabel = Utils.friendlyUri(ctx, peerUri, acc)
+                            val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
+                            val rule = BaresipService.blockRules.find {
+                                (it.aor == acc.aor || it.aor == "") && it.pattern.equals(peerUri, ignoreCase = true)
+                            }
+                            val unblockAction = {
+                                if (rule != null) {
+                                    BaresipService.blockRules.remove(rule)
+                                    BlockRule.save()
+                                }
+                            }
+                            if (contactExists) {
+                                if (rule != null) {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_unblock_question), peerNameWithLabel
+                                    )
+                                    secondButtonText.value = ""
+                                    thirdButtonText.value = ""
+                                    lastButtonText.value = ctx.getString(R.string.unblock)
+                                    lastAction.value = unblockAction
+                                    showDialog.value = true
+                                }
+                            } else {
+                                secondButtonText.value = ctx.getString(R.string.add_contact)
+                                secondAction.value = { navController.navigate("contact/$peerUri/new") }
+                                if (rule != null) {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_action_question), peerName
+                                    )
+                                    thirdButtonText.value = ctx.getString(R.string.unblock)
+                                    thirdAction.value = unblockAction
+                                } else {
+                                    message.value = String.format(
+                                        ctx.getString(R.string.blocked_contact_question), peerName
+                                    )
+                                    thirdButtonText.value = ""
+                                }
+                                lastButtonText.value = ""
+                                showDialog.value = true
+                            }
+                        },
+                        onLongClick = {
+                            val peerName = Utils.friendlyUri(ctx, peerUri, acc, includeLabel = false)
+                            val peerNameWithLabel = Utils.friendlyUri(ctx, peerUri, acc)
+                            val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
                             message.value = String.format(
-                                ctx.getString(R.string.blocked_contact_question), peerUri
+                                ctx.getString(R.string.blocked_peer_delete_alert),
+                                if (contactExists) peerNameWithLabel else peerName,
+                                historyName
                             )
-                            lastButtonText.value = ctx.getString(R.string.add_contact)
-                            lastAction.value = { navController.navigate("contact/$peerUri/new") }
+                            secondButtonText.value = ""
+                            thirdButtonText.value = ""
+                            lastButtonText.value = ctx.getString(R.string.delete)
+                            lastAction.value = {
+                                Blocked.remove(acc.aor, peerUri)
+                                blocked.value = blocked.value.filter { it.peerUri != peerUri }
+                            }
                             showDialog.value = true
                         }
                     )
@@ -283,7 +355,7 @@ private fun Blocked(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 val calendar = GregorianCalendar()
-                calendar.timeInMillis = blocked.timeStamp
+                calendar.timeInMillis = b.timeStamp
                 Text(
                     text = Utils.relativeTime(ctx, calendar),
                     fontSize = 12.sp,
@@ -300,10 +372,11 @@ private fun Blocked(
 
 private fun loadBlocked(request: String, aor: String): MutableList<Blocked> {
     val res = mutableListOf<Blocked>()
-    for (i in BaresipService.blocked.indices.reversed()) {
-        val b = BaresipService.blocked[i]
-        if (b.aor == aor && b.request == request)
-            res.add(Blocked("", b.peerUri, "", b.timeStamp))
+    synchronized(BaresipService.blocked) {
+        for (i in BaresipService.blocked.indices.reversed()) {
+            val b = BaresipService.blocked[i]
+            if (b.aor == aor && b.request == request) res.add(b)
+        }
     }
     Log.d(TAG, "Loaded ${res.size} blocked $request requests")
     return res

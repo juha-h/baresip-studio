@@ -272,6 +272,7 @@ private fun Chats(
 
     val shortChatQuestion = stringResource(R.string.short_chat_question)
     val longChatQuestion = stringResource(R.string.long_chat_question)
+    val blockDeleteChatQuestion = stringResource(R.string.long_chat_block_delete_question)
     val addContactText = stringResource(R.string.add_contact)
     val blockText = stringResource(R.string.block)
     val deleteText = stringResource(R.string.delete)
@@ -361,26 +362,29 @@ private fun Chats(
                             unknown = unknownText
                         )
                         val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
-                        if (contactExists) {
+                        if (message.peerUri.contains("anonymous") || message.peerUri == unknownText) {
                             dialogMessage.value = String.format(shortChatQuestion, peerNameWithLabel)
                             secondButtonText.value = ""
-                            lastButtonText.value = deleteText
-                            lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
+                            thirdButtonText.value = ""
                         }
                         else {
-                            dialogMessage.value = String.format(longChatQuestion, peerName)
-                            secondButtonText.value = addContactText
-                            secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
+                            if (contactExists) {
+                                dialogMessage.value = String.format(blockDeleteChatQuestion, peerNameWithLabel)
+                                secondButtonText.value = ""
+                            }
+                            else {
+                                dialogMessage.value = String.format(longChatQuestion, peerName)
+                                secondButtonText.value = addContactText
+                                secondAction.value = { navController.navigate("contact/${message.peerUri}/new") }
+                            }
                             thirdButtonText.value = blockText
                             thirdAction.value = {
-                                if (!BlockRule.exists(account.aor, message.peerUri)) {
-                                    BaresipService.blockRules.add(BlockRule(account.aor, message.peerUri))
-                                    BlockRule.save()
-                                }
+                                if (!BlockRule.exists(account.aor, message.peerUri))
+                                    BlockRule(account.aor, message.peerUri).add()
                             }
-                            lastButtonText.value = deleteText
-                            lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
                         }
+                        lastButtonText.value = deleteText
+                        lastAction.value = { deleteMessages(uaMessages, account, message.peerUri) }
                         showDialog.value = true
                     },
                     modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(end = 6.dp),

@@ -334,7 +334,6 @@
     <string name="blocked">Bloqueado</string>
     <string name="blocked_calls">Llamadas Bloqueadas</string>
     <string name="blocked_messages">Mensajes Bloqueados</string>
-    <string name="blocked_delete_alert">¿Desea borrar solicitudes bloqueadas de «%1$s»?</string>
     <string name="blocked_contact_question">¿Desea añadir pareja «%1$s» a contactos?</string>
     <string name="call_answered">Llamada respondida</string>
     <string name="call_answered_elsewhere">Llamada respondida donde sea</string>

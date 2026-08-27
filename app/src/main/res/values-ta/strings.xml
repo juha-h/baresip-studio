@@ -325,7 +325,6 @@
     <string name="blocked">தடுக்கப்பட்டது</string>
     <string name="blocked_calls">தடுக்கப்பட்ட அழைப்புகள்</string>
     <string name="blocked_messages">தடுக்கப்பட்ட செய்திகள்</string>
-    <string name="blocked_delete_alert">\'%1$s\' இன் தடுக்கப்பட்ட கோரிக்கைகளை நீக்க விரும்புகிறீர்களா?</string>
     <string name="blocked_contact_question">தொடர்புகளில் தம \'%1$s\' ஐச் சேர்க்க விரும்புகிறீர்களா?</string>
     <string name="call_answered">அழைப்பு பதிலளித்தது</string>
     <string name="call_answered_elsewhere">வேறொரு இடத்தில் அழைப்பு வந்தது</string>

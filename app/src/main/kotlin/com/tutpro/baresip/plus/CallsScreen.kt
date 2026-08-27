@@ -419,7 +419,7 @@ private fun Calls(
                                 else
                                     ctx.getString(R.string.calls_call)
                                 val contactExists = Contact.nameExists(peerName, BaresipService.contacts, false)
-                                if (contactExists || peerUri.contains("anonymous") || peerUri == unknown) {
+                                if (peerUri.contains("anonymous") || peerUri == unknown) {
                                     message.value = String.format(
                                         ctx.getString(R.string.calls_delete_question),
                                         peerNameWithLabel,
@@ -428,31 +428,36 @@ private fun Calls(
                                     secondButtonText.value = ""
                                     thirdButtonText.value = ""
                                     fourthButtonText.value = ""
-                                    lastButtonText.value = ctx.getString(R.string.delete)
-                                    lastAction.value = { removeFromHistory(callHistory, callRow) }
                                 }
                                 else {
-                                    message.value = String.format(
-                                        ctx.getString(R.string.calls_add_delete_question),
-                                        peerNameWithLabel,
-                                        callText
-                                    )
-                                    secondButtonText.value = ctx.getString(R.string.add_contact)
-                                    secondAction.value = {
-                                        val uri = Utils.sipToTel(peerUri)
-                                        navController.navigate("contact/$uri/new")
+                                    if (contactExists) {
+                                        message.value = String.format(
+                                            ctx.getString(R.string.calls_block_delete_question),
+                                            peerNameWithLabel,
+                                            callText
+                                        )
+                                        secondButtonText.value = ""
                                     }
-                                    thirdButtonText.value = ""
-                                    fourthButtonText.value = ctx.getString(R.string.block)
-                                    fourthAction.value = {
-                                        if (!BlockRule.exists(ua.account.aor, peerUri)) {
-                                            BaresipService.blockRules.add(BlockRule(ua.account.aor, peerUri))
-                                            BlockRule.save()
+                                    else {
+                                        message.value = String.format(
+                                            ctx.getString(R.string.calls_add_delete_question),
+                                            peerNameWithLabel,
+                                            callText
+                                        )
+                                        secondButtonText.value = ctx.getString(R.string.add_contact)
+                                        secondAction.value = {
+                                            val uri = Utils.sipToTel(peerUri)
+                                            navController.navigate("contact/$uri/new")
                                         }
                                     }
-                                    lastButtonText.value = ctx.getString(R.string.delete)
-                                    lastAction.value = { removeFromHistory(callHistory, callRow) }
+                                    thirdButtonText.value = ctx.getString(R.string.block)
+                                    thirdAction.value = {
+                                        if (!BlockRule.exists(ua.account.aor, peerUri))
+                                            BlockRule(ua.account.aor, peerUri).add()
+                                    }
                                 }
+                                lastButtonText.value = ctx.getString(R.string.delete)
+                                lastAction.value = { removeFromHistory(callHistory, callRow) }
                                 showDialog.value = true
                             }
                         )
