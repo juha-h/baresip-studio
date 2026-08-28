@@ -329,8 +329,8 @@
     <string name="check_origin">检查来源</string>
     <string name="check_origin_help">如果选中，则仅允许来自发送注册请求的 IP 地址的入站请求。</string>
     <string name="blocked">已屏蔽</string>
-    <string name="blocked_calls">已屏蔽的通话</string>
-    <string name="blocked_messages">已屏蔽的消息</string>
+    <string name="blocked_calls">已屏蔽通话</string>
+    <string name="blocked_messages">已屏蔽消息</string>
     <string name="blocked_contact_question">您要将对方“%1$s”添加到联系人吗？</string>
     <string name="call_blocked">已自动拒绝来自 %1$s 的已屏蔽通话</string>
     <string name="message_blocked">已自动拒绝来自 %1$s 的已屏蔽消息</string>
@@ -394,4 +394,8 @@
     <string name="calls_block_delete_question">您要屏蔽“%1$s”，还是从通话记录中删除 %2$s？</string>
     <string name="long_chat_block_delete_question">您要屏蔽“%1$s”，还是删除此聊天？</string>
     <string name="unblock">取消屏蔽</string>
+    <string name="blocked_calls_history">已屏蔽通话</string>
+    <string name="blocked_messages_history">已屏蔽消息</string>
+    <string name="blocked_history_delete_alert">您要删除账号“%2$s”的%1$s记录吗？</string>
+    <string name="blocked_peer_delete_alert">您要从%2$s记录中删除“%1$s”吗？</string>
 </resources>
