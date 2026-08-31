@@ -52,7 +52,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -1317,10 +1317,10 @@ private fun CallUriRow(
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
                         ) {
-                            items(
+                            itemsIndexed(
                                 items = filteredSuggestions,
-                                key = { (contact, _, matchingUri) -> "${contact.id()}:${matchingUri?.uri ?: ""}" }
-                            ) { (contact, annotatedName, matchingUri) ->
+                                key = { index, item -> "${item.first.id()}:${item.third?.uri ?: ""}:${item.third?.label ?: ""}:$index" }
+                            ) { _, (contact, annotatedName, matchingUri) ->
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -1745,10 +1745,10 @@ private fun CallRow(
                                                 horizontalAlignment = Alignment.Start,
                                                 state = lazyListState,
                                             ) {
-                                                items(
+                                                itemsIndexed(
                                                     items = filteredSuggestions,
-                                                    key = { (contact, _, matchingUri) -> "${contact.id()}:${matchingUri?.uri ?: ""}" }
-                                                ) { (contact, annotatedName, matchingUri) ->
+                                                    key = { index, item -> "${item.first.id()}:${item.third?.uri ?: ""}:${item.third?.label ?: ""}:$index" }
+                                                ) { _, (contact, annotatedName, matchingUri) ->
                                                     Box(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
