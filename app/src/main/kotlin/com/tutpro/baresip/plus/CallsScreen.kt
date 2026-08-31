@@ -102,6 +102,10 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
 
     LaunchedEffect(ua, refreshTrigger) {
         if (ua.account.isMobile) Utils.cancelMissedCallsNotification(ctx)
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Missed"
+        serviceIntent.putExtra("uap", ua.uap)
+        ctx.startService(serviceIntent)
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }
@@ -115,10 +119,6 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     }
 
     BackHandler(enabled = true) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Missed"
-        serviceIntent.putExtra("uap", ua.uap)
-        ctx.startService(serviceIntent)
         navController.navigateUp()
     }
 
@@ -181,13 +181,8 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
-            val ctx = LocalContext.current
             IconButton(
                 onClick = {
-                    val serviceIntent = Intent(ctx, BaresipService::class.java)
-                    serviceIntent.action = "Clear Missed"
-                    serviceIntent.putExtra("uap", ua.uap)
-                    ctx.startService(serviceIntent)
                     navController.navigateUp()
                 }
             ) {
