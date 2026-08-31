@@ -1,0 +1,3 @@
+- Fixed potential, contact suggestions related crash
+- Fixed clearing of missed calls and messages when returning to main screen
+- New translations (Chinese, Czech)
