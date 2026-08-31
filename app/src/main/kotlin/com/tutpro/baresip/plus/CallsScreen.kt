@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -316,7 +316,10 @@ private fun Calls(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(items = callHistory.value, key = { callRow -> callRow.stopTime }) { callRow ->
+        itemsIndexed(
+            items = callHistory.value,
+            key = { index, callRow -> "${callRow.stopTime}:$index" }
+        ) { _, callRow ->
             val peerUri = callRow.peerUri
             var recordings = false
             Row(

@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -402,7 +402,10 @@ private fun Messages(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(items = messages, key = { message -> message.timeStamp }) { message ->
+        itemsIndexed(
+            items = messages,
+            key = { index, message -> "${message.timeStamp}:$index" }
+        ) { _, message ->
             val down = message.direction == MESSAGE_DOWN
             val sender: String = if (down)
                 peerName

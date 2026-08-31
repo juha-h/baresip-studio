@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -305,7 +305,10 @@ private fun Chats(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(items = uaMessages.value, key = { message -> message.timeStamp }) { message ->
+        itemsIndexed(
+            items = uaMessages.value,
+            key = { index, message -> "${message.peerUri}:${message.timeStamp}:$index" }
+        ) { _, message ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when (val contact = Contact.findContact(message.peerUri)) {
                     is Contact.BaresipContact -> {
@@ -536,10 +539,10 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                             horizontalAlignment = Alignment.Start,
                             state = lazyListState
                         ) {
-                            items(
+                            itemsIndexed(
                                 items = filteredSuggestions,
-                                key = { (contact, _, matchingUri) -> "${contact.id()}:${matchingUri?.uri ?: ""}" }
-                            ) { (contact, annotatedName, matchingUri) ->
+                                key = { index, item -> "${item.first.id()}:${item.third?.uri ?: ""}:${item.third?.label ?: ""}:$index" }
+                            ) { _, (contact, annotatedName, matchingUri) ->
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
