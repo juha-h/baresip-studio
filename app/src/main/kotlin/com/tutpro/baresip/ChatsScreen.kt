@@ -117,6 +117,10 @@ private fun ChatsScreen(navController: NavController, aor: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(aor, refreshTrigger) {
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Unread"
+        serviceIntent.putExtra("uap", account.accp)
+        ctx.startService(serviceIntent)
         uaMessages.value = loadMessages(account)
         areMessagesLoaded = true
     }
@@ -130,10 +134,6 @@ private fun ChatsScreen(navController: NavController, aor: String) {
     }
 
     BackHandler(enabled = true) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Unread"
-        serviceIntent.putExtra("uap", account.accp)
-        ctx.startService(serviceIntent)
         navController.navigateUp()
     }
 
@@ -185,13 +185,8 @@ private fun TopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         navigationIcon = {
-            val ctx = LocalContext.current
             IconButton(
                 onClick = {
-                    val serviceIntent = Intent(ctx, BaresipService::class.java)
-                    serviceIntent.action = "Clear Unread"
-                    serviceIntent.putExtra("uap", account.accp)
-                    ctx.startService(serviceIntent)
                     navController.navigateUp()
                 }
             ) {

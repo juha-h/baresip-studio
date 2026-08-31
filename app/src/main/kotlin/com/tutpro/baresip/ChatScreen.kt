@@ -139,6 +139,13 @@ private fun ChatScreen(
 
     val reloadMessages = {
         Log.d(TAG, "Reloading messages for $aor peer $peerUri")
+        val serviceIntent = Intent(ctx, BaresipService::class.java)
+        serviceIntent.action = "Clear Unread"
+        serviceIntent.putExtra("uap", account.accp)
+        serviceIntent.putExtra("peer", peerUri)
+        ctx.startService(serviceIntent)
+        Message.updateMessagesFromPearRead(aor, peerUri)
+        account.unreadMessages = Message.unreadMessages(aor)
         chatMessages = loadPeerMessages(aor, peerUri)
         if (!areMessagesLoaded) areMessagesLoaded = true
     }
@@ -162,12 +169,7 @@ private fun ChatScreen(
     }
 
     BackHandler(enabled = true) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Unread"
-        serviceIntent.putExtra("uap", account.accp)
-        serviceIntent.putExtra("peer", peerUri)
-        ctx.startService(serviceIntent)
-        backAction(navController, account, peerUri)
+        navController.navigateUp()
     }
 
     Scaffold(
@@ -234,12 +236,7 @@ private fun TopAppBar(
         navigationIcon = {
             IconButton(
                 onClick = {
-                    val serviceIntent = Intent(ctx, BaresipService::class.java)
-                    serviceIntent.action = "Clear Unread"
-                    serviceIntent.putExtra("uap", account.accp)
-                    serviceIntent.putExtra("peer", peerUri)
-                    ctx.startService(serviceIntent)
-                    backAction(navController, account, peerUri)
+                    navController.navigateUp()
                 }
             ) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -627,12 +624,6 @@ private fun NewMessage(
     }
 }
 
-private fun backAction(navController: NavController, account: Account, peerUri: String) {
-    val aor = account.aor
-    Message.updateMessagesFromPearRead(aor, peerUri)
-    account.unreadMessages = Message.unreadMessages(aor)
-    navController.navigateUp()
-}
 
 private fun loadPeerMessages(aor: String, peerUri: String): List<Message> {
     val res = mutableListOf<Message>()
