@@ -283,13 +283,13 @@ class MainActivity : ComponentActivity() {
                     audioScreenRoute(navController)
                     accountScreenRoute(navController)
                     codecsScreenRoute(navController)
-                    contactsScreenRoute(navController)
+                    contactsScreenRoute(navController, viewModel)
                     contactScreenRoute(navController, viewModel)
                     callsScreenRoute(navController, viewModel)
                     callDetailsScreenRoute(navController, viewModel)
                     blockedScreenRoute(navController)
                     blockingScreenRoute(navController)
-                    chatsScreenRoute(navController)
+                    chatsScreenRoute(navController, viewModel)
                     chatScreenRoute(navController, viewModel)
                 }
             }

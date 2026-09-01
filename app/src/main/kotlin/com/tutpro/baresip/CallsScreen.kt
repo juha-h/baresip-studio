@@ -31,6 +31,7 @@ import androidx.compose.material.icons.automirrored.filled.CallMade
 import androidx.compose.material.icons.automirrored.filled.CallReceived
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,6 +75,8 @@ import coil.compose.AsyncImage
 import com.tutpro.baresip.BaresipService.Companion.circleGreen
 import com.tutpro.baresip.BaresipService.Companion.colorblind
 import com.tutpro.baresip.CustomElements.AlertDialog
+import com.tutpro.baresip.CustomElements.DropdownMenu
+import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: ViewModel) {
@@ -90,7 +93,7 @@ fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: Vi
 @Composable
 private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)
 
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
     var isHistoryLoaded by remember { mutableStateOf(false) }
@@ -101,12 +104,14 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
     val ctx = LocalContext.current
 
     LaunchedEffect(ua, refreshTrigger) {
-        if (ua.account.isMobile) Utils.cancelMissedCallsNotification(ctx)
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Missed"
-        serviceIntent.putExtra("uap", ua.uap)
-        ctx.startService(serviceIntent)
-        callHistory.value = loadCallHistory(aor)
+        if (ua != null) {
+            if (ua.account.isMobile) Utils.cancelMissedCallsNotification(ctx)
+            val serviceIntent = Intent(ctx, BaresipService::class.java)
+            serviceIntent.action = "Clear Missed"
+            serviceIntent.putExtra("uap", ua.uap)
+            ctx.startService(serviceIntent)
+            callHistory.value = loadCallHistory(aor)
+        }
         isHistoryLoaded = true
     }
 
@@ -128,12 +133,47 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
-                TopAppBar(navController, ua, callHistory)
+                if (ua != null)
+                    TopAppBar(navController, ua, callHistory)
+                else
+                    TopAppBar(
+                        title = { Text(text = stringResource(R.string.call_history), fontWeight = FontWeight.Bold) },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.navigateUp() }) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        windowInsets = WindowInsets(0, 0, 0, 0)
+                    )
             }
         },
+        bottomBar = { BottomNavigationBar(LocalContext.current, viewModel, navController) },
         content = { contentPadding ->
-            if (isHistoryLoaded)
-                CallsContent(LocalContext.current, navController, viewModel, contentPadding, ua, callHistory)
+            if (isHistoryLoaded) {
+                if (ua != null) {
+                    CallsContent(LocalContext.current, navController, viewModel, contentPadding, ua, callHistory)
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(contentPadding),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_account_found),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Button(onClick = { navController.navigate("accounts") }) {
+                            Text(text = stringResource(R.string.accounts))
+                        }
+                    }
+                }
+            }
         },
     )
 }

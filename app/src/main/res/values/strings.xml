@@ -263,6 +263,7 @@
     <string name="encrypt_password">Encrypt Password</string>
     <string name="decrypt_password">Decrypt Password</string>
     <string name="delete_account">Do you want to delete account \'%1$s\'?</string>
+    <string name="no_account_found">No account found</string>
     <!-- Baresip Service -->
     <string name="is_calling">is calling</string>
     <string name="missed_call_from">Missed call from</string>

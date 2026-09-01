@@ -608,7 +608,7 @@ private fun MainScreen(
                     )
                 }
             },
-            bottomBar = { BottomBar(ctx, viewModel, navController) },
+            bottomBar = { BottomNavigationBar(ctx, viewModel, navController) },
             content = { contentPadding -> MainContent(navController, viewModel, contentPadding) }
         )
     }
@@ -773,148 +773,7 @@ private fun TopAppBar(
     )
 }
 
-@Composable
-private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
-    val aor by viewModel.selectedAor.collectAsState()
-    val accountUpdate by viewModel.accountUpdate.collectAsState()
-
-    val showVmIcon = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.vmUri?.isNotEmpty() ?: false else false
-    }
-    val hasNewVoicemail = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
-    }
-    val isMobile = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.isMobile ?: false else false
-    }
-    val hasUnreadMessages = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
-    }
-    val hasMissedCalls = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.missedCalls ?: false else false
-    }
-
-    val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
-
-    val buttonSize = 48.dp
-
-    Row(
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        if (showVmIcon)
-            IconButton(
-                // Disable the button if no account is selected
-                enabled = aor.isNotEmpty(),
-                onClick = {
-                    val ua = UserAgent.ofAor(aor)!!
-                    val acc = ua.account
-                    if (acc.vmUri.isNotEmpty()) {
-                        if (isMobile) {
-                            val intent = Intent(ctx, MainActivity::class.java)
-                            intent.putExtra("uap", ua.uap)
-                            intent.putExtra("peer", acc.vmUri)
-                            handleIntent(ctx, viewModel, intent, "call")
-                        }
-                        else {
-                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                            dialogMessage.value = acc.vmMessages(ctx)
-                            firstText.value = ctx.getString(R.string.cancel)
-                            onFirstClicked.value = {}
-                            secondText.value = ""
-                            lastText.value = ctx.getString(R.string.listen)
-                            onLastClicked.value = {
-                                val intent = Intent(ctx, MainActivity::class.java)
-                                intent.putExtra("uap", ua.uap)
-                                intent.putExtra("peer", acc.vmUri)
-                                handleIntent(ctx, viewModel, intent, "call")
-                            }
-                            showDialog.value = true
-                        }
-                    }
-                },
-                modifier = Modifier.weight(1f).size(buttonSize)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Voicemail,
-                    contentDescription = null,
-                    Modifier.size(buttonSize),
-                    tint = if (hasNewVoicemail)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.secondary
-                )
-            }
-
-        IconButton(
-            onClick = { navController.navigate("contacts") },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = {
-                if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
-                    alertTitle.value = ctx.getString(R.string.notice)
-                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                    showAlert.value = true
-                    return@IconButton
-                }
-                navController.navigate("chats/$aor")
-            },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasUnreadMessages)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = { navController.navigate("calls/$aor") },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.History,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        IconButton(
-            onClick = { viewModel.toggleDialpadVisibility() },
-            modifier = Modifier.weight(1f).size(buttonSize),
-            enabled = dialpadButtonEnabled.value
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Dialpad,
-                contentDescription = null,
-                modifier = Modifier.size(buttonSize),
-                tint = if (isDialpadVisible)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
-}
 
 private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")

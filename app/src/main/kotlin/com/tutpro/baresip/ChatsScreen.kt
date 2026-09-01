@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,6 +64,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -89,27 +91,28 @@ import coil.compose.AsyncImage
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.DropdownMenu
 import com.tutpro.baresip.CustomElements.SelectableAlertDialog
+import com.tutpro.baresip.CustomElements.TextAvatar
 import com.tutpro.baresip.CustomElements.verticalScrollbar
 import java.text.DateFormat
 import java.util.GregorianCalendar
 
-fun NavGraphBuilder.chatsScreenRoute(navController: NavController) {
+fun NavGraphBuilder.chatsScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable(
         route = "chats/{aor}",
         arguments = listOf(navArgument("aor") { type = NavType.StringType })
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
-        ChatsScreen(navController, aor)
+        ChatsScreen(navController, viewModel, aor)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChatsScreen(navController: NavController, aor: String) {
+private fun ChatsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
     val ctx = LocalContext.current
 
-    val account = Account.ofAor(aor)!!
+    val account = Account.ofAor(aor)
     val uaMessages: MutableState<List<Message>> = remember { mutableStateOf(emptyList()) }
     var areMessagesLoaded by remember { mutableStateOf(false) }
 
@@ -117,11 +120,13 @@ private fun ChatsScreen(navController: NavController, aor: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(aor, refreshTrigger) {
-        val serviceIntent = Intent(ctx, BaresipService::class.java)
-        serviceIntent.action = "Clear Unread"
-        serviceIntent.putExtra("uap", account.accp)
-        ctx.startService(serviceIntent)
-        uaMessages.value = loadMessages(account)
+        if (account != null) {
+            val serviceIntent = Intent(ctx, BaresipService::class.java)
+            serviceIntent.action = "Clear Unread"
+            serviceIntent.putExtra("uap", account.accp)
+            ctx.startService(serviceIntent)
+            uaMessages.value = loadMessages(account)
+        }
         areMessagesLoaded = true
     }
 
@@ -143,12 +148,47 @@ private fun ChatsScreen(navController: NavController, aor: String) {
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Spacer(Modifier.statusBarsPadding())
-                TopAppBar(navController, account, uaMessages)
+                if (account != null)
+                    TopAppBar(navController, account, uaMessages)
+                else
+                    TopAppBar(
+                        title = { Text(text = stringResource(R.string.chats), fontWeight = FontWeight.Bold) },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.navigateUp() }) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        windowInsets = WindowInsets(0, 0, 0, 0)
+                    )
             }
         },
-        bottomBar = { NewChatPeer(navController, account) },
+        bottomBar = { BottomNavigationBar(ctx, viewModel, navController) },
         content = { contentPadding ->
-            if (areMessagesLoaded) ChatsContent(navController, contentPadding, account, uaMessages)
+            if (areMessagesLoaded) {
+                if (account != null) {
+                    ChatsContent(navController, contentPadding, account, uaMessages)
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(contentPadding),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_account_found),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Button(onClick = { navController.navigate("accounts") }) {
+                            Text(text = stringResource(R.string.accounts))
+                        }
+                    }
+                }
+            }
         },
     )
 }
@@ -233,6 +273,7 @@ private fun ChatsContent(
         verticalArrangement = Arrangement.Top
     ) {
         Account(account)
+        NewChatPeer(navController, account)
         Chats(navController, account, uaMessages)
     }
 }
@@ -509,8 +550,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp),
+            .padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         var newPeer by remember { mutableStateOf("") }
