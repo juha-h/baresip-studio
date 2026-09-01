@@ -94,12 +94,17 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -112,6 +117,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -121,6 +127,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -148,6 +155,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -480,47 +488,8 @@ private fun MainScreen(
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize().imePadding(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(
-                    viewModel = viewModel,
-                    navController = navController,
-                    onBackupClick = { launchBackupRequest() },
-                    onRestoreClick = { launchRestoreRequest() },
-                    onLogcatClick = { launchLogcatRequest() },
-                    onRestartClick = onRestartClick,
-                    onQuitClick = onQuitClick
-                )
-            }
-        },
-        bottomBar = { BottomBar(ctx, viewModel, navController) },
-        content = { contentPadding -> MainContent(navController, viewModel, contentPadding) }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopAppBar(
-    viewModel: ViewModel,
-    navController: NavController,
-    onBackupClick: () -> Unit,
-    onRestoreClick: () -> Unit,
-    onLogcatClick: () -> Unit,
-    onRestartClick: () -> Unit,
-    onQuitClick: () -> Unit
-) {
-    val ctx = LocalContext.current
-    val currentMicIcon by viewModel.micIcon.collectAsState()
-
-    val recOffImage = Icons.Filled.VoiceOverOff
-    val recOnImage = Icons.Filled.RecordVoiceOver
-    var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
-    val isSpeakerOn by viewModel.isSpeakerOn.collectAsState()
-    var menuExpanded by remember { mutableStateOf(false) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
     val about = stringResource(R.string.about)
     val settings = stringResource(R.string.configuration)
@@ -531,14 +500,156 @@ private fun TopAppBar(
     val restart = stringResource(R.string.restart)
     val quit = stringResource(R.string.quit)
 
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp * 0.75f),
+                drawerContainerColor = MaterialTheme.colorScheme.surface,
+                drawerTonalElevation = 4.dp
+            ) {
+                Spacer(Modifier.height(12.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.baresip),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                NavigationDrawerItem(
+                    label = { Text(text = about) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; navController.navigate("about") },
+                    icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = settings) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; navController.navigate("settings") },
+                    icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = accounts) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; navController.navigate("accounts") },
+                    icon = { Icon(Icons.Outlined.ManageAccounts, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = backup) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; launchBackupRequest() },
+                    icon = { Icon(Icons.Outlined.Upload, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = restore) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; launchRestoreRequest() },
+                    icon = { Icon(Icons.Outlined.Download, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                if (VERSION.SDK_INT >= 29) {
+                    NavigationDrawerItem(
+                        label = { Text(text = logcat) },
+                        selected = false,
+                        onClick = { scope.launch { drawerState.close() }; launchLogcatRequest() },
+                        icon = { Icon(Icons.AutoMirrored.Outlined.ReceiptLong, contentDescription = null) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
+                NavigationDrawerItem(
+                    label = { Text(text = restart) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; onRestartClick() },
+                    icon = { Icon(Icons.Outlined.RestartAlt, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = quit) },
+                    selected = false,
+                    onClick = { scope.launch { drawerState.close() }; onQuitClick() },
+                    icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = "v${BuildConfig.VERSION_NAME.removePrefix("v").removePrefix(".")}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp, end = 16.dp),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize().imePadding(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                    Spacer(Modifier.statusBarsPadding())
+                    TopAppBar(
+                        viewModel = viewModel,
+                        navController = navController,
+                        onMenuClick = { scope.launch { drawerState.open() } }
+                    )
+                }
+            },
+            bottomBar = { BottomBar(ctx, viewModel, navController) },
+            content = { contentPadding -> MainContent(navController, viewModel, contentPadding) }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopAppBar(
+    viewModel: ViewModel,
+    navController: NavController,
+    onMenuClick: () -> Unit
+) {
+    val ctx = LocalContext.current
+    val currentMicIcon by viewModel.micIcon.collectAsState()
+
+    val recOffImage = Icons.Filled.VoiceOverOff
+    val recOnImage = Icons.Filled.RecordVoiceOver
+    var isRecOn by remember { mutableStateOf(BaresipService.isRecOn) }
+    val isSpeakerOn by viewModel.isSpeakerOn.collectAsState()
+
     TopAppBar(
+        navigationIcon = {
+            IconButton(
+                onClick = onMenuClick,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Menu",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
         title = {
             Text(text = stringResource(R.string.baresip), fontSize = 22.sp, fontWeight = FontWeight.Bold)
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
@@ -592,7 +703,7 @@ private fun TopAppBar(
                 }
             }
 
-            Spacer(modifier = Modifier.width(22.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             val microPhoneTitle = stringResource(R.string.microphone_title)
             val microPhoneMessage = stringResource(R.string.microphone_tip)
@@ -658,44 +769,6 @@ private fun TopAppBar(
                     modifier = Modifier.size(40.dp)
                 )
             }
-
-            IconButton(
-                onClick = { menuExpanded = !menuExpanded }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-
-            DropdownMenu(
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-                menuItems = listOfNotNull(
-                    MenuItem(about, Icons.Outlined.Info),
-                    MenuItem(settings, Icons.Outlined.Settings),
-                    MenuItem(accounts, Icons.Outlined.ManageAccounts),
-                    MenuItem(backup, Icons.Outlined.Upload),
-                    MenuItem(restore, Icons.Outlined.Download),
-                    if (VERSION.SDK_INT >= 29) MenuItem(logcat, Icons.AutoMirrored.Outlined.ReceiptLong) else null,
-                    MenuItem(restart, Icons.Outlined.RestartAlt),
-                    MenuItem(quit, Icons.AutoMirrored.Filled.Logout)
-                ),
-                onItemClick = { selectedItem ->
-                    menuExpanded = false
-                    when (selectedItem) {
-                        about -> { navController.navigate("about") }
-                        settings -> { navController.navigate("settings") }
-                        accounts -> { navController.navigate("accounts") }
-                        backup -> onBackupClick()
-                        restore -> onRestoreClick()
-                        logcat -> onLogcatClick()
-                        restart -> onRestartClick()
-                        quit -> onQuitClick()
-                    }
-                }
-            )
         }
     )
 }
