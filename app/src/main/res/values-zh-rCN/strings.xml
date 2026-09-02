@@ -398,4 +398,22 @@
     <string name="blocked_messages_history">已屏蔽消息</string>
     <string name="blocked_history_delete_alert">您要删除账号“%2$s”的%1$s记录吗？</string>
     <string name="blocked_peer_delete_alert">您要从%2$s记录中删除“%1$s”吗？</string>
+    <string name="record">录音</string>
+    <string name="recording">录音中</string>
+    <string name="recording_started">开始录音</string>
+    <string name="recording_stopped">停止录音</string>
+    <string name="mute">静音</string>
+    <string name="unmute">取消静音</string>
+    <string name="speaker">扬声器</string>
+    <string name="incoming_call">来电</string>
+    <string name="outgoing_call">去电</string>
+    <string name="connected">已接通</string>
+    <string name="answer">接听</string>
+    <string name="decline">拒绝</string>
+    <string name="hangup">挂断</string>
+    <string name="calling">呼叫中</string>
+    <string name="ringing">响铃中</string>
+    <string name="hold">保持</string>
+    <string name="resume">恢复</string>
+    <string name="keypad">键盘</string>
 </resources>

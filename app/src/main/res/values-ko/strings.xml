@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>    <string name="record">녹음</string>
+    <string name="recording">녹음 중</string>
+    <string name="recording_started">녹음이 시작되었습니다</string>
+    <string name="recording_stopped">녹음이 중지되었습니다</string>
+    <string name="mute">음소거</string>
+    <string name="unmute">음소거 해제</string>
+    <string name="speaker">스피커</string>
+    <string name="incoming_call">수신 전화</string>
+    <string name="outgoing_call">발신 전화</string>
+    <string name="connected">연결됨</string>
+    <string name="answer">응답</string>
+    <string name="decline">거절</string>
+    <string name="hangup">통화 종료</string>
+    <string name="calling">전화 거는 중</string>
+    <string name="ringing">신호 가는 중</string>
+    <string name="hold">대기</string>
+    <string name="resume">재개</string>
+    <string name="keypad">키패드</string>
+</resources>

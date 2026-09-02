@@ -370,4 +370,22 @@
     <string name="airplane_mode">מצב טיסה מופעל. כבה אותו כדי להשתמש בחשבון סלולרי.</string>
     <string name="sim_manager">מנהל SIM</string>
     <string name="block_hidden">חסום מוסתרים</string>
+    <string name="record">הקלט</string>
+    <string name="recording">מקליט</string>
+    <string name="recording_started">ההקלטה החלה</string>
+    <string name="recording_stopped">ההקלטה הופסקה</string>
+    <string name="mute">השתק</string>
+    <string name="unmute">בטל השתקה</string>
+    <string name="speaker">רמקול</string>
+    <string name="incoming_call">שיחה נכנסת</string>
+    <string name="outgoing_call">שיחה יוצאת</string>
+    <string name="connected">מחובר</string>
+    <string name="answer">ענה</string>
+    <string name="decline">דחה</string>
+    <string name="hangup">נתק</string>
+    <string name="calling">מחייג</string>
+    <string name="ringing">מצלצל</string>
+    <string name="hold">המתנה</string>
+    <string name="resume">המשך</string>
+    <string name="keypad">לוח מקשים</string>
 </resources>

@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="record">تسجيل</string>
+    <string name="recording">جارٍ التسجيل</string>
+    <string name="recording_started">بدأ التسجيل</string>
+    <string name="recording_stopped">توقف التسجيل</string>
+    <string name="mute">كتم الصوت</string>
+    <string name="unmute">إلغاء كتم الصوت</string>
+    <string name="speaker">مكبر الصوت</string>
+    <string name="incoming_call">مكالمة واردة</string>
+    <string name="outgoing_call">مكالمة صادرة</string>
+    <string name="connected">متصل</string>
+    <string name="answer">رد</string>
+    <string name="decline">رفض</string>
+    <string name="hangup">إنهاء المكالمة</string>
+    <string name="calling">جارٍ الاتصال</string>
+    <string name="ringing">رنين</string>
+    <string name="hold">تعليق</string>
+    <string name="resume">استئناف</string>
+    <string name="keypad">لوحة المفاتيح</string>
 </resources>

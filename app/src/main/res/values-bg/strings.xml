@@ -198,4 +198,22 @@
     <string name="no_calls">Разговори не могат да бъдат осъществени без разрешен достъп до микрофона.</string>
     <string name="accounts_help">Порта и транспортния протокол на акаунта могат да бъдат посочени по избор, когато се създаде нов акаунт: потребителско име@домейн[:port] [;transport=udp|tcp|tls]. Ако е даден порт и транспортният протокол не е даден, транспортният протокол по подразбиране е udp. Ако порт не е даден и транспортният протокол е даден, портът по подразбиране е 5060 или 5061 (tls). Ако нито едното не е посочено и не е посочен изходящ прокси, регистраторът на акаунта (ако има такъв) се определя единствено въз основа на DNS информация от домейна.</string>
     <string name="new_account">Нов Акаунт</string>
+    <string name="record">Запис</string>
+    <string name="recording">Записване</string>
+    <string name="recording_started">Записът започна</string>
+    <string name="recording_stopped">Записът спря</string>
+    <string name="mute">Заглушаване</string>
+    <string name="unmute">Включване на звука</string>
+    <string name="speaker">Високоговорител</string>
+    <string name="incoming_call">Входящо повикване</string>
+    <string name="outgoing_call">Изходящо повикване</string>
+    <string name="connected">Свързан</string>
+    <string name="answer">Отговор</string>
+    <string name="decline">Отказ</string>
+    <string name="hangup">Затваряне</string>
+    <string name="calling">Избиране</string>
+    <string name="ringing">Звънене</string>
+    <string name="hold">Задържане</string>
+    <string name="resume">Възобновяване</string>
+    <string name="keypad">Клавиатура</string>
 </resources>

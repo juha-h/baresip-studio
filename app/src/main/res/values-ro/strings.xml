@@ -136,4 +136,22 @@
     <string name="audio_modules_help">Codecurile audio furnizate de modulele bifate sunt disponibile pentru utilizare de către conturi.</string>
     <string name="invalid_display_name">Nume afișat nevalid \"%1$s\'</string>
     <string name="about_title_plus">Despre baresip+</string>
+    <string name="record">Înregistrare</string>
+    <string name="recording">Se înregistrează</string>
+    <string name="recording_started">Înregistrare pornită</string>
+    <string name="recording_stopped">Înregistrare oprită</string>
+    <string name="mute">Dezactivare sunet</string>
+    <string name="unmute">Activare sunet</string>
+    <string name="speaker">Difuzor</string>
+    <string name="incoming_call">Apel primit</string>
+    <string name="outgoing_call">Apel inițiat</string>
+    <string name="connected">Conectat</string>
+    <string name="answer">Răspunde</string>
+    <string name="decline">Refuză</string>
+    <string name="hangup">Închide</string>
+    <string name="calling">Se apelează</string>
+    <string name="ringing">Sună</string>
+    <string name="hold">În așteptare</string>
+    <string name="resume">Reia</string>
+    <string name="keypad">Tastatură</string>
 </resources>

@@ -258,6 +258,8 @@ class MainActivity : ComponentActivity() {
                             }
                             is NavigationCommand.NavigateToChats ->
                                 navController.navigate("chats") { launchSingleTop = true }
+                            is NavigationCommand.NavigateToCall ->
+                                navController.navigate("call")
                             is NavigationCommand.NavigateToHome ->
                                 navController.navigate("main") {
                                     popUpTo("main") { inclusive = true }
@@ -274,6 +276,7 @@ class MainActivity : ComponentActivity() {
                         onRestartApp = { restartApp() },
                         onQuitApp = { quitApp() }
                     )
+                    callScreenRoute(navController, viewModel)
                     aboutScreenRoute(navController)
                     settingsScreenRoute(
                         navController = navController,
@@ -328,6 +331,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "Main onResume")
+        BaresipService.isMainVisible = true
         nm.cancelAll()
         if (Build.VERSION.SDK_INT >= 29) {
             val baresipService = Intent(this, BaresipService::class.java)
@@ -339,6 +343,7 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         Log.d(TAG, "Main onPause")
+        BaresipService.isMainVisible = false
     }
 
     override fun onDestroy() {

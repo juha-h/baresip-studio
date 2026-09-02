@@ -192,4 +192,22 @@
     <string name="time">Tid</string>
     <string name="calls_duration">Varighet</string>
     <string name="audio_settings">Lydinnstillinger</string>
+    <string name="record">Ta opp</string>
+    <string name="recording">Opptak</string>
+    <string name="recording_started">Opptak startet</string>
+    <string name="recording_stopped">Opptak stoppet</string>
+    <string name="mute">Demp</string>
+    <string name="unmute">Opphev demping</string>
+    <string name="speaker">Høyttaler</string>
+    <string name="incoming_call">Innkommende anrop</string>
+    <string name="outgoing_call">Utgående anrop</string>
+    <string name="connected">Tilkoblet</string>
+    <string name="answer">Svar</string>
+    <string name="decline">Avslå</string>
+    <string name="hangup">Legg på</string>
+    <string name="calling">Ringer</string>
+    <string name="ringing">Kimer</string>
+    <string name="hold">Sett på vent</string>
+    <string name="resume">Gjenoppta</string>
+    <string name="keypad">Tastatur</string>
 </resources>

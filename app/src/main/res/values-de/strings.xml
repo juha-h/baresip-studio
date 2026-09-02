@@ -310,4 +310,22 @@
     <string name="playing_recording">Spiele Aufnahme ab…</string>
     <string name="reply">Antworten</string>
     <string name="save">Speichern</string>
+    <string name="record">Aufnehmen</string>
+    <string name="recording">Aufnahme</string>
+    <string name="recording_started">Aufnahme gestartet</string>
+    <string name="recording_stopped">Aufnahme beendet</string>
+    <string name="mute">Stummschalten</string>
+    <string name="unmute">Stummschaltung aufheben</string>
+    <string name="speaker">Lautsprecher</string>
+    <string name="incoming_call">Eingehender Anruf</string>
+    <string name="outgoing_call">Ausgehender Anruf</string>
+    <string name="connected">Verbunden</string>
+    <string name="answer">Antworten</string>
+    <string name="decline">Ablehnen</string>
+    <string name="hangup">Auflegen</string>
+    <string name="calling">Wählt</string>
+    <string name="ringing">Klingelt</string>
+    <string name="hold">Halten</string>
+    <string name="resume">Fortsetzen</string>
+    <string name="keypad">Tastenfeld</string>
 </resources>

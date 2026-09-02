@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>    <string name="record">Nagraj</string>
+    <string name="recording">Nagrywanie</string>
+    <string name="recording_started">Rozpoczęto nagrywanie</string>
+    <string name="recording_stopped">Zatrzymano nagrywanie</string>
+    <string name="mute">Wycisz</string>
+    <string name="unmute">Wyłącz wyciszenie</string>
+    <string name="speaker">Głośnik</string>
+    <string name="incoming_call">Połączenie przychodzące</string>
+    <string name="outgoing_call">Połączenie wychodzące</string>
+    <string name="connected">Połączono</string>
+    <string name="answer">Odbierz</string>
+    <string name="decline">Odrzuć</string>
+    <string name="hangup">Rozłącz</string>
+    <string name="calling">Wybieranie numeru</string>
+    <string name="ringing">Dzwonienie</string>
+    <string name="hold">Zawieś</string>
+    <string name="resume">Wznów</string>
+    <string name="keypad">Klawiatura</string>
+</resources>

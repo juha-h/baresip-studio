@@ -295,4 +295,22 @@
     <string name="dtmf_auto">INFO RTP ou SIP em banda</string>
     <string name="dialer_role_not_available">A função de discador não está disponível</string>
     <string name="restore_unzip_failed">Falha ao restaurar os dados da aplicação. A versão 14 e superior do Android não permite a restauração de dados cujo backup foi feito %1$s antes da versão %2$s.</string>
+    <string name="record">Gravar</string>
+    <string name="recording">A gravar</string>
+    <string name="recording_started">Gravação iniciada</string>
+    <string name="recording_stopped">Gravação parada</string>
+    <string name="mute">Silenciar</string>
+    <string name="unmute">Ativar som</string>
+    <string name="speaker">Altifalante</string>
+    <string name="incoming_call">Chamada recebida</string>
+    <string name="outgoing_call">Chamada efetuada</string>
+    <string name="connected">Ligado</string>
+    <string name="answer">Atender</string>
+    <string name="decline">Recusar</string>
+    <string name="hangup">Desligar</string>
+    <string name="calling">A chamar</string>
+    <string name="ringing">A tocar</string>
+    <string name="hold">Em espera</string>
+    <string name="resume">Retomar</string>
+    <string name="keypad">Teclado</string>
 </resources>

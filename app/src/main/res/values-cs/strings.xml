@@ -403,4 +403,22 @@
     <string name="ussd_failed">Požadavek USSD se nezdařil</string>
     <string name="ussd_service_unavailable">Služba USSD není dostupná</string>
     <string name="ussd_unknown_error">Neznámá chyba USSD</string>
+    <string name="record">Nahrát</string>
+    <string name="recording">Nahrávání</string>
+    <string name="recording_started">Nahrávání zahájeno</string>
+    <string name="recording_stopped">Nahrávání zastaveno</string>
+    <string name="mute">Ztlumit</string>
+    <string name="unmute">Zrušit ztlumení</string>
+    <string name="speaker">Reproduktor</string>
+    <string name="incoming_call">Příchozí hovor</string>
+    <string name="outgoing_call">Odchozí hovor</string>
+    <string name="connected">Připojeno</string>
+    <string name="answer">Přijmout</string>
+    <string name="decline">Odmítnout</string>
+    <string name="hangup">Zavěsit</string>
+    <string name="calling">Vytáčení</string>
+    <string name="ringing">Vyzvánění</string>
+    <string name="hold">Přidržet</string>
+    <string name="resume">Pokračovat</string>
+    <string name="keypad">Klávesnice</string>
 </resources>

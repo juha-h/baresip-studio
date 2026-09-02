@@ -416,4 +416,22 @@
     <string name="ussd_unknown_error">USSD con error desconocido</string>
     <string name="permission_denied">Permiso denegado</string>
     <string name="show_call">Mostrar llamada</string>
+    <string name="record">Grabar</string>
+    <string name="recording">Grabando</string>
+    <string name="recording_started">Grabación iniciada</string>
+    <string name="recording_stopped">Grabación detenida</string>
+    <string name="mute">Silenciar</string>
+    <string name="unmute">Activar sonido</string>
+    <string name="speaker">Altavoz</string>
+    <string name="incoming_call">Llamada entrante</string>
+    <string name="outgoing_call">Llamada saliente</string>
+    <string name="connected">Conectado</string>
+    <string name="answer">Responder</string>
+    <string name="decline">Rechazar</string>
+    <string name="hangup">Colgar</string>
+    <string name="calling">Llamando</string>
+    <string name="ringing">Sonando</string>
+    <string name="hold">En espera</string>
+    <string name="resume">Reanudar</string>
+    <string name="keypad">Teclado</string>
 </resources>

@@ -685,4 +685,22 @@
     <string name="microphone_tip">Jos aktivoidaan puhelun aikana, mikrofoni suljetaan.</string>
     <string name="speakerphone_title">Kaiutin</string>
     <string name="speakerphone_tip">Jos aktivoitu, laitteen kaiutin on päällä.</string>
+    <string name="record">Talleta</string>
+    <string name="recording">Talletus</string>
+    <string name="recording_started">Talletus aloitettu</string>
+    <string name="recording_stopped">Talletus lopetettu</string>
+    <string name="mute">Mykistä</string>
+    <string name="unmute">Poista mykistys</string>
+    <string name="speaker">Kaiutin</string>
+    <string name="incoming_call">Saapuva puhelu</string>
+    <string name="outgoing_call">Lähtevä puhelu</string>
+    <string name="connected">Yhdistetty</string>
+    <string name="answer">Vastaa</string>
+    <string name="decline">Hylkää</string>
+    <string name="hangup">Lopeta</string>
+    <string name="calling">Soitetaan</string>
+    <string name="ringing">Hälyttää</string>
+    <string name="hold">Pito</string>
+    <string name="resume">Jatka</string>
+    <string name="keypad">Näppäimistö</string>
 </resources>

@@ -7,4 +7,22 @@
     <string name="sip_uri_of_proxy_server">SIP URI του διακομιστή μεσολάβησης</string>
     <string name="sip_uri_of_another_proxy_server">SIP URI του άλλου διακομιστή μεσολάβησης</string>
     <string name="register">Εγγραφή</string>
+    <string name="record">Εγγραφή</string>
+    <string name="recording">Εγγραφή</string>
+    <string name="recording_started">Η εγγραφή ξεκίνησε</string>
+    <string name="recording_stopped">Η εγγραφή διακόπηκε</string>
+    <string name="mute">Σίγαση</string>
+    <string name="unmute">Κατάργηση σίγασης</string>
+    <string name="speaker">Ηχείο</string>
+    <string name="incoming_call">Εισερχόμενη κλήση</string>
+    <string name="outgoing_call">Εξερχόμενη κλήση</string>
+    <string name="connected">Συνδέθηκε</string>
+    <string name="answer">Απάντηση</string>
+    <string name="decline">Απόρριψη</string>
+    <string name="hangup">Τερματισμός</string>
+    <string name="calling">Κλήση</string>
+    <string name="ringing">Κουδουνίζει</string>
+    <string name="hold">Αναμονή</string>
+    <string name="resume">Συνέχιση</string>
+    <string name="keypad">Πληκτρολόγιο</string>
 </resources>

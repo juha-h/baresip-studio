@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>    <string name="record">Enregistra</string>
+    <string name="recording">Enregistrant</string>
+    <string name="recording_started">Enregistrament iniciat</string>
+    <string name="recording_stopped">Enregistrament aturat</string>
+    <string name="mute">Silencia</string>
+    <string name="unmute">Activa el so</string>
+    <string name="speaker">Altaveu</string>
+    <string name="incoming_call">Trucada entrant</string>
+    <string name="outgoing_call">Trucada sortint</string>
+    <string name="connected">Connectat</string>
+    <string name="answer">Respon</string>
+    <string name="decline">Rebutja</string>
+    <string name="hangup">Penja</string>
+    <string name="calling">Trucant</string>
+    <string name="ringing">Sonant</string>
+    <string name="hold">En espera</string>
+    <string name="resume">Reprèn</string>
+    <string name="keypad">Teclat</string>
+</resources>

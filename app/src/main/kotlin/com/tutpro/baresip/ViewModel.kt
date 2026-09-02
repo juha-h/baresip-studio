@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 // Sealed class for type-safe navigation events
 sealed class NavigationCommand {
     object NavigateToHome : NavigationCommand()
+    object NavigateToCall : NavigationCommand()
     object NavigateToChats : NavigationCommand()
     data class NavigateToCalls(val aor: String) : NavigationCommand()
     data class NavigateToChat(val aor: String, val peerUri: String) : NavigationCommand()
@@ -126,6 +127,10 @@ class ViewModel: ViewModel() {
         _selectedAor.value = aor
     }
 
+    fun setFocusedCall(call: Call?) {
+        _focusedCall.value = call
+    }
+
     fun triggerAccountUpdate(call: Call? = null) {
         _focusedCall.value = call
         _accountUpdate.value += 1
@@ -154,6 +159,12 @@ class ViewModel: ViewModel() {
     fun navigateToHome() {
         viewModelScope.launch {
             _navigationCommand.emit(NavigationCommand.NavigateToHome)
+        }
+    }
+
+    fun navigateToCall() {
+        viewModelScope.launch {
+            _navigationCommand.emit(NavigationCommand.NavigateToCall)
         }
     }
 

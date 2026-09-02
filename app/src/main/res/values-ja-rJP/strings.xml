@@ -233,4 +233,22 @@
     <string name="transfer_request_query"> %1$s への通話転送を許可しますか?</string>
     <string name="backed_up">アプリケーションデータがダウンロードフォルダ %1$s にバックアップされました</string>
     <string name="no_calls">マイクへの権限付与がなく電話をかけたり、応答したりすることはできません。</string>
+    <string name="record">録音</string>
+    <string name="recording">録音中</string>
+    <string name="recording_started">録音を開始しました</string>
+    <string name="recording_stopped">録音を停止しました</string>
+    <string name="mute">ミュート</string>
+    <string name="unmute">ミュート解除</string>
+    <string name="speaker">スピーカー</string>
+    <string name="incoming_call">着信</string>
+    <string name="outgoing_call">発信</string>
+    <string name="connected">接続中</string>
+    <string name="answer">応答</string>
+    <string name="decline">拒否</string>
+    <string name="hangup">通話終了</string>
+    <string name="calling">発信中</string>
+    <string name="ringing">呼び出し中</string>
+    <string name="hold">保留</string>
+    <string name="resume">再開</string>
+    <string name="keypad">キーパッド</string>
 </resources>

@@ -296,4 +296,22 @@
     <string name="microphone_gain_help">Multiplique o volume do microfone por esse número decimal. O valor mínimo é 1,0 (padrão de fábrica), que desativa o ganho do microfone. Valores maiores podem afetar negativamente a qualidade do áudio.</string>
     <string name="favorite_help">Se marcada, o contato será exibido entre os favoritos na parte superior da lista.</string>
     <string name="check_origin">Verificar Origem</string>
+    <string name="record">Gravar</string>
+    <string name="recording">Gravando</string>
+    <string name="recording_started">Gravação iniciada</string>
+    <string name="recording_stopped">Gravação interrompida</string>
+    <string name="mute">Silenciar</string>
+    <string name="unmute">Desativar mudo</string>
+    <string name="speaker">Alto-falante</string>
+    <string name="incoming_call">Chamada recebida</string>
+    <string name="outgoing_call">Chamada realizada</string>
+    <string name="connected">Conectado</string>
+    <string name="answer">Atender</string>
+    <string name="decline">Recusar</string>
+    <string name="hangup">Desligar</string>
+    <string name="calling">Chamando</string>
+    <string name="ringing">Tocando</string>
+    <string name="hold">Em espera</string>
+    <string name="resume">Retomar</string>
+    <string name="keypad">Teclado</string>
 </resources>

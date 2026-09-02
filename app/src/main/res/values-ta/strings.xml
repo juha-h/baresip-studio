@@ -372,4 +372,22 @@
     <string name="call_is_connected">அழைப்பு இணைக்கப்பட்டுள்ளது</string>
     <string name="replaces_not_supported">ஒப்பி does not support REPLACES feature</string>
     <string name="airplane_mode">விமானப் பயன்முறை இயக்கத்தில் உள்ளது. மொபைல் கணக்கைப் பயன்படுத்த, அதை அணைக்கவும்.</string>
+    <string name="record">பதிவு செய்</string>
+    <string name="recording">பதிவாகிறது</string>
+    <string name="recording_started">பதிவு தொடங்கியது</string>
+    <string name="recording_stopped">பதிவு நிறுத்தப்பட்டது</string>
+    <string name="mute">ஒலி அடக்கு</string>
+    <string name="unmute">ஒலி இயக்கு</string>
+    <string name="speaker">ஸ்பீக்கர்</string>
+    <string name="incoming_call">உள்வரும் அழைப்பு</string>
+    <string name="outgoing_call">வெளிச்செல்லும் அழைப்பு</string>
+    <string name="connected">இணைக்கப்பட்டது</string>
+    <string name="answer">பதிலளி</string>
+    <string name="decline">நிராகரி</string>
+    <string name="hangup">துண்டி</string>
+    <string name="calling">அழைக்கிறது</string>
+    <string name="ringing">ஒலிக்கிறது</string>
+    <string name="hold">பிடித்துவை</string>
+    <string name="resume">தொடரவும்</string>
+    <string name="keypad">விசைப்பலகை</string>
 </resources>

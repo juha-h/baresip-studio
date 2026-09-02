@@ -257,4 +257,22 @@
     <string name="invalid_audio_delay">Délai audio invalide \'%1$s\'. Les valeurs valides sont comprises entre 100 et 3000.</string>
     <string name="default_call_volume">Volume d’appel par défaut</string>
     <string name="time">Heure</string>
+    <string name="record">Enregistrer</string>
+    <string name="recording">Enregistrement</string>
+    <string name="recording_started">Enregistrement démarré</string>
+    <string name="recording_stopped">Enregistrement arrêté</string>
+    <string name="mute">Couper le micro</string>
+    <string name="unmute">Rétablir le micro</string>
+    <string name="speaker">Haut-parleur</string>
+    <string name="incoming_call">Appel entrant</string>
+    <string name="outgoing_call">Appel sortant</string>
+    <string name="connected">Connecté</string>
+    <string name="answer">Répondre</string>
+    <string name="decline">Refuser</string>
+    <string name="hangup">Raccrocher</string>
+    <string name="calling">Appel en cours</string>
+    <string name="ringing">Sonnerie</string>
+    <string name="hold">En attente</string>
+    <string name="resume">Reprendre</string>
+    <string name="keypad">Clavier</string>
 </resources>

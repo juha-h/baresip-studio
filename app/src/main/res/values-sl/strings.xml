@@ -7,4 +7,22 @@
     <string name="account">Račun</string>
     <string name="about_title_plus">O baresip+</string>
     <string name="about_title">O baresip-u</string>
+    <string name="record">Snemaj</string>
+    <string name="recording">Snemanje</string>
+    <string name="recording_started">Snemanje začeto</string>
+    <string name="recording_stopped">Snemanje ustavljeno</string>
+    <string name="mute">Utišaj</string>
+    <string name="unmute">Vklopi zvok</string>
+    <string name="speaker">Zvočnik</string>
+    <string name="incoming_call">Dohodni klic</string>
+    <string name="outgoing_call">Odhodni klic</string>
+    <string name="connected">Povezano</string>
+    <string name="answer">Odgovori</string>
+    <string name="decline">Zavrni</string>
+    <string name="hangup">Prekini</string>
+    <string name="calling">Klicanje</string>
+    <string name="ringing">Zvoni</string>
+    <string name="hold">Zadrži</string>
+    <string name="resume">Nadaljuj</string>
+    <string name="keypad">Tipkovnica</string>
 </resources>

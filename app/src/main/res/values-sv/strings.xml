@@ -320,4 +320,22 @@
     <string name="tone_country">Signalland</string>
     <string name="dynamic_colors">Dynamiska färger</string>
     <string name="dynamic_colors_help">Använd dynamiska färger om det är aktiverat i Android-inställningarna</string>
+    <string name="record">Spela in</string>
+    <string name="recording">Spelar in</string>
+    <string name="recording_started">Inspelning startad</string>
+    <string name="recording_stopped">Inspelning stoppad</string>
+    <string name="mute">Ljud av</string>
+    <string name="unmute">Ljud på</string>
+    <string name="speaker">Högtalare</string>
+    <string name="incoming_call">Inkommande samtal</string>
+    <string name="outgoing_call">Utgående samtal</string>
+    <string name="connected">Ansluten</string>
+    <string name="answer">Svara</string>
+    <string name="decline">Avvisa</string>
+    <string name="hangup">Lägg på</string>
+    <string name="calling">Ringer</string>
+    <string name="ringing">Signaler</string>
+    <string name="hold">Parkera</string>
+    <string name="resume">Återuppta</string>
+    <string name="keypad">Knappsats</string>
 </resources>

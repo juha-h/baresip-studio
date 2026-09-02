@@ -378,4 +378,22 @@
     <string name="copy_uri">Salin URI</string>
     <string name="copied_to_clipboard">Disalin ke clipboard</string>
     <string name="airplane_mode">Mode pesawat AKTIF. Nonaktifkan untuk menggunakan akun seluler.</string>
+    <string name="record">Rekam</string>
+    <string name="recording">Merekam</string>
+    <string name="recording_started">Perekaman dimulai</string>
+    <string name="recording_stopped">Perekaman dihentikan</string>
+    <string name="mute">Bisukan</string>
+    <string name="unmute">Bunyikan</string>
+    <string name="speaker">Pengeras Suara</string>
+    <string name="incoming_call">Panggilan masuk</string>
+    <string name="outgoing_call">Panggilan keluar</string>
+    <string name="connected">Terhubung</string>
+    <string name="answer">Jawab</string>
+    <string name="decline">Tolak</string>
+    <string name="hangup">Tutup</string>
+    <string name="calling">Memanggil</string>
+    <string name="ringing">Berdering</string>
+    <string name="hold">Tahan</string>
+    <string name="resume">Lanjutkan</string>
+    <string name="keypad">Papan tombol</string>
 </resources>

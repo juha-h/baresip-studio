@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="record">บันทึก</string>
+    <string name="recording">กำลังบันทึก</string>
+    <string name="recording_started">เริ่มการบันทึกแล้ว</string>
+    <string name="recording_stopped">หยุดการบันทึกแล้ว</string>
+    <string name="mute">ปิดเสียง</string>
+    <string name="unmute">เปิดเสียง</string>
+    <string name="speaker">ลำโพง</string>
+    <string name="incoming_call">สายเรียกเข้า</string>
+    <string name="outgoing_call">โทรออก</string>
+    <string name="connected">เชื่อมต่อแล้ว</string>
+    <string name="answer">รับสาย</string>
+    <string name="decline">ปฏิเสธ</string>
+    <string name="hangup">วางสาย</string>
+    <string name="calling">กำลังโทร</string>
+    <string name="ringing">กำลังส่งสัญญาณ</string>
+    <string name="hold">พักสาย</string>
+    <string name="resume">สนทนาต่อ</string>
+    <string name="keypad">แป้นพิมพ์</string>
 </resources>

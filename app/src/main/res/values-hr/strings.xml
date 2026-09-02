@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>    <string name="record">Snimaj</string>
+    <string name="recording">Snimanje</string>
+    <string name="recording_started">Snimanje započeto</string>
+    <string name="recording_stopped">Snimanje zaustavljeno</string>
+    <string name="mute">Isključi mikrofon</string>
+    <string name="unmute">Uključi mikrofon</string>
+    <string name="speaker">Zvučnik</string>
+    <string name="incoming_call">Dolazni poziv</string>
+    <string name="outgoing_call">Odlazni poziv</string>
+    <string name="connected">Povezano</string>
+    <string name="answer">Odgovori</string>
+    <string name="decline">Odbij</string>
+    <string name="hangup">Prekini</string>
+    <string name="calling">Pozivanje</string>
+    <string name="ringing">Zvoni</string>
+    <string name="hold">Na čekanju</string>
+    <string name="resume">Nastavi</string>
+    <string name="keypad">Tipkovnica</string>
+</resources>

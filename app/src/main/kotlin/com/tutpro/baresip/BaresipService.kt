@@ -628,9 +628,13 @@ class BaresipService: Service() {
                 val call = Call.ofCallp(callp)
                 stopRinging()
                 stopMediaPlayer()
+                requestAudioFocus(this)
+                ensureCommunicationMode()
                 setCallVolume()
                 proximitySensing(proximitySensing)
+                ConnectionService.connections[callp]?.setActive()
                 call?.answer()
+                if (call != null) Api.call_start_audio(call.callp)
                 updateStatusNotification()
             }
 
@@ -780,7 +784,7 @@ class BaresipService: Service() {
                 val uri = intent.getStringExtra("uri")!!
                 val conferenceCall = intent.getBooleanExtra("conferenceCall", false)
                 val onHoldCallp = intent.getLongExtra("onHoldCallp", 0L)
-                if (!requestAudioFocus(this)) {
+                if (onHoldCallp == 0L && !requestAudioFocus(this)) {
                     toast(getString(R.string.audio_focus_denied))
                     return START_STICKY
                 }
@@ -900,11 +904,13 @@ class BaresipService: Service() {
 
         if (ev[0] == "sndfile dump") {
             Log.d(TAG, "Got sndfile dump ${ev[1]}")
-            if (Call.inCall()) {
+            val targetCall = Call.calls().find { it.status.value == "connected" || it.status.value == "answered" }
+                ?: Call.calls().firstOrNull()
+            if (targetCall != null) {
                 if (ev[1].endsWith("enc.wav"))
-                    Call.calls()[0].dumpfiles[0] = ev[1]
+                    targetCall.dumpfiles[0] = ev[1]
                 else
-                    Call.calls()[0].dumpfiles[1] = ev[1]
+                    targetCall.dumpfiles[1] = ev[1]
             }
             return
         }
@@ -1027,11 +1033,21 @@ class BaresipService: Service() {
                     }
 
                     "call ringing" -> {
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null && (call.status.value == "outgoing" || call.status.value == "calling")) {
+                                call.status.value = "ringing"
+                            }
+                        }
                         playRingBack()
                         return
                     }
 
                     "call progress" -> {
+                        Handler(Looper.getMainLooper()).post {
+                            if (call != null && (call.status.value == "outgoing" || call.status.value == "calling")) {
+                                call.status.value = "ringing"
+                            }
+                        }
                         if ((ev[1].toInt() and Api.SDP_RECVONLY) != 0)
                             stopMediaPlayer()
                         else
@@ -1127,8 +1143,10 @@ class BaresipService: Service() {
 
                     "call answered" -> {
                         stopMediaPlayer()
+                        requestAudioFocus(this)
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
+                        if (call != null) Api.call_start_audio(call.callp)
                         Handler(Looper.getMainLooper()).post {
                             if (call != null) {
                                 if (call.status.value == "incoming")
@@ -1136,6 +1154,15 @@ class BaresipService: Service() {
                                 else
                                     return@post
                             }
+                            if (call != null) {
+                                call.onhold = false
+                                call.callOnHold.value = false
+                                call.showOnHoldNotice.value = false
+                                call.startTime = GregorianCalendar()
+                            }
+                            updateStatusNotification()
+                            proximitySensing(proximitySensing)
+                            if (isMicMuted) setMicMute(true)
                         }
                     }
 
@@ -1143,15 +1170,19 @@ class BaresipService: Service() {
                         stopMediaPlayer()
 
                     "call established" -> {
+                        stopMediaPlayer()
+                        requestAudioFocus(this)
                         ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
-                        stopMediaPlayer()
                         nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
+                        if (call != null) Api.call_start_audio(call.callp)
                         Handler(Looper.getMainLooper()).post {
                             if (call != null) {
                                 call.status.value = "connected"
                                 call.onhold = false
+                                call.callOnHold.value = false
+                                call.showOnHoldNotice.value = false
                                 call.startTime = GregorianCalendar()
                                 if (call.conferenceCall) Api.cmd_exec("conference")
                             }
@@ -1159,7 +1190,6 @@ class BaresipService: Service() {
                             proximitySensing(proximitySensing)
                             if (isMicMuted) setMicMute(true)
                         }
-                        if (!isMainVisible) return
                     }
 
                     "call update" -> {
@@ -1213,7 +1243,7 @@ class BaresipService: Service() {
                                 }
                             }
                         }
-                        if (!isMainVisible || call?.status?.value != "connected") return
+                        if (call?.status?.value != "connected") return
                     }
 
                     "call verified", "call secure" -> {
@@ -1227,7 +1257,6 @@ class BaresipService: Service() {
                                 }
                             }
                         }
-                        if (!isMainVisible) return
                     }
 
                     "call transfer" -> {
@@ -1292,7 +1321,6 @@ class BaresipService: Service() {
                         stopMediaPlayer()
                         call!!.referTo = ""
                         if (Utils.isVisible()) toast("${getString(R.string.transfer_failed)}: ${ev[1].trim()}")
-                        if (!isMainVisible) return
                     }
 
                     "call closed" -> {
@@ -1390,6 +1418,7 @@ class BaresipService: Service() {
                                             Log.d(TAG, "Automatic merge succeeded.")
                                             history.recording = arrayOf(mergedFile.absolutePath, "")
                                             CallHistoryNew.save()
+                                            showRecordingSavedNotification(mergedFile.absolutePath, mergedFile.name)
                                             try {
                                                 rxFile.delete()
                                                 txFile.delete()
@@ -1406,7 +1435,12 @@ class BaresipService: Service() {
                                                 "Automatic merge failed. Storing raw file paths as fallback."
                                             )
                                             history.recording = call.dumpfiles
+                                            showRecordingSavedNotification(rxFile.absolutePath, rxFile.name)
                                         }
+                                    }
+                                    if (isRecOn && Call.calls().isEmpty()) {
+                                        Api.module_unload("sndfile")
+                                        isRecOn = false
                                     }
                                 }
                                 ua.account.missedCalls = ua.account.missedCalls || missed
@@ -1788,6 +1822,8 @@ class BaresipService: Service() {
         }
 
         registerTelephony()
+        Api.log_level_set(logLevel)
+        Api.uag_enable_sip_trace(sipTrace)
         Api.net_debug()
         postServiceEvent(ServiceEvent("started", arrayListOf(callActionUri), System.nanoTime()))
         callActionUri = ""
@@ -1922,7 +1958,7 @@ class BaresipService: Service() {
             val activeCall = synchronized(calls) {
                 calls.find {
                     it.status.value == "connected" || it.status.value == "outgoing"
-                            || it.status.value == "answered"
+                            || it.status.value == "ringing" || it.status.value == "answered"
                 }
             }
 
@@ -3130,6 +3166,34 @@ class BaresipService: Service() {
 
         nb.setNumber(missedCalls + 1)
         nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
+    }
+
+    fun showRecordingSavedNotification(filePath: String, fileName: String? = null) {
+        if (filePath.isEmpty() && fileName.isNullOrEmpty()) return
+        val name = fileName ?: File(filePath).name
+        val title = getString(R.string.recording_saved)
+        val text = "$name (${getString(R.string.call_history)})"
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("action", "calls")
+        }
+        val piFlags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        val pi = PendingIntent.getActivity(
+            this,
+            RECORDING_NOTIFICATION_ID,
+            intent,
+            piFlags
+        )
+        val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+        nb.setSmallIcon(R.drawable.ic_notification_save)
+            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText("$title: $name\nSaved in Call History & Recordings"))
+            .setContentIntent(pi)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+        nm.notify(RECORDING_NOTIFICATION_ID, nb.build())
     }
 
     private external fun baresipStart(
