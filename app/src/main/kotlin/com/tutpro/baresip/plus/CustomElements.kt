@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.BasicAlertDialog
@@ -54,6 +55,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -86,7 +88,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import kotlin.jvm.JvmName
 
-data class MenuItem(val text: String, val icon: ImageVector? = null)
+data class MenuItem(
+    val text: String,
+    val icon: ImageVector? = null,
+    val subItems: List<MenuItem>? = null,
+    val onSubItemClick: ((String) -> Unit)? = null
+)
 
 object CustomElements {
 
@@ -148,15 +155,15 @@ object CustomElements {
         menuItems: List<MenuItem>,
         onItemClick: (String) -> Unit
     ) {
-        val hasAnyIcon = menuItems.any { it.icon != null }
+        val hasAnyIcon = menuItems.any { it.icon != null || it.subItems != null }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismissRequest,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            shape = RoundedCornerShape(16.dp)
         ) {
-            val itemsIterator = menuItems.iterator()
-            while (itemsIterator.hasNext()) {
-                val menuItem = itemsIterator.next()
+            menuItems.forEachIndexed { index, menuItem ->
+                var subMenuExpanded by remember { mutableStateOf(false) }
                 DropdownMenuItem(
                     text = {
                         Text(
@@ -165,7 +172,51 @@ object CustomElements {
                             fontSize = 16.sp
                         )
                     },
-                    leadingIcon = if (hasAnyIcon) {
+                    trailingIcon = if (menuItem.subItems != null) {
+                        {
+                            Box {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                DropdownMenu(
+                                    expanded = subMenuExpanded,
+                                    onDismissRequest = { subMenuExpanded = false },
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    menuItem.subItems.forEachIndexed { subIndex, subMenuItem ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = subMenuItem.text,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    fontSize = 16.sp
+                                                )
+                                            },
+                                            trailingIcon = if (subMenuItem.icon != null) {
+                                                {
+                                                    Icon(
+                                                        imageVector = subMenuItem.icon,
+                                                        contentDescription = null,
+                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+                                            } else null,
+                                            onClick = {
+                                                subMenuExpanded = false
+                                                menuItem.onSubItemClick?.invoke(subMenuItem.text)
+                                                onDismissRequest()
+                                            }
+                                        )
+                                        if (subIndex < menuItem.subItems.size - 1)
+                                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                                    }
+                                }
+                            }
+                        }
+                    } else if (hasAnyIcon) {
                         {
                             if (menuItem.icon != null)
                                 Icon(
@@ -176,12 +227,16 @@ object CustomElements {
                             else
                                 Spacer(Modifier.size(24.dp))
                         }
-                    }
-                    else
+                    } else
                         null,
-                    onClick = { onItemClick(menuItem.text) }
+                    onClick = {
+                        if (menuItem.subItems != null)
+                            subMenuExpanded = true
+                        else
+                            onItemClick(menuItem.text)
+                    }
                 )
-                if (itemsIterator.hasNext())
+                if (index < menuItems.size - 1)
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }

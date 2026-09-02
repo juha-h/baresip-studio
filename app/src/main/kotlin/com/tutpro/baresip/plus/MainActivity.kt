@@ -144,7 +144,7 @@ class MainActivity : ComponentActivity() {
             if (BaresipService.isServiceRunning) {
                 restart = true
                 baresipService.action = "Stop"
-                ContextCompat.startForegroundService(this, baresipService)
+                startService(baresipService)
             }
             else {
                 finishAndRemoveTask()
@@ -165,7 +165,7 @@ class MainActivity : ComponentActivity() {
             if (BaresipService.isServiceRunning) {
                 restart = false
                 baresipService.action = "Stop"
-                ContextCompat.startForegroundService(this, baresipService)
+                startService(baresipService)
             }
             else {
                 finishAndRemoveTask()
@@ -432,7 +432,7 @@ class MainActivity : ComponentActivity() {
         if (BaresipService.isServiceRunning) {
             restart = reStart
             baresipService.action = "Stop"
-            ContextCompat.startForegroundService(this, baresipService)
+            startService(baresipService)
         }
         else {
             finishAndRemoveTask()
