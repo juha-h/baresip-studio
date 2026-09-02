@@ -1,0 +1,7 @@
+- Menu improvements
+- Improved showing of emojis in received SMS messages
+- Main screen bottom bar now has Material 3 Docked Toolbar look
+- Prevent ForegroundServiceDidNotStartInTimeException crash
+- Do not red-circle chat when message is sent
+- Shortened "show_call" string
+- New translations (Finnish)
