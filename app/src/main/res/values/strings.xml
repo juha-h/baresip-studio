@@ -505,6 +505,9 @@
     <string name="contact_no_tel_uri">Contact \'%1$s\' has no TEL URI</string>
     <string name="android_contact_help">If checked, this contact is added to Android contacts.</string>
     <string name="avatar_image">Profile image</string>
+    <string name="contact_mode">Contact Mode</string>
+    <string name="call_action" translatable="false">Call Action</string>
+    <string name="show" translatable="false">Show</string>
     <!-- Contacts Activity -->
     <string name="contacts">Contacts</string>
     <string name="contact_action_question">Do you want to call or send message to \'%1$s\'?</string>

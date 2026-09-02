@@ -21,7 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -170,7 +170,7 @@ private fun TopAppBar(
         },
         actions = {
             IconButton(onClick = { expanded = !expanded }) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
             }
             CustomElements.DropdownMenu(
                 expanded,

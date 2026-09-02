@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -375,7 +376,9 @@ private fun SettingsContent(
                 }
                 DropdownMenu(
                     expanded = isDropDownExpanded.value,
-                    onDismissRequest = { isDropDownExpanded.value = false }
+                    onDismissRequest = { isDropDownExpanded.value = false },
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     familyNames.forEachIndexed { index, family ->
                         DropdownMenuItem(
@@ -1401,7 +1404,10 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         UserAgent.updateColorblindStatus()
         val baresipService = Intent(ctx, BaresipService::class.java)
         baresipService.action = "Update Notification"
-        ContextCompat.startForegroundService(ctx, baresipService)
+        if (BaresipService.isServiceRunning)
+            ctx.startService(baresipService)
+        else
+            ContextCompat.startForegroundService(ctx, baresipService)
         viewModel.save = true
     }
 

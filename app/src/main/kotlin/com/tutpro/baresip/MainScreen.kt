@@ -73,7 +73,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Person
@@ -663,7 +663,7 @@ private fun TopAppBar(
                 onClick = { menuExpanded = !menuExpanded }
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    imageVector = Icons.Default.MoreVert,
                     contentDescription = "Menu",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
@@ -1137,7 +1137,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
             androidx.compose.material3.DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = RoundedCornerShape(16.dp),
             ) {
                 uas.value.forEachIndexed { index, ua ->
                     val acc = ua.account
@@ -2146,7 +2147,10 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
         baresipService.action = "Start Call"
         baresipService.putExtra("uap", ua.uap)
         baresipService.putExtra("uri", uri)
-        ContextCompat.startForegroundService(ctx, baresipService)
+        if (BaresipService.isServiceRunning)
+            ctx.startService(baresipService)
+        else
+            ContextCompat.startForegroundService(ctx, baresipService)
     }
     else {
         viewModel.dialerState.callButtonsEnabled.value = false

@@ -39,7 +39,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -117,7 +118,6 @@ private fun ContactsScreen(navController: NavController) {
     val ok = stringResource(R.string.ok)
 
     var expanded by remember { mutableStateOf(false) }
-    val showModeDialog = remember { mutableStateOf(false) }
     val both = stringResource(R.string.both)
     val import = stringResource(R.string.import_contacts)
     val export = stringResource(R.string.export_contacts)
@@ -294,15 +294,33 @@ private fun ContactsScreen(navController: NavController) {
     }
 
     val call = stringResource(R.string.call)
-    val showCall = stringResource(R.string.show_call)
+    val show = stringResource(R.string.show)
+    val callAction = stringResource(R.string.call_action)
 
-    val contactActionName = remember(BaresipService.contactAction) {
-        listOf(if (BaresipService.contactAction == "call") call else showCall)
+    val callActionItems = remember(BaresipService.contactAction) {
+        listOf(
+            MenuItem(
+                text = call,
+                icon = if (BaresipService.contactAction == "call") Icons.Filled.Check else null
+            ),
+            MenuItem(
+                text = show,
+                icon = if (BaresipService.contactAction == "dial") Icons.Filled.Check else null
+            )
+        )
     }
 
-    val contactModeNames = remember(both) { listOf("baresip", "Android", both) }
+    val contactModeItems = remember(both, BaresipService.contactsMode) {
+        val names = listOf("baresip", "Android", both)
+        val values = listOf("baresip", "android", "both")
+        names.mapIndexed { index, name ->
+            MenuItem(
+                text = name,
+                icon = if (BaresipService.contactsMode == values[index]) Icons.Filled.Check else null
+            )
+        }
+    }
     val contactModeValues = listOf("baresip", "android", "both")
-    val currentContactModeName = contactModeNames[contactModeValues.indexOf(BaresipService.contactsMode)]
 
     val showDialog = remember { mutableStateOf(false) }
     val showNoticeDialog = remember { mutableStateOf(false) }
@@ -348,7 +366,10 @@ private fun ContactsScreen(navController: NavController) {
             }
             Contact.contactsUpdate()
             Config.save()
-            ContextCompat.startForegroundService(ctx, baresipService)
+            if (BaresipService.isServiceRunning)
+                ctx.startService(baresipService)
+            else
+                ContextCompat.startForegroundService(ctx, baresipService)
         }
     }
 
@@ -373,6 +394,52 @@ private fun ContactsScreen(navController: NavController) {
             )
         }
     )
+
+    fun handleContactModeSelection(index: Int) {
+        val mode = contactModeValues[index]
+        val contactsPermissions = arrayOf(
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS
+        )
+        if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
+            title.value = consentRequest
+            message.value = contactsConsent
+            firstButtonText.value = deny
+            onFirstClicked.value = { }
+            lastButtonText.value = accept
+            onLastClicked.value = {
+                showDialog.value = false
+                if (ContextCompat.checkSelfPermission(
+                        ctx,
+                        Manifest.permission.READ_CONTACTS
+                    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                        ctx,
+                        Manifest.permission.WRITE_CONTACTS
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    Log.d(TAG, "Contacts permissions already granted")
+                    setContactsMode(mode)
+                }
+                else if (shouldShowRequestPermissionRationale(
+                        activity, Manifest.permission.READ_CONTACTS
+                    ) ||
+                    shouldShowRequestPermissionRationale(
+                        activity, Manifest.permission.WRITE_CONTACTS
+                    )
+                ) {
+                    pendingMode = mode
+                    showNoticeDialog.value = true
+                }
+                else {
+                    pendingMode = mode
+                    requestPermissionsLauncher.launch(contactsPermissions)
+                }
+            }
+            showDialog.value = true
+        }
+        else
+            setContactsMode(mode)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
@@ -400,25 +467,33 @@ private fun ContactsScreen(navController: NavController) {
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     actions = {
                         IconButton(onClick = { expanded = !expanded }) {
-                            Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
                         }
                         CustomElements.DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            items = listOf(currentContactModeName) + contactActionName + import + export + delete,
+                            menuItems = listOf(
+                                MenuItem(
+                                    text = stringResource(R.string.contact_mode),
+                                    subItems = contactModeItems,
+                                    onSubItemClick = { subItemText ->
+                                        val index = contactModeItems.indexOfFirst { it.text == subItemText }
+                                        if (index != -1) handleContactModeSelection(index)
+                                    }
+                                ),
+                                MenuItem(
+                                    text = callAction,
+                                    subItems = callActionItems,
+                                    onSubItemClick = { subItemText ->
+                                        val newAction = if (subItemText == call) "call" else "dial"
+                                        BaresipService.contactAction = newAction
+                                        Config.replaceVariable("contact_action", newAction)
+                                        Config.save()
+                                    }
+                                )
+                            ) + listOf(import, export, delete).map { MenuItem(it) },
                             onItemClick = { name ->
                                 expanded = false
-                                if (name == currentContactModeName) {
-                                    showModeDialog.value = true
-                                    return@DropdownMenu
-                                }
-                                if (name == call || name == showCall) {
-                                    val newAction = if (BaresipService.contactAction == "call") "dial" else "call"
-                                    BaresipService.contactAction = newAction
-                                    Config.replaceVariable("contact_action", newAction)
-                                    Config.save()
-                                    return@DropdownMenu
-                                }
                                 if (name == import) {
                                     vcfImportLauncher.launch(arrayOf("text/vcard", "text/x-vcard"))
                                     return@DropdownMenu
@@ -450,56 +525,6 @@ private fun ContactsScreen(navController: NavController) {
                                     showDialog.value = true
                                     return@DropdownMenu
                                 }
-                            }
-                        )
-                        CustomElements.SelectableAlertDialog(
-                            openDialog = showModeDialog,
-                            title = stringResource(R.string.contacts),
-                            items = contactModeNames,
-                            onItemClicked = { index ->
-                                val mode = contactModeValues[index]
-                                val contactsPermissions = arrayOf(
-                                    Manifest.permission.READ_CONTACTS,
-                                    Manifest.permission.WRITE_CONTACTS
-                                )
-                                if (mode != "baresip" && !Utils.checkPermissions(ctx, contactsPermissions)) {
-                                    title.value = consentRequest
-                                    message.value = contactsConsent
-                                    firstButtonText.value = deny
-                                    onFirstClicked.value = { }
-                                    lastButtonText.value = accept
-                                    onLastClicked.value = {
-                                        showDialog.value = false
-                                        if (ContextCompat.checkSelfPermission(
-                                                ctx,
-                                                Manifest.permission.READ_CONTACTS
-                                            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                                                ctx,
-                                                Manifest.permission.WRITE_CONTACTS
-                                            ) == PackageManager.PERMISSION_GRANTED
-                                        ) {
-                                            Log.d(TAG, "Contacts permissions already granted")
-                                            setContactsMode(mode)
-                                        }
-                                        else if (shouldShowRequestPermissionRationale(
-                                                    activity, Manifest.permission.READ_CONTACTS
-                                                ) ||
-                                                shouldShowRequestPermissionRationale(
-                                                    activity, Manifest.permission.WRITE_CONTACTS
-                                                )
-                                            ) {
-                                                pendingMode = mode
-                                                showNoticeDialog.value = true
-                                            }
-                                        else {
-                                            pendingMode = mode
-                                            requestPermissionsLauncher.launch(contactsPermissions)
-                                        }
-                                    }
-                                    showDialog.value = true
-                                }
-                                else
-                                    setContactsMode(mode)
                             }
                         )
                     }

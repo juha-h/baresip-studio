@@ -503,7 +503,10 @@ class BaresipService: Service() {
                     }
                 }
 
-                if (isStartReceived || isServiceRunning) return START_STICKY
+                if (isStartReceived || isServiceRunning) {
+                    updateStatusNotification()
+                    return START_STICKY
+                }
 
                 showStatusNotification()
                 isStartReceived = true
@@ -610,11 +613,15 @@ class BaresipService: Service() {
             "Notification Dismissed" ->
                 updateStatusNotification()
 
-            "Start Content Observer" ->
+            "Start Content Observer" -> {
                 registerAndroidContactsObserver()
+                updateStatusNotification()
+            }
 
-            "Stop Content Observer" ->
+            "Stop Content Observer" -> {
                 unRegisterAndroidContactsObserver()
+                updateStatusNotification()
+            }
 
             "Call Answer" -> {
                 val callp = intent!!.getLongExtra("callp", 0L)
@@ -641,6 +648,7 @@ class BaresipService: Service() {
                     Log.d(TAG, "Aor $aor rejected incoming call $callp from $peerUri")
                     call.reject()
                 }
+                updateStatusNotification()
             }
 
             "Call Hangup" -> {
@@ -648,6 +656,7 @@ class BaresipService: Service() {
                 Log.d(TAG, "onStartCommand Hangup action for $callp")
                 val call = Call.ofCallp(callp)
                 call?.hangup(0, "")
+                updateStatusNotification()
             }
 
             "Transfer Deny" -> {
@@ -779,6 +788,7 @@ class BaresipService: Service() {
             }
 
             "Stop" -> {
+                updateStatusNotification()
                 cleanService()
                 if (isServiceRunning) {
                     baresipStop(false)
@@ -2014,33 +2024,15 @@ class BaresipService: Service() {
                 notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
 
             try {
-                if (activeCall != null) {
-                    if (!isNotificationInCall) {
-                        // Only call startForeground when the FIRST call starts.
-                        if (VERSION.SDK_INT >= 29)
-                            startForeground(
-                                STATUS_NOTIFICATION_ID,
-                                notification,
-                                foregroundServiceType(activeCall)
-                            )
-                        else
-                            startForeground(STATUS_NOTIFICATION_ID, notification)
-                        isNotificationInCall = true
-                    }
-                    else
-                        nm.notify(STATUS_NOTIFICATION_ID, notification)
-                }
-                else if (isNotificationInCall) {
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    // Only call startForeground to drop the "Call" type when the LAST call ends.
-                    if (VERSION.SDK_INT >= 29)
-                        startForeground(STATUS_NOTIFICATION_ID, notification, foregroundServiceType())
-                    else
-                        startForeground(STATUS_NOTIFICATION_ID, notification)
-                    isNotificationInCall = false
-                } else
-                    // Already in standby, just keep the notification current.
-                    nm.notify(STATUS_NOTIFICATION_ID, notification)
+                if (VERSION.SDK_INT >= 29)
+                    startForeground(
+                        STATUS_NOTIFICATION_ID,
+                        notification,
+                        foregroundServiceType(activeCall)
+                    )
+                else
+                    startForeground(STATUS_NOTIFICATION_ID, notification)
+                isNotificationInCall = activeCall != null
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update notification: ${e.message}")
                 nm.notify(STATUS_NOTIFICATION_ID, notification)

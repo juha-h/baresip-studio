@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -268,7 +269,9 @@ private fun ToneCountry(viewModel: AudioViewModel) {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = { isDropDownExpanded.value = false }
+                onDismissRequest = { isDropDownExpanded.value = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 countryNames.forEachIndexed { index, name ->
                     DropdownMenuItem(
@@ -355,7 +358,9 @@ private fun CallVolume(viewModel: AudioViewModel) {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = { isDropDownExpanded.value = false }
+                onDismissRequest = { isDropDownExpanded.value = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 volNames.forEachIndexed { index, vol ->
                     DropdownMenuItem(
@@ -561,7 +566,9 @@ private fun IlbcMode(viewModel: AudioViewModel) {
             }
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
-                onDismissRequest = { isDropDownExpanded.value = false }
+                onDismissRequest = { isDropDownExpanded.value = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 modeNames.forEachIndexed { index, mode ->
                     DropdownMenuItem(
