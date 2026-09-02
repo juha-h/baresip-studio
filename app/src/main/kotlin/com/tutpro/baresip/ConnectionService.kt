@@ -174,6 +174,7 @@ class ConnectionService : ConnectionService() {
 
         var isDisconnecting = false
         private var isDestroyed = false
+        private var lastAudioRoute: Int = -1
 
         fun safeDestroy() {
             if (!isDestroyed) {
@@ -256,27 +257,21 @@ class ConnectionService : ConnectionService() {
                         )
                     )
                 }
-                val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
-                val call = Call.ofCallp(callp)
-                val status = call?.status?.value ?: "idle"
-                val hasPendingOrActiveConnection = connections.isNotEmpty() || pendingOutgoingConnection != null
-                if (isSpeaker != BaresipService.speakerPhone && (status != "connected" || hasPendingOrActiveConnection)) {
-                    if (status != "connected") {
-                        Log.d(
-                            TAG,
-                            "Suppressing speaker update,$isSpeaker during call setup " +
-                                "(status=$status, intent=${BaresipService.speakerPhone})"
+                if (lastAudioRoute == -1) {
+                    lastAudioRoute = it.route
+                } else if (lastAudioRoute != it.route) {
+                    lastAudioRoute = it.route
+                    val isSpeaker = it.route == CallAudioState.ROUTE_SPEAKER
+                    val call = Call.ofCallp(callp)
+                    val status = call?.status?.value ?: "idle"
+                    if (status == "connected" && BaresipService.speakerPhone != isSpeaker) {
+                        Log.d(TAG, "Syncing speakerPhone variable to hardware state: $isSpeaker")
+                        BaresipService.speakerPhone = isSpeaker
+                        BaresipService.postServiceEvent(
+                            ServiceEvent("speaker update,$isSpeaker", arrayListOf(uap, callp), System.nanoTime())
                         )
-                        return@let
                     }
                 }
-                if (status == "connected" && BaresipService.speakerPhone != isSpeaker) {
-                    Log.d(TAG, "Syncing speakerPhone variable to hardware state: $isSpeaker")
-                    BaresipService.speakerPhone = isSpeaker
-                }
-                BaresipService.postServiceEvent(
-                    ServiceEvent("speaker update,$isSpeaker", arrayListOf(uap, callp), System.nanoTime())
-                )
             }
         }
 
@@ -289,7 +284,7 @@ class ConnectionService : ConnectionService() {
                     // 2. Sync Call object state
                     call.onhold = true
                     call.callOnHold.value = true
-                    call.showOnHoldNotice.value = true
+                    call.showOnHoldNotice.value = false
                     // 3. Tell Telecom the move is complete
                     setOnHold()
                 }

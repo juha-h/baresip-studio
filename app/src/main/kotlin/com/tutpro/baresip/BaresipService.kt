@@ -1143,6 +1143,7 @@ class BaresipService: Service() {
                         stopMediaPlayer()
 
                     "call established" -> {
+                        ConnectionService.connections[callp]?.setActive()
                         ensureCommunicationMode()
                         stopMediaPlayer()
                         nm.cancel(CALL_NOTIFICATION_ID)
@@ -3287,19 +3288,24 @@ class BaresipService: Service() {
                 .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                 .build()
-            audioFocusRequest =
-                AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+            for (gainType in listOf(
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE,
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT,
+                AudioManager.AUDIOFOCUS_GAIN
+            )) {
+                val request = AudioFocusRequest.Builder(gainType)
                     .setAudioAttributes(attributes)
                     .setOnAudioFocusChangeListener { }
                     .build()
-            if (am.requestAudioFocus(audioFocusRequest!!) ==
-                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
-                Log.d(TAG, "requestAudioFocus granted")
-            else {
-                Log.w(TAG, "requestAudioFocus denied")
-                audioFocusRequest = null
+                if (am.requestAudioFocus(request) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    Log.d(TAG, "requestAudioFocus granted with gainType $gainType")
+                    audioFocusRequest = request
+                    return true
+                }
             }
-            return audioFocusRequest != null
+            Log.w(TAG, "requestAudioFocus denied for all gain types")
+            audioFocusRequest = null
+            return false
         }
 
         fun abandonAudioFocus(ctx: Context) {

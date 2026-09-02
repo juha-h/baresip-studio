@@ -158,7 +158,9 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     }
 
     open fun answer() {
+        ConnectionService.connections[callp]?.setActive()
         Api.ua_answer(ua.uap, callp, Api.VIDMODE_OFF)
+        Api.call_start_audio(callp)
     }
 
     open fun reject() {
