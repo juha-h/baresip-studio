@@ -91,6 +91,7 @@ import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -103,7 +104,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -112,6 +115,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -140,6 +147,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -149,6 +160,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -700,6 +712,33 @@ private fun TopAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DockedToolbarItem(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String,
+    tint: Color,
+    enabled: Boolean = true,
+    iconSize: Dp = 36.dp
+) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        tooltip = { PlainTooltip { Text(contentDescription) } },
+        state = rememberTooltipState(),
+    ) {
+        IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(48.dp)) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(iconSize),
+                tint = tint
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
@@ -724,120 +763,106 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
 
-    val buttonSize = 48.dp
+    val voicemailLabel = stringResource(R.string.voicemail_uri)
+    val contactsLabel = stringResource(R.string.contacts)
+    val chatsLabel = stringResource(R.string.chats)
+    val historyLabel = stringResource(R.string.call_history)
+    val dialpadLabel = stringResource(R.string.numeric_keypad)
 
-    Row(
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+    val iconSize = 36.dp
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(start = if (showVmIcon) 16.dp else 32.dp, end = if (showVmIcon) 16.dp else 32.dp, bottom = 12.dp)
+            .shadow(12.dp, RoundedCornerShape(32.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(32.dp))
+            .height(64.dp),
+        contentAlignment = Alignment.Center
     ) {
-
-        if (showVmIcon)
-            IconButton(
-                // Disable the button if no account is selected
-                enabled = aor.isNotEmpty(),
-                onClick = {
-                    val ua = UserAgent.ofAor(aor)!!
-                    val acc = ua.account
-                    if (acc.vmUri.isNotEmpty()) {
-                        if (isMobile) {
-                            val intent = Intent(ctx, MainActivity::class.java)
-                            intent.putExtra("uap", ua.uap)
-                            intent.putExtra("peer", acc.vmUri)
-                            handleIntent(ctx, viewModel, intent, "call")
-                        }
-                        else {
-                            dialogTitle.value = ctx.getString(R.string.voicemail_messages)
-                            dialogMessage.value = acc.vmMessages(ctx)
-                            firstText.value = ctx.getString(R.string.cancel)
-                            onFirstClicked.value = {}
-                            secondText.value = ""
-                            lastText.value = ctx.getString(R.string.listen)
-                            onLastClicked.value = {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (showVmIcon)
+                DockedToolbarItem(
+                    enabled = aor.isNotEmpty(),
+                    onClick = {
+                        val ua = UserAgent.ofAor(aor)!!
+                        val acc = ua.account
+                        if (acc.vmUri.isNotEmpty()) {
+                            if (isMobile) {
                                 val intent = Intent(ctx, MainActivity::class.java)
                                 intent.putExtra("uap", ua.uap)
                                 intent.putExtra("peer", acc.vmUri)
                                 handleIntent(ctx, viewModel, intent, "call")
                             }
-                            showDialog.value = true
+                            else {
+                                dialogTitle.value = ctx.getString(R.string.voicemail_messages)
+                                dialogMessage.value = acc.vmMessages(ctx)
+                                firstText.value = ctx.getString(R.string.cancel)
+                                onFirstClicked.value = {}
+                                secondText.value = ""
+                                lastText.value = ctx.getString(R.string.listen)
+                                onLastClicked.value = {
+                                    val intent = Intent(ctx, MainActivity::class.java)
+                                    intent.putExtra("uap", ua.uap)
+                                    intent.putExtra("peer", acc.vmUri)
+                                    handleIntent(ctx, viewModel, intent, "call")
+                                }
+                                showDialog.value = true
+                            }
                         }
-                    }
-                },
-                modifier = Modifier.weight(1f).size(buttonSize)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Voicemail,
-                    contentDescription = null,
-                    Modifier.size(buttonSize),
-                    tint = if (hasNewVoicemail)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.secondary
+                    },
+                    icon = Icons.Filled.Voicemail,
+                    contentDescription = voicemailLabel,
+                    iconSize = iconSize,
+                    tint = if (hasNewVoicemail) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
                 )
-            }
 
-        IconButton(
-            onClick = { navController.navigate("contacts") },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                Modifier.size(buttonSize),
+            DockedToolbarItem(
+                onClick = { navController.navigate("contacts") },
+                icon = Icons.Filled.Person,
+                contentDescription = contactsLabel,
+                iconSize = iconSize,
                 tint = MaterialTheme.colorScheme.secondary
             )
-        }
 
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = {
-                if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
-                    alertTitle.value = ctx.getString(R.string.notice)
-                    alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                    showAlert.value = true
-                    return@IconButton
-                }
-                navController.navigate("chats/$aor")
-            },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = null,
-                Modifier.size(buttonSize),
-                tint = if (hasUnreadMessages)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
+            DockedToolbarItem(
+                enabled = aor.isNotEmpty(),
+                onClick = {
+                    if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
+                        alertTitle.value = ctx.getString(R.string.notice)
+                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
+                        showAlert.value = true
+                    }
+                    else
+                        navController.navigate("chats/$aor")
+                },
+                icon = Icons.AutoMirrored.Filled.Chat,
+                contentDescription = chatsLabel,
+                iconSize = iconSize,
+                tint = if (hasUnreadMessages) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
-        }
 
-        IconButton(
-            enabled = aor.isNotEmpty(),
-            onClick = { navController.navigate("calls/$aor") },
-            modifier = Modifier.weight(1f).size(buttonSize)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.History,
-                contentDescription = null,
-                Modifier.size(buttonSize),
+            DockedToolbarItem(
+                enabled = aor.isNotEmpty(),
+                onClick = { navController.navigate("calls/$aor") },
+                icon = Icons.Filled.History,
+                contentDescription = historyLabel,
+                iconSize = iconSize,
                 tint = if (hasMissedCalls) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
-        }
 
-        IconButton(
-            onClick = { viewModel.toggleDialpadVisibility() },
-            modifier = Modifier.weight(1f).size(buttonSize),
-            enabled = dialpadButtonEnabled.value
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Dialpad,
-                contentDescription = null,
-                modifier = Modifier.size(buttonSize),
-                tint = if (isDialpadVisible)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.secondary
+            DockedToolbarItem(
+                onClick = { viewModel.toggleDialpadVisibility() },
+                enabled = dialpadButtonEnabled.value,
+                icon = Icons.Filled.Dialpad,
+                contentDescription = dialpadLabel,
+                iconSize = iconSize,
+                tint = if (isDialpadVisible) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
             )
         }
     }
