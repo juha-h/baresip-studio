@@ -555,7 +555,7 @@ private fun NewMessage(
                         MESSAGE_UP_WAIT,
                         0,
                         "",
-                        true
+                        false
                     )
                     msg.add()
                     var msgUri = ""
