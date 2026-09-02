@@ -87,6 +87,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.net.InetAddress
+import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.GregorianCalendar
@@ -1495,6 +1496,12 @@ class BaresipService: Service() {
 
         val aor = ua.account.aor
 
+        val decodedText = try {
+            URLDecoder.decode(text.replace("+", "%2B"), "UTF-8")
+        } catch (e: Exception) {
+            text
+        }
+
         if ((ua.account.blockUnknown &&
                 Contact.contactName(e164Uri(peerUri, ua.account.countryCode)) ==
                         e164Uri(peerUri, ua.account.countryCode)) ||
@@ -1522,7 +1529,7 @@ class BaresipService: Service() {
         // Check for duplicates
         val lastMsg = messages.lastOrNull { m -> m.aor == aor }
         if (lastMsg != null && lastMsg.timeStamp == timeStamp && lastMsg.peerUri == peerUri &&
-                lastMsg.message == text) {
+                lastMsg.message == decodedText) {
             Log.d(TAG, "Omit duplicate message from $peerUri")
             return
         }
@@ -1531,7 +1538,7 @@ class BaresipService: Service() {
         Message(
             aor = aor,
             peerUri = peerUri,
-            message = text,
+            message = decodedText,
             timeStamp = timeStamp,
             direction = MESSAGE_DOWN,
             responseCode = 0,
@@ -1562,7 +1569,7 @@ class BaresipService: Service() {
             val messagingStyle = MessagingStyle(localUserPerson)
                 .setConversationTitle(null)
                 .setGroupConversation(false)
-                .addMessage(text, timeStamp, sender)
+                .addMessage(decodedText, timeStamp, sender)
 
             val clearIntent = Intent(this, BaresipService::class.java)
             clearIntent.action = "Clear Unread"
