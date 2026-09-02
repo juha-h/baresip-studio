@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import androidx.core.graphics.scale
 import android.provider.ContactsContract
 import android.util.Base64
 import android.util.Log
@@ -22,15 +21,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -80,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.scale
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -130,7 +130,7 @@ private fun ContactsScreen(navController: NavController) {
     val vcfExportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/vcard")
     ) { uri: android.net.Uri? ->
-        if (uri != null) {
+        if (uri != null)
             try {
                 ctx.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     val writer = outputStream.bufferedWriter()
@@ -157,7 +157,8 @@ private fun ContactsScreen(navController: NavController) {
                                     writer.write("TEL;X-${u.label}:${u.uri.substring(4)}\n")
                                 else
                                     writer.write("TEL:${u.uri.substring(4)}\n")
-                            } else if (u.uri.startsWith("sip:")) {
+                            }
+                            else if (u.uri.startsWith("sip:")) {
                                 if (u.label.isNotEmpty())
                                     writer.write("X-SIP;X-${u.label}:${u.uri.substring(4)}\n")
                                 else
@@ -173,25 +174,23 @@ private fun ContactsScreen(navController: NavController) {
                 Log.e(TAG, "Failed to export VCF: ${e.message}")
                 Toast.makeText(ctx, R.string.contact_export_failure, Toast.LENGTH_SHORT).show()
             }
-        }
     }
 
     val vcfImportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: android.net.Uri? ->
-        if (uri != null) {
+        if (uri != null)
             try {
                 ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
                     val reader = inputStream.bufferedReader()
                     val lines = mutableListOf<String>()
                     reader.forEachLine { line ->
                         if (line.startsWith(" ") || line.startsWith("\t")) {
-                            if (lines.isNotEmpty()) {
+                            if (lines.isNotEmpty())
                                 lines[lines.size - 1] = lines.last() + line.trim()
-                            }
-                        } else {
-                            lines.add(line)
                         }
+                        else
+                            lines.add(line)
                     }
 
                     var name = ""
@@ -201,7 +200,7 @@ private fun ContactsScreen(navController: NavController) {
                     var contactNo = 0
                     val newBaresipContacts = BaresipService.baresipContacts.value.toMutableList()
 
-                    for (line in lines) {
+                    for (line in lines)
                         when {
                             line.startsWith("BEGIN:VCARD", ignoreCase = true) -> {
                                 name = ""
@@ -242,7 +241,7 @@ private fun ContactsScreen(navController: NavController) {
                                 if (name.isNotEmpty()) {
                                     val existingContact = newBaresipContacts.find { it.name == name }
                                     val contactId = existingContact?.id ?: (System.currentTimeMillis() + contactNo++)
-                                    if (photoBase64.isNotEmpty()) {
+                                    if (photoBase64.isNotEmpty())
                                         try {
                                             val decodedString = Base64.decode(photoBase64, Base64.DEFAULT)
                                             val decodedByte = Utils.decodeSampledBitmapFromByteArray(decodedString, 192, 192)
@@ -261,17 +260,14 @@ private fun ContactsScreen(navController: NavController) {
                                         } catch (e: Exception) {
                                             Log.e(TAG, "Failed to decode photo for $name: ${e.message}")
                                         }
-                                    }
                                     if (existingContact != null) {
-                                        for (u in uris) {
-                                            if (existingContact.uris.none { it.uri == u.uri }) {
+                                        for (u in uris)
+                                            if (existingContact.uris.none { it.uri == u.uri })
                                                 existingContact.uris.add(u)
-                                            }
-                                        }
-                                        if (existingContact.email.isEmpty() && email.isNotEmpty()) {
+                                        if (existingContact.email.isEmpty() && email.isNotEmpty())
                                             existingContact.email = email
-                                        }
-                                    } else {
+                                    }
+                                    else
                                         newBaresipContacts.add(
                                             Contact.BaresipContact(
                                                 name,
@@ -282,30 +278,19 @@ private fun ContactsScreen(navController: NavController) {
                                                 false
                                             )
                                         )
-                                    }
                                 }
                             }
                         }
-                    }
                     BaresipService.baresipContacts.value = newBaresipContacts.toList()
                     Contact.saveBaresipContacts()
                     Contact.restoreBaresipContacts()
                     Contact.contactsUpdate()
-                    Toast.makeText(
-                        ctx,
-                        R.string.contact_import_success,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(ctx, R.string.contact_import_success, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to import VCF: ${e.message}")
-                Toast.makeText(
-                    ctx,
-                    R.string.contact_import_failure,
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, R.string.contact_import_failure, Toast.LENGTH_SHORT).show()
             }
-        }
     }
 
     val call = stringResource(R.string.call)
@@ -392,8 +377,8 @@ private fun ContactsScreen(navController: NavController) {
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[Manifest.permission.READ_CONTACTS] == true &&
-                permissions[Manifest.permission.WRITE_CONTACTS] == true &&
-                pendingMode.isNotEmpty()
+            permissions[Manifest.permission.WRITE_CONTACTS] == true &&
+            pendingMode.isNotEmpty()
         ) setContactsMode(pendingMode)
         pendingMode = ""
     }
@@ -405,10 +390,7 @@ private fun ContactsScreen(navController: NavController) {
         lastButtonText = ok,
         onLastClicked = {
             requestPermissionsLauncher.launch(
-                arrayOf(
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.WRITE_CONTACTS
-                )
+                arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
             )
         }
     )
@@ -463,20 +445,11 @@ private fun ContactsScreen(navController: NavController) {
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(
-                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-            ) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                Spacer(Modifier.statusBarsPadding())
                 TopAppBar(
                     title = {
-                        Text(
-                            text = stringResource(R.string.contacts),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = stringResource(R.string.contacts), fontWeight = FontWeight.Bold)
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -488,12 +461,10 @@ private fun ContactsScreen(navController: NavController) {
                         IconButton(
                             onClick = { navController.navigateUp() }
                         ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                            )
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
+                    windowInsets = WindowInsets(0, 0, 0, 0),
                     actions = {
                         IconButton(onClick = { expanded = !expanded }) {
                             Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
@@ -646,10 +617,7 @@ private fun BottomBar(
             },
             label = { Text(stringResource(R.string.search)) },
             textStyle = TextStyle(fontSize = 18.sp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
-            )
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
         )
     }
 }
@@ -682,7 +650,8 @@ private fun ContactsContent(
 
     var lastSearchQuery by remember { mutableStateOf("") }
     LaunchedEffect(searchQuery) {
-        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank()) lazyListState.scrollToItem(0)
+        if (searchQuery.isBlank() && lastSearchQuery.isNotBlank())
+            lazyListState.scrollToItem(0)
         lastSearchQuery = searchQuery
     }
 
@@ -741,7 +710,6 @@ private fun ContactsContent(
                 horizontalArrangement = Arrangement.Start
             ) {
                 when (contact) {
-
                     is Contact.BaresipContact -> {
                         val avatarImage = contact.avatarImage
                         if (avatarImage != null)
@@ -754,7 +722,6 @@ private fun ContactsContent(
                         else
                             TextAvatar(contact.name(), contact.color)
                     }
-
                     is Contact.AndroidContact -> {
                         val thumbNailUri = contact.thumbnailUri
                         if (thumbNailUri != null)
