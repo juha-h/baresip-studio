@@ -1498,7 +1498,7 @@ class BaresipService: Service() {
 
         val decodedText = try {
             URLDecoder.decode(text.replace("+", "%2B"), "UTF-8")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             text
         }
 
