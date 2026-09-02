@@ -294,7 +294,7 @@ private fun ContactsScreen(navController: NavController) {
     }
 
     val call = stringResource(R.string.call)
-    val show = stringResource(R.string.show)
+    val show = stringResource(R.string.show_call)
     val callAction = stringResource(R.string.call_action)
 
     val callActionItems = remember(BaresipService.contactAction) {

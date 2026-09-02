@@ -302,8 +302,6 @@
     <string name="blocked_unblock_question">Haluatko poistaa URI:n \'%1$s\' eston?</string>
     <!-- Calls Activity -->
     <string name="call_history">Puheluhistoria</string>
-    <string name="call">Soita</string>
-    <string name="show_call">Näytä</string>
     <string name="calls_calls">puhelut</string>
     <string name="calls_call">puhelun</string>
     <string name="direction">Suunta</string>
@@ -524,6 +522,10 @@
     <string name="avatar_image">Profiilikuva</string>
     <!-- Contacts Activity -->
     <string name="contacts">Yhteystiedot</string>
+    <string name="contact_mode">Moodi</string>
+    <string name="call_action">Soittotoimi</string>
+    <string name="call">Soita</string>
+    <string name="show_call">Näytä</string>
     <string name="contact_action_question">Haluatko soittaa tai lähettää viestin
         osoitteeseen \'%1$s\'?</string>
     <string name="contact_email_action_question">Haluatko soittaa tai lähettää viestin tai sähköpostin
