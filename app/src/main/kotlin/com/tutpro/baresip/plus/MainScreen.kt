@@ -373,7 +373,8 @@ private fun MainScreen(
                 showPasswordsDialog.value = false
                 showPasswordsDialog.value = true
             }
-        } else
+        }
+        else
             onRequestPermissions()
     }
 
@@ -386,10 +387,10 @@ private fun MainScreen(
                     Charsets.UTF_8
                 ).lines().toMutableList()
                 showPasswordsDialog.value = true
-            } else {
+            }
+            else
                 // Baresip is started for the first time
                 onRequestPermissions()
-            }
         }
     }
 
@@ -1146,19 +1147,18 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                                     showCall(ctx, viewModel, ua)
                                 }
                             }
-                        } else if (offset > swipeThreshold) {
-                            if (uas.value.isNotEmpty()) {
-                                val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
-                                val newPos = when (curPos) {
-                                    null -> 0
-                                    0 -> uas.value.size - 1
-                                    else -> curPos - 1
-                                }
-                                if (curPos != newPos) {
-                                    val ua = uas.value[newPos]
-                                    spinToAor(viewModel, ua.account.aor)
-                                    showCall(ctx, viewModel, ua)
-                                }
+                        }
+                        else if (offset > swipeThreshold && uas.value.isNotEmpty()) {
+                            val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
+                            val newPos = when (curPos) {
+                                null -> 0
+                                0 -> uas.value.size - 1
+                                else -> curPos - 1
+                            }
+                            if (curPos != newPos) {
+                                val ua = uas.value[newPos]
+                                spinToAor(viewModel, ua.account.aor)
+                                showCall(ctx, viewModel, ua)
                             }
                         }
                     }
@@ -1254,11 +1254,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                     if (Api.account_regint(acc.accp) > 0) {
                                         Api.account_set_regint(acc.accp, 0)
                                         Api.ua_unregister(ua.uap)
-                                    } else {
-                                        Api.account_set_regint(
-                                            acc.accp,
-                                            acc.configuredRegInt
-                                        )
+                                    }
+                                    else {
+                                        Api.account_set_regint(acc.accp, acc.configuredRegInt)
                                         Api.ua_register(ua.uap)
                                     }
                                     acc.regint = Api.account_regint(acc.accp)
@@ -1305,11 +1303,9 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                                     if (Api.account_regint(acc.accp) > 0) {
                                         Api.account_set_regint(acc.accp, 0)
                                         Api.ua_unregister(ua.uap)
-                                    } else {
-                                        Api.account_set_regint(
-                                            acc.accp,
-                                            acc.configuredRegInt
-                                        )
+                                    }
+                                    else {
+                                        Api.account_set_regint(acc.accp, acc.configuredRegInt)
                                         Api.ua_register(ua.uap)
                                     }
                                     acc.regint = Api.account_regint(acc.accp)
@@ -2265,7 +2261,8 @@ private fun CallRow(
                                         "${ctx.getString(R.string.lost)}: ${parts[3]}\n" +
                                         String.format(ctx.getString(R.string.jitter), parts[4])
                             showAlert.value = true
-                        } else {
+                        }
+                        else {
                             alertTitle.value = ctx.getString(R.string.call_info)
                             alertMessage.value = ctx.getString(R.string.call_info_not_available)
                             showAlert.value = true
@@ -2414,9 +2411,9 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         onClick = {
                             if (call != null) {
                                 val targetUiState = !isFrontCamera
-                                if (call!!.setVideoSource(targetUiState) != 0) {
+                                if (call!!.setVideoSource(targetUiState) != 0)
                                     Log.w(TAG, "Failed to switch camera")
-                                } else {
+                                else {
                                     isFrontCamera = targetUiState
                                     BaresipService.isCameraFront = targetUiState
                                     Log.d(TAG, "Switched UI to $targetUiState")
@@ -2550,7 +2547,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         val call = ua?.currentCall()
                         val connection =
                             if (call != null) ConnectionService.connections[call.callp] else null
-                        if (connection != null) {
+                        if (connection != null)
                             @Suppress("DEPRECATION")
                             connection.setAudioRoute(
                                 if (isCurrentlyOn)
@@ -2558,9 +2555,8 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                 else
                                     android.telecom.CallAudioState.ROUTE_SPEAKER
                             )
-                        } else {
+                        else
                             Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
-                        }
                     }
                 ) {
                     Icon(
@@ -2583,7 +2579,8 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                         if (isMicMuted) {
                             viewModel.updateMicIcon(Icons.Filled.MicOff)
                             Api.calls_mute(true)
-                        } else {
+                        }
+                        else {
                             viewModel.updateMicIcon(Icons.Filled.Mic)
                             Api.calls_mute(false)
                         }
@@ -2624,9 +2621,9 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                         "${String.format(ctx.getString(R.string.jitter), parts[4])}\n" +
                                         "${ctx.getString(R.string.packets)}: ${parts[2]}\n" +
                                         "${ctx.getString(R.string.lost)}: ${parts[3]}"
-                            } else {
-                                alertMessage.value = ctx.getString(R.string.call_info_not_available)
                             }
+                            else
+                                alertMessage.value = ctx.getString(R.string.call_info_not_available)
                             showAlert.value = true
                         }
                     }
@@ -2736,12 +2733,11 @@ fun videoClick(ctx: Context, call: Call) {
         if (dir != 0) {
             call.videoRequest = 0
             call.setVideoDirection(dir)
-        } else {
-            if (Utils.isCameraAvailable(ctx))
-                call.setVideoDirection(Api.SDP_SENDRECV)
-            else
-                call.setVideoDirection(Api.SDP_RECVONLY)
         }
+        else if (Utils.isCameraAvailable(ctx))
+            call.setVideoDirection(Api.SDP_SENDRECV)
+        else
+            call.setVideoDirection(Api.SDP_RECVONLY)
     }, 250)
     showVideoLayout.value = true
 }
@@ -2960,7 +2956,8 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             BaresipService.isMicMuted = false
             viewModel.updateMicIcon(Icons.Filled.Mic)
         }
-    } else {
+    }
+    else {
         viewModel.dialerState.callUri.value = ""
         pullToRefreshEnabled.value = false
         call.callUriEnabled.value = false
@@ -3262,9 +3259,9 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 call.security = if (Api.cmd_exec("zrtp_verify ${ev[2]}") != 0) {
                     Log.e(TAG, "Command 'zrtp_verify ${ev[2]}' failed")
                     R.color.colorTrafficYellow
-                } else {
-                    R.color.colorTrafficGreen
                 }
+                else
+                    R.color.colorTrafficGreen
                 call.zid = ev[2]
                 if (aor == viewModel.selectedAor.value) call.securityIconTint.value = call.security
             }
@@ -3530,11 +3527,13 @@ private fun acceptTransfer(ctx: Context, viewModel: ViewModel, ua: UserAgent, ca
             if (ua.account.aor != viewModel.selectedAor.value)
                 spinToAor(viewModel, ua.account.aor)
             showCall(ctx, viewModel, ua)
-        } else {
+        }
+        else {
             Log.w(TAG, "call_connect $newCallp failed")
             call.notifySipfrag(500, "Call Error")
         }
-    } else {
+    }
+    else {
         Log.w(TAG, "callAlloc for ua ${ua.uap} call ${call.callp} transfer failed")
         call.notifySipfrag(500, "Call Error")
     }

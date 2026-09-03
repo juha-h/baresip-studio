@@ -2116,12 +2116,10 @@ class BaresipService: Service() {
                     startForeground(targetId, notification, fgsType)
                 else
                     startForeground(targetId, notification)
-
-                if (activeCall == null) {
+                if (activeCall == null)
                     nm.cancel(CALL_NOTIFICATION_ID)
-                } else {
+                else
                     nm.cancel(STATUS_NOTIFICATION_ID)
-                }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update notification: ${e.message}")
                 nm.notify(targetId, notification)
