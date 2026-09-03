@@ -1,0 +1,3 @@
+- Improved incoming call User Interface
+- Fixed removal of ongoing call status notification from lock screen when call is closed
+- Fixed showing of contact labels
