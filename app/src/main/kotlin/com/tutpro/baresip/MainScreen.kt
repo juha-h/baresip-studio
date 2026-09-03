@@ -886,9 +886,7 @@ private fun IncomingCallCard(
     call: Call
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -980,15 +978,14 @@ private fun CallCard(
     call: Call?,
     dialerState: ViewModel.DialerState?
 ) {
-    if (call != null && call.status.value == "incoming") {
+    if (call != null && call.status.value == "incoming")
         IncomingCallCard(ctx, call)
-    } else {
+    else
         Column {
             CallUriRow(ctx, viewModel, call, dialerState)
             CallRow(ctx, viewModel, call, dialerState)
             if (call != null && call.showOnHoldNotice.value) OnHoldNotice()
         }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
