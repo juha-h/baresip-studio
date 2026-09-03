@@ -144,7 +144,6 @@ class BaresipService: Service() {
     private var airplaneModeReceiverRegistered = false
     private var simStateReceiverRegistered = false
     private var telephonyCallbackRegistered = false
-    private var isNotificationInCall = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
     private var previousMobileServiceState = -1
@@ -1146,7 +1145,6 @@ class BaresipService: Service() {
                     "call established" -> {
                         ensureCommunicationMode()
                         stopMediaPlayer()
-                        nm.cancel(CALL_NOTIFICATION_ID)
                         Log.d(TAG, "AoR $aor call $callp established")
                         Handler(Looper.getMainLooper()).post {
                             if (call != null) {
@@ -1313,8 +1311,10 @@ class BaresipService: Service() {
                             ConnectionService.connections.remove(callp)
                         }
                         if (call != null) {
+                            call.status.value = "closed"
                             call.terminated.value = true
                             call.remove()
+                            Log.d(TAG, "uaEvent: call $callp closed and removed")
                             val noMoreCalls = synchronized(calls) { !Call.inCall() }
                             stopRinging()
                             stopMediaPlayer()
@@ -1336,7 +1336,6 @@ class BaresipService: Service() {
                             val isConference = call.conferenceCall
                             val hasOtherCalls = synchronized(calls) { calls.any { it.ua == ua } }
                             if (noMoreCalls) releaseAudioEffects()
-                            updateStatusNotification()
                             if (isConference && !hasOtherCalls) {
                                 Log.d(TAG, "Last conference call closed, scheduling mixminus unload")
                                 Handler(Looper.getMainLooper()).postDelayed({
@@ -1412,8 +1411,9 @@ class BaresipService: Service() {
                                 ua.account.missedCalls = ua.account.missedCalls || missed
                             }
                             if (missed) showMissedCallNotification(uap, call.peerUri, aor)
-                            if (!Utils.isVisible()) return
                         }
+                        updateStatusNotification()
+                        if (!Utils.isVisible()) return
                         val reason = ev[1].trim()
                         if ((reason != "") && (ua.calls().isEmpty())) {
                             if (reason[0].isDigit()) {
@@ -1927,11 +1927,12 @@ class BaresipService: Service() {
         Handler(Looper.getMainLooper()).post {
             val activeCall = synchronized(calls) {
                 calls.find {
-                    it.status.value == "connected" || it.status.value == "outgoing"
-                            || it.status.value == "answered"
+                    (it.status.value == "connected" || it.status.value == "outgoing"
+                            || it.status.value == "answered") && !it.terminated.value
                 }
             }
 
+            val targetId = if (activeCall != null) CALL_NOTIFICATION_ID else STATUS_NOTIFICATION_ID
             val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
             val intent = Intent(this, MainActivity::class.java)
                 .setAction(Intent.ACTION_MAIN)
@@ -1996,7 +1997,7 @@ class BaresipService: Service() {
                     .setWhen(0)
                     .setShowWhen(false)
                     .setUsesChronometer(false)
-                    .setContentTitle("")
+                    .setContentTitle(getString(R.string.app_name))
                     .setContentText("")
 
                 val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
@@ -2031,18 +2032,19 @@ class BaresipService: Service() {
                 notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
 
             try {
+                val fgsType = foregroundServiceType(activeCall)
                 if (VERSION.SDK_INT >= 29)
-                    startForeground(
-                        STATUS_NOTIFICATION_ID,
-                        notification,
-                        foregroundServiceType(activeCall)
-                    )
+                    startForeground(targetId, notification, fgsType)
                 else
-                    startForeground(STATUS_NOTIFICATION_ID, notification)
-                isNotificationInCall = activeCall != null
+                    startForeground(targetId, notification)
+
+                if (activeCall == null)
+                    nm.cancel(CALL_NOTIFICATION_ID)
+                else
+                    nm.cancel(STATUS_NOTIFICATION_ID)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update notification: ${e.message}")
-                nm.notify(STATUS_NOTIFICATION_ID, notification)
+                nm.notify(targetId, notification)
             }
         }
     }
