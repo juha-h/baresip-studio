@@ -150,6 +150,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -164,6 +165,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -178,6 +180,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import coil.compose.AsyncImage
 import com.tutpro.baresip.plus.BaresipService.Companion.circleGreen
 import com.tutpro.baresip.plus.BaresipService.Companion.colorblind
 import com.tutpro.baresip.plus.BaresipService.Companion.uas
@@ -949,17 +952,127 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 enum class Video { NONE, ON, PENDING, OFF }
 
 @Composable
+private fun IncomingCallCard(
+    ctx: Context,
+    call: Call
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.incoming_call_from_dots).replace("…", "").trim(),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        val peerUri = call.peerUri
+        val contact = Contact.findContact(peerUri)
+        val avatarSize = 120.dp
+
+        when (contact) {
+            is Contact.BaresipContact -> {
+                val avatarImage = contact.avatarImage
+                if (avatarImage != null)
+                    CustomElements.ImageAvatar(avatarImage, size = avatarSize)
+                else
+                    CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+            }
+            is Contact.AndroidContact -> {
+                val thumbNailUri = contact.thumbnailUri
+                if (thumbNailUri != null)
+                    AsyncImage(
+                        model = thumbNailUri,
+                        contentDescription = "Avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(avatarSize).clip(CircleShape)
+                    )
+                else
+                    CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+            }
+            null -> {
+                CustomElements.TextAvatar(Utils.friendlyUri(ctx, peerUri, call.ua.account), 0xFFCCCCCC.toInt(), size = avatarSize)
+            }
+        }
+
+        Text(
+            text = call.callUri.value,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.9f),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { answer(ctx, call, false) },
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(colorResource(R.color.colorTrafficGreen), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Call,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+            if (call.hasVideo()) {
+                Spacer(Modifier.width(48.dp))
+                IconButton(
+                    onClick = { answer(ctx, call, true) },
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(colorResource(R.color.colorTrafficGreen), CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VideoCall,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+            }
+            Spacer(Modifier.width(48.dp))
+            IconButton(
+                onClick = { reject(call) },
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(colorResource(R.color.colorTrafficRed), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CallEnd,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun CallCard(
     ctx: Context,
     viewModel: ViewModel,
     call: Call?,
     dialerState: ViewModel.DialerState?
 ) {
-    Column {
-        CallUriRow(ctx, viewModel, call, dialerState)
-        CallRow(ctx, viewModel, call, dialerState)
-        if (call != null && call.showOnHoldNotice.value) OnHoldNotice()
-    }
+    if (call != null && call.status.value == "incoming")
+        IncomingCallCard(ctx, call)
+    else
+        Column {
+            CallUriRow(ctx, viewModel, call, dialerState)
+            CallRow(ctx, viewModel, call, dialerState)
+            if (call != null && call.showOnHoldNotice.value) OnHoldNotice()
+        }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1450,8 +1563,7 @@ private fun CallUriRow(
                                             }
                                             Text(
                                                 text = buildAnnotatedString {
-                                                    if (matchingUri.label.isNotEmpty() &&
-                                                        !listOf("SIP", "TEL").contains(matchingUri.label.uppercase()))
+                                                    if (matchingUri.label.isNotEmpty())
                                                         append("${matchingUri.label} ")
                                                     append(annotatedUri)
                                                 },
@@ -1651,7 +1763,7 @@ private fun CallRow(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Videocam,
+                        imageVector = Icons.Filled.VideoCall,
                         modifier = Modifier.size(42.dp),
                         tint = colorResource(
                             if (dialerState.callButtonsEnabled.value)
@@ -1947,8 +2059,7 @@ private fun CallRow(
                                                                 }
                                                                 Text(
                                                                     text = buildAnnotatedString {
-                                                                        if (matchingUri.label.isNotEmpty() &&
-                                                                            !listOf("SIP", "TEL").contains(matchingUri.label.uppercase()))
+                                                                        if (matchingUri.label.isNotEmpty())
                                                                             append("${matchingUri.label} ")
                                                                         append(annotatedUri)
                                                                     },

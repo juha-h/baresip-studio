@@ -71,7 +71,7 @@ sealed class Contact {
                 val name = contact.name()
                 if (includeLabel) {
                     val label = contactWithUri.second.label
-                    if (label.isNotEmpty() && !listOf("SIP", "TEL").contains(label.uppercase()))
+                    if (label.isNotEmpty())
                         return "$name $label"
                     if (contact.uris().size > 1 ||
                             (unique &&
@@ -92,7 +92,7 @@ sealed class Contact {
                     val name = contact.name()
                     if (includeLabel) {
                         val label = telContactWithUri.second.label
-                        if (label.isNotEmpty() && !listOf("SIP", "TEL").contains(label.uppercase()))
+                        if (label.isNotEmpty())
                             return "$name $label"
                         if (contact.uris().size > 1 ||
                                 (unique &&
@@ -231,8 +231,8 @@ sealed class Contact {
             // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
                 ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1,
-                ContactsContract.Data.DATA2, ContactsContract.Data.PHOTO_THUMBNAIL_URI,
-                ContactsContract.Contacts.STARRED)
+                ContactsContract.Data.DATA2, ContactsContract.Data.DATA3,
+                ContactsContract.Data.PHOTO_THUMBNAIL_URI, ContactsContract.Contacts.STARRED)
             @Suppress("DEPRECATION")
             val sipMime = ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
             val selection =
@@ -249,8 +249,9 @@ sealed class Contact {
                 val mime = cur.getString(2)
                 val data = cur.getString(3) ?: continue
                 val type = cur.getInt(4)
-                val thumb = cur.getString(5)?.toUri()
-                val starred = cur.getInt(6)
+                val labelData = cur.getString(5)
+                val thumb = cur.getString(6)?.toUri()
+                val starred = cur.getInt(7)
                 val contact = if (contacts.containsKey(id))
                     contacts[id]!!
                 else
@@ -260,12 +261,13 @@ sealed class Contact {
                 when (mime) {
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
                         val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
-                        val label = typeToString(type)
+                        val label = typeToString(type, labelData)
                         if (contact.uris.none { it.uri == uri }) contact.uris.add(ContactUri(uri, label))
                     }
                     sipMime -> {
                         val uri = "sip:$data"
-                        if (contact.uris.none { it.uri == uri }) contact.uris.add(ContactUri(uri, ""))
+                        val label = typeToString(type, labelData)
+                        if (contact.uris.none { it.uri == uri }) contact.uris.add(ContactUri(uri, label))
                     }
                     ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE ->
                         if (contact.email == "") contact.email = data
@@ -279,11 +281,12 @@ sealed class Contact {
             BaresipService.androidContacts.value = newList.toList()
         }
 
-        private fun typeToString(type: Int): String {
+        private fun typeToString(type: Int, label: String?): String {
             return when(type) {
                 ContactsContract.CommonDataKinds.Phone.TYPE_HOME -> "Home"
                 ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> "Mobile"
                 ContactsContract.CommonDataKinds.Phone.TYPE_WORK -> "Work"
+                ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM -> label ?: ""
                 else -> ""
             }
         }

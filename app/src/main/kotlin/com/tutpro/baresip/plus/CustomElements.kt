@@ -243,28 +243,26 @@ object CustomElements {
     }
 
     @Composable
-    fun TextAvatar(name: String, color: Int) {
+    fun TextAvatar(name: String, color: Int, size: Dp = 36.dp) {
         Box(
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(size),
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawCircle(SolidColor(Color(color)))
             }
-            val text = if (name == "") "" else name[0].toString()
-            Text(text, color = Color.White, fontSize = 20.sp)
+            val text = if (name == "") "" else name[0].uppercase()[0].toString()
+            Text(text, color = Color.White, fontSize = (size.value * 0.55).sp)
         }
     }
 
     @Composable
-    fun ImageAvatar(bitmap: Bitmap) {
+    fun ImageAvatar(bitmap: Bitmap, size: Dp = 36.dp) {
         Image(
             bitmap = bitmap.asImageBitmap(),
             contentDescription = "Avatar",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
+            modifier = Modifier.size(size).clip(CircleShape)
         )
     }
 
