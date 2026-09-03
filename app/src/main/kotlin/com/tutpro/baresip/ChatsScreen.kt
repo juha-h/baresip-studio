@@ -570,8 +570,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
                                             }
                                             Text(
                                                 text = buildAnnotatedString {
-                                                    if (matchingUri.label.isNotEmpty() &&
-                                                        !listOf("SIP", "TEL").contains(matchingUri.label.uppercase()))
+                                                    if (matchingUri.label.isNotEmpty())
                                                         append("${matchingUri.label} ")
                                                     append(annotatedUri)
                                                 },
