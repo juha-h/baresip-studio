@@ -1188,6 +1188,7 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_Api_ua_1alloc(
         LOGD("allocated ua '%ld'\n", (long)ua);
     } else {
         LOGE("failed to allocate ua '%s'\n", uri);
+        ua = 0;
     }
     (*env)->ReleaseStringUTFChars(env, jUri, uri);
     return (jlong)ua;
