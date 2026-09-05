@@ -189,10 +189,7 @@ fun NewAccount(navController: NavController) {
 
     fun createNew(ctx: Context, newAor: String): Account? {
 
-        val aor = if (newAor.startsWith("sip:"))
-            newAor
-        else
-            "sip:$newAor"
+        val aor = if (newAor.startsWith("sip:")) newAor else "sip:$newAor"
 
         if (!Utils.checkAor(aor)) {
             alertTitle.value = ctx.getString(R.string.notice)
@@ -219,13 +216,8 @@ fun NewAccount(navController: NavController) {
             return null
         }
 
-        val ua = UserAgent.ofUap(uap)
-        if (ua == null) {
-            alertTitle.value = ctx.getString(R.string.notice)
-            alertMessage.value = ctx.getString(R.string.account_allocation_failure)
-            showAlert.value = true
-            return null
-        }
+        val ua = UserAgent(uap)
+        ua.add()
 
         val acc = ua.account
         acc.checkOrigin = true
