@@ -906,7 +906,7 @@ class BaresipService: Service() {
                     Api.account_set_auth_pass(acc.accp, NO_AUTH_PASS)
             }
 
-            Log.d(TAG, "got uaEvent $ev/${acc.aor}")
+            Log.d(TAG, "Processed uaEvent create/${acc.aor}")
             return
         }
 

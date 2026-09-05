@@ -23,6 +23,8 @@ class UserAgent(val uap: Long, virtualAccount: Account? = null) {
                 updatedUas.add(this)
             else if (updatedUas[index].uap == 0L && this.uap != 0L)
                 updatedUas[index] = this
+            else if (updatedUas[index].uap == this.uap)
+                updatedUas[index].status = this.status
             else
                 return
             uas.value = updatedUas.toList()
