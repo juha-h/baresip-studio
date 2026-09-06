@@ -995,7 +995,11 @@ private fun IncomingCallCard(
                     CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
             }
             null -> {
-                CustomElements.TextAvatar(Utils.friendlyUri(ctx, peerUri, call.ua.account), 0xFFCCCCCC.toInt(), size = avatarSize)
+                CustomElements.TextAvatar(
+                    name = Utils.friendlyUri(ctx, peerUri, call.ua.account),
+                    color = 0xFFCCCCCC.toInt(),
+                    size = avatarSize
+                )
             }
         }
 
