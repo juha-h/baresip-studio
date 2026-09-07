@@ -378,4 +378,11 @@
     <string name="copy_uri">Salin URI</string>
     <string name="copied_to_clipboard">Disalin ke clipboard</string>
     <string name="airplane_mode">Mode pesawat AKTIF. Nonaktifkan untuk menggunakan akun seluler.</string>
+    <string name="blocking_rules">Aturan Pemblokiran</string>
+    <string name="show_call">Tunjukkan</string>
+    <string name="unblock">Buka blokir</string>
+    <string name="permission_denied">Izin ditolak</string>
+    <string name="create_mobile_account">Buat Akun Seluler</string>
+    <string name="create_mobile_account_help">Jika dicentang, akun Mobile virtual akan dibuat untuk panggilan seluler.</string>
+    <string name="ilbc_mode"></string>
 </resources>
