@@ -378,4 +378,18 @@
     <string name="copy_uri">Salin URI</string>
     <string name="copied_to_clipboard">Disalin ke clipboard</string>
     <string name="airplane_mode">Mode pesawat AKTIF. Nonaktifkan untuk menggunakan akun seluler.</string>
+    <string name="blocking_rules">Aturan Pemblokiran</string>
+    <string name="show_call">Tunjukkan</string>
+    <string name="unblock">Buka blokir</string>
+    <string name="permission_denied">Izin ditolak</string>
+    <string name="create_mobile_account">Buat Akun Seluler</string>
+    <string name="create_mobile_account_help">Jika dicentang, akun Mobile virtual akan dibuat untuk panggilan seluler.</string>
+    <string name="ilbc_mode">iLBC mode</string>
+    <string name="ilbc_mode_help">Memilih durasi frame iLBC default. 30ms memberikan kualitas bitrate rendah yang lebih baik, sedangkan 20ms memiliki latensi yang lebih rendah.</string>
+    <string name="contact_mode">Mode kontak</string>
+    <string name="call_action">Panggil tindakan</string>
+    <string name="mobile_service_not_available">Layanan seluler tidak tersedia.</string>
+    <string name="ussd_failed">Permintaan USSD gagal</string>
+    <string name="ussd_service_unavailable">Layanan USSD tidak tersedia</string>
+    <string name="ussd_unknown_error">Kesalahan USSD yang tidak diketahui</string>
 </resources>
