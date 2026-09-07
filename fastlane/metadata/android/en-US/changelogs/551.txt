@@ -1,0 +1,3 @@
+- Improved outgoing call user interface
+- Fixed potential race condition in new account creation
+- New translations (Indonesian)
