@@ -881,6 +881,92 @@ private val onLastClicked = mutableStateOf({})
 private val showDialog = mutableStateOf(false)
 
 @Composable
+private fun OutgoingCallCard(
+    ctx: Context,
+    call: Call
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.outgoing_call_to_dots).replace("…", "").trim(),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        val peerUri = call.peerUri
+        val contact = Contact.findContact(peerUri)
+        val avatarSize = 120.dp
+
+        when (contact) {
+            is Contact.BaresipContact -> {
+                val avatarImage = contact.avatarImage
+                if (avatarImage != null)
+                    CustomElements.ImageAvatar(avatarImage, size = avatarSize)
+                else
+                    CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+            }
+            is Contact.AndroidContact -> {
+                val thumbNailUri = contact.thumbnailUri
+                if (thumbNailUri != null)
+                    AsyncImage(
+                        model = thumbNailUri,
+                        contentDescription = "Avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(avatarSize).clip(CircleShape)
+                    )
+                else
+                    CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+            }
+            null -> {
+                CustomElements.TextAvatar(
+                    name = Utils.friendlyUri(ctx, peerUri, call.ua.account),
+                    color = 0xFFCCCCCC.toInt(),
+                    size = avatarSize
+                )
+            }
+        }
+
+        Text(
+            text = call.callUri.value,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.9f),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = {
+                    if (call.terminated.value) return@IconButton
+                    call.terminated.value = true
+                    Log.d(TAG, "AoR ${call.ua.account.aor} canceling call ${call.callp}")
+                    call.hangup(487, "Request Terminated")
+                },
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(colorResource(R.color.colorTrafficRed), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CallEnd,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun IncomingCallCard(
     ctx: Context,
     call: Call
@@ -982,10 +1068,17 @@ private fun CallCard(
     call: Call?,
     dialerState: ViewModel.DialerState?
 ) {
-    if (call != null && call.status.value == "incoming")
-        IncomingCallCard(ctx, call)
-    else
-        Column {
+    if (call != null) {
+        if (call.status.value == "incoming") {
+            IncomingCallCard(ctx, call)
+            return
+        }
+        if ((call.status.value == "outgoing" || call.status.value == "transferring") && !call.conferenceCall) {
+            OutgoingCallCard(ctx, call)
+            return
+        }
+    }
+    Column {
             CallUriRow(ctx, viewModel, call, dialerState)
             CallRow(ctx, viewModel, call, dialerState)
             if (call != null && call.showOnHoldNotice.value) OnHoldNotice()
