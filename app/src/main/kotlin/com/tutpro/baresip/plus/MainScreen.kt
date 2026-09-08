@@ -428,15 +428,8 @@ fun DefaultLayout(ctx: Context, navController: NavController, viewModel: ViewMod
 
     LaunchedEffect(key1 = call?.status, key2 = configuration.orientation) {
         val isConnected = call != null && call.status.value == "connected" && !call.held
-        if (isConnected) {
-            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                call.focusDtmf.value = true
-                delay(300.milliseconds)
-                keyboardController?.show()
-            }
-            else
-                keyboardController?.hide()
-        }
+        if (isConnected && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            keyboardController?.hide()
     }
 
     val encryptPasswordTitle = stringResource(R.string.encrypt_password)
@@ -3064,11 +3057,8 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             call.dtmfEnabled.value = !call.held
             Handler(Looper.getMainLooper()).postDelayed({ viewModel.requestHideKeyboard() }, 25)
         }
-        else {
+        else
             call.dtmfEnabled.value = true
-            call.focusDtmf.value = true
-            viewModel.requestShowKeyboard()
-        }
         Log.d(TAG, "Showing call $callp from $aor with status $status")
         when (status) {
             "outgoing", "transferring", "answered" -> {
