@@ -382,7 +382,7 @@
     <string name="ussd_service_unavailable">USSD 服务不可用</string>
     <string name="ussd_unknown_error">USSD 未知错误</string>
     <string name="permission_denied">权限被拒绝</string>
-    <string name="show_call">显示通话</string>
+    <string name="show_call">显示</string>
     <string name="blocking_rules">屏蔽规则</string>
     <string name="mobile_service_not_available">移动服务不可用。</string>
     <string name="create_mobile_account">创建移动账号</string>
@@ -399,4 +399,5 @@
     <string name="blocked_history_delete_alert">您要删除账号“%2$s”的%1$s记录吗？</string>
     <string name="blocked_peer_delete_alert">您要从%2$s记录中删除“%1$s”吗？</string>
     <string name="contact_mode">联系模式</string>
+    <string name="call_action">通话操作</string>
 </resources>
