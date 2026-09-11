@@ -1,0 +1,2 @@
+- Don't automatically focus to DTMF field when call is connected
+- New translations (Chinese)
