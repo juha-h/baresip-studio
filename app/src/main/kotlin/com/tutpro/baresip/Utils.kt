@@ -979,10 +979,6 @@ object Utils {
             if (!enable) {
                 Log.d(TAG, "Disabling speakerphone")
                 clearCommunicationDevice(am)
-                if (inCall() && am.mode == AudioManager.MODE_NORMAL) {
-                    Log.d(TAG, "Restoring MODE_IN_COMMUNICATION")
-                    am.mode = AudioManager.MODE_IN_COMMUNICATION
-                }
                 return
             }
             val current = am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN
@@ -998,30 +994,9 @@ object Utils {
                 return
             }
             if (current != speakerDevice.type) {
-                // Currently at API levels 31+, speakerphone needs normal mode
-                if (am.mode == AudioManager.MODE_NORMAL) {
-                    Log.d(TAG, "Setting com device to ${speakerDevice.type} in MODE_NORMAL")
-                    if (!am.setCommunicationDevice(speakerDevice))
-                        Log.e(TAG, "Could not set com device")
-                }
-                else {
-                    val normalListener = object : AudioManager.OnModeChangedListener {
-                        override fun onModeChanged(mode: Int) {
-                            if (mode == AudioManager.MODE_NORMAL) {
-                                am.removeOnModeChangedListener(this)
-                                Log.d(
-                                    TAG, "Setting com device to ${speakerDevice.type}" +
-                                            " in mode ${am.mode}"
-                                )
-                                if (!am.setCommunicationDevice(speakerDevice))
-                                    Log.e(TAG, "Could not set com device")
-                            }
-                        }
-                    }
-                    am.addOnModeChangedListener(executor, normalListener)
-                    Log.d(TAG, "Setting mode to NORMAL")
-                    am.mode = AudioManager.MODE_NORMAL
-                }
+                Log.d(TAG, "Setting com device to ${speakerDevice.type} in mode ${am.mode}")
+                if (!am.setCommunicationDevice(speakerDevice))
+                    Log.e(TAG, "Could not set com device")
                 Log.d(TAG, "New com device/mode is " +
                         "${am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN}/${am.mode}")
             }

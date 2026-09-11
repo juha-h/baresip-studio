@@ -2743,13 +2743,6 @@ class BaresipService: Service() {
                 Handler(Looper.getMainLooper()).removeCallbacks(it)
                 cleanupRunnable = null
             }
-            if (isSpeakerphoneOn == speakerPhone) {
-                if (Call.hasTelecomCall() || currentMode == MODE_IN_COMMUNICATION) {
-                    Log.d(TAG, "Already in valid call mode ($currentMode) " +
-                            "with correct speaker state.")
-                    return
-                }
-            }
         }
         else if (!Call.inCall() && currentMode == MODE_NORMAL)
             return
