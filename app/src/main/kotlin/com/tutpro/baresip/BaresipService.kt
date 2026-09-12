@@ -2737,13 +2737,12 @@ class BaresipService: Service() {
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn
 
-        if (Call.inCall() && isAnyCallMode) {
+        if (Call.inCall() && isAnyCallMode)
             cleanupRunnable?.let {
                 Log.d(TAG, "Canceling pending speakerphone cleanup because call is active")
                 Handler(Looper.getMainLooper()).removeCallbacks(it)
                 cleanupRunnable = null
             }
-        }
         else if (!Call.inCall() && currentMode == MODE_NORMAL)
             return
 
