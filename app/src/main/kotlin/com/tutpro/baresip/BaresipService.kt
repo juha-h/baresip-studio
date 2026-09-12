@@ -2786,7 +2786,7 @@ class BaresipService: Service() {
                     Log.d(TAG, "Manual Mode Guard: Resetting to MODE_NORMAL")
                     Utils.clearCommunicationDevice(am)
                 }
-                if (speakerPhone) {
+                if (speakerPhone && !speakerPhoneAuto) {
                     Log.d(TAG, "Resetting speakerPhone runtime state after call")
                     speakerPhone = false
                     postServiceEvent(
