@@ -2816,20 +2816,12 @@ class BaresipService: Service() {
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn
 
-        if (Call.inCall() && isAnyCallMode) {
+        if (Call.inCall() && isAnyCallMode)
             cleanupRunnable?.let {
                 Log.d(TAG, "Canceling pending speakerphone cleanup because call is active")
                 Handler(Looper.getMainLooper()).removeCallbacks(it)
                 cleanupRunnable = null
             }
-            if (isSpeakerphoneOn == speakerPhone) {
-                if (Call.hasTelecomCall() || currentMode == MODE_IN_COMMUNICATION) {
-                    Log.d(TAG, "Already in valid call mode ($currentMode) " +
-                            "with correct speaker state.")
-                    return
-                }
-            }
-        }
         else if (!Call.inCall() && currentMode == MODE_NORMAL)
             return
 
@@ -2872,7 +2864,7 @@ class BaresipService: Service() {
                     Log.d(TAG, "Manual Mode Guard: Resetting to MODE_NORMAL")
                     Utils.clearCommunicationDevice(am)
                 }
-                if (speakerPhone) {
+                if (speakerPhone && !speakerPhoneAuto) {
                     Log.d(TAG, "Resetting speakerPhone runtime state after call")
                     speakerPhone = false
                     postServiceEvent(
