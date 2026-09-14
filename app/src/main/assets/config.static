@@ -3,9 +3,9 @@ call_local_timeout 60
 call_max_calls 4
 call_hold_other_calls yes
 filter_registrar udp,tcp,tls,ws,wss
-audio_player aaudio,nil
-audio_source aaudio,nil
-audio_alert aaudio,nil
+audio_player aaudio,default
+audio_source aaudio,default
+audio_alert aaudio,default
 audio_level no
 ausrc_format s16
 auplay_format s16

@@ -1162,6 +1162,32 @@ private fun CallCard(
     Column {
             CallUriRow(ctx, viewModel, call, dialerState)
             CallRow(ctx, viewModel, call, dialerState)
+            if (call != null && call.showHangupButton.value && !call.conferenceCall) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {
+                            if (call.terminated.value) return@IconButton
+                            call.terminated.value = true
+                            Log.d(TAG, "AoR ${call.ua.account.aor} hanging up call ${call.callp}")
+                            call.hangup(487, "Request Terminated")
+                        },
+                        modifier = Modifier
+                            .size(64.dp)
+                            .background(colorResource(R.color.colorTrafficRed), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CallEnd,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+                }
+            }
             if (call != null && call.showOnHoldNotice.value) OnHoldNotice()
         }
 }
@@ -1668,65 +1694,9 @@ private fun CallUriRow(
         if (call != null && call.showCallTimer.value) {
             CallTimer(
                 initialDurationSeconds = call.callDuration.toLong(),
-                modifier = Modifier.padding(
-                    start = 6.dp,
-                    top = 6.dp,
-                    end = if (call.securityIconTint.value != -1) 6.dp else 0.dp
-                )
+                modifier = Modifier.padding(start = 6.dp, top = 6.dp)
             )
         }
-        if (call != null && call.securityIconTint.value != -1)
-            Box(
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        when (call.securityIconTint.value) {
-                            R.color.colorTrafficRed -> {
-                                alertTitle.value = ctx.getString(R.string.alert)
-                                alertMessage.value = ctx.getString(R.string.call_not_secure)
-                                showAlert.value = true
-                            }
-
-                            R.color.colorTrafficYellow -> {
-                                alertTitle.value = ctx.getString(R.string.alert)
-                                alertMessage.value = ctx.getString(R.string.peer_not_verified)
-                                showAlert.value = true
-                            }
-
-                            R.color.colorTrafficGreen -> {
-                                dialogTitle.value = ctx.getString(R.string.info)
-                                dialogMessage.value = ctx.getString(R.string.call_is_secure)
-                                firstText.value = ctx.getString(R.string.cancel)
-                                onFirstClicked.value = {}
-                                secondText.value = ""
-                                lastText.value = ctx.getString(R.string.unverify)
-                                onLastClicked.value = {
-                                    if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
-                                        Log.e(
-                                            TAG,
-                                            "Command 'zrtp_unverify ${call.zid}' failed"
-                                        )
-                                    else
-                                        call.securityIconTint.value = R.color.colorTrafficYellow
-                                }
-                                showDialog.value = true
-                            }
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (call.securityIconTint.value == R.color.colorTrafficRed)
-                        Icons.Filled.LockOpen
-                    else
-                        Icons.Filled.Lock,
-                    contentDescription = null,
-                    modifier = Modifier.size(28.dp),
-                    tint = colorResource(call.securityIconTint.value)
-                )
-            }
     }
 }
 
@@ -1886,7 +1856,7 @@ private fun CallRow(
                 Spacer(modifier = Modifier.width(12.dp))
             }
 
-            if (call.showHangupButton.value) {
+            if (call.showHangupButton.value && call.conferenceCall) {
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
@@ -1927,6 +1897,8 @@ private fun CallRow(
                         )
                     }
             }
+
+
 
             if (call.showHangupButton.value && !call.conferenceCall)
                 IconButton(    modifier = Modifier.size(48.dp),
@@ -2322,6 +2294,53 @@ private fun CallRow(
                         focusRequester.requestFocus()
                         call.focusDtmf.value = false
                     }
+                }
+
+            if (call.showHangupButton.value && call.securityIconTint.value != -1)
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            when (call.securityIconTint.value) {
+                                R.color.colorTrafficRed -> {
+                                    alertTitle.value = ctx.getString(R.string.alert)
+                                    alertMessage.value = ctx.getString(R.string.call_not_secure)
+                                    showAlert.value = true
+                                }
+                                R.color.colorTrafficYellow -> {
+                                    alertTitle.value = ctx.getString(R.string.alert)
+                                    alertMessage.value = ctx.getString(R.string.peer_not_verified)
+                                    showAlert.value = true
+                                }
+                                R.color.colorTrafficGreen -> {
+                                    dialogTitle.value = ctx.getString(R.string.info)
+                                    dialogMessage.value = ctx.getString(R.string.call_is_secure)
+                                    firstText.value = ctx.getString(R.string.cancel)
+                                    onFirstClicked.value = {}
+                                    secondText.value = ""
+                                    lastText.value = ctx.getString(R.string.unverify)
+                                    onLastClicked.value = {
+                                        if (Api.cmd_exec("zrtp_unverify " + call.zid) != 0)
+                                            Log.e(TAG, "Command 'zrtp_unverify ${call.zid}' failed")
+                                        else
+                                            call.securityIconTint.value = R.color.colorTrafficYellow
+                                    }
+                                    showDialog.value = true
+                                }
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (call.securityIconTint.value == R.color.colorTrafficRed)
+                            Icons.Filled.LockOpen
+                        else
+                            Icons.Filled.Lock,
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp),
+                        tint = colorResource(call.securityIconTint.value)
+                    )
                 }
 
             if (call.showHangupButton.value && !call.ua.account.isMobile)
@@ -2930,13 +2949,19 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
             callExtras.putBoolean("conferenceCall", dialerState.showCallConferenceButton.value)
             callExtras.putBoolean("videoCall", videoCall)
             callExtras.putLong("uap", ua.uap)
-            if (onHoldCallp != 0L)
-                callExtras.putLong("onHoldCallp", onHoldCallp)
+            val holdCallp = if (onHoldCallp == 0L && dialerState.showCallConferenceButton.value)
+                ua.calls().firstOrNull()?.callp ?: 0L
+            else
+                onHoldCallp
+            if (holdCallp != 0L)
+                callExtras.putLong("onHoldCallp", holdCallp)
             extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
             try {
                 Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
                 tm.placeCall(uri.toUri(), extras)
-            } catch (e: SecurityException) { error = "placeCall failed: ${e.message}" }
+            } catch (e: SecurityException) {
+                error = "placeCall failed: ${e.message}"
+            }
         }
         if (error != "") {
             Log.e(TAG, error)
