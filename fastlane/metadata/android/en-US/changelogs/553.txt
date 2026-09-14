@@ -1,0 +1,5 @@
+- Show call end button on its own line
+- After call, do not disable speaker phone if Speaker Phone audio setting is enabled
+- Fixed adding of parties to conference call
+- Upstream fix on notifying un-registering failure
+- New translations (Chinese and Indonesian)
