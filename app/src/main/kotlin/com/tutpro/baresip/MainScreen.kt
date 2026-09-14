@@ -2423,13 +2423,19 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
             val callExtras = Bundle()
             callExtras.putBoolean("conferenceCall", dialerState.showCallConferenceButton.value)
             callExtras.putLong("uap", ua.uap)
-            if (onHoldCallp != 0L)
-                callExtras.putLong("onHoldCallp", onHoldCallp)
+            val holdCallp = if (onHoldCallp == 0L && dialerState.showCallConferenceButton.value)
+                ua.calls().firstOrNull()?.callp ?: 0L
+            else
+                onHoldCallp
+            if (holdCallp != 0L)
+                callExtras.putLong("onHoldCallp", holdCallp)
             extras.putBundle(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras)
             try {
                 Log.d(TAG, "Placing Telecom SIP call to $uri with uap=${ua.uap}")
                 tm.placeCall(uri.toUri(), extras)
-            } catch (e: SecurityException) { error = "placeCall failed: ${e.message}" }
+            } catch (e: SecurityException) {
+                error = "placeCall failed: ${e.message}"
+            }
         }
         if (error != "") {
             Log.e(TAG, error)

@@ -1709,7 +1709,10 @@ class BaresipService: Service() {
                         call.conferenceCall = conferenceCall
                         call.add()
                         updateStatusNotification()
-                        if (onHoldCall != null) onHoldCall.newCall = call
+                        if (onHoldCall != null) {
+                            onHoldCall.newCall = call
+                            onHoldCall.conferenceCall = true
+                        }
                         if (!call.connect(uri)) {
                             Log.w(TAG, "call_connect $callp failed")
                             ConnectionService.onCallClosed(callp)

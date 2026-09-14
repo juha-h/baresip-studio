@@ -283,36 +283,44 @@ class ConnectionService : ConnectionService() {
         override fun onHold() {
             Log.d(TAG, "Telecom Connection onHold $callp")
             val call = Call.ofCallp(callp)
-            if (call != null && !call.conferenceCall) {
-                // 1. Force SIP Signaling
-                if (Api.call_hold(call.callp, true)) {
-                    // 2. Sync Call object state
-                    call.onhold = true
-                    call.callOnHold.value = true
-                    call.showOnHoldNotice.value = true
-                    // 3. Tell Telecom the move is complete
-                    setOnHold()
+            if (call != null) {
+                if (!call.conferenceCall) {
+                    // 1. Force SIP Signaling
+                    if (Api.call_hold(call.callp, true)) {
+                        // 2. Sync Call object state
+                        call.onhold = true
+                        call.callOnHold.value = true
+                        call.showOnHoldNotice.value = true
+                        // 3. Tell Telecom the move is complete
+                        setOnHold()
+                    }
+                    else
+                        Log.e(TAG, "SIP Hold failed for $callp")
                 }
                 else
-                    Log.e(TAG, "SIP Hold failed for $callp")
+                    setOnHold()
             }
         }
 
         override fun onUnhold() {
             Log.d(TAG, "Telecom Connection onUnhold $callp")
             val call = Call.ofCallp(callp)
-            if (call != null && !call.conferenceCall) {
-                // 1. Force SIP Signaling
-                if (Api.call_hold(call.callp, false)) {
-                    // 2. Sync Call object state
-                    call.onhold = false
-                    call.callOnHold.value = false
-                    call.showOnHoldNotice.value = false
-                    // 3. Tell Telecom we are active
-                    setActive()
+            if (call != null) {
+                if (!call.conferenceCall) {
+                    // 1. Force SIP Signaling
+                    if (Api.call_hold(call.callp, false)) {
+                        // 2. Sync Call object state
+                        call.onhold = false
+                        call.callOnHold.value = false
+                        call.showOnHoldNotice.value = false
+                        // 3. Tell Telecom we are active
+                        setActive()
+                    }
+                    else
+                        Log.e(TAG, "SIP Resume failed for $callp")
                 }
                 else
-                    Log.e(TAG, "SIP Resume failed for $callp")
+                    setActive()
             }
         }
 
