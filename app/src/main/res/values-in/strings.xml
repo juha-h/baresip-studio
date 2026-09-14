@@ -168,7 +168,7 @@
     <string name="tls_ca_file_help">Jika dicentang, sebuah berkas telah atau akan dimuat yang berisi sertifikat TLS dari Otoritas Sertifikat yang tidak termasuk dalam OS Android. Pada Android versi 9, berkas bernama \'ca_certs.crt\' dimuat dari folder Unduhan.</string>
     <string name="no_read_permission">Tidak ada izin baca Penyimpanan Eksternal</string>
     <string name="unique_contact_uri">URI Kontak Unik</string>
-    <string name="unique_contact_uri_help">Jika dicentang, URI Kontak dijamin unik. Perlu dicentang jika terdapat lebih dari satu akun dengan bagian pengguna URI SIP yang sama, tetapi juga meningkatkan perlindungan akun dari serangan.</string>
+    <string name="unique_contact_uri_help">Jika dicentang, URI Kontak dijamin unik. Opsi ini perlu dicentang jika terdapat lebih dari satu akun dengan bagian pengguna SIP URI yang sama, serta meningkatkan perlindungan akun dari serangan. Nonaktifkan jika penyedia Anda mengharuskan bagian pengguna URI Kontak sama dengan bagian pengguna SIP URI.</string>
     <string name="audio_settings">Pengaturan Audio</string>
     <string name="speaker_phone">Telepon Loudspeaker</string>
     <string name="speaker_phone_help">Jika dicentang, loudspeaker dinyalakan secara otomatis saat panggilan dimulai.</string>
@@ -392,4 +392,12 @@
     <string name="ussd_failed">Permintaan USSD gagal</string>
     <string name="ussd_service_unavailable">Layanan USSD tidak tersedia</string>
     <string name="ussd_unknown_error">Kesalahan USSD yang tidak diketahui</string>
+    <string name="blocked_history_delete_alert">Apakah Anda ingin menghapus riwayat %1$s dari akun \'%2$s\'?</string>
+    <string name="blocked_peer_delete_alert">Apakah Anda ingin menghapus \'%1$s\' dari riwayat %2$s?</string>
+    <string name="blocked_calls_history">panggilan diblokir</string>
+    <string name="blocked_messages_history">pesan diblokir</string>
+    <string name="blocked_action_question">Apakah Anda ingin menambahkan rekan \'%1$s\' ke kontak atau membuka blokirnya?</string>
+    <string name="blocked_unblock_question">Apakah Anda ingin membuka blokir rekan \'%1$s\'?</string>
+    <string name="calls_block_delete_question">Apakah Anda ingin memblokir \'%1$s\' atau menghapus %2$s dari riwayat panggilan?</string>
+    <string name="long_chat_block_delete_question">Apakah Anda ingin memblokir \'%1$s\' atau menghapus obrolan ini?</string>
 </resources>
