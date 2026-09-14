@@ -979,18 +979,6 @@ class BaresipService: Service() {
                         ua.updateStatus(circleYellow.getValue(colorblind))
                         updateStatusNotification()
                         if (isMainVisible) registrationUpdate.postValue(System.currentTimeMillis())
-                        if (ev[0] == "unregistering") {
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                val currentUa = UserAgent.ofUap(uap)
-                                if (currentUa != null && currentUa.status == circleYellow.getValue(colorblind) &&
-                                        Api.account_regint(currentUa.account.accp) == 0) {
-                                    Log.d(TAG, "Unregistering timed out for ${currentUa.account.aor}, forcing white status")
-                                    currentUa.updateStatus(R.drawable.circle_white)
-                                    updateStatusNotification()
-                                    if (isMainVisible) registrationUpdate.postValue(System.currentTimeMillis())
-                                }
-                            }, 4000)
-                        }
                         return
                     }
 
