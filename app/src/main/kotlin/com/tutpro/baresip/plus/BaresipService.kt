@@ -2810,12 +2810,6 @@ class BaresipService: Service() {
         val currentMode = am.mode
         val isAnyCallMode = currentMode == MODE_IN_COMMUNICATION || currentMode == MODE_IN_CALL
 
-        val isSpeakerphoneOn = if (VERSION.SDK_INT >= 31)
-            am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-        else
-            @Suppress("DEPRECATION")
-            am.isSpeakerphoneOn
-
         if (Call.inCall() && isAnyCallMode)
             cleanupRunnable?.let {
                 Log.d(TAG, "Canceling pending speakerphone cleanup because call is active")
