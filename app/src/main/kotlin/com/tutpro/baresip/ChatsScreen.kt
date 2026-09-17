@@ -698,7 +698,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
 private fun loadMessages(account: Account) : List<Message> {
     val res = mutableListOf<Message>()
     account.unreadMessages = false
-    for (m in BaresipService.messages) {
+    for (m in BaresipService.messages.reversed()) {
         if (m.aor != account.aor) continue
         var found = false
         for (r in res)
@@ -707,7 +707,7 @@ private fun loadMessages(account: Account) : List<Message> {
                 break
             }
         if (!found) {
-            res.add(0, m)
+            res.add(m)
             if (m.new) account.unreadMessages = true
         }
     }
