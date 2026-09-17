@@ -23,6 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -455,6 +460,20 @@ private fun Messages(
                                 )
                             }
                         }
+                        if (message.images.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            message.images.forEach { imageUri ->
+                                AsyncImage(
+                                    model = imageUri,
+                                    contentDescription = "MMS Image Attachment",
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                        .sizeIn(maxWidth = 200.dp, maxHeight = 200.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -566,7 +585,7 @@ private fun NewMessage(
                             showDialog.value = true
                         }
                         else {
-                            val destination = Utils.uriUserPart(peerUri)
+                            val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
                             if (Utils.sendSms(ctx, destination, msgText)) {
                                 msg.direction = MESSAGE_UP
                                 newMessage.value = TextFieldValue("")

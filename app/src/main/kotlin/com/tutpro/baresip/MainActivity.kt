@@ -18,6 +18,7 @@ import android.content.Intent.ACTION_DIAL
 import android.content.Intent.ACTION_VIEW
 import android.content.IntentFilter
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
@@ -92,7 +93,7 @@ class MainActivity : ComponentActivity() {
                             Log.d(TAG, "Handling service event 'stopped' with start error '${first.params[0]}'")
                             if (first.params[0] != "")
                                 handleDialog(
-                                    ctx = applicationContext,
+                                    ctx = this,
                                     title = getString(R.string.notice),
                                     message =getString(R.string.start_failed)
                                 )
@@ -180,7 +181,7 @@ class MainActivity : ComponentActivity() {
             ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
                 if (BaresipService.isServiceRunning)
                     callAction(
-                        applicationContext,
+                        this,
                         viewModel,
                         intent.data,
                         if (intent?.action == ACTION_CALL) "call" else "dial"
@@ -219,14 +220,14 @@ class MainActivity : ComponentActivity() {
                 }
                 if (denied.contains(POST_NOTIFICATIONS) && !shouldShow.contains(POST_NOTIFICATIONS))
                     handleDialog(
-                        ctx = applicationContext,
+                        ctx = this,
                         title = getString(R.string.notice),
                         message = getString(R.string.no_notifications),
                         action = { quitRestart(false) }
                     )
                 else if (shouldShow.isNotEmpty())
                     handleDialog(
-                        ctx = applicationContext,
+                        ctx = this,
                         title = getString(R.string.permissions_rationale),
                         message = getString(R.string.audio_permissions),
                         action = { requestPermissionsLauncher.launch(permissions) }
@@ -249,11 +250,14 @@ class MainActivity : ComponentActivity() {
                         Log.d(TAG, "MainActivity: Received NavigationCommand: $command")
                         when (command) {
                             is NavigationCommand.NavigateToChat -> {
-                                val route = "chat/${command.aor}/${command.peerUri}"
+                                val encodedAor = Uri.encode(command.aor)
+                                val encodedPeer = Uri.encode(command.peerUri)
+                                val route = "chat/$encodedAor/$encodedPeer"
                                 navController.navigate(route) { launchSingleTop = true }
                             }
                             is NavigationCommand.NavigateToCalls -> {
-                                val route = "calls/${command.aor}"
+                                val encodedAor = Uri.encode(command.aor)
+                                val route = "calls/$encodedAor"
                                 navController.navigate(route) { launchSingleTop = true }
                             }
                             is NavigationCommand.NavigateToChats ->
@@ -304,7 +308,7 @@ class MainActivity : ComponentActivity() {
         if (action != null) {
             // MainActivity was not visible when call, message, or transfer request came in
             intent.removeExtra("action")
-            handleIntent(applicationContext, viewModel, intent, action)
+            handleIntent(this, viewModel, intent, action)
         }
         else if (isCallLogIntent(intent))
             handleCallLogIntent()
@@ -369,7 +373,7 @@ class MainActivity : ComponentActivity() {
             isCallLogIntent(intent) -> handleCallLogIntent()
             intent.action in listOf(ACTION_DIAL, ACTION_CALL, ACTION_VIEW) ->
                 callAction(
-                    applicationContext,
+                    this,
                     viewModel,
                     intent.data,
                     if (intent.action == ACTION_CALL) "call" else "dial"
@@ -378,7 +382,7 @@ class MainActivity : ComponentActivity() {
                 val action = intent.getStringExtra("action")
                 if (action != null) {
                     intent.removeExtra("action")
-                    handleIntent(applicationContext, viewModel, intent, action)
+                    handleIntent(this, viewModel, intent, action)
                 }
             }
         }

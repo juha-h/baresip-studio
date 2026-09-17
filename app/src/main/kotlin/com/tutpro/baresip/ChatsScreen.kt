@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import android.text.format.DateUtils.isToday
 import androidx.compose.animation.animateContentSize
@@ -344,7 +345,11 @@ private fun Chats(
                 else
                     null
                 CustomElements.Button(
-                    onClick = { navController.navigate("chat/${aor}/${message.peerUri}") },
+                    onClick = {
+                        val encodedAor = Uri.encode(aor)
+                        val encodedPeer = Uri.encode(message.peerUri)
+                        navController.navigate("chat/$encodedAor/$encodedPeer")
+                    },
                     onLongClick = {
                         val peerName = Utils.friendlyUri(
                             uri = message.peerUri,

@@ -3,6 +3,7 @@ package com.tutpro.baresip
 
 import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -42,6 +43,7 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Build.VERSION
+import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.IBinder
@@ -59,6 +61,7 @@ import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telephony.PhoneStateListener
 import android.telephony.ServiceState
+import android.telephony.SmsManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
@@ -76,6 +79,7 @@ import androidx.core.app.NotificationCompat.MessagingStyle
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
@@ -126,7 +130,7 @@ class BaresipService: Service() {
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
-    private data class PendingMessage(val sender: String, val body: String, val time: Long)
+    private data class PendingMessage(val sender: String, val body: String, val time: Long, val images: List<String>)
     private val pendingMessages = mutableListOf<PendingMessage>()
 
     private var vbTimer: Timer? = null
@@ -480,134 +484,170 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
-
                 val sender = intent?.getStringExtra("sender")
                 val body = intent?.getStringExtra("body")
                 val time = intent?.getLongExtra("time", 0L) ?: 0L
+                val images = intent?.getStringArrayListExtra("images") ?: emptyList<String>()
 
                 if (sender != null && body != null && time != 0L) {
                     Handler(Looper.getMainLooper()).post {
                         if (isNativeReady) {
                             val mobileUa = uas.value.find { it.account.isMobile }
                             if (mobileUa != null)
-                                handleIncomingMessage(mobileUa.uap, sender, body, time)
+                                handleIncomingMessage(mobileUa.uap, sender, body, time, images)
                             else
                                 synchronized(pendingMessages) {
-                                    pendingMessages.add(PendingMessage(sender, body, time))
+                                    pendingMessages.add(PendingMessage(sender, body, time, images))
                                 }
                         }
                         else
                             synchronized(pendingMessages) {
-                                pendingMessages.add(PendingMessage(sender, body, time))
+                                pendingMessages.add(PendingMessage(sender, body, time, images))
                             }
                     }
                 }
+            }
 
-                if (isStartReceived || isServiceRunning) {
-                    updateStatusNotification()
-                    return START_STICKY
-                }
-
-                showStatusNotification()
-                isStartReceived = true
-
-                if (VERSION.SDK_INT < 31)
-                    @Suppress("DEPRECATION")
-                    allNetworks = cm.allNetworks.toMutableSet()
-
-                updateDnsServers()
-                updatePartialWakeLock()
-
-                val assets = arrayOf("accounts", "config", "contacts")
-                var file = File(filesPath)
-                if (!file.exists()) {
-                    Log.i(TAG, "Creating baresip directory")
-                    try {
-                        File(filesPath).mkdirs()
-                    } catch (e: Error) {
-                        Log.e(TAG, "Failed to create directory: ${e.message}")
-                    }
-                }
-                for (a in assets) {
-                    file = File("${filesPath}/$a")
-                    if (!file.exists() && a != "config") {
-                        Log.i(TAG, "Copying asset '$a'")
-                        Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
-                    }
-                    else
-                        Log.i(TAG, "Asset '$a' already copied")
-                    if (a == "config") Config.initialize(applicationContext)
-                }
-
+            "Process Incoming MMS" -> {
+                val pdu = intent?.getByteArrayExtra("pdu")
+                val subId = intent?.getIntExtra("subId", -1) ?: -1
                 Thread {
-                    if (contactsMode != "android") Contact.restoreBaresipContacts()
-                    if (contactsMode != "baresip") {
-                        Contact.loadAndroidContacts(applicationContext)
-                        registerAndroidContactsObserver()
+                    Log.i(TAG, "Process Incoming MMS started in background thread (subId: $subId)")
+
+                     if (pdu != null) {
+                        Log.d(TAG, "Parsing PDU (size ${pdu.size}) for Content-Location")
+                        val pduString = String(pdu, StandardCharsets.ISO_8859_1)
+                        val httpIndex = pduString.indexOf("http")
+                        if (httpIndex != -1) {
+                            var url = pduString.substring(httpIndex)
+                            // Clean up URL: split at any character that is NOT part of a standard URL
+                            url = url.split(Regex("""[^a-zA-Z0-9./?:=&\-]"""))[0]
+
+                            Log.i(TAG, "Triggering MMS download from cleaned URL: $url")
+
+                            try {
+                                val smsManager = if (subId != -1) {
+                                    if (VERSION.SDK_INT >= 31)
+                                        getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+                                    else
+                                        @Suppress("DEPRECATION")
+                                        SmsManager.getSmsManagerForSubscriptionId(subId)
+                                } else {
+                                    if (VERSION.SDK_INT >= 31)
+                                        getSystemService(SmsManager::class.java)
+                                    else
+                                        @Suppress("DEPRECATION")
+                                        SmsManager.getDefault()
+                                }
+
+                                val downloadFile = File(filesDir, "mms_download.dat")
+                                if (!downloadFile.exists()) downloadFile.createNewFile()
+                                // Use FileProvider to grant system telephony process access to our file
+                                val contentUri = FileProvider.getUriForFile(this, "$packageName.fileprovider", downloadFile)
+
+                                // Action for the download completion intent
+                                val downloadAction = "com.tutpro.baresip.MMS_DOWNLOADED"
+                                val downloadIntent = Intent(downloadAction).setPackage(packageName)
+                                val pi = PendingIntent.getBroadcast(this, 0, downloadIntent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+                                // Register receiver to log download result
+                                val receiver = object : BroadcastReceiver() {
+                                    override fun onReceive(context: Context, intent: Intent) {
+                                        val resCode = resultCode
+                                        Log.i(TAG, "MMS Download callback received. Result: $resCode")
+                                        if (resCode == Activity.RESULT_OK) {
+                                            Log.i(TAG, "MMS Data downloaded successfully to file. Starting manual extraction.")
+                                            Thread {
+                                                try {
+                                                    val data = downloadFile.readBytes()
+                                                    if (data.isNotEmpty()) {
+                                                        extractFromRawPdu(data)
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Log.e(TAG, "Manual PDU extraction failed: ${e.message}")
+                                                }
+                                            }.start()
+                                        } else
+                                            Log.e(TAG, "MMS Download failed at system level. Code: $resCode")
+                                        try {
+                                            context.unregisterReceiver(this)
+                                        } catch (_: Exception) {}
+                                    }
+                                }
+                                ContextCompat.registerReceiver(this, receiver, IntentFilter(downloadAction), ContextCompat.RECEIVER_NOT_EXPORTED)
+
+                                // Standard MmsConfig overrides to satisfy carrier requirements
+                                val configOverrides = Bundle().apply {
+                                    putString(SmsManager.MMS_CONFIG_USER_AGENT, "Android-Mms/2.0")
+                                    putString(SmsManager.MMS_CONFIG_UA_PROF_URL, "http://www.google.com/oha/rdf/ua-profile-kml.xml")
+                                }
+
+                                Log.d(TAG, "Requesting system download to $contentUri")
+                                // Grant temporary write permission to the system telephony process
+                                grantUriPermission("com.android.phone", contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                                smsManager.downloadMultimediaMessage(this, url, contentUri, configOverrides, pi)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "SmsManager download trigger failed: ${e.message}")
+                            }
+                        } else {
+                            Log.w(TAG, "No http URL found in MMS PDU")
+                        }
                     }
-                    Contact.contactsUpdate()
 
-                    CallHistoryNew.restore()
-                    Blocked.restore()
-                    BlockRule.restore()
-                    Message.restore()
+                    var attempts = 0
+                    val maxAttempts = 30
+                    val delayMs = 3000L
 
-                    val recordings = File(filesDir, "recordings")
+                    while (attempts < maxAttempts) {
+                        val uri = "content://mms".toUri()
+                        val now = System.currentTimeMillis()
+                        // Query all messages from the last 15 minutes
+                        val selection = "date > ${(now - 900000) / 1000}"
+                        val cursor = try {
+                            contentResolver.query(uri, null, selection, null, "date DESC")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Query content://mms failed: ${e.message}")
+                            null
+                        }
 
-                    val restored = File(filesPath, "restored")
-                    if (restored.exists()) {
-                        Log.d(TAG, "Clearing recordings")
-                        CallHistoryNew.clearRecordings()
-                        CallHistoryNew.save()
-                        Message.save()
-                        Blocked.save()
-                        BlockRule.save()
-                        if (recordings.exists()) recordings.deleteRecursively()
-                        restored.delete()
+                        if (cursor != null && cursor.count > 0)
+                            cursor.use { c ->
+                                while (c.moveToNext()) {
+                                    val id = c.getString(c.getColumnIndexOrThrow("_id"))
+                                    val mType = c.getInt(c.getColumnIndexOrThrow("m_type"))
+
+                                    val partUri = "content://mms/part".toUri()
+                                    val partCursor = contentResolver.query(partUri, null, "mid=$id", null, null)
+                                    val partsCount = partCursor?.use { it.count } ?: 0
+
+                                    // Type 132 is a retrieved message with actual content
+                                    if (mType == 132 && partsCount > 0) {
+                                        val address = getMmsAddrHelper(id) ?: "unknown"
+                                        val bodyText = getMmsTextHelper(id)
+                                        val extractedImages = getMmsImagesHelper(id)
+
+                                        if (bodyText.isNotEmpty() || extractedImages.isNotEmpty()) {
+                                            Log.i(TAG, "SUCCESS: Extracted MMS from Provider: $address")
+                                            Handler(Looper.getMainLooper()).post {
+                                                val mobileUa = uas.value.find { it.account.isMobile }
+                                                if (mobileUa != null)
+                                                    handleIncomingMessage(mobileUa.uap, address, bodyText, now, extractedImages)
+                                            }
+                                            return@Thread
+                                        }
+                                    }
+                                }
+                            }
+
+                        attempts++
+                        try {
+                            Thread.sleep(delayMs)
+                        } catch (_: InterruptedException) {
+                            break
+                        }
                     }
-
-                    File(filesDir, "recordings").mkdir()
-                    File(filesDir, "tmp").mkdir()
-
-                    hotSpotAddresses = Utils.hotSpotAddresses()
-                    linkAddresses = linkAddresses()
-                    if (linkAddresses.isEmpty()) toast(getString(R.string.no_network), Toast.LENGTH_LONG)
-                    var addresses = ""
-                    for (la in linkAddresses)
-                        addresses = "$addresses;${la.key};${la.value}"
-                    Log.i(TAG, "Link addresses: $addresses")
-
-                    val userAgent = Config.variable("user_agent")
-                    val software = if (userAgent != "")
-                        userAgent
-                    else
-                        "baresip v${BuildConfig.VERSION_NAME} " +
-                                "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
-
-                    baresipStart(
-                        filesPath,
-                        addresses.removePrefix(";"),
-                        logLevel,
-                        software
-                    )
+                    Log.d(TAG, "MMS Polling finished (Provider didn't ingest message, manual extraction was primary).")
                 }.start()
-
-                isServiceRunning = true
-
-                activeNetwork = cm.activeNetwork
-                Log.i(TAG, "Active network: $activeNetwork")
-
-                registerPhoneAccount()
-
-                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
-
-                if (!aecAvailable) toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
-
-                if (VERSION.SDK_INT >= 29) {
-                    val baresipService = Intent(this, BaresipService::class.java)
-                    baresipService.action = "Check Roles"
-                    startService(baresipService)
-                }
             }
 
             "Notification Dismissed" ->
@@ -798,6 +838,115 @@ class BaresipService: Service() {
 
             else ->
                 Log.e(TAG, "Unknown start action $action")
+        }
+
+        if (action == "Start" || action == "Process Incoming MMS") {
+
+            if (isStartReceived || isServiceRunning) {
+                updateStatusNotification()
+                return START_STICKY
+            }
+
+            showStatusNotification()
+            isStartReceived = true
+
+            if (VERSION.SDK_INT < 31)
+                @Suppress("DEPRECATION")
+                allNetworks = cm.allNetworks.toMutableSet()
+
+            updateDnsServers()
+            updatePartialWakeLock()
+
+            val assets = arrayOf("accounts", "config", "contacts")
+            var file = File(filesPath)
+            if (!file.exists()) {
+                Log.i(TAG, "Creating baresip directory")
+                try {
+                    File(filesPath).mkdirs()
+                } catch (e: Error) {
+                    Log.e(TAG, "Failed to create directory: ${e.message}")
+                }
+            }
+            for (a in assets) {
+                file = File("${filesPath}/$a")
+                if (!file.exists() && a != "config") {
+                    Log.i(TAG, "Copying asset '$a'")
+                    Utils.copyAssetToFile(this, a, "$filesPath/$a")
+                }
+                else
+                    Log.i(TAG, "Asset '$a' already copied")
+                if (a == "config") Config.initialize(this)
+            }
+
+            Thread {
+                if (contactsMode != "android") Contact.restoreBaresipContacts()
+                if (contactsMode != "baresip") {
+                    Contact.loadAndroidContacts(this)
+                    registerAndroidContactsObserver()
+                }
+                Contact.contactsUpdate()
+
+                CallHistoryNew.restore()
+                Blocked.restore()
+                BlockRule.restore()
+                Message.restore()
+
+                val recordings = File(filesDir, "recordings")
+
+                val restored = File(filesPath, "restored")
+                if (restored.exists()) {
+                    Log.d(TAG, "Clearing recordings")
+                    CallHistoryNew.clearRecordings()
+                    CallHistoryNew.save()
+                    Message.save()
+                    Blocked.save()
+                    BlockRule.save()
+                    if (recordings.exists()) recordings.deleteRecursively()
+                    restored.delete()
+                }
+
+                File(filesDir, "recordings").mkdir()
+                File(filesDir, "tmp").mkdir()
+
+                hotSpotAddresses = Utils.hotSpotAddresses()
+                linkAddresses = linkAddresses()
+                if (linkAddresses.isEmpty()) toast(getString(R.string.no_network), Toast.LENGTH_LONG)
+                var addresses = ""
+                for (la in linkAddresses)
+                    addresses = "$addresses;${la.key};${la.value}"
+                Log.i(TAG, "Link addresses: $addresses")
+
+                val userAgent = Config.variable("user_agent")
+                val software = if (userAgent != "")
+                    userAgent
+                else
+                    "baresip v${BuildConfig.VERSION_NAME} " +
+                            "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
+
+                baresipStart(
+                    filesPath,
+                    addresses.removePrefix(";"),
+                    logLevel,
+                    software
+                )
+            }.start()
+
+            isServiceRunning = true
+
+            activeNetwork = cm.activeNetwork
+            Log.i(TAG, "Active network: $activeNetwork")
+
+            registerPhoneAccount()
+
+            Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
+
+            if (!aecAvailable) toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
+
+            if (VERSION.SDK_INT >= 29) {
+                val baresipService = Intent(this, BaresipService::class.java)
+                baresipService.action = "Check Roles"
+                startService(baresipService)
+            }
         }
 
         return START_STICKY
@@ -1088,7 +1237,7 @@ class BaresipService: Service() {
                             }
                             else {
                                 val name = "callwaiting_$toneCountry"
-                                val resourceId = applicationContext.resources.getIdentifier(
+                                val resourceId = resources.getIdentifier(
                                     name,
                                     "raw",
                                     packageName
@@ -1113,7 +1262,7 @@ class BaresipService: Service() {
                         val peerUri = Utils.uriUnescape(ev[1])
                         Log.d(TAG, "Incoming call $uap/$callp/$peerUri")
                         if (Call.ofCallp(callp) == null) Call(callp, ua, peerUri, "in", "incoming").add()
-                        val extras = android.os.Bundle()
+                        val extras = Bundle()
                         extras.putLong("uap", uap)
                         extras.putLong("callp", callp)
                         extras.putString("peerUri", peerUri)
@@ -1486,7 +1635,7 @@ class BaresipService: Service() {
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    fun handleIncomingMessage(uap: Long, peerUri: String, text: String, timeStamp: Long) {
+    fun handleIncomingMessage(uap: Long, peerUri: String, text: String, timeStamp: Long, images: List<String> = emptyList()) {
 
         val ua = UserAgent.ofUap(uap)
         if (ua == null) {
@@ -1495,6 +1644,7 @@ class BaresipService: Service() {
         }
 
         val aor = ua.account.aor
+        val sanitizedPeerUri = peerUri.removeSuffix("/")
 
         val decodedText = try {
             URLDecoder.decode(text.replace("+", "%2B"), "UTF-8")
@@ -1503,23 +1653,23 @@ class BaresipService: Service() {
         }
 
         if ((ua.account.blockUnknown &&
-                Contact.contactName(e164Uri(peerUri, ua.account.countryCode)) ==
-                        e164Uri(peerUri, ua.account.countryCode)) ||
-                (ua.account.blockHidden && peerUri.contains("anonymous")) ||
-                    isBlocked(aor, peerUri)) {
-            Log.d(TAG, "Auto-rejecting blocked message from $peerUri")
+                Contact.contactName(e164Uri(sanitizedPeerUri, ua.account.countryCode)) ==
+                        e164Uri(sanitizedPeerUri, ua.account.countryCode)) ||
+                (ua.account.blockHidden && sanitizedPeerUri.contains("anonymous")) ||
+                    isBlocked(aor, sanitizedPeerUri)) {
+            Log.d(TAG, "Auto-rejecting blocked message from $sanitizedPeerUri")
             toast(
-                if (ua.account.blockHidden && peerUri.contains("anonymous"))
+                if (ua.account.blockHidden && sanitizedPeerUri.contains("anonymous"))
                     getString(R.string.hidden_message_blocked)
                 else
                     String.format(
                         getString(R.string.message_blocked),
-                        Utils.friendlyUri(this, peerUri, ua.account, unique = true)
+                        Utils.friendlyUri(this, sanitizedPeerUri, ua.account, unique = true)
                     )
             )
             Blocked(
                 aor = ua.account.aor,
-                peerUri = peerUri,
+                peerUri = sanitizedPeerUri,
                 request = "message",
                 timeStamp = GregorianCalendar().timeInMillis
             ).add()
@@ -1528,22 +1678,23 @@ class BaresipService: Service() {
 
         // Check for duplicates
         val lastMsg = messages.lastOrNull { m -> m.aor == aor }
-        if (lastMsg != null && lastMsg.timeStamp == timeStamp && lastMsg.peerUri == peerUri &&
+        if (lastMsg != null && lastMsg.timeStamp == timeStamp && lastMsg.peerUri == sanitizedPeerUri &&
                 lastMsg.message == decodedText) {
-            Log.d(TAG, "Omit duplicate message from $peerUri")
+            Log.d(TAG, "Omit duplicate message from $sanitizedPeerUri")
             return
         }
 
-        Log.d(TAG, "Message event for $uap from $peerUri at $timeStamp")
+        Log.d(TAG, "Message event for $uap from $sanitizedPeerUri at $timeStamp")
         Message(
             aor = aor,
-            peerUri = peerUri,
+            peerUri = sanitizedPeerUri,
             message = decodedText,
             timeStamp = timeStamp,
             direction = MESSAGE_DOWN,
             responseCode = 0,
             responseReason = "",
-            new = true
+            new = true,
+            images = images
         ).add()
         ua.account.unreadMessages = true
 
@@ -1553,7 +1704,7 @@ class BaresipService: Service() {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("action", "message show").putExtra("uap", uap).putExtra("peer", peerUri)
+            intent.putExtra("action", "message show").putExtra("uap", uap).putExtra("peer", sanitizedPeerUri)
             val pi = PendingIntent.getActivity(
                 this,
                 MESSAGE_REQ_CODE,
@@ -1561,7 +1712,7 @@ class BaresipService: Service() {
                 piFlags
             )
 
-            val sender = createPerson(this, peerUri, ua.account)
+            val sender = createPerson(this, sanitizedPeerUri, ua.account)
             val localUserPerson = Person.Builder()
                 .setName(getString(R.string.you))
                 .setKey(ua.account.aor)
@@ -1573,7 +1724,7 @@ class BaresipService: Service() {
 
             val clearIntent = Intent(this, BaresipService::class.java)
             clearIntent.action = "Clear Unread"
-            clearIntent.putExtra("uap", uap).putExtra("peer", peerUri)
+            clearIntent.putExtra("uap", uap).putExtra("peer", sanitizedPeerUri)
             val dpi = PendingIntent.getService(this, MESSAGE_NOTIFICATION_ID, clearIntent, piFlags)
 
             val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
@@ -1599,7 +1750,7 @@ class BaresipService: Service() {
             val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY).setLabel(getString(R.string.reply)).build()
             val directReplyIntent = Intent(this, BaresipService::class.java)
             directReplyIntent.action = "Message Inline Reply"
-            directReplyIntent.putExtra("uap", uap).putExtra("peer", peerUri).putExtra("time", timeStamp)
+            directReplyIntent.putExtra("uap", uap).putExtra("peer", sanitizedPeerUri).putExtra("time", timeStamp)
             val directReplyPendingIntent = PendingIntent.getService(
                 this,
                 DIRECT_REPLY_REQ_CODE,
@@ -1647,7 +1798,7 @@ class BaresipService: Service() {
         postServiceEvent(
             ServiceEvent(
                 "message show",
-                arrayListOf(uap, peerUri),
+                arrayListOf(uap, sanitizedPeerUri),
                 System.nanoTime()
             )
         )
@@ -1780,7 +1931,7 @@ class BaresipService: Service() {
             if (mobileUa != null)
                 synchronized(pendingMessages) {
                     for (m in pendingMessages)
-                        handleIncomingMessage(mobileUa.uap, m.sender, m.body, m.time)
+                        handleIncomingMessage(mobileUa.uap, m.sender, m.body, m.time, m.images)
                     pendingMessages.clear()
                 }
 
@@ -2652,7 +2803,7 @@ class BaresipService: Service() {
     private fun playRingBack() {
         if (mediaPlayer == null) {
             val name = "ringback_$toneCountry"
-            val resourceId = applicationContext.resources.getIdentifier(name, "raw", packageName)
+            val resourceId = resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
                 val audioAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
@@ -2660,7 +2811,7 @@ class BaresipService: Service() {
                     .build()
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(audioAttributes)
-                    val afd = applicationContext.resources.openRawResourceFd(resourceId)
+                    val afd = resources.openRawResourceFd(resourceId)
                     setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     afd.close()
                     isLooping = true
@@ -2677,7 +2828,7 @@ class BaresipService: Service() {
     private fun playBusy() {
         if (mediaPlayer == null) {
             val name = "busy_$toneCountry"
-            val resourceId = applicationContext.resources.getIdentifier(name, "raw", packageName)
+            val resourceId = resources.getIdentifier(name, "raw", packageName)
             if (resourceId != 0) {
                 val audioAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
@@ -2685,7 +2836,7 @@ class BaresipService: Service() {
                     .build()
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(audioAttributes)
-                    val afd = applicationContext.resources.openRawResourceFd(resourceId)
+                    val afd = resources.openRawResourceFd(resourceId)
                     setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     afd.close()
                     setOnCompletionListener {
@@ -2770,7 +2921,7 @@ class BaresipService: Service() {
                 }
                 else if (!hasTelecom) {
                     Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
-                    Utils.setSpeakerPhone(mainExecutor, am, speakerPhone)
+                    Utils.setSpeakerPhone(am, speakerPhone)
                 }
                 else
                     for (c in Call.calls())
@@ -3127,6 +3278,184 @@ class BaresipService: Service() {
 
         nb.setNumber(missedCalls + 1)
         nm.notify(CALL_MISSED_NOTIFICATION_ID, nb.build())
+    }
+
+    private fun getMmsAddrHelper(id: String): String? {
+        val uri = "content://mms/$id/addr".toUri()
+        val cursor = contentResolver.query(uri, null, "msg_id=$id", null, null)
+        var addr: String? = null
+        cursor?.use {
+            if (it.moveToFirst())
+                do {
+                    val type = it.getInt(it.getColumnIndexOrThrow("type"))
+                    if (type == 137) { // PDU_FROM
+                        addr = it.getString(it.getColumnIndexOrThrow("address"))
+                        break
+                    }
+                } while (it.moveToNext())
+        }
+        return addr
+    }
+
+    private fun getMmsTextHelper(id: String): String {
+        val selectionPart = "mid=$id"
+        val uri = "content://mms/part".toUri()
+        val cursor = contentResolver.query(uri, null, selectionPart, null, null)
+        val sb = StringBuilder()
+        cursor?.use {
+            while (it.moveToNext()) {
+                val type = it.getString(it.getColumnIndexOrThrow("ct"))
+                if (type == "text/plain") {
+                    val data = it.getString(it.getColumnIndexOrThrow("_data"))
+                    val body = if (data != null)
+                        try {
+                            contentResolver.openInputStream("content://mms/part/${it.getString(it.getColumnIndexOrThrow("_id"))}".toUri())?.use { isStream ->
+                                isStream.bufferedReader().use { r -> r.readText() }
+                            }
+                        } catch (_: Exception) { null }
+                    else
+                        it.getString(it.getColumnIndexOrThrow("text"))
+                    if (body != null) sb.append(body)
+                }
+            }
+        }
+        return sb.toString()
+    }
+
+    private fun getMmsImagesHelper(id: String): ArrayList<String> {
+        val selectionPart = "mid=$id"
+        val uri = "content://mms/part".toUri()
+        val cursor = contentResolver.query(uri, null, selectionPart, null, null)
+        val images = ArrayList<String>()
+        val imagesDir = File(filesDir, "mms_images")
+        if (!imagesDir.exists()) imagesDir.mkdirs()
+        cursor?.use {
+            while (it.moveToNext()) {
+                val type = it.getString(it.getColumnIndexOrThrow("ct"))
+                if (type != null && type.startsWith("image/")) {
+                    val partId = it.getString(it.getColumnIndexOrThrow("_id"))
+                    val partUri = "content://mms/part/$partId".toUri()
+                    val file = File(imagesDir, "mms_${partId}_${System.currentTimeMillis()}.jpg")
+                    try {
+                        contentResolver.openInputStream(partUri)?.use { isStream ->
+                            file.outputStream().use { osStream ->
+                                isStream.copyTo(osStream)
+                            }
+                        }
+                        images.add(file.absolutePath)
+                    } catch (_: Exception) {}
+                }
+            }
+        }
+        return images
+    }
+
+    private fun extractFromRawPdu(data: ByteArray) {
+        Log.i(TAG, "Starting binary carving of MMS PDU (${data.size} bytes)")
+
+        var sender = "unknown"
+        var body = ""
+        val images = ArrayList<String>()
+        val imagesDir = File(filesDir, "mms_images")
+        if (!imagesDir.exists()) imagesDir.mkdirs()
+
+        try {
+            // 1. Improved Sender Extraction (Look for "From" header 0x89)
+            // In MMS binary, From is 0x89 followed by either a length or 0x80 (address token)
+            val fromIndex = data.indexOf(0x89.toByte())
+            if (fromIndex != -1) {
+                // Skip the header byte and try to find the start of the number
+                // Common pattern: 89 [length] 80 [number] 00
+                var searchIndex = fromIndex + 1
+                while (searchIndex < data.size && searchIndex < fromIndex + 10) {
+                    if (data[searchIndex] == 0x80.toByte() || (data[searchIndex] in 0x30.toByte()..0x39.toByte())) {
+                        if (data[searchIndex] == 0x80.toByte()) searchIndex++
+                        val start = searchIndex
+                        // Only allow '+' (0x2B) and '0'-'9' (0x30-0x39)
+                        while (searchIndex < data.size && (data[searchIndex] == 0x2B.toByte() ||
+                                        data[searchIndex] in 0x30.toByte()..0x39.toByte())) {
+                            searchIndex++
+                        }
+                        if (searchIndex > start) {
+                            sender = String(data.sliceArray(start until searchIndex), StandardCharsets.UTF_8)
+                            Log.i(TAG, "Carved Sender: $sender")
+                        }
+                        break
+                    }
+                    searchIndex++
+                }
+            }
+
+            // 2. Direct Image Carving (JPEG)
+            // Carve all JPEGs found in the blob (FF D8 FF ... FF D9)
+            var offset = 0
+            val jpegHeader = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())
+            val jpegFooter = byteArrayOf(0xFF.toByte(), 0xD9.toByte())
+
+            while (offset < data.size) {
+                val start = data.indexOf(jpegHeader, offset)
+                if (start == -1) break
+
+                val end = data.indexOf(jpegFooter, start + 3)
+                if (end != -1) {
+                    val imgData = data.sliceArray(start until end + 2)
+                    if (imgData.size > 100) { // Ignore tiny noise
+                        val file = File(imagesDir, "mms_carved_${System.currentTimeMillis()}_${images.size}.jpg")
+                        file.writeBytes(imgData)
+                        images.add(file.absolutePath)
+                        Log.i(TAG, "Carved JPEG Image: ${file.name} (${imgData.size} bytes)")
+                    }
+                    offset = end + 2
+                }
+                else
+                    break
+            }
+
+            // 3. Robust Text Extraction
+            // Scan for the largest block of printable characters that isn't a filename or header
+            val pduString = String(data, StandardCharsets.ISO_8859_1)
+            val textRegex = Regex("""[\x20-\x7E\s]{10,}""")
+            val candidateTexts = textRegex.findAll(pduString)
+                .map { it.value.trim() }
+                .filter { it.length > 5 && !it.endsWith(".txt") && !it.endsWith(".smil") &&
+                          !it.contains("http") && !it.contains("/") && !it.contains("content-") }
+                .toList()
+            body = candidateTexts.lastOrNull() ?: ""
+            if (body.isNotEmpty())
+                Log.i(TAG, "SUCCESS: Carved body text: $body")
+            else
+                Log.w(TAG, "No body text found in PDU, check for empty message")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Binary carving failed: ${e.message}")
+        }
+
+        if (images.isNotEmpty() || body.isNotEmpty()) {
+            Handler(Looper.getMainLooper()).post {
+                val mobileUa = uas.value.find { it.account.isMobile }
+                if (mobileUa != null)
+                    handleIncomingMessage(mobileUa.uap, sender, body, System.currentTimeMillis(), images)
+                else
+                    synchronized(pendingMessages) {
+                        pendingMessages.add(PendingMessage(sender, body, System.currentTimeMillis(), images))
+                    }
+            }
+        }
+    }
+
+    private fun ByteArray.indexOf(pattern: ByteArray, startIndex: Int = 0): Int {
+        if (startIndex < 0 || startIndex > size - pattern.size) return -1
+        for (i in startIndex..size - pattern.size) {
+            var found = true
+            for (j in pattern.indices) {
+                if (this[i + j] != pattern[j]) {
+                    found = false
+                    break
+                }
+            }
+            if (found) return i
+        }
+        return -1
     }
 
     private external fun baresipStart(

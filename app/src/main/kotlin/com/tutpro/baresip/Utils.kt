@@ -54,7 +54,6 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.NavController
-import com.tutpro.baresip.Call.Companion.inCall
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -82,7 +81,6 @@ import java.util.Enumeration
 import java.util.GregorianCalendar
 import java.util.Locale
 import java.util.Random
-import java.util.concurrent.Executor
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -567,7 +565,12 @@ object Utils {
 
     fun copyAssetToFile(context: Context, asset: String, path: String) {
         try {
-            context.applicationContext.assets.open(asset).use { `is` ->
+            val assets = try {
+                context.assets
+            } catch (_: Exception) {
+                context.createPackageContext(context.packageName, 0).assets
+            }
+            assets.open(asset).use { `is` ->
                 FileOutputStream(path).use { os ->
                     val buffer = ByteArray(512)
                     var byteRead: Int = `is`.read(buffer)
@@ -579,6 +582,23 @@ object Utils {
             }
         } catch (e: IOException) {
             Log.e(TAG, "Failed to copy asset '$asset' to file: $e")
+            if (e.message?.contains("Failed to load asset path") == true) {
+                try {
+                    context.createPackageContext(context.packageName, 0).assets.open(asset).use { `is` ->
+                        FileOutputStream(path).use { os ->
+                            val buffer = ByteArray(512)
+                            var byteRead: Int = `is`.read(buffer)
+                            while (byteRead != -1) {
+                                os.write(buffer, 0, byteRead)
+                                byteRead = `is`.read(buffer)
+                            }
+                        }
+                    }
+                    Log.i(TAG, "Successfully copied asset '$asset' using fresh context")
+                } catch (e2: Exception) {
+                    Log.e(TAG, "Failed to copy asset even with fresh context: $e2")
+                }
+            }
         }
     }
 
@@ -974,7 +994,7 @@ object Utils {
         }
     }
 
-    fun setSpeakerPhone(executor: Executor, am: AudioManager, enable: Boolean) {
+    fun setSpeakerPhone(am: AudioManager, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 31) {
             if (!enable) {
                 Log.d(TAG, "Disabling speakerphone")

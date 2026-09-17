@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import java.io.File
+import java.io.IOException
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 
@@ -22,7 +23,19 @@ object Config {
 
     fun initialize(ctx: Context) {
 
-        config = ctx.assets.open("config.static").bufferedReader().use { it.readText() }
+        config = try {
+            ctx.assets.open("config.static").bufferedReader().use { it.readText() }
+        } catch (e: IOException) {
+            Log.w(TAG, "Failed to open config.static with default context ($e), trying fresh context")
+            try {
+                ctx.createPackageContext(ctx.packageName, 0).assets.open("config.static").bufferedReader().use {
+                    it.readText()
+                }
+            } catch (e2: Exception) {
+                Log.e(TAG, "Failed to open config.static even with fresh context: $e2")
+                throw e
+            }
+        }
         if (!File(configPath).exists()) {
             for (module in audioModules)
                 config = "${config}module ${module}.so\n"
