@@ -421,8 +421,14 @@ private fun Chats(
                             Text(text = info, color = textColor, fontSize = 12.sp)
                         }
                         Row {
+                            val displayText = if (message.message != "")
+                                message.message
+                            else if (message.images.isNotEmpty())
+                                "📷 Photo"
+                            else
+                                "..."
                             BasicText(
-                                text = message.message,
+                                text = displayText,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 style = TextStyle(

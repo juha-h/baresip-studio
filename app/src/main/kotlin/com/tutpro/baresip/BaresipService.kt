@@ -3412,32 +3412,36 @@ class BaresipService: Service() {
             }
 
             // 3. Robust Text Extraction
-            // Scan for the largest block of printable characters that isn't a filename or header
             val pduString = String(data, StandardCharsets.ISO_8859_1)
             val textRegex = Regex("""[\x20-\x7E\s]{10,}""")
             val candidateTexts = textRegex.findAll(pduString)
                 .map { it.value.trim() }
-                .filter { it.length > 5 && !it.endsWith(".txt") && !it.endsWith(".smil") &&
-                          !it.contains("http") && !it.contains("/") && !it.contains("content-") }
+                .filter {
+                    it.length > 3 &&
+                    !it.endsWith(".txt") && !it.endsWith(".smil") && !it.endsWith(".xml") &&
+                    !it.contains("http") && !it.contains("/") && !it.contains("content-") &&
+                    !it.contains("region=") && !it.contains("<par") &&
+                    !(it.startsWith("<") && it.endsWith(">")) &&
+                    !it.contains("src=") && !it.startsWith("text0")
+                }
                 .toList()
+
             body = candidateTexts.lastOrNull() ?: ""
-            if (body.isNotEmpty())
-                Log.i(TAG, "SUCCESS: Carved body text: $body")
-            else
-                Log.w(TAG, "No body text found in PDU, check for empty message")
+            if (body.isNotEmpty()) Log.i(TAG, "SUCCESS: Carved body text: $body")
 
         } catch (e: Exception) {
             Log.e(TAG, "Binary carving failed: ${e.message}")
         }
 
         if (images.isNotEmpty() || body.isNotEmpty()) {
+            val peerUri = if (sender.startsWith("tel:") || sender.startsWith("sip:")) sender else "tel:$sender"
             Handler(Looper.getMainLooper()).post {
                 val mobileUa = uas.value.find { it.account.isMobile }
                 if (mobileUa != null)
-                    handleIncomingMessage(mobileUa.uap, sender, body, System.currentTimeMillis(), images)
+                    handleIncomingMessage(mobileUa.uap, peerUri, body, System.currentTimeMillis(), images)
                 else
                     synchronized(pendingMessages) {
-                        pendingMessages.add(PendingMessage(sender, body, System.currentTimeMillis(), images))
+                        pendingMessages.add(PendingMessage(peerUri, body, System.currentTimeMillis(), images))
                     }
             }
         }
