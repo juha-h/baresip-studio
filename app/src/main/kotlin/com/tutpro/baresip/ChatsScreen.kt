@@ -297,7 +297,6 @@ private fun Chats(
             .padding(start = 8.dp, end = 4.dp)
             .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
-        reverseLayout = true,
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -699,7 +698,7 @@ private fun NewChatPeer(navController: NavController, account: Account) {
 private fun loadMessages(account: Account) : List<Message> {
     val res = mutableListOf<Message>()
     account.unreadMessages = false
-    for (m in BaresipService.messages.reversed()) {
+    for (m in BaresipService.messages) {
         if (m.aor != account.aor) continue
         var found = false
         for (r in res)
