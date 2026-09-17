@@ -703,7 +703,7 @@ private fun loadMessages(account: Account) : List<Message> {
                 break
             }
         if (!found) {
-            res.add(0, m)
+            res.add(m)
             if (m.new) account.unreadMessages = true
         }
     }
