@@ -134,7 +134,7 @@ class BaresipService: Service() {
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
 
-    private data class PendingMessage(val sender: String, val body: String, val time: Long)
+    private data class PendingMessage(val sender: String, val body: String, val time: Long, val images: List<String>)
     private val pendingMessages = mutableListOf<PendingMessage>()
 
     private var vbTimer: Timer? = null
@@ -491,137 +491,170 @@ class BaresipService: Service() {
         when (action) {
 
             "Start" -> {
-
                 val sender = intent?.getStringExtra("sender")
                 val body = intent?.getStringExtra("body")
                 val time = intent?.getLongExtra("time", 0L) ?: 0L
+                val images = intent?.getStringArrayListExtra("images") ?: emptyList<String>()
 
                 if (sender != null && body != null && time != 0L) {
                     Handler(Looper.getMainLooper()).post {
                         if (isNativeReady) {
                             val mobileUa = uas.value.find { it.account.isMobile }
                             if (mobileUa != null)
-                                handleIncomingMessage(mobileUa.uap, sender, body, time)
+                                handleIncomingMessage(mobileUa.uap, sender, body, time, images)
                             else
                                 synchronized(pendingMessages) {
-                                    pendingMessages.add(PendingMessage(sender, body, time))
+                                    pendingMessages.add(PendingMessage(sender, body, time, images))
                                 }
                         }
                         else
                             synchronized(pendingMessages) {
-                                pendingMessages.add(PendingMessage(sender, body, time))
+                                pendingMessages.add(PendingMessage(sender, body, time, images))
                             }
                     }
                 }
+            }
 
-                if (isStartReceived || isServiceRunning) {
-                    updateStatusNotification()
-                    return START_STICKY
-                }
-
-                showStatusNotification()
-                isStartReceived = true
-
-                if (VERSION.SDK_INT < 31)
-                    @Suppress("DEPRECATION")
-                    allNetworks = cm.allNetworks.toMutableSet()
-
-                updateDnsServers()
-                updatePartialWakeLock()
-
-                val assets = arrayOf("accounts", "config", "contacts")
-                var file = File(filesPath)
-                if (!file.exists()) {
-                    Log.i(TAG, "Creating baresip directory")
-                    try {
-                        File(filesPath).mkdirs()
-                    } catch (e: Error) {
-                        Log.e(TAG, "Failed to create directory: ${e.message}")
-                    }
-                }
-                for (a in assets) {
-                    file = File("${filesPath}/$a")
-                    if (!file.exists() && a != "config") {
-                        Log.i(TAG, "Copying asset '$a'")
-                        Utils.copyAssetToFile(applicationContext, a, "$filesPath/$a")
-                    }
-                    else
-                        Log.i(TAG, "Asset '$a' already copied")
-                    if (a == "config") Config.initialize(applicationContext)
-                }
-
+            "Process Incoming MMS" -> {
+                val pdu = intent?.getByteArrayExtra("pdu")
+                val subId = intent?.getIntExtra("subId", -1) ?: -1
                 Thread {
-                    if (contactsMode != "android") Contact.restoreBaresipContacts()
-                    if (contactsMode != "baresip") {
-                        Contact.loadAndroidContacts(applicationContext)
-                        registerAndroidContactsObserver()
+                    Log.i(TAG, "Process Incoming MMS started in background thread (subId: $subId)")
+
+                     if (pdu != null) {
+                        Log.d(TAG, "Parsing PDU (size ${pdu.size}) for Content-Location")
+                        val pduString = String(pdu, StandardCharsets.ISO_8859_1)
+                        val httpIndex = pduString.indexOf("http")
+                        if (httpIndex != -1) {
+                            var url = pduString.substring(httpIndex)
+                            // Clean up URL: split at any character that is NOT part of a standard URL
+                            url = url.split(Regex("""[^a-zA-Z0-9./?:=&\-]"""))[0]
+
+                            Log.i(TAG, "Triggering MMS download from cleaned URL: $url")
+
+                            try {
+                                val smsManager = if (subId != -1) {
+                                    if (VERSION.SDK_INT >= 31)
+                                        getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+                                    else
+                                        @Suppress("DEPRECATION")
+                                        SmsManager.getSmsManagerForSubscriptionId(subId)
+                                } else {
+                                    if (VERSION.SDK_INT >= 31)
+                                        getSystemService(SmsManager::class.java)
+                                    else
+                                        @Suppress("DEPRECATION")
+                                        SmsManager.getDefault()
+                                }
+
+                                val downloadFile = File(filesDir, "mms_download.dat")
+                                if (!downloadFile.exists()) downloadFile.createNewFile()
+                                // Use FileProvider to grant system telephony process access to our file
+                                val contentUri = FileProvider.getUriForFile(this, "$packageName.fileprovider", downloadFile)
+
+                                // Action for the download completion intent
+                                val downloadAction = "com.tutpro.baresip.MMS_DOWNLOADED"
+                                val downloadIntent = Intent(downloadAction).setPackage(packageName)
+                                val pi = PendingIntent.getBroadcast(this, 0, downloadIntent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+                                // Register receiver to log download result
+                                val receiver = object : BroadcastReceiver() {
+                                    override fun onReceive(context: Context, intent: Intent) {
+                                        val resCode = resultCode
+                                        Log.i(TAG, "MMS Download callback received. Result: $resCode")
+                                        if (resCode == Activity.RESULT_OK) {
+                                            Log.i(TAG, "MMS Data downloaded successfully to file. Starting manual extraction.")
+                                            Thread {
+                                                try {
+                                                    val data = downloadFile.readBytes()
+                                                    if (data.isNotEmpty()) {
+                                                        extractFromRawPdu(data)
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Log.e(TAG, "Manual PDU extraction failed: ${e.message}")
+                                                }
+                                            }.start()
+                                        } else
+                                            Log.e(TAG, "MMS Download failed at system level. Code: $resCode")
+                                        try {
+                                            context.unregisterReceiver(this)
+                                        } catch (_: Exception) {}
+                                    }
+                                }
+                                ContextCompat.registerReceiver(this, receiver, IntentFilter(downloadAction), ContextCompat.RECEIVER_NOT_EXPORTED)
+
+                                // Standard MmsConfig overrides to satisfy carrier requirements
+                                val configOverrides = Bundle().apply {
+                                    putString(SmsManager.MMS_CONFIG_USER_AGENT, "Android-Mms/2.0")
+                                    putString(SmsManager.MMS_CONFIG_UA_PROF_URL, "http://www.google.com/oha/rdf/ua-profile-kml.xml")
+                                }
+
+                                Log.d(TAG, "Requesting system download to $contentUri")
+                                // Grant temporary write permission to the system telephony process
+                                grantUriPermission("com.android.phone", contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                                smsManager.downloadMultimediaMessage(this, url, contentUri, configOverrides, pi)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "SmsManager download trigger failed: ${e.message}")
+                            }
+                        } else {
+                            Log.w(TAG, "No http URL found in MMS PDU")
+                        }
                     }
-                    Contact.contactsUpdate()
 
-                    CallHistoryNew.restore()
-                    Blocked.restore()
-                    BlockRule.restore()
-                    Message.restore()
+                    var attempts = 0
+                    val maxAttempts = 30
+                    val delayMs = 3000L
 
-                    val recordings = File(filesDir, "recordings")
+                    while (attempts < maxAttempts) {
+                        val uri = "content://mms".toUri()
+                        val now = System.currentTimeMillis()
+                        // Query all messages from the last 15 minutes
+                        val selection = "date > ${(now - 900000) / 1000}"
+                        val cursor = try {
+                            contentResolver.query(uri, null, selection, null, "date DESC")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Query content://mms failed: ${e.message}")
+                            null
+                        }
 
-                    val restored = File(filesPath, "restored")
-                    if (restored.exists()) {
-                        Log.d(TAG, "Clearing recordings")
-                        CallHistoryNew.clearRecordings()
-                        CallHistoryNew.save()
-                        Message.save()
-                        Blocked.save()
-                        BlockRule.save()
-                        if (recordings.exists()) recordings.deleteRecursively()
-                        restored.delete()
+                        if (cursor != null && cursor.count > 0)
+                            cursor.use { c ->
+                                while (c.moveToNext()) {
+                                    val id = c.getString(c.getColumnIndexOrThrow("_id"))
+                                    val mType = c.getInt(c.getColumnIndexOrThrow("m_type"))
+
+                                    val partUri = "content://mms/part".toUri()
+                                    val partCursor = contentResolver.query(partUri, null, "mid=$id", null, null)
+                                    val partsCount = partCursor?.use { it.count } ?: 0
+
+                                    // Type 132 is a retrieved message with actual content
+                                    if (mType == 132 && partsCount > 0) {
+                                        val address = getMmsAddrHelper(id) ?: "unknown"
+                                        val bodyText = getMmsTextHelper(id)
+                                        val extractedImages = getMmsImagesHelper(id)
+
+                                        if (bodyText.isNotEmpty() || extractedImages.isNotEmpty()) {
+                                            Log.i(TAG, "SUCCESS: Extracted MMS from Provider: $address")
+                                            Handler(Looper.getMainLooper()).post {
+                                                val mobileUa = uas.value.find { it.account.isMobile }
+                                                if (mobileUa != null)
+                                                    handleIncomingMessage(mobileUa.uap, address, bodyText, now, extractedImages)
+                                            }
+                                            return@Thread
+                                        }
+                                    }
+                                }
+                            }
+
+                        attempts++
+                        try {
+                            Thread.sleep(delayMs)
+                        } catch (_: InterruptedException) {
+                            break
+                        }
                     }
-
-                    File(filesDir, "recordings").mkdir()
-                    File(filesDir, "tmp").mkdir()
-
-                    hotSpotAddresses = Utils.hotSpotAddresses()
-                    linkAddresses = linkAddresses()
-                    if (linkAddresses.isEmpty()) toast(getString(R.string.no_network), Toast.LENGTH_LONG)
-                    var addresses = ""
-                    for (la in linkAddresses)
-                        addresses = "$addresses;${la.key};${la.value}"
-                    Log.i(TAG, "Link addresses: $addresses")
-
-                    val userAgent = Config.variable("user_agent")
-                    val software = if (userAgent != "")
-                        userAgent
-                    else
-                        "baresip v${BuildConfig.VERSION_NAME} " +
-                                "(Android ${VERSION.RELEASE}/${System.getProperty("os.arch") ?: "?"})"
-
-                    baresipStart(
-                        filesPath,
-                        addresses.removePrefix(";"),
-                        logLevel,
-                        software
-                    )
+                    Log.d(TAG, "MMS Polling finished (Provider didn't ingest message, manual extraction was primary).")
                 }.start()
-
-                isServiceRunning = true
-
-                activeNetwork = cm.activeNetwork
-                Log.i(TAG, "Active network: $activeNetwork")
-
-                registerPhoneAccount()
-
-                Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
-
-                if (!aecAvailable) toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
-
-                if (!supportedCameras)
-                    toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
-
-                if (VERSION.SDK_INT >= 29) {
-                    val baresipService = Intent(this, BaresipService::class.java)
-                    baresipService.action = "Check Roles"
-                    startService(baresipService)
-                }
             }
 
             "Notification Dismissed" ->
@@ -917,6 +950,8 @@ class BaresipService: Service() {
             Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
             if (!aecAvailable) toast(getString(R.string.no_aec), Toast.LENGTH_LONG)
+
+            if (!supportedCameras) toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
 
             if (VERSION.SDK_INT >= 29) {
                 val baresipService = Intent(this, BaresipService::class.java)
