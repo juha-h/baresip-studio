@@ -1,0 +1,2 @@
+- Added capability to receive MMS messages
+- Minor chat list improvements
