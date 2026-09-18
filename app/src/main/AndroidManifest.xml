@@ -51,6 +51,8 @@
         tools:ignore="SmsAndCallLogPolicy" />
     <uses-permission android:name="android.permission.RECEIVE_MMS"
         tools:ignore="SmsAndCallLogPolicy" />
+    <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH"
+        tools:ignore="SmsAndCallLogPolicy" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -230,6 +232,19 @@
                 <action android:name="com.tutpro.baresip.plus.QUIT" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PATHS"
+                android:resource="@xml/file_paths" />
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

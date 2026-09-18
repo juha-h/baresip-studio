@@ -7,7 +7,7 @@ import java.io.*
 @Serializable
 class Message(val aor: String, val peerUri: String, val message: String, val timeStamp: Long,
               var direction: Int, var responseCode: Int, var responseReason: String,
-              var new: Boolean): java.io.Serializable {
+              var new: Boolean, val images: List<String> = emptyList()): java.io.Serializable {
 
     fun add() {
         val updatedMessages = synchronized(BaresipService.messagesLock) {
@@ -161,9 +161,14 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             val file = File(BaresipService.filesPath, "messages")
             if (file.exists()) {
                 val content = file.readText()
-                if (content.startsWith("[")) {
+                if (content.startsWith("["))
                     try {
-                        val restoredMessages = Json.decodeFromString<List<Message>>(content)
+                        val restoredMessages = Json.decodeFromString<List<Message>>(content).map {
+                            if (it.peerUri.endsWith("/"))
+                                Message(it.aor, it.peerUri.removeSuffix("/"), it.message, it.timeStamp, it.direction, it.responseCode, it.responseReason, it.new, it.images)
+                            else
+                                it
+                        }
                         synchronized(BaresipService.messagesLock) {
                             BaresipService.messages = restoredMessages
                         }
@@ -172,7 +177,6 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     } catch (e: Exception) {
                         Log.d(TAG, "JSON restore failed, trying Java serialization: $e")
                     }
-                }
                 try {
                     val fis = FileInputStream(file)
                     val ois = ObjectInputStream(fis)

@@ -1,6 +1,7 @@
 package com.tutpro.baresip.plus
 
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import android.text.format.DateUtils.isToday
 import androidx.compose.animation.animateContentSize
@@ -296,7 +297,6 @@ private fun Chats(
             .padding(start = 8.dp, end = 4.dp)
             .verticalScrollbar(state = lazyListState)
             .background(MaterialTheme.colorScheme.background),
-        reverseLayout = true,
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -344,7 +344,11 @@ private fun Chats(
                 else
                     null
                 CustomElements.Button(
-                    onClick = { navController.navigate("chat/${aor}/${message.peerUri}") },
+                    onClick = {
+                        val encodedAor = Uri.encode(aor)
+                        val encodedPeer = Uri.encode(message.peerUri)
+                        navController.navigate("chat/$encodedAor/$encodedPeer")
+                    },
                     onLongClick = {
                         val peerName = Utils.friendlyUri(
                             uri = message.peerUri,
@@ -417,8 +421,14 @@ private fun Chats(
                             Text(text = info, color = textColor, fontSize = 12.sp)
                         }
                         Row {
+                            val displayText = if (message.message != "")
+                                message.message
+                            else if (message.images.isNotEmpty())
+                                "📷 Photo"
+                            else
+                                "..."
                             BasicText(
-                                text = message.message,
+                                text = displayText,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 style = TextStyle(
