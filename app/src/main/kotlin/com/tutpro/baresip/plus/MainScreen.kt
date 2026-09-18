@@ -2665,7 +2665,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                                     android.telecom.CallAudioState.ROUTE_SPEAKER
                             )
                         else
-                            Utils.toggleSpeakerPhone(ContextCompat.getMainExecutor(ctx), am)
+                            Utils.toggleSpeakerPhone(am)
                     }
                 ) {
                     Icon(

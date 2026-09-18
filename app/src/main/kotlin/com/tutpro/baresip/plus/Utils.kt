@@ -1092,14 +1092,13 @@ object Utils {
         }
     }
 
-    fun toggleSpeakerPhone(executor: Executor, am: AudioManager) {
-        val isSpeakerOn = if (Build.VERSION.SDK_INT >= 31) {
+    fun toggleSpeakerPhone(am: AudioManager) {
+        val isSpeakerOn = if (Build.VERSION.SDK_INT >= 31)
             am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-        } else {
+        else
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn
-        }
-        setSpeakerPhone(executor, am, !isSpeakerOn)
+        setSpeakerPhone(am, !isSpeakerOn)
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
