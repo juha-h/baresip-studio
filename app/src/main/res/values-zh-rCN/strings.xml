@@ -6,7 +6,7 @@
     <string name="nickname">昵称</string>
     <string name="invalid_account_nickname">账号昵称“%1$s”无效</string>
     <string name="non_unique_account_nickname">昵称“%1$s”已存在</string>
-    <string name="account_nickname_help">昵称（如果有）用于在 baresip 应用中识别此账号。</string>
+    <string name="account_nickname_help">用于在 baresip 应用中标识此账号的昵称（如果有）。</string>
     <string name="display_name">显示名称</string>
     <string name="display_name_help">名称（如果有）用于在出站请求中的 From URI。</string>
     <string name="invalid_display_name">显示名称“%1$s”无效</string>
