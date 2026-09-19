@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.PendingIntent
 import android.app.role.RoleManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -35,6 +36,7 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.SmsManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.text.format.DateUtils
@@ -48,6 +50,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
@@ -64,6 +67,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.OutputStream
 import java.io.RandomAccessFile
 import java.io.Serializable
 import java.lang.reflect.Method
@@ -99,6 +103,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import java.io.ByteArrayOutputStream
 
 object Utils {
 
@@ -1393,6 +1398,22 @@ object Utils {
         return file
     }
 
+    fun copyUriToInternalStorage(ctx: Context, uri: Uri, destDir: File, fileName: String): String? {
+        if (!destDir.exists()) destDir.mkdirs()
+        val destFile = File(destDir, fileName)
+        return try {
+            ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
+                destFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            destFile.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to copy URI to internal storage: ${e.message}")
+            null
+        }
+    }
+
     @SuppressLint("MissingPermission")
     fun cancelMissedCallsNotification(ctx: Context) {
         val telecom = ctx.getSystemService(TelecomManager::class.java)
@@ -1526,10 +1547,10 @@ object Utils {
     fun sendSms(ctx: Context, destination: String, message: String): Boolean {
         return try {
             val smsManager = if (Build.VERSION.SDK_INT >= 31)
-                ctx.getSystemService(android.telephony.SmsManager::class.java)
+                ctx.getSystemService(SmsManager::class.java)
             else
                 @Suppress("DEPRECATION")
-                android.telephony.SmsManager.getDefault()
+                SmsManager.getDefault()
             smsManager.sendTextMessage(
                 destination,
                 null,
@@ -1542,6 +1563,243 @@ object Utils {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to send SMS: ${e.message}")
             false
+        }
+    }
+
+    fun sendMms(ctx: Context, aor: String, destination: String, text: String, images: List<String>, time: Long): Boolean {
+        Log.i(TAG, "Sending MMS to $destination (images: ${images.size})")
+        return try {
+            val subId = SubscriptionManager.getDefaultSmsSubscriptionId()
+            val smsManager = if (subId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+                if (Build.VERSION.SDK_INT >= 31)
+                    ctx.getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+                else
+                    @Suppress("DEPRECATION")
+                    SmsManager.getSmsManagerForSubscriptionId(subId)
+            } else {
+                if (Build.VERSION.SDK_INT >= 31)
+                    ctx.getSystemService(SmsManager::class.java)
+                else
+                    @Suppress("DEPRECATION")
+                    SmsManager.getDefault()
+            }
+
+            // 1. Build the MMS PDU (Send-Req)
+            val pduFile = File(ctx.filesDir, "mms_send_$time.pdu")
+            val pduData = buildMmsSendReqPdu(destination, text, images)
+            if (pduData == null) {
+                Log.e(TAG, "Failed to build MMS PDU")
+                return false
+            }
+            pduFile.writeBytes(pduData)
+
+            // 2. Share with SmsManager via FileProvider
+            val contentUri = FileProvider.getUriForFile(
+                ctx, "${ctx.packageName}.fileprovider", pduFile
+            )
+
+            // 3. Trigger sending with extras for tracking
+            val sentAction = "com.tutpro.baresip.MMS_SENT"
+            val sentIntent = Intent(sentAction).setPackage(ctx.packageName).apply {
+                putExtra("aor", aor)
+                putExtra("time", time)
+            }
+            val pi = PendingIntent.getBroadcast(
+                ctx, time.toInt(), sentIntent,
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            // Try to resolve carrier settings from the system database
+            val carrierConfig = resolveMmsConfig(ctx, subId)
+            
+            smsManager.sendMultimediaMessage(ctx, contentUri, carrierConfig.location, carrierConfig.config, pi)
+            Log.d(TAG, "MMS transmission triggered via SmsManager (subId: $subId) for $time")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "MMS Send trigger failed: ${e.message}")
+            false
+        }
+    }
+
+    private data class MmsConfig(val location: String?, val config: Bundle)
+
+    private fun resolveMmsConfig(ctx: Context, subId: Int): MmsConfig {
+        val config = Bundle().apply {
+            putString(SmsManager.MMS_CONFIG_USER_AGENT, "Android-Mms/2.0")
+            putString(SmsManager.MMS_CONFIG_UA_PROF_URL, "http://www.google.com/oha/rdf/ua-profile-kml.xml")
+        }
+        
+        var mmsc: String? = null
+        val projection = arrayOf("mmsc", "mmsproxy", "mmsport")
+        
+        try {
+            // Target the specific subscription ID for carrier settings
+            val uri = if (subId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+                Uri.parse("content://telephony/carriers/subid/$subId")
+            } else {
+                Uri.parse("content://telephony/carriers/current")
+            }
+
+            val cursor = ctx.contentResolver.query(uri, projection, "current=1", null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    mmsc = it.getString(0)
+                    val proxy = it.getString(1)
+                    val port = it.getString(2)
+                    if (!proxy.isNullOrEmpty()) {
+                        config.putString("mmsProxyAddress", proxy)
+                        config.putString("mmsProxyPort", port ?: "80")
+                    }
+                    Log.d(TAG, "Found carrier MMSC for subId $subId: $mmsc, Proxy: $proxy:$port")
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not query carrier DB for subId $subId: ${e.message}")
+        }
+        
+        return MmsConfig(mmsc, config)
+    }
+
+    private fun buildMmsSendReqPdu(destination: String, text: String, images: List<String>): ByteArray? {
+        val out = ByteArrayOutputStream()
+        try {
+            // 1. X-Mms-Message-Type: m-send-req (0x8C 0x80)
+            out.write(0x8C)
+            out.write(0x80)
+
+            // 2. X-Mms-Transaction-ID: (0x98 text 0x00)
+            out.write(0x98)
+            out.write("baresip${System.currentTimeMillis()}".toByteArray())
+            out.write(0x00)
+
+            // 3. X-Mms-MMS-Version: 1.2 (0x8D 0x92)
+            out.write(0x8D)
+            out.write(0x92)
+
+            // 4. From: Insert-address-token (0x89 0x81)
+            out.write(0x89)
+            out.write(0x81)
+
+            // 5. To: (0x97 text 0x00)
+            out.write(0x97)
+            out.write(destination.toByteArray())
+            out.write(0x00)
+
+            // 6. X-Mms-Message-ID: (0x8B text 0x00)
+            out.write(0x8B)
+            out.write("msg${System.currentTimeMillis()}".toByteArray())
+            out.write(0x00)
+
+            // 7. Content-Type: multipart/related (0x84 0xA3)
+            out.write(0x84)
+            out.write(0xA3)
+
+            // --- Body (Multipart) ---
+            val parts = mutableListOf<Triple<String, String, ByteArray>>()
+            if (text.isNotEmpty()) {
+                parts.add(Triple("text/plain", "text.txt", text.toByteArray()))
+            }
+            for ((index, path) in images.withIndex()) {
+                val file = File(path)
+                if (file.exists()) {
+                    val ext = path.substringAfterLast(".", "jpg").lowercase()
+                    val mime = if (ext == "png") "image/png" else "image/jpeg"
+                    val data = resizeImageForMms(file) ?: file.readBytes()
+                    parts.add(Triple(mime, "img_$index.$ext", data))
+                }
+            }
+
+            // Part Count (UintVar)
+            writeUintVar(out, parts.size)
+
+            for (part in parts) {
+                val header = ByteArrayOutputStream()
+                
+                // Content-Type Header (0x85 token)
+                header.write(0x85)
+                val typeToken = when (part.first) {
+                    "text/plain" -> 0x03 or 0x80
+                    "image/jpeg" -> 0x0E or 0x80
+                    "image/gif" -> 0x0D or 0x80
+                    "image/png" -> 0x11 or 0x80
+                    else -> 0x00
+                }
+                if (typeToken != 0x00) {
+                    header.write(typeToken)
+                } else {
+                    header.write(part.first.toByteArray())
+                    header.write(0x00)
+                }
+
+                // Content-Location Header (0x8E text 0x00)
+                header.write(0x8E)
+                header.write(part.second.toByteArray())
+                header.write(0x00)
+
+                val hData = header.toByteArray()
+                // MMS Part Header Length (UintVar)
+                writeUintVar(out, hData.size)
+                // MMS Part Data Length (UintVar)
+                writeUintVar(out, part.third.size)
+                
+                out.write(hData)
+                out.write(part.third)
+            }
+
+            return out.toByteArray()
+        } catch (e: Exception) {
+            Log.e(TAG, "PDU Build Error: ${e.message}")
+            return null
+        }
+    }
+
+    private fun writeUintVar(out: OutputStream, value: Int) {
+        if (value < 0) return
+        var v = value
+        val bytes = mutableListOf<Int>()
+        bytes.add(v and 0x7F)
+        while (v >= 128) {
+            v = v shr 7
+            bytes.add(0, (v and 0x7F) or 0x80)
+        }
+        for (b in bytes) out.write(b)
+    }
+
+    private fun resizeImageForMms(file: File): ByteArray? {
+        val maxSize = 600 * 1024 // 600KB
+        if (file.length() <= maxSize) {
+            return try { file.readBytes() } catch (_: Exception) { null }
+        }
+
+        try {
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(file.absolutePath, options)
+
+            var scale = 1
+            while ((options.outWidth / scale) * (options.outHeight / scale) > 2000000) {
+                scale *= 2
+            }
+            
+            options.inJustDecodeBounds = false
+            options.inSampleSize = scale
+            
+            val bitmap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
+            
+            var quality = 90
+            var output: ByteArray
+            do {
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+                output = stream.toByteArray()
+                quality -= 10
+            } while (output.size > maxSize && quality > 10)
+            
+            bitmap.recycle()
+            Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes (quality: ${quality + 10})")
+            return output
+        } catch (e: Exception) {
+            Log.e(TAG, "Resizing failed: ${e.message}")
+            return null
         }
     }
 

@@ -129,6 +129,7 @@ class BaresipService: Service() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var stopState: String
     private lateinit var quitTimer: CountDownTimer
+    private var mmsSentReceiver: BroadcastReceiver? = null
 
     private data class PendingMessage(val sender: String, val body: String, val time: Long, val images: List<String>)
     private val pendingMessages = mutableListOf<PendingMessage>()
@@ -148,6 +149,7 @@ class BaresipService: Service() {
     private var airplaneModeReceiverRegistered = false
     private var simStateReceiverRegistered = false
     private var telephonyCallbackRegistered = false
+    private var mmsSentReceiverRegistered = false
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
     private var previousMobileServiceState = -1
@@ -403,6 +405,34 @@ class BaresipService: Service() {
             ContextCompat.RECEIVER_EXPORTED
         )
         bluetoothReceiverRegistered = true
+
+        mmsSentReceiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                if (intent.action == "com.tutpro.baresip.MMS_SENT") {
+                    val aor = intent.getStringExtra("aor") ?: ""
+                    val time = intent.getLongExtra("time", 0L)
+                    val resultCode = resultCode
+                    Log.d(TAG, "MMS Sent Result: $resultCode for $time")
+                    if (resultCode == Activity.RESULT_OK) {
+                        Message.updateMessageStatus(aor, time, MESSAGE_UP)
+                    } else {
+                        Message.updateMessageStatus(aor, time, MESSAGE_UP_FAIL, "MMS failed ($resultCode)")
+                    }
+                    val pduFile = File(filesDir, "mms_send_$time.pdu")
+                    if (pduFile.exists()) pduFile.delete()
+                }
+            }
+        }
+
+        mmsSentReceiver?.let {
+            ContextCompat.registerReceiver(
+                this,
+                it,
+                IntentFilter("com.tutpro.baresip.MMS_SENT"),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            mmsSentReceiverRegistered = true
+        }
 
         telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         if (VERSION.SDK_INT >= 31)
@@ -3189,6 +3219,12 @@ class BaresipService: Service() {
                 unregisterReceiver(airplaneModeReceiver)
             } catch (_: IllegalArgumentException) {}
             airplaneModeReceiverRegistered = false
+        }
+        if (mmsSentReceiverRegistered) {
+            try {
+                mmsSentReceiver?.let { unregisterReceiver(it) }
+            } catch (_: IllegalArgumentException) {}
+            mmsSentReceiverRegistered = false
         }
         if (telephonyCallbackRegistered) {
             if (VERSION.SDK_INT >= 31)

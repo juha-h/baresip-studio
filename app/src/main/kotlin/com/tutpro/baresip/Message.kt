@@ -95,6 +95,23 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                 }
         }
 
+        fun updateMessageStatus(aor: String, time: Long, direction: Int, reason: String = "") {
+            val updatedMessages = synchronized(BaresipService.messagesLock) {
+                BaresipService.messages.toMutableList()
+            }
+            for (message in updatedMessages.reversed())
+                if (message.aor == aor && message.timeStamp == time) {
+                    message.direction = direction
+                    if (reason != "") message.responseReason = reason
+                    synchronized(BaresipService.messagesLock) {
+                        BaresipService.messages = updatedMessages.toList()
+                    }
+                    BaresipService.messageUpdate.postValue(System.currentTimeMillis())
+                    save()
+                    return
+                }
+        }
+
         fun unreadMessages(aor: String): Boolean {
             synchronized(BaresipService.messagesLock) {
                 for (message in BaresipService.messages.reversed())
