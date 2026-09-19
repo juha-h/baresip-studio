@@ -67,7 +67,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.io.OutputStream
 import java.io.RandomAccessFile
 import java.io.Serializable
 import java.lang.reflect.Method
@@ -1623,43 +1622,49 @@ object Utils {
     private fun buildMmsSendReqPdu(destination: String, text: String, images: List<String>): ByteArray? {
         val out = ByteArrayOutputStream()
         try {
-            // 1. Message Type: m-send-req (0x8C 0x80)
-            out.write(0x8C); out.write(0x80)
-            
-            // 2. Transaction ID (0x98 text 0x00)
+            // 1. Message Type: m-send-req
+            out.write(byteArrayOf(0x8C.toByte(), 0x80.toByte()))
+
+            // 2. Transaction ID
             out.write(0x98)
-            out.write("baresip${System.currentTimeMillis()}".toByteArray())
+            val txId = "msg${System.currentTimeMillis()}".toByteArray(Charsets.UTF_8)
+            out.write(txId)
             out.write(0x00)
-            
-            // 3. MMS Version 1.2 (0x8D 0x92)
-            out.write(0x8D); out.write(0x92)
 
-            // 4. From: Insert-address-token (0x89 0x81)
-            out.write(0x89); out.write(0x81)
+            // 3. Version: 1.2
+            out.write(byteArrayOf(0x8D.toByte(), 0x92.toByte()))
 
-            // 5. To (0x97 text 0x00)
+            // 4. From: Insert-Address-Token
+            out.write(byteArrayOf(0x89.toByte(), 0x81.toByte()))
+
+            // 5. To: Address
             out.write(0x97)
-            out.write(destination.toByteArray())
+            out.write(destination.toByteArray(Charsets.UTF_8))
             out.write(0x00)
 
-            // 6. Message-Class: Personal (0x8A 0x80)
-            out.write(0x8A); out.write(0x80)
+            // 6. Date: Absolute (4-byte Unix timestamp)
+            out.write(0x85)
+            writeTime(out, System.currentTimeMillis() / 1000)
 
-            // 7. X-Mms-Message-ID: (0x8B text 0x00)
+            // 7. Message-Class: Personal
+            out.write(byteArrayOf(0x8A.toByte(), 0x80.toByte()))
+
+            // 8. X-Mms-Message-ID
             out.write(0x8B)
-            out.write("msg${System.currentTimeMillis()}".toByteArray())
+            out.write("id${System.currentTimeMillis()}".toByteArray(Charsets.UTF_8))
             out.write(0x00)
 
-            // 8. Subject (0x96 0x00) - Blank subject
-            out.write(0x96); out.write(0x00)
-            
-            // 9. Content-Type: multipart/related (0x84 0xA3)
-            out.write(0x84); out.write(0xA3)
-            
-            // --- Body (Multipart) ---
-            val parts = mutableListOf<Triple<String, String, ByteArray>>()
+            // 9. Subject (empty)
+            out.write(byteArrayOf(0x96.toByte(), 0x00.toByte()))
+
+            // 10. Content-Type: multipart/related
+            out.write(0x84)  // Content-Type header
+            out.write(0xA3)  // multipart/related
+
+            // Build parts
+            val parts = mutableListOf<Pair<String, ByteArray>>()
             if (text.isNotEmpty()) {
-                parts.add(Triple("text/plain", "text.txt", text.toByteArray()))
+                parts.add("text/plain" to text.toByteArray(Charsets.UTF_8))
             }
             for ((index, path) in images.withIndex()) {
                 val file = File(path)
@@ -1667,62 +1672,75 @@ object Utils {
                     val ext = path.substringAfterLast(".", "jpg").lowercase()
                     val mime = if (ext == "png") "image/png" else "image/jpeg"
                     val data = resizeImageForMms(file) ?: file.readBytes()
-                    parts.add(Triple(mime, "img_$index.$ext", data))
+                    parts.add(mime to data)
                 }
             }
-            
-            // Part Count (UintVar)
-            writeUintVar(out, parts.size) 
 
-            for (part in parts) {
+            if (parts.isEmpty()) {
+                Log.e(TAG, "No message content!")
+                return null
+            }
+
+            // Part count
+            writeUintVar(out, parts.size)
+
+            for ((mime, data) in parts) {
                 val header = ByteArrayOutputStream()
-                
-                // Content-Type Header (WSP token 0x01 | 0x80 = 0x81)
-                header.write(0x81) 
-                val typeToken = when (part.first) {
-                    "text/plain" -> 0x03 or 0x80 // 0x83
-                    "image/jpeg" -> 0x0E or 0x80 // 0x8E
-                    "image/gif" -> 0x1D or 0x80  // 0x9D
-                    "image/png" -> 0x11 or 0x80  // 0x91
-                    else -> 0x00
-                }
-                if (typeToken != 0x00) {
+
+                // Content-Type
+                header.write(0x85)
+                val typeToken = getMimeTypeToken(mime)
+                if (typeToken > 0) {
                     header.write(typeToken)
                 } else {
-                    header.write(part.first.toByteArray())
+                    header.write(mime.toByteArray(Charsets.UTF_8))
                     header.write(0x00)
                 }
 
-                // Content-Location Header (WSP token 0x0E | 0x80 = 0x8E)
-                header.write(0x8E) 
-                header.write(part.second.toByteArray())
-                header.write(0x00)
-                
                 val hData = header.toByteArray()
-                // MMS Part layout: Header-Len (UintVar), Data-Len (UintVar), Headers, Data
                 writeUintVar(out, hData.size)
-                writeUintVar(out, part.third.size)
+                writeUintVar(out, data.size)
                 out.write(hData)
-                out.write(part.third)
+                out.write(data)
             }
-            
+
+            Log.d(TAG, "PDU built: ${out.size()} bytes")
             return out.toByteArray()
         } catch (e: Exception) {
-            Log.e(TAG, "PDU Build Error: ${e.message}")
+            Log.e(TAG, "PDU Build Error: ${e.message}", e)
             return null
         }
     }
 
-    private fun writeUintVar(out: OutputStream, value: Int) {
-        if (value < 0) return
-        var v = value
-        val bytes = mutableListOf<Int>()
-        bytes.add(v and 0x7F)
-        while (v >= 128) {
-            v = v shr 7
-            bytes.add(0, (v and 0x7F) or 0x80)
+    private fun getMimeTypeToken(mime: String): Int = when (mime) {
+        "text/plain" -> 0x83.toByte().toInt()
+        "image/jpeg" -> 0x8E.toByte().toInt()
+        "image/gif" -> 0x9D.toByte().toInt()
+        "image/png" -> 0x91.toByte().toInt()
+        else -> 0
+    }
+
+    private fun writeTime(out: ByteArrayOutputStream, seconds: Long) {
+        val time = seconds and 0xFFFFFFFFL
+        out.write(((time shr 24) and 0xFF).toInt())
+        out.write(((time shr 16) and 0xFF).toInt())
+        out.write(((time shr 8) and 0xFF).toInt())
+        out.write((time and 0xFF).toInt())
+    }
+
+    private fun writeUintVar(out: ByteArrayOutputStream, value: Int) {
+        when {
+            value < 128 -> out.write(value)
+            value < 16384 -> {
+                out.write(0x80 or (value shr 8))
+                out.write(value and 0xFF)
+            }
+            else -> {
+                out.write(0xC0 or (value shr 16))
+                out.write((value shr 8) and 0xFF)
+                out.write(value and 0xFF)
+            }
         }
-        for (b in bytes) out.write(b)
     }
 
     private fun resizeImageForMms(file: File): ByteArray? {
@@ -1760,6 +1778,33 @@ object Utils {
         } catch (e: Exception) {
             Log.e(TAG, "Resizing failed: ${e.message}")
             return null
+        }
+    }
+
+    fun debugCarrierConfig(ctx: Context) {
+        Log.d(TAG, "=== MMS CARRIER CONFIG DEBUG ===")
+        val tm = ctx.getSystemService(TelephonyManager::class.java)
+        Log.d(TAG, "Carrier Name: ${tm?.simOperatorName}")
+        Log.d(TAG, "Operator Code: ${tm?.simOperator}")
+
+        try {
+            val resolver = ctx.contentResolver
+            val cursor = resolver.query(
+                Uri.parse("content://telephony/carriers/current"),
+                null, null, null, null
+            )
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val mmsc = it.getString(it.getColumnIndexOrThrow("mmsc"))
+                    Log.d(TAG, "MMSC: $mmsc")
+                    Log.d(TAG, "MMS Proxy: ${it.getString(it.getColumnIndexOrThrow("mmsport"))}")
+                    Log.d(TAG, "✓ Carrier config found")
+                } else {
+                    Log.w(TAG, "⚠️ No carrier config found in cursor!")
+                }
+            } ?: Log.w(TAG, "⚠️ Cursor is null!")
+        } catch (e: Exception) {
+            Log.e(TAG, "⚠️ Carrier query FAILED: ${e.message}", e)
         }
     }
 
