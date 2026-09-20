@@ -1648,6 +1648,7 @@ object Utils {
 
             // 6. Date: Absolute (4-byte Unix timestamp)
             out.write(0x85)
+            out.write(0x04) // Value length
             writeTime(out, System.currentTimeMillis() / 1000)
 
             // 7. Message-Class: Personal
@@ -1689,7 +1690,6 @@ object Utils {
             writeUintVar(out, parts.size)
 
             for ((index, part) in parts.withIndex()) {
-                val part = parts[index]
                 val header = ByteArrayOutputStream()
 
                 // Content-Type
@@ -1724,10 +1724,10 @@ object Utils {
     }
 
     private fun getMimeTypeToken(mime: String): Int = when (mime) {
-        "text/plain" -> 0x83.toByte().toInt()
-        "image/jpeg" -> 0x8E.toByte().toInt()
-        "image/gif" -> 0x9D.toByte().toInt()
-        "image/png" -> 0x91.toByte().toInt()
+        "text/plain" -> 0x03 or 0x80
+        "image/jpeg" -> 0x0E or 0x80
+        "image/gif" -> 0x1D or 0x80
+        "image/png" -> 0x11 or 0x80
         else -> 0
     }
 

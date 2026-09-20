@@ -671,7 +671,6 @@ private fun NewMessage(
                                 // Implement MMS Sending
                                 val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
                                 if (copiedImages.isNotEmpty()) {
-                                    val logTag = "SmsManager"
                                     if (Utils.sendMms(ctx, aor, destination, msgText, copiedImages, time)) {
                                         msg.direction = MESSAGE_UP_WAIT
                                     } else {
