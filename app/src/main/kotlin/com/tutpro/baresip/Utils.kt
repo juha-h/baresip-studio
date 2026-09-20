@@ -103,6 +103,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 object Utils {
 
@@ -1626,6 +1627,197 @@ object Utils {
     }
 
     private fun buildMmsSendReqPdu(destination: String, text: String, images: List<String>): ByteArray? {
+        val out = ByteArrayOutputStream()
+        try {
+            // Calculate per-image budget
+            val perImageBudget = if (images.isNotEmpty()) {
+                MAX_MMS_IMAGES_SIZE / images.size
+            } else {
+                MAX_MMS_IMAGES_SIZE
+            }
+
+            // 1. Message Type: m-send-req (0x8C 0x80)
+            out.write(0x8C)
+            out.write(0x80)
+
+            // 2. Transaction ID (0x98) with proper length encoding
+            val txnId = System.currentTimeMillis().toString().toByteArray(Charsets.US_ASCII)
+            out.write(0x98)
+            writeEncodedLength(out, txnId.size)
+            out.write(txnId)
+
+            // 3. Version: 1.2 (0x8D 0x92)
+            out.write(0x8D)
+            out.write(0x92)
+
+            // 4. From: Insert-Address-Token (0x89 0x81)
+            out.write(0x89)
+            out.write(0x81)
+
+            // 5. To: Address (0x97) with proper length encoding
+            val toAddr = destination.toByteArray(Charsets.US_ASCII)
+            out.write(0x97)
+            writeEncodedLength(out, toAddr.size)
+            out.write(toAddr)
+
+            // 6. Date: Absolute 4-byte Unix timestamp (0x85)
+            out.write(0x85)
+            out.write(0x04) // length
+            val timestamp = (System.currentTimeMillis() / 1000).toInt()
+            out.write((timestamp shr 24) and 0xFF)
+            out.write((timestamp shr 16) and 0xFF)
+            out.write((timestamp shr 8) and 0xFF)
+            out.write(timestamp and 0xFF)
+
+            // 7. Message-Class: Personal (0x8A 0x80)
+            out.write(0x8A)
+            out.write(0x80)
+
+            // 8. X-Mms-Message-ID (0x8B) with proper length encoding
+            val msgId = UUID.randomUUID().toString().toByteArray(Charsets.US_ASCII)
+            out.write(0x8B)
+            writeEncodedLength(out, msgId.size)
+            out.write(msgId)
+
+            // 9. Subject: Empty (0x96 0x00)
+            out.write(0x96)
+            out.write(0x00)
+
+            // 10. Content-Type: multipart/related with start parameter (0x84)
+            out.write(0x84)
+
+            // Build the Content-Type value with parameters
+            val contentTypeBuffer = ByteArrayOutputStream()
+
+            // Multipart/related content type (0xA3)
+            contentTypeBuffer.write(0xA3)
+
+            // Start parameter (points to first part's Content-ID)
+            contentTypeBuffer.write(0x85) // Parameter: Start
+            val startParam = "text_0".toByteArray(Charsets.US_ASCII)
+            writeEncodedLength(contentTypeBuffer, startParam.size)
+            contentTypeBuffer.write(startParam)
+
+            val contentTypeBytes = contentTypeBuffer.toByteArray()
+            writeEncodedLength(out, contentTypeBytes.size)
+            out.write(contentTypeBytes)
+
+            // 11. Parts (text + images)
+            val numParts = (if (text.isNotEmpty()) 1 else 0) + images.size
+            out.write(numParts)
+
+            // Part 1: Text (text/plain) - if present
+            if (text.isNotEmpty()) {
+                writeTextPart(out, text)
+            }
+
+            // Parts 2+: Images
+            images.forEachIndexed { index, imagePath ->
+                writeImagePart(out, imagePath, index, perImageBudget)
+            }
+
+            return out.toByteArray()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error building MMS PDU", e)
+            return null
+        }
+    }
+
+    private fun writeImagePart(
+        out: ByteArrayOutputStream,
+        imagePath: String,
+        index: Int,
+        perImageBudget: Int
+    ) {
+        val partBuffer = ByteArrayOutputStream()
+
+        // Resize image to fit within budget
+        val resizedImageBytes = resizeImageForMms(File(imagePath), perImageBudget)
+        val imageBytes = resizedImageBytes ?: File(imagePath).readBytes()
+
+        // Content-Type: image/jpeg or image/png (0x81) with filename parameter
+        val contentTypeBuffer = ByteArrayOutputStream()
+
+        // MIME type byte (0x0B for image/jpeg, 0x0C for image/png)
+        val typeCode = if (imagePath.endsWith(".png")) 0x0C else 0x0B
+        contentTypeBuffer.write(typeCode)
+
+        // Filename parameter (0x09)
+        val filename = "image_$index${if (imagePath.endsWith(".png")) ".png" else ".jpg"}".toByteArray(Charsets.US_ASCII)
+        contentTypeBuffer.write(0x09)
+        writeEncodedLength(contentTypeBuffer, filename.size)
+        contentTypeBuffer.write(filename)
+
+        val contentTypeBytes = contentTypeBuffer.toByteArray()
+        partBuffer.write(0x81)
+        writeEncodedLength(partBuffer, contentTypeBytes.size)
+        partBuffer.write(contentTypeBytes)
+
+        // Content-ID (0x84)
+        val contentId = "image_$index".toByteArray(Charsets.US_ASCII)
+        partBuffer.write(0x84)
+        writeEncodedLength(partBuffer, contentId.size)
+        partBuffer.write(contentId)
+
+        // Content-Transfer-Encoding: binary (0x88 0x00)
+        partBuffer.write(0x88)
+        partBuffer.write(0x00)
+
+        // Image body
+        writeEncodedLength(partBuffer, imageBytes.size)
+        partBuffer.write(imageBytes)
+
+        // Write part length and content to main output
+        val partBytes = partBuffer.toByteArray()
+        writeEncodedLength(out, partBytes.size)
+        out.write(partBytes)
+    }
+
+    private fun writeEncodedLength(out: ByteArrayOutputStream, length: Int) {
+        if (length < 128) {
+            out.write(length)
+        } else {
+            // Multi-byte length encoding (first byte has high bit set, remaining bits encode length)
+            val bytes = mutableListOf<Int>()
+            var remaining = length
+            while (remaining > 0) {
+                bytes.add(0, remaining and 0xFF)
+                remaining = remaining shr 8
+            }
+            out.write((0x80 or bytes.size) and 0xFF)
+            bytes.forEach { out.write(it) }
+        }
+    }
+
+    private fun writeTextPart(out: ByteArrayOutputStream, text: String) {
+        val partBuffer = ByteArrayOutputStream()
+
+        // Content-Type: text/plain (0x81 0x01)
+        partBuffer.write(0x81)
+        partBuffer.write(0x01)
+
+        // Content-ID (0x84)
+        val contentId = "text_0".toByteArray(Charsets.US_ASCII)
+        partBuffer.write(0x84)
+        writeEncodedLength(partBuffer, contentId.size)
+        partBuffer.write(contentId)
+
+        // Content-Transfer-Encoding: binary (0x88 0x00)
+        partBuffer.write(0x88)
+        partBuffer.write(0x00)
+
+        // Part body (text bytes)
+        val textBytes = text.toByteArray(Charsets.UTF_8)
+        writeEncodedLength(partBuffer, textBytes.size)
+        partBuffer.write(textBytes)
+
+        // Write part length and content to main output
+        val partBytes = partBuffer.toByteArray()
+        writeEncodedLength(out, partBytes.size)
+        out.write(partBytes)
+    }
+
+    private fun buildMmsSendReqPduOld(destination: String, text: String, images: List<String>): ByteArray? {
         val out = ByteArrayOutputStream()
         try {
             // 1. Message Type: m-send-req
