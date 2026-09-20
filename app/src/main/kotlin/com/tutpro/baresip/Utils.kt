@@ -111,6 +111,8 @@ object Utils {
         "gzrtp.zid", "cert.pem", "ca_certs.crt"
     )
 
+    const val MAX_MMS_IMAGES_SIZE = 250 * 1024
+
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
         val result = ArrayList<String>()
@@ -1666,7 +1668,9 @@ object Utils {
             out.write(0x84)  // Content-Type header
             out.write(0xA3)  // multipart/related
 
-            // Build parts
+            // Build parts with a shared size budget
+            val perImageBudget = if (images.isNotEmpty()) MAX_MMS_IMAGES_SIZE / images.size else MAX_MMS_IMAGES_SIZE
+
             val parts = mutableListOf<Pair<String, ByteArray>>()
             if (text.isNotEmpty()) {
                 parts.add("text/plain" to text.toByteArray(Charsets.UTF_8))
@@ -1676,7 +1680,7 @@ object Utils {
                 if (file.exists()) {
                     val ext = path.substringAfterLast(".", "jpg").lowercase()
                     val mime = if (ext == "png") "image/png" else "image/jpeg"
-                    val data = resizeImageForMms(file) ?: file.readBytes()
+                    val data = resizeImageForMms(file, perImageBudget) ?: file.readBytes()
                     parts.add(mime to data)
                 }
             }
@@ -1751,8 +1755,7 @@ object Utils {
         for (b in buffer) out.write(b)
     }
 
-    private fun resizeImageForMms(file: File): ByteArray? {
-        val maxSize = 250 * 1024 // 250KB target
+    private fun resizeImageForMms(file: File, maxSize: Int): ByteArray? {
         if (file.length() <= maxSize)
             return try { file.readBytes() } catch (_: Exception) { null }
 
@@ -1761,7 +1764,9 @@ object Utils {
             BitmapFactory.decodeFile(file.absolutePath, options)
 
             var scale = 1
-            while ((options.outWidth / scale) * (options.outHeight / scale) > 800000)
+            // Ensure resolution isn't unnecessarily high for small file targets
+            val targetPixels = if (maxSize < 100 * 1024) 400000 else 800000
+            while ((options.outWidth / scale) * (options.outHeight / scale) > targetPixels)
                 scale *= 2
 
             options.inJustDecodeBounds = false
@@ -1769,18 +1774,18 @@ object Utils {
 
             val bitmap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
 
-            var quality = 70 // Start lower (not 90)
+            var quality = 70
             var output: ByteArray
             do {
                 val stream = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
                 output = stream.toByteArray()
-                quality -= 15 // Drop faster
-            } while (output.size > maxSize && quality > 5)
+                quality -= 15
+            } while (output.size > maxSize && quality > 10)
 
             bitmap.recycle()
             Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes " +
-                    "(dims: ${options.outWidth / scale}×${options.outHeight / scale}, quality: ${quality + 15})")
+                    "(target: $maxSize, dims: ${options.outWidth / scale}×${options.outHeight / scale})")
             return output
         } catch (e: Exception) {
             Log.e(TAG, "Resizing failed: ${e.message}")
