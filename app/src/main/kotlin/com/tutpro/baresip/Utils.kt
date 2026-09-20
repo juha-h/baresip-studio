@@ -1777,7 +1777,7 @@ object Utils {
         if (length < 128) {
             out.write(length)
         } else {
-            // Multi-byte length encoding (first byte has high bit set, remaining bits encode length)
+            // Multibyte length encoding (first byte has high bit set, remaining bits encode length)
             val bytes = mutableListOf<Int>()
             var remaining = length
             while (remaining > 0) {
