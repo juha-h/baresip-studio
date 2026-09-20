@@ -413,11 +413,10 @@ class BaresipService: Service() {
                     val time = intent.getLongExtra("time", 0L)
                     val resultCode = resultCode
                     Log.d(TAG, "MMS Sent Result: $resultCode for $time")
-                    if (resultCode == Activity.RESULT_OK) {
+                    if (resultCode == Activity.RESULT_OK)
                         Message.updateMessageStatus(aor, time, MESSAGE_UP)
-                    } else {
+                    else
                         Message.updateMessageStatus(aor, time, MESSAGE_UP_FAIL, "MMS failed ($resultCode)")
-                    }
                     val pduFile = File(filesDir, "mms_send_$time.pdu")
                     if (pduFile.exists()) pduFile.delete()
                 }

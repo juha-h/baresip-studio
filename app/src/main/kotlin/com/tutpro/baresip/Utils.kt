@@ -1593,9 +1593,7 @@ object Utils {
             pduFile.writeBytes(pduData)
 
             // 2. Share with SmsManager via FileProvider
-            val contentUri = FileProvider.getUriForFile(
-                ctx, "${ctx.packageName}.fileprovider", pduFile
-            )
+            val contentUri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", pduFile)
 
             // 3. Trigger sending with extras for tracking
             val sentAction = "com.tutpro.baresip.MMS_SENT"
@@ -1603,14 +1601,20 @@ object Utils {
                 putExtra("aor", aor)
                 putExtra("time", time)
             }
+            val requestCode = "$aor:$destination:$time".hashCode()
             val pi = PendingIntent.getBroadcast(
-                ctx, time.toInt(), sentIntent,
+                ctx, requestCode, sentIntent,
                 PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
 
             // 4. Send and let system resolve carrier config automatically
             // (Permissions should be granted automatically by passing the contentUri)
-            smsManager.sendMultimediaMessage(ctx, contentUri, null, null, pi)
+            try {
+                smsManager.sendMultimediaMessage(ctx, contentUri, null, null, pi)
+                Log.d(TAG, "sendMultimediaMessage called successfully")
+            } catch (e: Exception) {
+                Log.e(TAG, "sendMultimediaMessage exception: ${e.message}", e)
+            }
             Log.d(TAG, "MMS transmission triggered via SmsManager (subId: $subId) for $time")
             true
         } catch (e: Exception) {
@@ -1666,7 +1670,7 @@ object Utils {
             if (text.isNotEmpty()) {
                 parts.add("text/plain" to text.toByteArray(Charsets.UTF_8))
             }
-            for ((index, path) in images.withIndex()) {
+            for ((_, path) in images.withIndex()) {
                 val file = File(path)
                 if (file.exists()) {
                     val ext = path.substringAfterLast(".", "jpg").lowercase()
@@ -1684,24 +1688,31 @@ object Utils {
             // Part count
             writeUintVar(out, parts.size)
 
-            for ((mime, data) in parts) {
+            for ((index, part) in parts.withIndex()) {
+                val part = parts[index]
                 val header = ByteArrayOutputStream()
 
                 // Content-Type
-                header.write(0x85)
-                val typeToken = getMimeTypeToken(mime)
+                header.write(0x81)
+                val typeToken = getMimeTypeToken(part.first)
                 if (typeToken > 0) {
                     header.write(typeToken)
                 } else {
-                    header.write(mime.toByteArray(Charsets.UTF_8))
+                    header.write(part.first.toByteArray(Charsets.UTF_8))
                     header.write(0x00)
                 }
 
+                // Content-Location
+                header.write(0x8E) // 0x0E | 0x80
+                val name = if (part.first.startsWith("text")) "text.txt" else "image_$index.jpg"
+                header.write(name.toByteArray(Charsets.UTF_8))
+                header.write(0x00)
+
                 val hData = header.toByteArray()
                 writeUintVar(out, hData.size)
-                writeUintVar(out, data.size)
+                writeUintVar(out, part.second.size)
                 out.write(hData)
-                out.write(data)
+                out.write(part.second)
             }
 
             Log.d(TAG, "PDU built: ${out.size()} bytes")
@@ -1729,82 +1740,51 @@ object Utils {
     }
 
     private fun writeUintVar(out: ByteArrayOutputStream, value: Int) {
-        when {
-            value < 128 -> out.write(value)
-            value < 16384 -> {
-                out.write(0x80 or (value shr 8))
-                out.write(value and 0xFF)
-            }
-            else -> {
-                out.write(0xC0 or (value shr 16))
-                out.write((value shr 8) and 0xFF)
-                out.write(value and 0xFF)
-            }
+        var v = value
+        val buffer = mutableListOf<Int>()
+        buffer.add(v and 0x7F)
+        v = v shr 7
+        while (v > 0) {
+            buffer.add(0, (v and 0x7F) or 0x80)
+            v = v shr 7
         }
+        for (b in buffer) out.write(b)
     }
 
     private fun resizeImageForMms(file: File): ByteArray? {
-        val maxSize = 600 * 1024 // 600KB
-        if (file.length() <= maxSize) {
+        val maxSize = 250 * 1024 // 250KB target
+        if (file.length() <= maxSize)
             return try { file.readBytes() } catch (_: Exception) { null }
-        }
 
         try {
             val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(file.absolutePath, options)
 
             var scale = 1
-            while ((options.outWidth / scale) * (options.outHeight / scale) > 2000000) {
+            while ((options.outWidth / scale) * (options.outHeight / scale) > 800000)
                 scale *= 2
-            }
-            
+
             options.inJustDecodeBounds = false
             options.inSampleSize = scale
-            
+
             val bitmap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
-            
-            var quality = 90
+
+            var quality = 70 // Start lower (not 90)
             var output: ByteArray
             do {
                 val stream = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
                 output = stream.toByteArray()
-                quality -= 10
-            } while (output.size > maxSize && quality > 10)
-            
+                quality -= 15 // Drop faster
+            } while (output.size > maxSize && quality > 5)
+
             bitmap.recycle()
-            Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes (quality: ${quality + 10})")
+            Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes " +
+                    "(dims: ${options.outWidth / scale}×${options.outHeight / scale}, quality: ${quality + 15})")
             return output
         } catch (e: Exception) {
             Log.e(TAG, "Resizing failed: ${e.message}")
             return null
-        }
-    }
-
-    fun debugCarrierConfig(ctx: Context) {
-        Log.d(TAG, "=== MMS CARRIER CONFIG DEBUG ===")
-        val tm = ctx.getSystemService(TelephonyManager::class.java)
-        Log.d(TAG, "Carrier Name: ${tm?.simOperatorName}")
-        Log.d(TAG, "Operator Code: ${tm?.simOperator}")
-
-        try {
-            val resolver = ctx.contentResolver
-            val cursor = resolver.query(
-                Uri.parse("content://telephony/carriers/current"),
-                null, null, null, null
-            )
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val mmsc = it.getString(it.getColumnIndexOrThrow("mmsc"))
-                    Log.d(TAG, "MMSC: $mmsc")
-                    Log.d(TAG, "MMS Proxy: ${it.getString(it.getColumnIndexOrThrow("mmsport"))}")
-                    Log.d(TAG, "✓ Carrier config found")
-                } else {
-                    Log.w(TAG, "⚠️ No carrier config found in cursor!")
-                }
-            } ?: Log.w(TAG, "⚠️ Cursor is null!")
-        } catch (e: Exception) {
-            Log.e(TAG, "⚠️ Carrier query FAILED: ${e.message}", e)
         }
     }
 
