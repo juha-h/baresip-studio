@@ -1586,9 +1586,12 @@ object Utils {
                     SmsManager.getDefault()
             }
 
+            // Fetch SIM number for PDU From field (essential for delivery)
+            val senderNumber = if (Build.VERSION.SDK_INT >= 29) getLine1Number(ctx, subId) ?: "" else ""
+
             // 1. Build the MMS PDU (Send-Req)
             val pduFile = File(ctx.filesDir, "mms_send_$time.pdu")
-            val pduData = buildMmsSendReqPdu(destination, text, images)
+            val pduData = buildMmsSendReqPdu(destination, senderNumber, text, images)
             if (pduData == null) {
                 Log.e(TAG, "Failed to build MMS PDU")
                 return false
@@ -1621,7 +1624,7 @@ object Utils {
         }
     }
 
-    private fun buildMmsSendReqPdu(destination: String, text: String, images: List<String>): ByteArray? {
+    private fun buildMmsSendReqPdu(destination: String, sender: String, text: String, images: List<String>): ByteArray? {
         val out = ByteArrayOutputStream()
         try {
             val perImageBudget = if (images.isNotEmpty()) MAX_MMS_IMAGES_SIZE / images.size else MAX_MMS_IMAGES_SIZE
@@ -1637,12 +1640,23 @@ object Utils {
             // 3. MMS Version 1.2 (0x8D 0x92)
             out.write(0x8D); out.write(0x92)
 
-            // 4. From (0x89 0x01 0x81) - Insert-address-token
-            out.write(0x89); out.write(0x01); out.write(0x81)
+            // 4. From (0x89 [length] 0x80 [sender/TYPE=PLMN] 0x00)
+            out.write(0x89)
+            val fromAddress = if (sender.isEmpty()) "" else "$sender/TYPE=PLMN"
+            if (fromAddress.isEmpty()) {
+                out.write(1); out.write(0x81) // Insert-address-token fallback
+            } else {
+                val fromBytes = fromAddress.toByteArray(Charsets.UTF_8)
+                out.write(fromBytes.size + 2) // Length byte
+                out.write(0x80) // Address type: String
+                out.write(fromBytes)
+                out.write(0x00)
+            }
 
-            // 5. To (0x97 string 0x00)
+            // 5. To (0x97 [address/TYPE=PLMN] 0x00)
             out.write(0x97)
-            out.write(destination.toByteArray(Charsets.UTF_8))
+            val toAddress = if (destination.contains("/")) destination else "$destination/TYPE=PLMN"
+            out.write(toAddress.toByteArray(Charsets.UTF_8))
             out.write(0x00)
 
             // 6. Message-Class: Personal (0x8A 0x80)
@@ -1657,7 +1671,12 @@ object Utils {
             out.write((seconds shr 24) and 0xFF); out.write((seconds shr 16) and 0xFF)
             out.write((seconds shr 8) and 0xFF); out.write(seconds and 0xFF)
             
-            // 9. Content-Type: multipart/mixed (0x84 0xA4)
+            // 9. X-Mms-Message-ID (0x8B text 0x00)
+            out.write(0x8B)
+            out.write("id${System.currentTimeMillis()}".toByteArray(Charsets.UTF_8))
+            out.write(0x00)
+
+            // 10. Content-Type: multipart/mixed (0x84 0xA4) - MUST be last header
             out.write(0x84); out.write(0xA4)
             
             // --- Body (Multipart) ---
