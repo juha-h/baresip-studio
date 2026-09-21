@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
-import android.app.PendingIntent
 import android.app.role.RoleManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -29,7 +28,6 @@ import android.media.audiofx.NoiseSuppressor
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
@@ -39,6 +37,12 @@ import android.telecom.TelecomManager
 import android.telephony.SmsManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
+import com.klinker.android.send_message.Message as MmsLibMessage
+import com.klinker.android.send_message.Settings
+import android.os.Bundle
+import com.klinker.android.send_message.Transaction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -50,7 +54,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
@@ -102,6 +105,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.io.ByteArrayOutputStream
 
 
@@ -1568,194 +1572,52 @@ object Utils {
         }
     }
 
-    fun sendMms(ctx: Context, aor: String, destination: String, text: String, images: List<String>, time: Long): Boolean {
+    suspend fun sendMms(ctx: Context, aor: String, destination: String, text: String, images: List<String>, time: Long):
+            Boolean = withContext(Dispatchers.IO) {
         Log.i(TAG, "Sending MMS to $destination (images: ${images.size})")
-        return try {
-            val subId = SubscriptionManager.getDefaultSmsSubscriptionId()
-            val smsManager = if (subId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
-                if (Build.VERSION.SDK_INT >= 31)
-                    ctx.getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
-                else
-                    @Suppress("DEPRECATION")
-                    SmsManager.getSmsManagerForSubscriptionId(subId)
-            } else {
-                if (Build.VERSION.SDK_INT >= 31)
-                    ctx.getSystemService(SmsManager::class.java)
-                else
-                    @Suppress("DEPRECATION")
-                    SmsManager.getDefault()
+        try {
+            val settings = Settings().apply {
+                useSystemSending = true
+            }
+            val transaction = Transaction(ctx, settings)
+            val message = MmsLibMessage(text, destination)
+
+            // For now, send only one image
+            if (images.isNotEmpty()) {
+                val bytes = resizeImageForMms(File(images[0]), MAX_MMS_IMAGES_SIZE)
+                if (bytes != null) {
+                    message.setMedia(bytes, "image/jpeg")
+                } else {
+                    Log.e(TAG, "Failed to load/resize image from ${images[0]}")
+                    return@withContext false
+                }
             }
 
-            // Fetch SIM number for PDU From field (essential for delivery)
-            val senderNumber = if (Build.VERSION.SDK_INT >= 29) getLine1Number(ctx, subId) ?: "" else ""
+            // Add to tracking queue before sending
+            pendingMms.add(Pair(aor, time))
 
-            // 1. Build the MMS PDU (Send-Req)
-            val pduFile = File(ctx.filesDir, "mms_send_$time.pdu")
-            val pduData = buildMmsSendReqPdu(destination, senderNumber, text, images)
-            if (pduData == null) {
-                Log.e(TAG, "Failed to build MMS PDU")
-                return false
-            }
-            pduFile.writeBytes(pduData)
-
-            // 2. Share with SmsManager via FileProvider
-            val contentUri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", pduFile)
-
-            // 3. Trigger sending with extras for tracking
-            val sentAction = "com.tutpro.baresip.MMS_SENT"
-            val sentIntent = Intent(sentAction).setPackage(ctx.packageName).apply {
-                putExtra("aor", aor)
-                putExtra("time", time)
-            }
-            val requestCode = "$aor:$destination:$time".hashCode()
-            val pi = PendingIntent.getBroadcast(
-                ctx, requestCode, sentIntent,
-                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-            // 4. Send MMS - let system resolve APN settings (null overrides)
-            // (Permissions should be granted automatically by passing the contentUri)
-            smsManager.sendMultimediaMessage(ctx, contentUri, null, null, pi)
-            Log.d(TAG, "MMS transmission triggered via SmsManager (subId: $subId) for $time")
+            transaction.sendNewMessage(message)
+            Log.d(TAG, "MMS transmission triggered via mmslib for $time to $destination")
             true
         } catch (e: Exception) {
             Log.e(TAG, "MMS Send trigger failed: ${e.message}")
+            pendingMms.remove(Pair(aor, time))
             false
         }
     }
 
-    private fun buildMmsSendReqPdu(destination: String, sender: String, text: String, images: List<String>): ByteArray? {
-        val out = ByteArrayOutputStream()
-        try {
-            val perImageBudget = if (images.isNotEmpty()) MAX_MMS_IMAGES_SIZE / images.size else MAX_MMS_IMAGES_SIZE
+    private val pendingMms = ConcurrentLinkedQueue<Pair<String, Long>>()
 
-            // 1. Message Type: m-send-req (0x8C 0x80)
-            out.write(0x8C); out.write(0x80)
-            
-            // 2. Transaction ID (0x98 text 0x00)
-            out.write(0x98)
-            out.write("T${System.currentTimeMillis() % 1000000}".toByteArray(Charsets.UTF_8))
-            out.write(0x00)
-            
-            // 3. MMS Version 1.2 (0x8D 0x92)
-            out.write(0x8D); out.write(0x92)
-
-            // 4. From (0x89 [length] 0x80 [sender/TYPE=PLMN] 0x00)
-            out.write(0x89)
-            val fromAddress = if (sender.isEmpty()) "" else "$sender/TYPE=PLMN"
-            if (fromAddress.isEmpty()) {
-                out.write(1); out.write(0x81) // Insert-address-token fallback
-            } else {
-                val fromBytes = fromAddress.toByteArray(Charsets.UTF_8)
-                out.write(fromBytes.size + 2) // Length byte
-                out.write(0x80) // Address type: String
-                out.write(fromBytes)
-                out.write(0x00)
-            }
-
-            // 5. To (0x97 [address/TYPE=PLMN] 0x00)
-            out.write(0x97)
-            val toAddress = if (destination.contains("/")) destination else "$destination/TYPE=PLMN"
-            out.write(toAddress.toByteArray(Charsets.UTF_8))
-            out.write(0x00)
-
-            // 6. Message-Class: Personal (0x8A 0x80)
-            out.write(0x8A); out.write(0x80)
-
-            // 7. Subject (0x96 0x01 0x20 0x00) - " " string
-            out.write(0x96); out.write(0x01); out.write(0x20); out.write(0x00)
-
-            // 8. Date (0x85 0x04 4-byte-value)
-            val seconds = (System.currentTimeMillis() / 1000).toInt()
-            out.write(0x85); out.write(0x04)
-            out.write((seconds shr 24) and 0xFF); out.write((seconds shr 16) and 0xFF)
-            out.write((seconds shr 8) and 0xFF); out.write(seconds and 0xFF)
-            
-            // 9. X-Mms-Message-ID (0x8B text 0x00)
-            out.write(0x8B)
-            out.write("id${System.currentTimeMillis()}".toByteArray(Charsets.UTF_8))
-            out.write(0x00)
-
-            // 10. Content-Type: multipart/mixed (0x84 0xA4) - MUST be last header
-            out.write(0x84); out.write(0xA4)
-            
-            // --- Body (Multipart) ---
-            val parts = mutableListOf<Pair<String, ByteArray>>()
-            if (text.isNotEmpty()) {
-                parts.add("text/plain" to text.toByteArray(Charsets.UTF_8))
-            }
-            for (path in images) {
-                val file = File(path)
-                if (file.exists()) {
-                    val ext = path.substringAfterLast(".", "jpg").lowercase()
-                    val mime = if (ext == "png") "image/png" else "image/jpeg"
-                    val data = resizeImageForMms(file, perImageBudget) ?: file.readBytes()
-                    parts.add(mime to data)
-                }
-            }
-            
-            if (parts.isEmpty()) {
-                Log.e(TAG, "No message content!")
-                return null
-            }
-
-            // Number of parts (UintVar)
-            writeUintVar(out, parts.size) 
-
-            for ((index, part) in parts.withIndex()) {
-                val header = ByteArrayOutputStream()
-                
-                // Content-Type Header (WSP token 0x01 | 0x80 = 0x81)
-                header.write(0x81) 
-                val typeToken = getMimeTypeToken(part.first)
-                if (typeToken > 0) {
-                    header.write(typeToken)
-                } else {
-                    header.write(part.first.toByteArray(Charsets.UTF_8))
-                    header.write(0x00)
-                }
-
-                // Content-Location Header (token 0x0E | 0x80 = 0x8E)
-                header.write(0x8E) 
-                val name = if (part.first.startsWith("text")) "text.txt" else "image_$index.jpg"
-                header.write(name.toByteArray(Charsets.UTF_8))
-                header.write(0x00)
-                
-                val hData = header.toByteArray()
-                // MMS Part layout: Header-Len (UintVar), Data-Len (UintVar), Headers, Data
-                writeUintVar(out, hData.size)
-                writeUintVar(out, part.second.size)
-                out.write(hData)
-                out.write(part.second)
-            }
-            
-            Log.d(TAG, "PDU built: ${out.size()} bytes")
-            return out.toByteArray()
-        } catch (e: Exception) {
-            Log.e(TAG, "PDU Build Error: ${e.message}")
-            return null
-        }
+    fun popPendingMms(): Pair<String, Long>? {
+        val res = pendingMms.poll()
+        Log.d(TAG, "Popped pending MMS: $res (remaining: ${pendingMms.size})")
+        return res
     }
 
-    private fun getMimeTypeToken(mime: String): Int = when (mime) {
-        "text/plain" -> 0x03 or 0x80 // 0x83
-        "image/jpeg" -> 0x0E or 0x80 // 0x8E
-        "image/gif" -> 0x1D or 0x80  // 0x9D
-        "image/png" -> 0x11 or 0x80  // 0x91
-        else -> 0
-    }
+    val isMmsInProgress: Boolean
+        get() = !pendingMms.isEmpty() || isIncomingMmsInProgress
 
-    private fun writeUintVar(out: ByteArrayOutputStream, value: Int) {
-        var v = value
-        val buffer = mutableListOf<Int>()
-        buffer.add(v and 0x7F)
-        v = v shr 7
-        while (v > 0) {
-            buffer.add(0, (v and 0x7F) or 0x80)
-            v = v shr 7
-        }
-        for (b in buffer) out.write(b)
-    }
+    var isIncomingMmsInProgress = false
 
     private fun resizeImageForMms(file: File, maxSize: Int): ByteArray? {
         if (file.length() <= maxSize)

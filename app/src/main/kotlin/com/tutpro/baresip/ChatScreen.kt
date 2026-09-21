@@ -503,6 +503,7 @@ private fun NewMessage(
     val ctx = LocalContext.current
     val aor = account.aor
     val ua = UserAgent.ofAor(aor)!!
+    val coroutineScope = rememberCoroutineScope()
 
     val newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(viewModel.getAorPeerMessage(aor, peerUri)))
@@ -671,12 +672,15 @@ private fun NewMessage(
                                 // Implement MMS Sending
                                 val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
                                 if (copiedImages.isNotEmpty()) {
-                                    if (Utils.sendMms(ctx, aor, destination, msgText, copiedImages, time)) {
-                                        msg.direction = MESSAGE_UP_WAIT
-                                    } else {
-                                        Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
-                                        msg.direction = MESSAGE_UP_FAIL
-                                        msg.responseReason = messageFailed
+                                    coroutineScope.launch {
+                                        if (Utils.sendMms(ctx, aor, destination, msgText, copiedImages, time)) {
+                                            msg.direction = MESSAGE_UP_WAIT
+                                        } else {
+                                            Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
+                                            msg.direction = MESSAGE_UP_FAIL
+                                            msg.responseReason = messageFailed
+                                        }
+                                        Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
                                     }
                                 } else {
                                     if (Utils.sendSms(ctx, destination, msgText)) {

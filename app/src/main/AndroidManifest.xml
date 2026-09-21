@@ -18,7 +18,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_APN_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
@@ -223,6 +222,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".BaresipMmsSentReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.tutpro.baresip.MMS_SENT" />
+                <action android:name="com.klinker.android.messaging.MMS_SENT" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -232,6 +240,22 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <provider
+            android:name="com.klinker.android.send_message.MmsFileProvider"
+            android:authorities="${applicationId}.MmsFileProvider"
+            android:enabled="true"
+            android:exported="false"
+            tools:replace="android:exported"
+            android:grantUriPermissions="true" />
+
+        <service
+            android:name="com.android.mms.transaction.TransactionService"
+            tools:node="remove" />
+
+        <receiver
+            android:name="com.klinker.android.send_message.MmsSentReceiver"
+            tools:node="remove" />
 
     </application>
 
