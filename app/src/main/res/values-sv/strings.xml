@@ -15,13 +15,13 @@
     <string name="you">Du</string>
     <string name="today">Idag</string>
     <string name="add_contact">Lägg till kontakt</string>
-    <string name="short_message_question">Vill du ta bort meddelandet?</string>
+    <string name="short_message_question">Vill du ta bort det här meddelandet?</string>
     <string name="new_message">Nytt meddelande</string>
     <string name="delete_history_alert">Vill du ta bort samtalshistoriken för kontot \'%1$s\'\?</string>
     <string name="enable_history">Aktivera</string>
     <string name="disable_history">Inaktivera</string>
-    <string name="calls_delete_question">Vill du ta bort \'%1$s\' %2$s från samtalshistoriken?</string>
-    <string name="calls_add_delete_question">Vill du lägga till \'%1$s\' to dina kontakter eller ta bort %2$s från samtalshistoriken?</string>
+    <string name="calls_delete_question">Vill du ta bort %2$s från samtalshistoriken?</string>
+    <string name="calls_add_delete_question">Vill du lägga till ”%1$s” bland kontakterna, blockera den eller ta bort %2$s från samtalshistoriken?</string>
     <string name="calls_call">samtal</string>
     <string name="calls_calls">samtal</string>
     <string name="call">Ring</string>
@@ -29,7 +29,7 @@
     <string name="missed_call_from">Missat samtal från</string>
     <string name="delete_account">Vill du ta bort kontot \'%1$s\'\?</string>
     <string name="account_exists">Kontot \'%1$s\' finns redan.</string>
-    <string name="invalid_aor">Ogiltig användare@domän[:port][;transport=udp|tcp|tls] \'%1$s\'</string>
+    <string name="invalid_aor">Ogiltig användare@domän[:port][;transport=udp|tcp|tls|wss] ”%1$s”</string>
     <string name="new_account">SIP URI för nytt konto</string>
     <string name="accounts">Konton</string>
     <string name="default_account">Förvalt konto</string>
@@ -44,7 +44,7 @@
     <string name="invalid_stun_username">Ogiltigt användarnamn \'%1$s\'</string>
     <string name="stun_username_help">Användarnamn om STUN/TURN-servern kräver det</string>
     <string name="invalid_stun_server">Ogiltig STUN/TURN-server-URI \'%1$s\'</string>
-    <string name="stun_server_help">En STUN/TURN-server-URI på formatet schema:värd[:port][?transport=udp|tcp], där schema är \'stun\', \'stuns\', \'turn\', eller \'turns\'. Förvald STUN-server för STUN- och ICE-protokollen är \'stun:stun.l.google.com:19302\' som är Googles publika STUN-server. Det finns ingen förvald TURN-server.</string>
+    <string name="stun_server_help">En STUN/TURN-server-URI på formatet schema:värd[:port][;transport=udp|tcp], där schemat är ”stun”, ”stuns”, ”turn” eller ”turns”. Standard-STUN-servern för STUN- och ICE-protokollen är ”stun:stun.l.google.com:19302”, som pekar på Googles offentliga STUN-server. Det finns ingen standard-TURN-server.</string>
     <string name="media_nat">NAT-passering av media</string>
     <string name="media_nat_help">Väljer protokoll för NAT-passering av media. Möjliga val är STUN (Session Traversal Utilities for NAT, RFC 5389) och ICE (Interactive Connectivity Establishment, RFC 5245).</string>
     <string name="no">Nej</string>
@@ -92,7 +92,7 @@
     <string name="invalid_proxy_server_uri">Ogiltig proxyserver-URI \'%1$s\'</string>
     <string name="sip_uri_of_proxy_server">SIP-URI för en proxyserver</string>
     <string name="sip_uri_of_another_proxy_server">SIP-URI för en annan proxyserver</string>
-    <string name="outbound_proxies_help">SIP-URI för en eller två proxyservrar som måste användas när SIP-förfrågningar skickas. Om två anges skickas REGISTER-förfrågningar till båda och andra förfrågningar skickas till den som svarar. Om ingen utgående proxyserver anges skickas förfrågningar genom att DNS NAPTR/SRV/A-poster slås upp från värdnamnet i mottagarens URI. Om värdnamnet är en IPv6-adress måste det skrivas inom hakparenteser []. \nExempel: \n • sip:example.com:5061;transport=tls \n • sip:[2001:67c:223:777::10];transport=tcp \n • sip:192.168.43.50:443;transport=wss</string>
+    <string name="outbound_proxies_help">SIP-URI för en eller två proxyservrar som måste användas när begäranden skickas. Om två anges skickas REGISTER-begäranden till båda och övriga begäranden till den som svarar. Om ingen utgående proxy anges skickas begäranden baserat på DNS-uppslag av NAPTR-/SRV-/A-poster för värddelen i begärans URI. SIP-URI:n har formatet sip:&lt;värd&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss]. Om &lt;port&gt; inte anges men transportprotokoll anges används som standard 5060 (udp, tcp), 5061 (tls) eller 443 (wss). Om &lt;värd&gt; är en IPv6-adress måste adressen skrivas inom hakparenteser [].\nExempel:\n • sip:example.com;transport=tls\n • sip:[2001:67c:223:777::10];transport=tcp\n • sip:192.168.43.50:4430;transport=wss</string>
     <string name="outbound_proxies">Utgående proxyservrar</string>
     <string name="invalid_authentication_password">Ogiltigt lösenord för autentisering \'%1$s\'</string>
     <string name="authentication_password_help">Lösenord för autentisering, upp till 64 tecken. Om användarnamn för autentisering är ifyllt, men lösenordet lämnas tomt kommer baresip fråga om lösenord vid uppstart.</string>
@@ -106,7 +106,7 @@
     <string name="account">Konto</string>
     <string name="about_title_plus">Om baresip+</string>
     <string name="about_title">Om baresip</string>
-    <string name="about_text"><![CDATA[\n<h1>SIP-användaragent baserad på <a href=\"https://github.com/baresip/baresip\">baresip</a>-biblioteket</h1>\n<br>\n<p>Juha Heinanen &lt;jh@tutpro.com></p>\n<p>Version %1$s</p>\n<br>\n<h2>Användningstips</h2>\n<ul>\n<li>Kontrollera att standardvärdena i baresips inställningar uppfyller dina behov\n(tryck på objektets titel för hjälp).</li>\n<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>\n<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering\nlyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering\nhar inte aktiverats).</li>\n<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.\n<li>Långt tryck på baresip-ikonerna visar information om ikonerna.\n<li>Svep nedåt för att omregistrera det aktuella kontot.\n<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.\n<li>Svep åt vänster/höger för att växla mellan kontona.\n<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.\n<li>Samtal och meddelanden kan läggas till i kontakter genom att trycka länge på dem.\n<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.\n<li>Tryck/långtryck på kontaktikonen kan användas för att installera/ta bort bildavatar.\n<li>Långtryck på en ljudkodek kan användas för att aktivera/inaktivera kodeken.\n<li>Se <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> för mer information.\n</ul>\n<h2>Integritet</h2>\n<p>Integritetspolicyn finns tillgänglig <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">här</a>.</p>\n<br>\n<h2>Källkod</h2>\n<p>Källkoden finns tillgänglig på <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\ndär även problem kan rapporteras.</p>\n<br>\n<h2>Språköversättningar</h2>\n<p>Språköversättningar hanteras via baresip\n<a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>-projektet.</p>\n<br>\n<h2>Licenser</h2>\n<ul>\n<li><b>BSD-3-klausul</b> med undantag för följande:</li>\n<li><b>Apache 2.0</b> AMR-kodekter och TLS-säkerhet</li>\n<li><b>AGPLv4</b> ZRTP-mediekryptering</li>\n<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>\n<li><b>GNU GPLv3</b> G.729-kodeken</li>\n</ul>\n]]></string>
+    <string name="about_text"><![CDATA[<h1>SIP- och mobiltelefoni-användaragent baserad på <a href=\"https://github.com/baresip/baresip\">baresip</a>-biblioteket</h1>\n<br>\n<p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n<p>Version %1$s</p>\n<br>\n<h2>Användningstips</h2>\n<ul>\n<li>Kontrollera att standardvärdena i baresips inställningar uppfyller dina behov (tryck på objektrubrikerna för hjälp).</li>\n<li>Om enheten har SIM-kort och du vill använda baresip för mobilsamtal aktiverar du inställningen Standardapp för telefoni. Då skapas ett mobilkonto för mobilsamtal.</li>\n<li>Skapa sedan ett eller flera SIP-konton under Konton (tryck återigen på objektrubrikerna för hjälp).</li>\n<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registreringen lyckades), gul (registrering pågår), röd (registreringen misslyckades), vit (registreringen har inte aktiverats).</li>\n<li>Tryck på statuspunkten för att gå direkt till kontokonfigurationen.</li>\n<li>Ett långt tryck på ikonerna i baresips fält visar information om ikonerna.</li>\n<li>Ett svep nedåt omregistrerar det konto som visas.</li>\n<li>Ett långt tryck på kontot som visas aktiverar eller inaktiverar kontots registrering.</li>\n<li>Svep åt vänster eller höger för att växla mellan kontona.</li>\n<li>Den tidigare samtalspartnern kan väljas igen genom att trycka på samtalsikonen när Mottagare är tom.</li>\n<li>Samtals- och meddelandemotparter kan läggas till bland kontakterna med långa tryck.</li>\n<li>Du kan också använda långa tryck för att ta bort samtal, chattar, meddelanden och kontakter.</li>\n<li>Tryck eller långt tryck på kontaktikonen kan användas för att installera eller ta bort en bildavatar.</li>\n<li>Ett långt tryck på en ljudcodec kan användas för att aktivera eller inaktivera codecen.</li>\n<li>Se <a href=\"https://github.com/juha-h/baresip-studio/wiki\">wikin</a> för mer information.</li>\n</ul>\n<h2>Integritetspolicy</h2>\n<p>Integritetspolicyn finns <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/master/PrivacyPolicy.txt\">här</a>.</p>\n<br>\n<h2>Källkod</h2>\n<p>Källkoden finns på <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>, där problem också kan rapporteras.</p>\n<br>\n<h2>Språköversättningar</h2>\n<p>Språköversättningar hanteras via baresips <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>-projekt.</p>\n<br>\n<h2>Licenser</h2>\n<ul>\n<li><b>BSD-3-Clause</b> med undantag för följande:</li>\n<li><b>Apache 2.0</b> för AMR-codecar och TLS-säkerhet</li>\n<li><b>AGPLv4</b> för ZRTP-mediekryptering</li>\n<li><b>GNU LGPL 2.1</b> för Codec2-codecen</li>\n<li><b>Free</b> för G.722-codecen</li>\n<li><b>GNU GPLv3</b> för G.729-codecen</li>\n</ul>]]></string>
     <string name="transfer_request_query">Accepterar du att koppla det här samtalet till \'%1$s\'\?</string>
     <string name="audio_modules_title">Ljudmoduler</string>
     <string name="start_failed">Baresip kunde inte starta. Det kan bero på ett ogiltigt värde för en inställning. Kontrollera Adress att lyssna på, TLS certifikat-fil och TLS CA-fil. Starta sedan om baresip.</string>
@@ -161,18 +161,18 @@
     <string name="invalid_listen_address">Ogiltig adress att lyssna på</string>
     <string name="listen_address_help">IP-adress och port i formatet ”adress:port” där baresip lyssnar efter inkommande SIP-förfrågningar. Om IP-adressen är en IPv6-adress måste den skrivas inom hakparenteser []. IPv4-adressen 0.0.0.0 eller IPv6-adressen [::] gör att baresip lyssnar på alla tillgängliga adresser. Om fältet lämnas tomt (fabriksinställning) lyssnar baresip på en godtycklig port på alla tillgängliga adresser.</string>
     <string name="listen_address">Adress att lyssna på</string>
-    <string name="start_automatically_help">Kryssa i för att starta baresip automatiskt när enheten startat.</string>
+    <string name="start_automatically_help">Om alternativet är markerat startar baresip automatiskt när enheten har startats eller en ny version av baresip har installerats. Starten fördröjs tills enheten har låsts upp.</string>
     <string name="delete_chats_alert">Vill du ta bort chatt-historiken för kontot \'%1$s\'\?</string>
     <string name="short_chat_question">Vill du ta bort chatten med \'%1$s\'\?</string>
-    <string name="long_chat_question">Vill du ta bort chatten med motparten \'%1$s\' eller lägga till motparten till dina kontakter?</string>
+    <string name="long_chat_question">Vill du lägga till ”%1$s” bland kontakterna, blockera den eller ta bort den här chatten?</string>
     <string name="new_chat_peer">Ny chat-motpart</string>
     <string name="chats">Chat-historik</string>
     <string name="message_failed">Misslyckades</string>
     <string name="sending_failed">Kunde inte skicka meddelande</string>
     <string name="decrypt_password">Lösenord för avkryptering</string>
     <string name="encrypt_password">Lösenord för kryptering</string>
-    <string name="accounts_help">SIP URI för nytt konto i formatet &lt;användare&gt;@&lt;domän&gt;[:&lt;port&gt;][;transport=udp|tcp|tls]. Om &lt;port&gt; anges och transportprotokollet inte anges, är standardtransportprotokollet UDP. Om &lt;port&gt; inte anges och transportprotokollet anges, är standardporten 5060 eller 5061 (TLS). Om varken det ena eller det andra anges och ingen utgående proxy specificeras, bestäms kontots registrator (om sådan finns) enbart utifrån domänens DNS-information.</string>
-    <string name="about_text_plus"><![CDATA[\n<h1>SIP-användaragent med videosamtal baserat på <a href=\"https://github.com/baresip/baresip\">baresip</a>-biblioteket</h1>\n<br>\n<p>Juha Heinanen &lt;jh@tutpro.com></p>\n<p>Version %1$s</p>\n<br>\n<h2>Användningstips</h2>\n<ul>\n<li>Kontrollera att standardvärdena i baresip+\'s Inställningar uppfyller dina behov\n(tryck på objektets titel för hjälp).</li>\n<li>Skapa sedan ett eller flera konton i Konton (tryck på objektets titel för hjälp).</li>\n<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registrering\nlyckades), gul (registrering pågår), röd (registrering misslyckades), vit (registrering\nhar inte aktiverats).</li>\n<li>Tryck på statuspunkten för att komma direkt till kontoinställningarna.\n<li>Långt tryck på baresip-ikonerna visar information om ikonerna.\n<li>Svep nedåt för att omregistrera det aktuella kontot.\n<li>Långt tryck på det aktuella kontot aktiverar eller inaktiverar kontots registrering.\n<li>Svep åt vänster/höger för att växla mellan kontona.\n<li>Tidigare samtalspartner kan väljas igen genom att trycka på samtalsikonen när mottagaren är tom.\n<li>Samtalspartner och meddelanden kan läggas till i kontakter genom att trycka länge på dem.\n<li>Långt tryck kan också användas för att ta bort samtal, chattar, meddelanden och kontakter.\n<li>Tryck/långt tryck på kontaktikonen kan användas för att installera/ta bort bildavatar.\n<li>Långt tryck på en ljud- eller videokodek kan användas för att aktivera/inaktivera kodeken.\n<li>Se <a href=\"https://github.com/juha-h/baresip-studio/wiki\">Wiki</a> för mer\ninformation.\n</li>\n</ul>\n<h2>Kända problem\n<ul>\n<li>Vid videosamtal måste enheten hållas i liggande\n \nläge, roterat 90 grader åt vänster från stående läge.\n<li>Självbilden visas inte korrekt när videoströmmen är sendonly. </li>\n</ul>\n<h2>Integritet</h2>\n<p>Integritet finns\n<a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt\">här</a>.</p>\n<br>\n<h2>Källkod</h2>\n<p>Källkoden finns tillgänglig på <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>,\ndär även problem kan rapporteras.</p>\n<br>\n<h2>Språköversättningar</h2>\n<p>Språköversättningar hanteras via baresip\n<a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>-projektet.</p>\n<br>\n<h2>Licenser</h2>\n<ul>\n<li><b>BSD-3-klausul</b> med undantag för följande:</li>\n<li><b>Apache 2.0</b> AMR-kodeken och TLS-säkerhet</li>\n<li><b>AGPLv4</b> ZRTP-mediekryptering</li>\n<li><b>GNU LGPL 2.1</b> G.722-, G.726- och Codec2-kodeken</li>\n<li><b>GNU GPLv3</b> G.729-kodeken</li>\n<li><b>GNU GPLv2</b> H.264- och H.265-kodeken</li>\n<li><b>AOMedia</b> AV1-kodeken</li>\n</ul>\n]]></string>
+    <string name="accounts_help">SIP-URI för nytt konto i formatet &lt;användare&gt;@&lt;domän&gt;[:&lt;port&gt;][;transport=udp|tcp|tls|wss]. Om &lt;port&gt; anges men transportprotokoll inte anges används udp som standard. Om &lt;port&gt; inte anges men transportprotokoll anges används som standard 5060 (udp, tcp), 5061 (tls) eller 443 (wss). Om inget av dem anges och ingen utgående proxy är specificerad fastställs kontots registrar, om den finns, endast utifrån domänens DNS-information.\nExempel: user@example.com</string>
+    <string name="about_text_plus"><![CDATA[<h1>SIP-användaragent med videosamtal baserad på <a href=\"https://github.com/baresip/baresip\">baresip</a>-biblioteket</h1>\n<br>\n<p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>\n<p>Version %1$s</p>\n<br>\n<h2>Användningstips</h2>\n<ul>\n<li>Kontrollera att standardvärdena i baresip+s inställningar uppfyller dina behov (tryck på objektrubrikerna för hjälp).</li>\n<li>Om enheten har SIM-kort och du vill använda baresip+ för mobilsamtal aktiverar du inställningen Standardapp för telefoni. Då skapas ett mobilkonto för mobilsamtal.</li>\n<li>Skapa sedan ett eller flera SIP-konton under Konton (tryck återigen på objektrubrikerna för hjälp).</li>\n<li>Registreringsstatus för ett konto visas med en färgad punkt: grön (registreringen lyckades), gul (registrering pågår), röd (registreringen misslyckades), vit (registreringen har inte aktiverats).</li>\n<li>Tryck på statuspunkten för att gå direkt till kontokonfigurationen.</li>\n<li>Ett långt tryck på ikonerna i baresip+s fält visar information om ikonerna.</li>\n<li>Ett svep nedåt omregistrerar det konto som visas.</li>\n<li>Ett långt tryck på kontot som visas aktiverar eller inaktiverar kontots registrering.</li>\n<li>Svep åt vänster eller höger för att växla mellan kontona.</li>\n<li>Den tidigare samtalspartnern kan väljas igen genom att trycka på samtalsikonen när Mottagare är tom.</li>\n<li>Samtals- och meddelandemotparter kan läggas till bland kontakterna med långa tryck.</li>\n<li>Du kan också använda långa tryck för att ta bort samtal, chattar, meddelanden och kontakter.</li>\n<li>Tryck eller långt tryck på kontaktikonen kan användas för att installera eller ta bort en bildavatar.</li>\n<li>Ett långt tryck på en ljud- eller videocodec kan användas för att aktivera eller inaktivera codecen.</li>\n<li>Se <a href=\"https://github.com/juha-h/baresip-studio/wiki\">wikin</a> för mer information.</li>\n</ul>\n<h2>Kända problem</h2>\n<ul>\n<li>Självbilden visas inte korrekt när videoströmmen är sendonly.</li>\n</ul>\n<h2>Integritetspolicy</h2>\n<p>Integritetspolicyn finns <a href=\"https://raw.githubusercontent.com/juha-h/baresip-studio/video/PrivacyPolicy.txt\">här</a>.</p>\n<br>\n<h2>Källkod</h2>\n<p>Källkoden finns på <a href=\"https://github.com/juha-h/baresip-studio\">GitHub</a>, där problem också kan rapporteras.</p>\n<br>\n<h2>Språköversättningar</h2>\n<p>Språköversättningar hanteras via baresips <a href=\"https://hosted.weblate.org/projects/baresip/\">Weblate</a>-projekt.</p>\n<br>\n<h2>Licenser</h2>\n<ul>\n<li><b>BSD-3-Clause</b> med undantag för följande:</li>\n<li><b>Apache 2.0</b> för AMR-codecar och TLS-säkerhet</li>\n<li><b>AGPLv4</b> för ZRTP-mediekryptering</li>\n<li><b>GNU LGPL 2.1</b> för Codec2-codecen</li>\n<li><b>Free</b> för G.722-codecen</li>\n<li><b>GNU GPLv3</b> för G.729-codecen</li>\n<li><b>GNU GPLv2</b> för H.264- och H.265-codecar</li>\n<li><b>AOMedia</b> för AV1-codecen</li>\n</ul>]]></string>
     <string name="default_call_volume">Förvald samtalsvolym</string>
     <string name="invalid_opus_packet_loss">Ogiltig procentuell paketförlust för Opus</string>
     <string name="opus_packet_loss_help">Förväntad procentuell förlust av Opus-ljudströmspaket, från 0 till 100. Fabriksinställt standardvärde är 1. Värdet 0 tur inaktiverar även Opus Forward Error Correction (FEC).</string>
@@ -211,7 +211,7 @@
     <string name="avatar_image">Profilbild</string>
     <string name="no_backup">Det går inte att skapa en backup utan behörigheten \"Lagring\".</string>
     <string name="no_restore">Det går inte att återställa en backup utan behörigheten \"Lagring\".</string>
-    <string name="battery_optimizations_help">Inaktivera batterioptimering (rekommenderas) om du vill minska risken att Android begränsar baresips åtkomst till nätverk eller inaktiverar baresip för att spara ström.</string>
+    <string name="battery_optimizations_help">Inaktivera batterioptimeringar om du vill minska risken att Android begränsar baresips nätverksåtkomst eller försätter baresip i viloläge.</string>
     <string name="audio_settings">Ljudinställningar</string>
     <string name="jitter">Jitter: %1$s (ms)</string>
     <string name="call_is_on_hold">Samtalet är parkerat</string>
@@ -234,7 +234,7 @@
     <string name="no_android_contacts">Det går inte att komma åt Androids kontakter utan behörigheten \"Kontakter\".</string>
     <string name="country_code">Landsnummer</string>
     <string name="invalid_country_code">Ogiltigt landsnummer \'%1$s\'</string>
-    <string name="country_code_help">Det här kontots landsnummer, enligt E.164. Om telefonnumret i From-URI för ett inkommande samtal, eller meddelande, inte börjar med en \'+\'-symbol och en matchande kontakt inte kan hittas, då läggs landsnumret till telefonnumret och en kontaktsökning görs igen. Om telefonnumret börjar med siffran \'0\' tas denna siffra bort innan landsnumret läggs till.</string>
+    <string name="country_code_help">Det här kontots E.164-landskod. Om användardelen i motpartens URI för ett samtal eller meddelande innehåller ett telefonnummer som inte börjar med tecknet ”+” och kontaktsökningen misslyckas, läggs landskoden till numret och kontaktsökningen görs igen. Om numret börjar med en ensam siffra ”0” tas den bort innan landskoden läggs till.</string>
     <string name="anonymous">Anonym</string>
     <string name="unknown">Okänd</string>
     <string name="consent_request">Begäran om medgivande</string>
@@ -281,8 +281,8 @@
     <string name="playing_recording">Spelar upp inspelning …</string>
     <string name="appear_on_top_permission">Automatisk start kräver behörighet för att visas överst.</string>
     <string name="default_phone_app">Telefonapp som standard</string>
-    <string name="dialer_role_not_available">Uppringningsrollen är inte tillgänglig</string>
-    <string name="default_phone_app_help">Om denna ruta är markerad är baresip standardappen för telefoni. Markera inte denna ruta om din enhet kan behöva hantera andra samtal eller meddelanden än SIP-samtal.</string>
+    <string name="dialer_role_not_available">Rollen som standardapp för telefoni är inte tillgänglig</string>
+    <string name="default_phone_app_help">Om alternativet är markerat är baresip standardapp för telefoni.</string>
     <string name="no_read_permission">Ingen läsbehörighet för extern lagring</string>
     <string name="speaker_phone">Högtalartelefon</string>
     <string name="speaker_phone_help">Om denna ruta är markerad aktiveras högtalartelefonen automatiskt när samtalet inleds.</string>
@@ -311,7 +311,7 @@
     <string name="redirect_request_query">Accepterar du vidarekoppling av samtal till ’%1$s’?</string>
     <string name="restore_unzip_failed">Det gick inte att återställa applikationsdata. Android version 14 och senare tillåter inte återställning av data som säkerhetskopierats före %1$s version %2$s.</string>
     <string name="no_aec">Ingen hårdvara för akustisk ekokompensering!</string>
-    <string name="call_recording_tip">Om funktionen är aktiverad kommer nya inkommande och utgående samtal att spelas in. Inspelningarna kan spelas upp på sidan Samtalsdetaljer</string>
+    <string name="call_recording_tip">Om alternativet är aktiverat spelas nya inkommande och utgående samtal in. Inspelningarna kan spelas upp på sidan Samtalsdetaljer.</string>
     <string name="microphone_tip">Om funktionen aktiveras under samtalet stängs mikrofonen av.</string>
     <string name="speakerphone_tip">Om funktionen är aktiverad spelas ljudet upp via enhetens högtalartelefon.</string>
     <string name="rel_100">Reliable Provisional Responses</string>
@@ -320,4 +320,89 @@
     <string name="tone_country">Signalland</string>
     <string name="dynamic_colors">Dynamiska färger</string>
     <string name="dynamic_colors_help">Använd dynamiska färger om det är aktiverat i Android-inställningarna</string>
+    <string name="is_calling">ringer</string>
+    <string name="save_recording">Spara inspelning</string>
+    <string name="save_recording_question">Vill du spara inspelningen?</string>
+    <string name="recording_saved">Inspelningen har sparats</string>
+    <string name="delete_call_alert">Vill du ta bort det här samtalet från historiken?</string>
+    <string name="stop">Stoppa</string>
+    <string name="block_unknown">Blockera okända</string>
+    <string name="block_unknown_help">Blockera samtal och meddelanden från motparter som inte finns bland kontakterna.</string>
+    <string name="transport_protocols">Transportprotokoll</string>
+    <string name="transport_protocols_help">Kommaseparerad lista över SIP-transportprotokoll som stöds för begäranden och svar. Om den lämnas tom används standardvärdet ”udp,tcp,tls,ws,wss”, som omfattar alla transportprotokoll som stöds. Ange endast de protokoll du behöver. UDP rekommenderas inte av säkerhetsskäl och andra skäl.</string>
+    <string name="invalid_transport_protocols">Ogiltig lista över transportprotokoll</string>
+    <string name="check_origin">Kontrollera ursprung</string>
+    <string name="check_origin_help">Om alternativet är markerat tillåts inkommande begäranden endast från IP-adresser till vilka registerbegäranden skickades.</string>
+    <string name="call_blocked">Blockerat samtal från %1$s avvisades automatiskt</string>
+    <string name="message_blocked">Blockerat meddelande från %1$s avvisades automatiskt</string>
+    <string name="blocked">Blockerad</string>
+    <string name="blocked_calls">Blockerade samtal</string>
+    <string name="blocked_messages">Blockerade meddelanden</string>
+    <string name="blocked_contact_question">Vill du lägga till motparten ”%1$s” bland kontakterna?</string>
+    <string name="search">Sök</string>
+    <string name="unique_contact_uri">Unik kontakt-URI</string>
+    <string name="unique_contact_uri_help">Om alternativet är markerat garanteras att kontakt-URI:n är unik. Det måste vara markerat om fler än ett konto har samma användardel i SIP-URI:n, och det förbättrar även kontoskyddet mot angrepp. Inaktivera om leverantören kräver att kontakt-URI:ns användardel är samma som SIP-URI:ns användardel.</string>
+    <string name="call_is_connected">Samtalet är anslutet</string>
+    <string name="replaces_not_supported">Motparten har inte stöd för REPLACES-funktionen</string>
+    <string name="call_is_ringing">Samtalet ringer</string>
+    <string name="custom_parameters">Anpassade parametrar</string>
+    <string name="custom_parameters_help">Semikolonseparerad lista över anpassade kontoparametrar</string>
+    <string name="diverted_by">vidarekopplat av</string>
+    <string name="not_available">Inte tillgängligt</string>
+    <string name="voicemain_tel_uri_help">TEL-URI för kontroll av röstmeddelanden.</string>
+    <string name="no_telephone_number">Mobilsamtal kan endast ringas till telefonnummer</string>
+    <string name="default_messaging_app">Standardapp för meddelanden</string>
+    <string name="default_messaging_app_help">Om alternativet är markerat är baresip standardapp för SMS/MMS.</string>
+    <string name="messaging_role_not_available">Rollen som standardapp för meddelanden är inte tillgänglig</string>
+    <string name="enable_default_messaging">Aktivera Standardapp för meddelanden i Inställningar</string>
+    <string name="email">E-postadress</string>
+    <string name="contact_email_action_question">Vill du ringa, skicka ett meddelande eller e-posta ”%1$s”?</string>
+    <string name="send_email">Skicka e-post</string>
+    <string name="import_contacts">Importera</string>
+    <string name="contact_import_success">Kontakter har importerats</string>
+    <string name="contact_import_failure">Kunde inte importera kontakter</string>
+    <string name="contact_no_sip_or_tel_uri">Kontakten ”%1$s” har ingen SIP- eller TEL-URI</string>
+    <string name="contact_no_tel_uri">Kontakten ”%1$s” har ingen TEL-URI</string>
+    <string name="airplane_mode">Flygplansläget är PÅ. Stäng av det för att använda mobilkonto.</string>
+    <string name="export_contacts">Exportera</string>
+    <string name="contact_export_success">Kontakter har exporterats</string>
+    <string name="contact_export_failure">Kunde inte exportera kontakter</string>
+    <string name="contacts_delete_question">Vill du ta bort alla kontakter?</string>
+    <string name="tel_uri_calls">TEL-URI för samtal</string>
+    <string name="tel_uri_messages">TEL-URI för meddelanden</string>
+    <string name="label">Etikett</string>
+    <string name="copy_uri">Kopiera URI</string>
+    <string name="copied_to_clipboard">Kopierat till urklipp</string>
+    <string name="block_hidden">Blockera dolt nummer</string>
+    <string name="block_hidden_help">Blockera samtal och meddelanden från motparter med dold identifiering.</string>
+    <string name="hidden_call_blocked">Samtal från dolt nummer avvisades automatiskt</string>
+    <string name="hidden_message_blocked">Meddelande från dold avsändare avvisades automatiskt</string>
+    <string name="blocking">Blockering</string>
+    <string name="new_blocking_rule">Ny blockeringsregel</string>
+    <string name="blocking_rule_help">En blockeringsregel kan vara en vanlig sträng eller ett reguljärt uttryck. Om den vanliga strängen ingår i motpartens URI eller om det reguljära uttrycket matchar motpartens URI blockeras samtalet eller meddelandet.</string>
+    <string name="blocking_delete_alert">Vill du ta bort blockeringsregeln ”%1$s”?</string>
+    <string name="block">Blockera</string>
+    <string name="sim_manager">SIM-hanterare</string>
+    <string name="ussd_failed">USSD-begäran misslyckades</string>
+    <string name="ussd_service_unavailable">USSD-tjänsten är inte tillgänglig</string>
+    <string name="ussd_unknown_error">Okänt USSD-fel</string>
+    <string name="permission_denied">Behörighet nekades</string>
+    <string name="show_call">Visa</string>
+    <string name="blocking_rules">Blockeringsregler</string>
+    <string name="mobile_service_not_available">Mobiltjänsten är inte tillgänglig.</string>
+    <string name="create_mobile_account">Skapa mobilkonto</string>
+    <string name="create_mobile_account_help">Om alternativet är markerat skapas ett virtuellt mobilkonto för mobilsamtal.</string>
+    <string name="ilbc_mode">iLBC-läge</string>
+    <string name="ilbc_mode_help">Väljer standardvaraktighet för iLBC-ramen. 30 ms ger bättre kvalitet vid låg bithastighet medan 20 ms har lägre fördröjning.</string>
+    <string name="blocked_action_question">Vill du lägga till motparten ”%1$s” bland kontakterna eller häva blockeringen?</string>
+    <string name="calls_block_delete_question">Vill du blockera ”%1$s” eller ta bort %2$s från samtalshistoriken?</string>
+    <string name="long_chat_block_delete_question">Vill du blockera ”%1$s” eller ta bort den här chatten?</string>
+    <string name="unblock">Häv blockering</string>
+    <string name="blocked_unblock_question">Vill du häva blockeringen av motparten ”%1$s”?</string>
+    <string name="blocked_history_delete_alert">Vill du ta bort %1$s-historik för kontot ”%2$s”?</string>
+    <string name="blocked_peer_delete_alert">Vill du ta bort ”%1$s” från %2$s-historiken?</string>
+    <string name="blocked_calls_history">blockerade samtal</string>
+    <string name="blocked_messages_history">blockerade meddelanden</string>
+    <string name="contact_mode">Kontaktläge</string>
+    <string name="call_action">Samtalsåtgärd</string>
 </resources>
