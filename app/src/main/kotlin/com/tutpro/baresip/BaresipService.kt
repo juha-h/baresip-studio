@@ -1133,6 +1133,7 @@ class BaresipService: Service() {
                     }
 
                     "registered" -> {
+                        registrationRetries.remove(uap)
                         ua.updateStatus(
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
