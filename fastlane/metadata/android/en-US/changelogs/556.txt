@@ -1,0 +1,3 @@
+- Retry registration once after failure
+- Remove call log permissions (not needed and Google does not like them)
+- New translations (Chinese, Swedish)
