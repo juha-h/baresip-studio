@@ -151,6 +151,7 @@ class BaresipService: Service() {
     private var isServiceClean = false
     private var cleanupRunnable: Runnable? = null
     private var previousMobileServiceState = -1
+    private val registrationRetries = mutableMapOf<Long, Int>()
 
     @SuppressLint("WakelockTimeout")
     override fun onCreate() {
@@ -1144,6 +1145,21 @@ class BaresipService: Service() {
                     }
 
                     "registering failed" -> {
+                        if (Api.account_regint(ua.account.accp) > 0) {
+                            val retries = registrationRetries[uap] ?: 0
+                            if (retries < 1) {
+                                registrationRetries[uap] = retries + 1
+                                Log.d(TAG, "Registration failed for $aor, retrying in 1s...")
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    if (isServiceRunning) {
+                                        Log.d(TAG, "Retrying registration for $aor")
+                                        Api.ua_register(uap)
+                                    }
+                                }, 1000)
+                                return
+                            }
+                        }
+                        registrationRetries.remove(uap)
                         ua.updateStatus(
                             if (Api.account_regint(ua.account.accp) == 0)
                                 R.drawable.circle_white
