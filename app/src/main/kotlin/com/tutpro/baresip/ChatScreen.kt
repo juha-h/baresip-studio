@@ -611,21 +611,22 @@ private fun NewMessage(
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                            IconButton(
-                                onClick = {
-                                    photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                                },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Image,
-                                    contentDescription = "Attach",
-                                    tint = if (attachedImages.isNotEmpty())
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            if (ua.account.isMobile)
+                                IconButton(
+                                    onClick = {
+                                        photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                    },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Image,
+                                        contentDescription = "Attach",
+                                        tint = if (attachedImages.isNotEmpty())
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                         }
                     }
                 },
