@@ -655,7 +655,7 @@ private fun NewMessage(
                         )
                         msg.add()
                         addMessage(msg)
-                        
+
                         // Clear attachments after sending
                         attachedImages.clear()
                         newMessage.value = TextFieldValue("")

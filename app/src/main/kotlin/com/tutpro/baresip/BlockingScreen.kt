@@ -174,7 +174,7 @@ fun BlockingContent(
             )
             Switch(
                 checked = block,
-                onCheckedChange = { 
+                onCheckedChange = {
                     viewModel.blockUnknown.value = it
                     acc.blockUnknown = it
                     Account.saveAccounts()
@@ -206,8 +206,8 @@ fun BlockingContent(
             )
             Switch(
                 checked = block,
-                onCheckedChange = { 
-                    viewModel.blockHidden.value = it 
+                onCheckedChange = {
+                    viewModel.blockHidden.value = it
                     acc.blockHidden = it
                     Account.saveAccounts()
                 }
