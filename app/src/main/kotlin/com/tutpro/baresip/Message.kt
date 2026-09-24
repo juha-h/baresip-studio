@@ -3,6 +3,7 @@ package com.tutpro.baresip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.*
+import android.util.Log
 
 @Serializable
 class Message(val aor: String, val peerUri: String, val message: String, val timeStamp: Long,
@@ -35,7 +36,18 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
         val updatedMessages = synchronized(BaresipService.messagesLock) {
             BaresipService.messages.toMutableList()
         }
-        updatedMessages.remove(this)
+        if (updatedMessages.remove(this)) {
+            // Delete associated image files from internal storage
+            for (path in images) {
+                val file = File(path)
+                if (file.exists()) {
+                    if (file.delete())
+                        Log.d("Baresip", "Deleted message image: $path")
+                    else
+                        Log.w("Baresip", "Failed to delete message image: $path")
+                }
+            }
+        }
         synchronized(BaresipService.messagesLock) {
             BaresipService.messages = updatedMessages.toList()
         }
@@ -90,6 +102,23 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
                     synchronized(BaresipService.messagesLock) {
                         BaresipService.messages = updatedMessages.toList()
                     }
+                    save()
+                    return
+                }
+        }
+
+        fun updateMessageStatus(aor: String, time: Long, direction: Int, reason: String = "") {
+            val updatedMessages = synchronized(BaresipService.messagesLock) {
+                BaresipService.messages.toMutableList()
+            }
+            for (message in updatedMessages.reversed())
+                if (message.aor == aor && message.timeStamp == time) {
+                    message.direction = direction
+                    if (reason != "") message.responseReason = reason
+                    synchronized(BaresipService.messagesLock) {
+                        BaresipService.messages = updatedMessages.toList()
+                    }
+                    BaresipService.messageUpdate.postValue(System.currentTimeMillis())
                     save()
                     return
                 }
