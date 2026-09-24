@@ -1159,7 +1159,6 @@ class BaresipService: Service() {
                     }
 
                     "registering failed" -> {
-                        logNetworkState("Registration failure")
                         if (Api.account_regint(ua.account.accp) > 0) {
                             val retries = registrationRetries[uap] ?: 0
                             if (retries < 1) {

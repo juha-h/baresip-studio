@@ -15,6 +15,8 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
@@ -1557,13 +1559,7 @@ object Utils {
             else
                 @Suppress("DEPRECATION")
                 SmsManager.getDefault()
-            smsManager.sendTextMessage(
-                destination,
-                null,
-                message,
-                null,
-                null
-            )
+            smsManager.sendTextMessage(destination, null, message, null, null)
             Log.d(TAG, "Sent SMS message to $destination")
             true
         } catch (e: Exception) {
@@ -1574,30 +1570,48 @@ object Utils {
 
     suspend fun sendMms(ctx: Context, aor: String, destination: String, text: String, images: List<String>, time: Long):
             Boolean = withContext(Dispatchers.IO) {
-        Log.i(TAG, "Sending MMS to $destination (images: ${images.size})")
+        val cleanDestination = destination.replace(Regex("[^0-9+]"), "")
+        Log.i(TAG, "Sending MMS via mmslib to $cleanDestination (images: ${images.size})")
         try {
+            val subId = SubscriptionManager.getDefaultSmsSubscriptionId()
             val settings = Settings().apply {
                 useSystemSending = true
+                if (subId != SubscriptionManager.INVALID_SUBSCRIPTION_ID)
+                    subscriptionId = subId
             }
             val transaction = Transaction(ctx, settings)
-            val message = MmsLibMessage(text, destination)
+            val message = MmsLibMessage(text, cleanDestination)
 
-            // For now, send only one image
             if (images.isNotEmpty()) {
-                val bytes = resizeImageForMms(File(images[0]), MAX_MMS_IMAGES_SIZE)
-                if (bytes != null) {
-                    message.setMedia(bytes, "image/jpeg")
-                } else {
-                    Log.e(TAG, "Failed to load/resize image from ${images[0]}")
-                    return@withContext false
+                val perImageBudget = MAX_MMS_IMAGES_SIZE / images.size
+                for ((index, path) in images.withIndex()) {
+                    val file = File(path)
+                    if (file.exists()) {
+                        val bytes = resizeImageForMms(file, perImageBudget)
+                        if (bytes != null) {
+                            val name = "image_$index.jpg"
+                            val cid = "image_$index"
+                            message.addMedia(bytes, "image/jpeg", name, cid)
+                        }
+                        else {
+                            Log.e(TAG, "Failed to load/resize image from $path")
+                            return@withContext false
+                        }
+                    }
                 }
             }
+
+            val mmsSentIntent = Intent(ctx, BaresipMmsSentReceiver::class.java).apply {
+                putExtra("aor", aor)
+                putExtra("time", time)
+            }
+            transaction.setExplicitBroadcastForSentMms(mmsSentIntent)
 
             // Add to tracking queue before sending
             pendingMms.add(Pair(aor, time))
 
             transaction.sendNewMessage(message)
-            Log.d(TAG, "MMS transmission triggered via mmslib for $time to $destination")
+            Log.d(TAG, "MMS transmission triggered via mmslib for $time to $cleanDestination")
             true
         } catch (e: Exception) {
             Log.e(TAG, "MMS Send trigger failed: ${e.message}")
@@ -1620,10 +1634,13 @@ object Utils {
     var isIncomingMmsInProgress = false
 
     private fun resizeImageForMms(file: File, maxSize: Int): ByteArray? {
-        if (file.length() <= maxSize)
-            return try { file.readBytes() } catch (_: Exception) { null }
-
         try {
+            val exif = ExifInterface(file.absolutePath)
+            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+            if (file.length() <= maxSize && orientation == ExifInterface.ORIENTATION_NORMAL)
+                return try { file.readBytes() } catch (_: Exception) { null }
+
             val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(file.absolutePath, options)
 
@@ -1636,7 +1653,10 @@ object Utils {
             options.inJustDecodeBounds = false
             options.inSampleSize = scale
 
-            val bitmap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
+            var bitmap = BitmapFactory.decodeFile(file.absolutePath, options) ?: return null
+
+            if (orientation != ExifInterface.ORIENTATION_NORMAL)
+                bitmap = rotateBitmap(bitmap, orientation)
 
             var quality = 70
             var output: ByteArray
@@ -1647,13 +1667,45 @@ object Utils {
                 quality -= 15
             } while (output.size > maxSize && quality > 10)
 
-            bitmap.recycle()
             Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes " +
-                    "(target: $maxSize, dims: ${options.outWidth / scale}×${options.outHeight / scale})")
+                    "(target: $maxSize, dims: ${bitmap.width}×${bitmap.height}, orientation: $orientation)")
+            bitmap.recycle()
             return output
         } catch (e: Exception) {
             Log.e(TAG, "Resizing failed: ${e.message}")
             return null
+        }
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_NORMAL -> return bitmap
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.setScale(-1f, 1f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.setRotate(180f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
+                matrix.setRotate(180f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.setRotate(90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.setRotate(90f)
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.setRotate(-90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
+            else -> return bitmap
+        }
+        return try {
+            val bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            bitmap.recycle()
+            bmRotated
+        } catch (e: Exception) {
+            Log.e(TAG, "Rotation failed: ${e.message}")
+            bitmap
         }
     }
 
@@ -1679,10 +1731,7 @@ object Utils {
         }
         val files = directory.listFiles()
         if (files == null) {
-            Log.e(
-                TAG,
-                "Failed to list files in directory (listFiles returned null): $directory"
-            )
+            Log.e(TAG, "Failed to list files in directory (listFiles returned null): $directory")
             return emptyList()
         }
         return files.filter { it.isFile }

@@ -543,9 +543,7 @@ private fun NewMessage(
     ) {
         if (attachedImages.isNotEmpty()) {
             LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(start = 8.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(attachedImages) { uri ->
@@ -671,21 +669,21 @@ private fun NewMessage(
                             else {
                                 // Implement MMS Sending
                                 val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
-                                if (copiedImages.isNotEmpty()) {
-                                    coroutineScope.launch {
-                                        if (Utils.sendMms(ctx, aor, destination, msgText, copiedImages, time)) {
-                                            msg.direction = MESSAGE_UP_WAIT
-                                        } else {
-                                            Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
-                                            msg.direction = MESSAGE_UP_FAIL
-                                            msg.responseReason = messageFailed
+                                when {
+                                    copiedImages.isNotEmpty() ->
+                                        coroutineScope.launch {
+                                            if (Utils.sendMms(ctx, aor, destination, msgText, copiedImages, time))
+                                                msg.direction = MESSAGE_UP_WAIT
+                                            else {
+                                                Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
+                                                msg.direction = MESSAGE_UP_FAIL
+                                                msg.responseReason = messageFailed
+                                            }
+                                            Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
                                         }
-                                        Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
-                                    }
-                                } else {
-                                    if (Utils.sendSms(ctx, destination, msgText)) {
+                                    Utils.sendSms(ctx, destination, msgText) ->
                                         msg.direction = MESSAGE_UP
-                                    } else {
+                                    else -> {
                                         Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
                                         msg.direction = MESSAGE_UP_FAIL
                                         msg.responseReason = messageFailed
@@ -694,23 +692,23 @@ private fun NewMessage(
                             }
                         }
                         else {
-                            // SIP message sending...
+                            // SIP message sending
                             val msgUri = if (Utils.isTelUri(peerUri)) {
                                 if (ua.account.telProvider == "") {
                                     dialogMessage.value = String.format(noTelephonyProvider, Utils.plainAor(aor))
                                     showDialog.value = true
                                     ""
-                                } else Utils.telToSip(peerUri, ua.account)
-                            } else peerUri
-                            
-                            if (msgUri != "") {
-                                if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
-                                    Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
-                                    msg.direction = MESSAGE_UP_FAIL
-                                    msg.responseReason = messageFailed
-                                } else {
-                                    // Success
                                 }
+                                else
+                                    Utils.telToSip(peerUri, ua.account)
+                            }
+                            else
+                                peerUri
+
+                            if (msgUri.isNotEmpty() && Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
+                                Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
+                                msg.direction = MESSAGE_UP_FAIL
+                                msg.responseReason = messageFailed
                             }
                         }
                     }
