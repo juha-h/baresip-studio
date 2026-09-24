@@ -35,11 +35,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -51,6 +49,7 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -58,12 +57,12 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,7 +75,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -511,7 +510,6 @@ private fun NewMessage(
         mutableStateOf(TextFieldValue(viewModel.getAorPeerMessage(aor, peerUri)))
     }
 
-    var textFieldLoaded by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     val attachedImages = remember { mutableStateListOf<Uri>() }
@@ -575,9 +573,12 @@ private fun NewMessage(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             val keyboardController = LocalSoftwareKeyboardController.current
+            var oneLineHeight by remember { mutableIntStateOf(0) }
+            var fieldHeight by remember { mutableIntStateOf(0) }
+            val isMultiline = oneLineHeight in 1..<fieldHeight
+
             OutlinedTextField(
                 value = newMessage.value,
-                placeholder = { Text(stringResource(R.string.new_message)) },
                 onValueChange = {
                     newMessage.value = it
                     viewModel.updateAorPeerMessage(aor, peerUri, it.text)
@@ -585,52 +586,80 @@ private fun NewMessage(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
-                    .verticalScroll(rememberScrollState())
                     .focusRequester(focusRequester)
-                    .onGloballyPositioned {
-                        if (!textFieldLoaded) textFieldLoaded = true
-                    },
-                singleLine = false,
-                trailingIcon = {
-                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(end = 4.dp)
-                        ) {
-                            if (newMessage.value.text.isNotEmpty())
-                                IconButton(
-                                    onClick = {
-                                        newMessage.value = TextFieldValue("")
-                                        viewModel.updateAorPeerMessage(aor, peerUri, "")
-                                    },
-                                    modifier = Modifier.size(36.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Clear,
-                                        contentDescription = "Clear",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            if (ua.account.isMobile)
-                                IconButton(
-                                    onClick = {
-                                        photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                                    },
-                                    modifier = Modifier.size(36.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Image,
-                                        contentDescription = "Attach",
-                                        tint = if (attachedImages.isNotEmpty())
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+                    .onSizeChanged { size ->
+                        fieldHeight = size.height
+                        // Capture the normal one-line height.
+                        if (newMessage.value.text.isEmpty()) {
+                            oneLineHeight = size.height
                         }
+                    },
+
+                singleLine = false,
+                maxLines = 5,
+                trailingIcon = {
+                    CompositionLocalProvider(
+                        LocalMinimumInteractiveComponentSize provides 0.dp
+                    ) {
+                        if (isMultiline)
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(end = 4.dp)
+                            ) {
+                                if (newMessage.value.text.isNotEmpty()) {
+                                    ClearButton(
+                                        onClick = {
+                                            newMessage.value = TextFieldValue("")
+                                            viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                        }
+                                    )
+                                }
+                                if (ua.account.isMobile)
+                                    AttachButton(
+                                        attachedImages = attachedImages,
+                                        onClick = {
+                                            photoLauncher.launch(
+                                                PickVisualMediaRequest(
+                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                )
+                                            )
+                                        }
+                                    )
+                            }
+                        else
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(end = 4.dp)
+                            ) {
+                                if (newMessage.value.text.isNotEmpty()) {
+                                    ClearButton(
+                                        onClick = {
+                                            newMessage.value = TextFieldValue("")
+                                            viewModel.updateAorPeerMessage(aor, peerUri, "")
+                                        }
+                                    )
+                                }
+                                if (ua.account.isMobile)
+                                    AttachButton(
+                                        attachedImages = attachedImages,
+                                        onClick = {
+                                            photoLauncher.launch(
+                                                PickVisualMediaRequest(
+                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                )
+                                            )
+                                        }
+                                    )
+                            }
                     }
                 },
-                label = { Text(stringResource(R.string.new_message)) },
+                placeholder = {
+                    Text(stringResource(R.string.new_message))
+                },
+                label = {
+                    Text(stringResource(R.string.new_message))
+                },
                 textStyle = TextStyle(fontSize = 18.sp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -638,9 +667,11 @@ private fun NewMessage(
                     autoCorrectEnabled = true
                 )
             )
+
             LaunchedEffect(Unit) {
                 if (newMessage.value.text.isNotEmpty()) focusRequester.requestFocus()
             }
+
             SmallFloatingActionButton(
                 modifier = Modifier.offset(y = 2.dp),
                 onClick = {
@@ -743,6 +774,42 @@ private fun NewMessage(
     }
 }
 
+@Composable
+private fun ClearButton(
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(36.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Clear,
+            contentDescription = "Clear",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun AttachButton(
+    attachedImages: List<*>,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(36.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Image,
+            contentDescription = "Attach",
+            tint = if (attachedImages.isNotEmpty()) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
+        )
+    }
+}
 
 private fun loadPeerMessages(aor: String, peerUri: String): List<Message> {
     val res = mutableListOf<Message>()
