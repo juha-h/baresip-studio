@@ -49,7 +49,7 @@
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>
-            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
+            <li><b>Apache 2.0</b> AMR codecs, MMS, and TLS security</li>
             <li><b>AGPLv4</b> ZRTP media encryption</li>
             <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
             <li><b>Free</b> G.722 codec</li>
@@ -106,7 +106,7 @@
         <h2>Licenses</h2>
         <ul>
             <li><b>BSD-3-Clause</b> except the following:</li>
-            <li><b>Apache 2.0</b> AMR codecs and TLS security</li>
+            <li><b>Apache 2.0</b> AMR codecs, MMS, and TLS security</li>
             <li><b>AGPLv4</b> ZRTP media encryption</li>
             <li><b>GNU LGPL 2.1</b> Codec2 codec</li>
             <li><b>Free</b> G.722 codec</li>
