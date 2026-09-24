@@ -631,7 +631,7 @@ private fun NewMessage(
                     if (msgText.isNotEmpty() || attachedImages.isNotEmpty()) {
                         keyboardController?.hide()
                         val time = System.currentTimeMillis()
-                        
+
                         // Copy attached images to internal storage to ensure persistence
                         val copiedImages = mutableListOf<String>()
                         val imagesDir = File(ctx.filesDir, "mms_images")
