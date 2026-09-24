@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
 
 class SettingsViewModel: ViewModel() {
-    
+
     val autoStart = MutableStateFlow(false)
     val listenAddress = MutableStateFlow("")
     val addressFamily = MutableStateFlow("")

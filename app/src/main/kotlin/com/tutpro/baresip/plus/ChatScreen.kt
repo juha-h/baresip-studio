@@ -1,14 +1,19 @@
 package com.tutpro.baresip.plus
 
 import android.content.Intent
+import android.net.Uri
 import android.text.format.DateUtils.isToday
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,19 +21,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -39,10 +43,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +63,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,8 +71,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -88,11 +97,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import coil.compose.AsyncImage
 import com.tutpro.baresip.plus.BaresipService.Companion.circleGreen
 import com.tutpro.baresip.plus.BaresipService.Companion.colorblind
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
+import java.io.File
 import java.lang.String.format
 import java.text.DateFormat
 import java.util.GregorianCalendar
@@ -517,6 +528,7 @@ private fun NewMessage(
     val ctx = LocalContext.current
     val aor = account.aor
     val ua = UserAgent.ofAor(aor)!!
+    val coroutineScope = rememberCoroutineScope()
 
     val newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(viewModel.getAorPeerMessage(aor, peerUri)))
@@ -524,6 +536,17 @@ private fun NewMessage(
 
     var textFieldLoaded by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+
+    val attachedImages = remember { mutableStateListOf<Uri>() }
+    val photoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(5)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            // Add new images to the list, respecting the limit if desired
+            attachedImages.addAll(uris)
+            Log.d(TAG, "Added ${uris.size} images to attachment list")
+        }
+    }
 
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
@@ -538,132 +561,192 @@ private fun NewMessage(
         lastButtonText = stringResource(R.string.ok),
     )
 
-    Row(modifier = Modifier
+    Column(modifier = Modifier
         .fillMaxWidth()
         .navigationBarsPadding()
-        .padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        .padding(horizontal = 8.dp, vertical = 8.dp)
     ) {
-        val keyboardController = LocalSoftwareKeyboardController.current
-        OutlinedTextField(
-            value = newMessage.value,
-            placeholder = { Text(stringResource(R.string.new_message)) },
-            onValueChange = {
-                newMessage.value = it
-                viewModel.updateAorPeerMessage(aor, peerUri, it.text)
-            },
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 8.dp)
-                .verticalScroll(rememberScrollState())
-                .focusRequester(focusRequester)
-                .onGloballyPositioned {
-                    if (!textFieldLoaded) textFieldLoaded = true
-                },
-            singleLine = false,
-            trailingIcon = {
-                if (newMessage.value.text.isNotEmpty())
-                    Icon(
-                        imageVector = Icons.Outlined.Clear,
-                        contentDescription = "Clear",
-                        modifier = Modifier.clickable {
-                            newMessage.value = TextFieldValue("")
-                            viewModel.updateAorPeerMessage(aor, peerUri, "")
-                        },
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-            },
-            label = { Text(stringResource(R.string.new_message)) },
-            textStyle = TextStyle(fontSize = 18.sp),
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                keyboardType = KeyboardType.Text,
-                autoCorrectEnabled = true
-            )
-        )
-        LaunchedEffect(Unit) {
-            if (newMessage.value.text.isNotEmpty()) focusRequester.requestFocus()
+        if (attachedImages.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().padding(start = 8.dp, bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(attachedImages) { uri ->
+                    Box(modifier = Modifier.padding(top = 4.dp, end = 4.dp)) {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.Cancel,
+                            contentDescription = "Remove",
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(20.dp)
+                                .offset(x = 8.dp, y = (-8).dp)
+                                .clickable { attachedImages.remove(uri) },
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
         }
-        SmallFloatingActionButton(
-            modifier = Modifier.offset(y = 2.dp),
-            onClick = {
-                val msgText = newMessage.value.text
-                if (msgText.isNotEmpty()) {
-                    keyboardController?.hide()
-                    val time = System.currentTimeMillis()
-                    val msg = Message(
-                        aor,
-                        peerUri,
-                        msgText,
-                        time,
-                        MESSAGE_UP_WAIT,
-                        0,
-                        "",
-                        false
-                    )
-                    msg.add()
-                    var msgUri = ""
-                    addMessage(msg)
-                    if (ua.account.isMobile) {
-                        if (ua.status != circleGreen.getValue(colorblind)) {
-                            dialogMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
-                            showDialog.value = true
-                        }
-                        else {
-                            val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
-                            if (Utils.sendSms(ctx, destination, msgText)) {
-                                msg.direction = MESSAGE_UP
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            val keyboardController = LocalSoftwareKeyboardController.current
+            OutlinedTextField(
+                value = newMessage.value,
+                placeholder = { Text(stringResource(R.string.new_message)) },
+                onValueChange = {
+                    newMessage.value = it
+                    viewModel.updateAorPeerMessage(aor, peerUri, it.text)
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+                    .verticalScroll(rememberScrollState())
+                    .focusRequester(focusRequester)
+                    .onGloballyPositioned {
+                        if (!textFieldLoaded) textFieldLoaded = true
+                    },
+                singleLine = false,
+                trailingIcon = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (newMessage.value.text.isNotEmpty())
+                            IconButton(onClick = {
                                 newMessage.value = TextFieldValue("")
                                 viewModel.updateAorPeerMessage(aor, peerUri, "")
-                                keyboardController?.hide()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Clear,
+                                    contentDescription = "Clear",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-                            else {
-                                Toast.makeText(
-                                    ctx, "$messageFailed!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = messageFailed
-                            }
+                        IconButton(onClick = {
+                            photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Image,
+                                contentDescription = "Attach",
+                                tint = if (attachedImages.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
-                    else {
-                        if (Utils.isTelUri(peerUri)) {
-                            if (ua.account.telProvider == "") {
-                                dialogMessage.value = String.format(
-                                    noTelephonyProvider,
-                                    Utils.plainAor(aor)
-                                )
+                },
+                label = { Text(stringResource(R.string.new_message)) },
+                textStyle = TextStyle(fontSize = 18.sp),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    autoCorrectEnabled = true
+                )
+            )
+            LaunchedEffect(Unit) {
+                if (newMessage.value.text.isNotEmpty()) focusRequester.requestFocus()
+            }
+            SmallFloatingActionButton(
+                modifier = Modifier.offset(y = 2.dp),
+                onClick = {
+                    val msgText = newMessage.value.text
+                    if (msgText.isNotEmpty() || attachedImages.isNotEmpty()) {
+                        keyboardController?.hide()
+                        val time = System.currentTimeMillis()
+
+                        // Copy attached images to internal storage to ensure persistence
+                        val copiedImages = mutableListOf<String>()
+                        val imagesDir = File(ctx.filesDir, "mms_images")
+                        attachedImages.forEachIndexed { index, uri ->
+                            val fileName = "mms_outgoing_${time}_$index.jpg"
+                            Utils.copyUriToInternalStorage(ctx, uri, imagesDir, fileName)?.let { path ->
+                                copiedImages.add(path)
+                            }
+                        }
+
+                        val msg = Message(
+                            aor,
+                            peerUri,
+                            msgText,
+                            time,
+                            MESSAGE_UP_WAIT,
+                            0,
+                            "",
+                            false,
+                            copiedImages
+                        )
+                        msg.add()
+                        addMessage(msg)
+
+                        // Clear attachments after sending
+                        attachedImages.clear()
+                        newMessage.value = TextFieldValue("")
+                        viewModel.updateAorPeerMessage(aor, peerUri, "")
+
+                        if (ua.account.isMobile) {
+                            if (ua.status != circleGreen.getValue(colorblind)) {
+                                dialogMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
                                 showDialog.value = true
                             }
-                            else
-                                msgUri = Utils.telToSip(peerUri, ua.account)
+                            else {
+                                // Implement MMS Sending
+                                val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
+                                when {
+                                    copiedImages.isNotEmpty() ->
+                                        coroutineScope.launch {
+                                            if (Utils.sendMms(ctx, aor, destination, msgText, copiedImages, time))
+                                                msg.direction = MESSAGE_UP_WAIT
+                                            else {
+                                                Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
+                                                msg.direction = MESSAGE_UP_FAIL
+                                                msg.responseReason = messageFailed
+                                            }
+                                            Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
+                                        }
+                                    Utils.sendSms(ctx, destination, msgText) ->
+                                        msg.direction = MESSAGE_UP
+                                    else -> {
+                                        Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
+                                        msg.direction = MESSAGE_UP_FAIL
+                                        msg.responseReason = messageFailed
+                                    }
+                                }
+                            }
                         }
-                        else
-                            msgUri = peerUri
-                        if (msgUri != "") {
-                            if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
+                        else {
+                            // SIP message sending
+                            val msgUri = if (Utils.isTelUri(peerUri)) {
+                                if (ua.account.telProvider == "") {
+                                    dialogMessage.value = String.format(noTelephonyProvider, Utils.plainAor(aor))
+                                    showDialog.value = true
+                                    ""
+                                }
+                                else
+                                    Utils.telToSip(peerUri, ua.account)
+                            }
+                            else
+                                peerUri
+
+                            if (msgUri.isNotEmpty() && Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
                                 Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
                                 msg.direction = MESSAGE_UP_FAIL
                                 msg.responseReason = messageFailed
                             }
-                            else {
-                                newMessage.value = TextFieldValue("")
-                                viewModel.updateAorPeerMessage(aor, peerUri, "")
-                                keyboardController?.hide()
-                            }
                         }
                     }
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
-                modifier = Modifier.size(28.dp),
-                contentDescription = stringResource(R.string.add)
-            )
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    modifier = Modifier.size(28.dp),
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
         }
     }
 }
