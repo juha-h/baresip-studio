@@ -1755,10 +1755,9 @@ private fun CallRow(
                 }
             }
 
-
-
             if (call.showHangupButton.value && !call.conferenceCall)
-                IconButton(    modifier = Modifier.size(48.dp),
+                IconButton(
+                    modifier = Modifier.size(48.dp),
                     onClick = {
                         if (call.callOnHold.value) {
                             Log.d(TAG, "User requested resume for ${call.callp}")
