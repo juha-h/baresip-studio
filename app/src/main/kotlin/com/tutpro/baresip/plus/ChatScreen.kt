@@ -505,7 +505,7 @@ private fun Messages(
                                     contentDescription = "MMS Image Attachment",
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
-                                        .gi sizeIn(maxWidth = 200.dp, maxHeight = 200.dp)
+                                        .sizeIn(maxWidth = 200.dp, maxHeight = 200.dp)
                                         .clip(RoundedCornerShape(8.dp)),
                                     contentScale = ContentScale.Fit
                                 )
