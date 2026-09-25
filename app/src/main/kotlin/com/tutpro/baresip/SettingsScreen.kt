@@ -1136,6 +1136,69 @@ private fun SettingsContent(
     }
 
     @Composable
+    fun MaxMmsImagesSize() {
+        val maxMmsImagesSizeTitle = stringResource(R.string.max_mms_images_size)
+        val maxMmsImagesSizeHelp = stringResource(R.string.max_mms_images_size_help)
+        Row(
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            val maxMmsImagesSize by viewModel.maxMmsImagesSize.collectAsState()
+            Text(text = maxMmsImagesSizeTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = maxMmsImagesSizeTitle
+                        alertMessage.value = maxMmsImagesSizeHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            val isDropDownExpanded = remember { mutableStateOf(false) }
+            val sizeNames = listOf("300 KB", "600 KB", "900 KB")
+            val sizeValues = listOf("300", "600", "900")
+            val itemPosition = remember { mutableIntStateOf(sizeValues.indexOf(maxMmsImagesSize).coerceAtLeast(1)) }
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { isDropDownExpanded.value = true }
+                ) {
+                    Text(text = sizeNames[itemPosition.intValue])
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = isDropDownExpanded.value,
+                    onDismissRequest = { isDropDownExpanded.value = false },
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    sizeNames.forEachIndexed { index, sizeName ->
+                        DropdownMenuItem(
+                            text = { Text(text = sizeName) },
+                            onClick = {
+                                isDropDownExpanded.value = false
+                                itemPosition.intValue = index
+                                val sizeVal = sizeValues[index]
+                                viewModel.maxMmsImagesSize.value = sizeVal
+                                BaresipService.maxMmsImagesSize = sizeVal.toInt() * 1024
+                                Config.replaceVariable("max_mms_images_size", sizeVal)
+                                Config.save()
+                            })
+                        if (index < sizeNames.size - 1)
+                            HorizontalDivider(thickness = 1.dp)
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
     fun Debug() {
         val debugTitle = stringResource(R.string.debug)
         val debugHelp = stringResource(R.string.debug_help)
@@ -1256,9 +1319,12 @@ private fun SettingsContent(
         AudioSettings(navController)
         if (VERSION.SDK_INT >= 29) {
             DefaultDialer()
-            DefaultMessaging()
             val defaultDialer by viewModel.defaultDialer.collectAsState()
             val defaultMessaging by viewModel.defaultMessaging.collectAsState()
+            DefaultMessaging()
+            if (defaultMessaging) {
+                MaxMmsImagesSize()
+            }
             if (!defaultDialer && !defaultMessaging) BatteryOptimizations()
         }
         else
@@ -1408,6 +1474,13 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
             ctx.startService(baresipService)
         else
             ContextCompat.startForegroundService(ctx, baresipService)
+        viewModel.save = true
+    }
+
+    val maxMmsImagesSize = viewModel.maxMmsImagesSize.value
+    if (Config.variable("max_mms_images_size") != maxMmsImagesSize) {
+        Config.replaceVariable("max_mms_images_size", maxMmsImagesSize)
+        BaresipService.maxMmsImagesSize = maxMmsImagesSize.toInt() * 1024
         viewModel.save = true
     }
 

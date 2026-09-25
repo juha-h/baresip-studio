@@ -34,6 +34,7 @@ class SettingsViewModel: ViewModel() {
     val defaultDialer = MutableStateFlow(false)
     val mobileAccount = MutableStateFlow(true)
     val defaultMessaging = MutableStateFlow(false)
+    val maxMmsImagesSize = MutableStateFlow("600")
     val debug = MutableStateFlow(false)
     val sipTrace = MutableStateFlow(false)
 
@@ -83,6 +84,9 @@ class SettingsViewModel: ViewModel() {
             mobileAccount.value = BaresipService.mobileAccount
             defaultMessaging.value = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
         }
+
+        val mmsSize = Config.variable("max_mms_images_size")
+        maxMmsImagesSize.value = if (mmsSize != "") mmsSize else "600"
 
         debug.value = Config.variable("log_level") == "0"
 

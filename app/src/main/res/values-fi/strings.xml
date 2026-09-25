@@ -366,6 +366,8 @@
     <string name="default_messaging_app">Oletus tekstiviestisovellus</string>
     <string name="default_messaging_app_help">Jos merkitty, baresip on tekstiviestien
         oletussovellus</string>
+    <string name="max_mms_images_size">MMS-kuvien maksimikoko</string>
+    <string name="max_mms_images_size_help">MMS-viestin kuvien yhteenlaskettu tiivistetty maksimikoko</string>
     <string name="messaging_role_not_available">Oletus tekstiviestisovellusrooli ei ole
         saatavana</string>
     <string name="enable_default_messaging">Ole hyvä ja merkitse \'Oletus tekstiviestisovellus\'

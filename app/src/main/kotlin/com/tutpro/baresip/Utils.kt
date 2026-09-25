@@ -118,7 +118,8 @@ object Utils {
         "gzrtp.zid", "cert.pem", "ca_certs.crt"
     )
 
-    const val MAX_MMS_IMAGES_SIZE = 250 * 1024
+    val MAX_MMS_IMAGES_SIZE: Int
+        get() = BaresipService.maxMmsImagesSize
 
     fun getNameValue(string: String, name: String): ArrayList<String> {
         val lines = string.split("\n")
@@ -1658,14 +1659,15 @@ object Utils {
             if (orientation != ExifInterface.ORIENTATION_NORMAL)
                 bitmap = rotateBitmap(bitmap, orientation)
 
-            var quality = 70
+            var quality = 90
             var output: ByteArray
             do {
                 val stream = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
                 output = stream.toByteArray()
-                quality -= 15
-            } while (output.size > maxSize && quality > 10)
+                if (output.size > maxSize)
+                    quality -= 10
+            } while (output.size > maxSize && quality >= 20)
 
             Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes " +
                     "(target: $maxSize, dims: ${bitmap.width}×${bitmap.height}, orientation: $orientation)")

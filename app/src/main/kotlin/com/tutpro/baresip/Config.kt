@@ -141,6 +141,16 @@ object Config {
             BaresipService.mobileAccount = true
         }
 
+        val maxMmsImagesSize = previousVariable("max_mms_images_size")
+        if (maxMmsImagesSize != "") {
+            config = "${config}max_mms_images_size $maxMmsImagesSize\n"
+            BaresipService.maxMmsImagesSize = (maxMmsImagesSize.toIntOrNull() ?: 600) * 1024
+        }
+        else {
+            config = "${config}max_mms_images_size 600\n"
+            BaresipService.maxMmsImagesSize = 600 * 1024
+        }
+
         val sipCuserRandom = previousVariable("sip_cuser_random")
         config = if (sipCuserRandom != "")
             "${config}sip_cuser_random $sipCuserRandom\n"

@@ -3525,6 +3525,7 @@ class BaresipService: Service() {
         var isConfigInitialized = false
         var libraryLoaded = false
         var callVolume = 0
+        var maxMmsImagesSize = 600 * 1024
 
         @Volatile
         var speakerPhone = false
