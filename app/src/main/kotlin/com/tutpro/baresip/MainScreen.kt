@@ -2112,7 +2112,7 @@ private fun CallRow(
                             enabled = call.dtmfEnabled.value,
                             interactionSource = interactionSource,
                             label = { Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp)) },
-                            contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                            contentPadding = PaddingValues(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
