@@ -1,4 +1,4 @@
-Baresip+ is security focused open source communication app for Android that originally only supported SIP based voice and video calling and messaging.  Now baresip+ can also be chosen as Android's default mobile calling and messaging app.  In addition, contacts are integrated within the app. Voice conference calls, voicemail indication as well as blind and attended call transfers are available when VoIP is used. Multimedia messaging is not supported yet.
+Baresip+ is security focused open source communication app that originally only supported SIP based voice and video calling and messaging.  Now baresip+ can also be chosen as Android's default mobile calling and messaging app.  In addition, contacts are integrated within the app. Voice conference calls, voicemail indication as well as blind and attended call transfers are available when VoIP is used.
 
 In SIP calls audio can be coded with AMR, Codec2, G.729, G.722, G.722.1, iLBC, opus or PCMU/PCMA codecs.  Video can be coded with VP9, VP8, H.265, H.264, or AV1 codecs.  Security is achieved via TLS or WSS SIP signaling transport and ZRTP or (DTLS) SRTP media encapsulation.
 

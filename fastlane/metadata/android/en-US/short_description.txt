@@ -1,1 +1,1 @@
-VoIP and mobile calling and messaging app for Android based on baresip library
+VoIP and mobile calling and messaging app based on baresip library

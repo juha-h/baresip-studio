@@ -1,0 +1,3 @@
+- Mobile account chat screen now supports sending of MMS messages
+- Main screen in-call user interface improvements
+- New translations (several languages)
