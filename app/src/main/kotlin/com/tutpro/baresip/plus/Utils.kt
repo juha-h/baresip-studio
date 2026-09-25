@@ -1572,7 +1572,8 @@ object Utils {
         return if (Build.VERSION.SDK_INT >= 29) {
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
             roleManager.isRoleHeld(RoleManager.ROLE_SMS)
-        } else
+        }
+        else
             @Suppress("DEPRECATION")
             android.provider.Telephony.Sms.getDefaultSmsPackage(ctx) == ctx.packageName
     }
