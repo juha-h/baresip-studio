@@ -415,8 +415,6 @@ class BaresipService: Service() {
         )
         bluetoothReceiverRegistered = true
 
-        bluetoothReceiverRegistered = true
-
         telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         if (VERSION.SDK_INT >= 31)
             telephonyCallback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
