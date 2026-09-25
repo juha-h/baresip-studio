@@ -11,3 +11,15 @@
 -keepattributes LineNumberTable,SourceFile
 -keep class com.tutpro.baresip.plus.Camera2 { *; }
 -dontobfuscate
+-dontoptimize
+
+# Prevent R8 from inlining, merging, or optimizing Android framework and internal classes
+-keep class android.** { *; }
+-keepclassmembers class android.** { *; }
+-keep class com.android.internal.** { *; }
+-keepclassmembers class com.android.internal.** { *; }
+-dontwarn com.android.internal.**
+
+# Keep androidx activity and activity result classes intact
+-keep class androidx.activity.** { *; }
+-keepclassmembers class androidx.activity.** { *; }

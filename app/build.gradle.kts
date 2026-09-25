@@ -19,7 +19,7 @@ configure<ApplicationExtension> {
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
-                arguments.addAll(listOf("-DANDROID_STL=c++_shared"))
+                arguments.addAll(listOf("-DANDROID_STL=c++_shared", "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384"))
             }
         }
         ndk {
