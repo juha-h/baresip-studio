@@ -1691,12 +1691,11 @@ private fun CallUriRow(
                 }
             }
         }
-        if (call != null && call.showCallTimer.value) {
+        if (call != null && !call.ua.account.isMobile && call.showCallTimer.value)
             CallTimer(
                 initialDurationSeconds = call.callDuration.toLong(),
                 modifier = Modifier.padding(start = 6.dp, top = 6.dp)
             )
-        }
     }
 }
 
@@ -2276,7 +2275,7 @@ private fun CallRow(
                             enabled = call.dtmfEnabled.value,
                             interactionSource = interactionSource,
                             label = { Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp)) },
-                            contentPadding = PaddingValues(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                            contentPadding = PaddingValues(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -2286,6 +2285,13 @@ private fun CallRow(
                             )
                         )
                     }
+                )
+
+            if (call.ua.account.isMobile && call.showCallTimer.value)
+                CallTimer(
+                    initialDurationSeconds = call.callDuration.toLong(),
+                    modifier = Modifier.padding(end = 2.dp, top = 6.dp)
+
                 )
 
             if (call.showHangupButton.value)
