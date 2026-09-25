@@ -13,13 +13,13 @@ configure<ApplicationExtension> {
         applicationId = "com.tutpro.baresip"
         minSdk = 28
         targetSdk = 36
-        versionCode = 557
+        versionCode = 559
         versionName = "92.0.0"
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
                 cFlags += "-DHAVE_INTTYPES_H -lstdc++"
-                arguments.addAll(listOf("-DANDROID_STL=c++_shared"))
+                arguments.addAll(listOf("-DANDROID_STL=c++_shared", "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384"))
             }
         }
         ndk {
