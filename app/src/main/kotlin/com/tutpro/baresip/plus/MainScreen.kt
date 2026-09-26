@@ -1120,7 +1120,7 @@ private fun IncomingCallCard(
                         imageVector = Icons.Default.VideoCall,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(48.dp)
                     )
                 }
             }
@@ -1819,7 +1819,7 @@ private fun CallRow(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.VideoCall,
-                        modifier = Modifier.size(42.dp),
+                        modifier = Modifier.size(48.dp),
                         tint = colorResource(
                             if (dialerState.callButtonsEnabled.value)
                                 R.color.colorTrafficGreen
@@ -1887,7 +1887,7 @@ private fun CallRow(
                                 Icons.Filled.VideocamOff
                             else // Video.ON, Video.PENDING
                                 Icons.Filled.VideoCall,
-                            modifier = Modifier.size(42.dp),
+                            modifier = Modifier.size(48.dp),
                             tint = if (call.videoIcon.value == Video.PENDING)
                                 colorResource(R.color.colorTrafficYellow)
                             else
