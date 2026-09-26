@@ -153,7 +153,26 @@ class ConnectionService : ConnectionService() {
 
         if (!pstnCall) {
             connection.audioModeIsVoip = true
-            val sipUri = if (destination.startsWith("sip:")) destination else "sip:$destination"
+            val addressStr = request?.address?.toString() ?: ""
+            val peerUri = if (addressStr.startsWith("tel:"))
+                addressStr
+            else if (Utils.isTelNumber(destination))
+                "tel:$destination"
+            else
+                destination
+            val sipUri = if (Utils.isTelUri(peerUri)) {
+                if (ua != null && ua.account.isMobile)
+                    peerUri
+                else if (ua != null)
+                    Utils.telToSip(peerUri, ua.account)
+                else
+                    if (destination.startsWith("sip:")) destination else "sip:$destination"
+            } else {
+                if (ua != null)
+                    Utils.uriComplete(peerUri, ua.account.aor)
+                else
+                    if (destination.startsWith("sip:")) destination else "sip:$destination"
+            }
             BaresipService.instance?.runCall(uap, sipUri, conferenceCall, onHoldCallp)
         }
 
