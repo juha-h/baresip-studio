@@ -400,4 +400,6 @@
     <string name="blocked_peer_delete_alert">您要从%2$s记录中删除“%1$s”吗？</string>
     <string name="contact_mode">联系模式</string>
     <string name="call_action">通话操作</string>
+    <string name="max_mms_images_size">最大彩信图像大小</string>
+    <string name="max_mms_images_size_help">彩信消息图片的最大总压缩大小</string>
 </resources>
