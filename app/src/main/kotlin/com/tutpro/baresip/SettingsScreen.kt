@@ -1321,11 +1321,14 @@ private fun SettingsContent(
             DefaultDialer()
             val defaultDialer by viewModel.defaultDialer.collectAsState()
             val defaultMessaging by viewModel.defaultMessaging.collectAsState()
-            DefaultMessaging()
-            if (defaultMessaging) {
-                MaxMmsImagesSize()
+            val isSimReady = BaresipService.instance?.isSimReady() == true
+            if (isSimReady) {
+                DefaultMessaging()
+                if (defaultMessaging) {
+                    MaxMmsImagesSize()
+                }
             }
-            if (!defaultDialer && !defaultMessaging) BatteryOptimizations()
+            if (!defaultDialer && (!isSimReady || !defaultMessaging)) BatteryOptimizations()
         }
         else
             BatteryOptimizations()
