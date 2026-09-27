@@ -3603,6 +3603,7 @@ class BaresipService: Service() {
         var supportedCameras = false
         var isCameraFront = true
         var callVolume = 0
+        var maxMmsImagesSize = 600 * 1024
 
         @Volatile
         var speakerPhone = false
