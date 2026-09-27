@@ -837,7 +837,14 @@ class BaresipService: Service() {
                     toast(getString(R.string.audio_focus_denied))
                     return START_STICKY
                 }
-                runCall(uap, uri, conferenceCall, onHoldCallp)
+                if (isNativeReady) {
+                    val resolvedUap = if (uap != 0L) uap else uas.value.firstOrNull()?.uap ?: 0L
+                    runCall(resolvedUap, uri, conferenceCall, onHoldCallp)
+                }
+                else {
+                    Log.d(TAG, "Native engine not ready yet, saving pending call intent for $uri")
+                    pendingCallIntent = intent
+                }
             }
 
             "Stop" -> {
@@ -1966,6 +1973,22 @@ class BaresipService: Service() {
                 }
 
             // Process any calls that arrived while baresip is starting
+            pendingCallIntent?.let { intent ->
+                val callUap = intent.getLongExtra("uap", 0L)
+                val uri = intent.getStringExtra("uri")
+                val conferenceCall = intent.getBooleanExtra("conferenceCall", false)
+                val onHoldCallp = intent.getLongExtra("onHoldCallp", 0L)
+                pendingCallIntent = null
+                if (uri != null && ConnectionService.pendingOutgoingConnection != null) {
+                    val resolvedUap = if (callUap != 0L) callUap else uas.value.firstOrNull()?.uap ?: 0L
+                    Log.d(TAG, "Processing pending outgoing call to $uri with uap=$resolvedUap")
+                    if (!requestAudioFocus(this))
+                        toast(getString(R.string.audio_focus_denied))
+                    else
+                        runCall(resolvedUap, uri, conferenceCall, onHoldCallp)
+                }
+            }
+
             InCallService.instance?.let { inCallService ->
                 for (call in inCallService.calls) {
                     val aor = call.details.intentExtras?.getString("aor")
@@ -3200,6 +3223,7 @@ class BaresipService: Service() {
 
     private fun cleanService() {
         if (isServiceClean) return
+        pendingCallIntent = null
         if (simStateReceiverRegistered) {
             try {
                 unregisterReceiver(simStateReceiver)
@@ -3519,6 +3543,7 @@ class BaresipService: Service() {
         var instance: BaresipService? = null
         var isServiceRunning = false
         var isNativeReady = false
+        var pendingCallIntent: Intent? = null
         var mobileAccount = false
         var mobileNumber = ""
         var isStartReceived = false
