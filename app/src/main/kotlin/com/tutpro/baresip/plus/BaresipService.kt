@@ -2209,6 +2209,15 @@ class BaresipService: Service() {
     fun updateStatusNotification() {
 
         Handler(Looper.getMainLooper()).post {
+            val incomingCall = synchronized(calls) {
+                calls.find {
+                    it.status.value == "incoming" && !it.terminated.value
+                }
+            }
+            if (incomingCall != null) {
+                return@post
+            }
+
             val activeCall = synchronized(calls) {
                 calls.find {
                     (it.status.value == "connected" || it.status.value == "outgoing"
