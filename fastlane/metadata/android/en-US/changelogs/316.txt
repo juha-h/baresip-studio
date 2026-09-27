@@ -1,0 +1,6 @@
+- Added 'Max MMS Images Size' setting
+- Fixed SIP URI of incoming call coming via Telecom Framework
+- Fixed showing of incoming call notification when baresip was started by Telecom Framework
+- Don't show Default Messaging App setting if device has no SIM card
+- Start baresip automatically when external dialer makes call via Telecom Framework
+- New translations (several languages)
