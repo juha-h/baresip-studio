@@ -11,6 +11,7 @@ import android.telecom.ConnectionService
 import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import androidx.core.content.ContextCompat
 import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
@@ -170,13 +171,26 @@ class ConnectionService : ConnectionService() {
                     Utils.telToSip(peerUri, ua.account)
                 else
                     if (destination.startsWith("sip:")) destination else "sip:$destination"
-            } else {
+            }
+            else {
                 if (ua != null)
                     Utils.uriComplete(peerUri, ua.account.aor)
                 else
                     if (destination.startsWith("sip:")) destination else "sip:$destination"
             }
-            BaresipService.instance?.runCall(uap, sipUri, conferenceCall, videoCall, onHoldCallp)
+            if (BaresipService.isServiceRunning && BaresipService.isNativeReady)
+                BaresipService.instance?.runCall(uap, sipUri, conferenceCall, videoCall, onHoldCallp)
+            else {
+                val baresipService = Intent(this, BaresipService::class.java).apply {
+                    action = "Start Call"
+                    putExtra("uap", uap)
+                    putExtra("uri", sipUri)
+                    putExtra("conferenceCall", conferenceCall)
+                    putExtra("videoCall", videoCall)
+                    putExtra("onHoldCallp", onHoldCallp)
+                }
+                ContextCompat.startForegroundService(this, baresipService)
+            }
         }
 
         connection.setDialing()
