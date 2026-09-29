@@ -23,4 +23,3 @@ tasks.register("clean", Delete::class) {
     group = "cleanup"
     delete(layout.buildDirectory)
 }
-
