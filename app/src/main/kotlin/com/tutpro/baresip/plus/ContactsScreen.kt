@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -544,82 +543,27 @@ private fun ContactsScreen(navController: NavController) {
                 )
             }
         },
-        bottomBar = {
-            BottomBar(
-                searchContactName = searchContactName,
-                onSearchContactNameChange = { searchContactName = it }
-            )
-        },
         content = { contentPadding ->
             ContactsContent(
-                ctx,
-                navController,
-                contentPadding,
-                searchContactName,
-                showDialog,
-                title,
-                message,
-                firstButtonText,
-                onFirstClicked,
-                lastButtonText,
-                onLastClicked,
-                confirmation,
-                cancel,
-                delete,
-                contactDeleteQuestion
+                ctx = ctx,
+                navController = navController,
+                contentPadding = contentPadding,
+                searchQuery = searchContactName,
+                onSearchQueryChange = { searchContactName = it },
+                showDialog = showDialog,
+                title = title,
+                message = message,
+                firstButtonText = firstButtonText,
+                onFirstClicked = onFirstClicked,
+                lastButtonText = lastButtonText,
+                onLastClicked = onLastClicked,
+                confirmationText = confirmation,
+                cancelText = cancel,
+                deleteText = delete,
+                contactDeleteQuestion = contactDeleteQuestion
             )
         }
     )
-}
-
-@Composable
-private fun BottomBar(
-    searchContactName: String,
-    onSearchContactNameChange: (String) -> Unit
-) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    var isFocused by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        OutlinedTextField(
-            value = searchContactName,
-            onValueChange = {
-                onSearchContactNameChange(it)
-                if (it.isBlank()) keyboardController?.hide()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { isFocused = it.isFocused },
-            singleLine = true,
-            leadingIcon = if (!isFocused && searchContactName.isEmpty()) {
-                { Icon(Icons.Filled.Search, contentDescription = null) }
-            }
-            else
-                null,
-            trailingIcon = {
-                if (searchContactName.isNotEmpty())
-                    Icon(
-                        Icons.Outlined.Clear,
-                        contentDescription = null,
-                        modifier = Modifier.clickable {
-                            onSearchContactNameChange("")
-                            keyboardController?.hide()
-                        },
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-            },
-            label = { Text(stringResource(R.string.search)) },
-            textStyle = TextStyle(fontSize = 18.sp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
-        )
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -629,6 +573,7 @@ private fun ContactsContent(
     navController: NavController,
     contentPadding: PaddingValues,
     searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     showDialog: androidx.compose.runtime.MutableState<Boolean>,
     title: androidx.compose.runtime.MutableState<String>,
     message: androidx.compose.runtime.MutableState<String>,
@@ -642,6 +587,8 @@ private fun ContactsContent(
     contactDeleteQuestion: String
 ) {
     val lazyListState = rememberLazyListState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var isFocused by remember { mutableStateOf(false) }
 
     val scrollToContact = navController.currentBackStackEntry
         ?.savedStateHandle
@@ -692,16 +639,55 @@ private fun ContactsContent(
         }
     }
 
-    LazyColumn(
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 4.dp, top = 16.dp, bottom = 10.dp)
-            .verticalScrollbar(state = lazyListState),
-        state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+            .padding(horizontal = 16.dp)
     ) {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = {
+                onSearchQueryChange(it)
+                if (it.isBlank()) keyboardController?.hide()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, bottom = 8.dp)
+                .onFocusChanged { isFocused = it.isFocused },
+            singleLine = true,
+            leadingIcon = if (!isFocused && searchQuery.isEmpty()) {
+                { Icon(Icons.Filled.Search, contentDescription = null) }
+            }
+            else
+                null,
+            trailingIcon = {
+                if (searchQuery.isNotEmpty())
+                    Icon(
+                        Icons.Outlined.Clear,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            onSearchQueryChange("")
+                            keyboardController?.hide()
+                        },
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+            },
+            label = { Text(stringResource(R.string.search)) },
+            textStyle = TextStyle(fontSize = 18.sp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(end = 4.dp, bottom = 10.dp)
+                .verticalScrollbar(state = lazyListState),
+            state = lazyListState,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
         itemsIndexed(
             filteredContacts, key = { index, (contact, _, _) -> "${contact.id()}_$index" }
         ) { _, (contact, annotatedName, matchingUri) ->
@@ -801,4 +787,5 @@ private fun ContactsContent(
             }
         }
     }
+}
 }

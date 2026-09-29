@@ -229,25 +229,40 @@ private fun ContactScreen(
         }
     }
 
-    val onBack: () -> Unit = {
-        if (screenState.isEditing && !screenState.new) {
-            screenState = screenState.copy(isEditing = false)
-            // Reload original state
-            val contact = Contact.baresipContact(uriOrNameArg)!!
-            val avatarFile = File(BaresipService.filesPath, "${contact.id}.png")
+    val reloadContact: () -> Unit = {
+        val baresipContact = if (screenState.id != 0L) Contact.baresipContact(screenState.id) else Contact.baresipContact(uriOrNameArg)
+        val androidContact = if (screenState.id != 0L) Contact.androidContact(screenState.id) else Contact.androidContact(uriOrNameArg)
+        val contact = baresipContact ?: androidContact
+        if (contact != null) {
+            val avatarFile = File(BaresipService.filesPath, "${contact.id()}.png")
             screenState = screenState.copy(
-                name = contact.name,
-                uris = contact.uris,
-                email = contact.email,
-                favorite = contact.favorite,
-                color = contact.color,
-                avatarImageUri = if (contact.avatarImage != null && avatarFile.exists())
-                    Uri.fromFile(avatarFile).toString()
-                else
-                    null,
-                tmpAvatarFile = null
+                isEditing = false,
+                tmpAvatarFile = null,
+                name = contact.name(),
+                uris = contact.uris(),
+                email = contact.email(),
+                favorite = contact.favorite(),
+                color = contact.colorInt(),
+                id = contact.id(),
+                newId = contact.id(),
+                avatarImageUri = when (contact) {
+                    is Contact.BaresipContact if contact.avatarImage != null && avatarFile.exists() ->
+                        Uri.fromFile(avatarFile).toString()
+
+                    is Contact.AndroidContact if contact.thumbnailUri != null ->
+                        contact.thumbnailUri.toString()
+
+                    else -> null
+                }
             )
         }
+        else
+            screenState = screenState.copy(isEditing = false, tmpAvatarFile = null)
+    }
+
+    val onBack: () -> Unit = {
+        if (screenState.isEditing && !screenState.new)
+            reloadContact()
         else {
             screenState.tmpAvatarFile?.let { tempFile ->
                 if (tempFile.exists()) {
@@ -271,24 +286,7 @@ private fun ContactScreen(
                 navController.navigateUp()
             }
             else {
-                // Update UI state with saved values
-                val contact = Contact.baresipContact(screenState.name)!!
-                val avatarFile = File(BaresipService.filesPath, "${contact.id}.png")
-                screenState = screenState.copy(
-                    isEditing = false,
-                    tmpAvatarFile = null,
-                    name = contact.name,
-                    uris = contact.uris,
-                    email = contact.email,
-                    favorite = contact.favorite,
-                    color = contact.color,
-                    id = contact.id,
-                    newId = contact.id,
-                    avatarImageUri = if (contact.avatarImage != null && avatarFile.exists())
-                        Uri.fromFile(avatarFile).toString()
-                    else
-                        null
-                )
+                reloadContact()
             }
         }
     }
@@ -475,14 +473,16 @@ private fun ContactContent(
             onEmailChange = { newEmail -> onStateChange(screenState.copy(email = newEmail)) }
         )
 
+        FavoriteSection(
+            ctx = ctx,
+            favorite = screenState.favorite,
+            isEditing = screenState.isEditing,
+            onFavoriteChange = { newFavorite ->
+                onStateChange(screenState.copy(favorite = newFavorite))
+            }
+        )
+
         if (screenState.isEditing) {
-            FavoriteSection(
-                ctx = ctx,
-                favorite = screenState.favorite,
-                onFavoriteChange = { newFavorite ->
-                    onStateChange(screenState.copy(favorite = newFavorite))
-                }
-            )
             if (screenState.new && BaresipService.contactsMode == "both")
                 AndroidSection(
                     ctx = ctx,
@@ -896,7 +896,7 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
 }
 
 @Composable
-private fun FavoriteSection(ctx: Context, favorite: Boolean, onFavoriteChange: (Boolean) -> Unit) {
+private fun FavoriteSection(ctx: Context, favorite: Boolean, isEditing: Boolean, onFavoriteChange: (Boolean) -> Unit) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -905,15 +905,20 @@ private fun FavoriteSection(ctx: Context, favorite: Boolean, onFavoriteChange: (
         Text(
             text = stringResource(R.string.favorite),
             modifier = Modifier.weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.favorite)
-                    alertMessage.value = ctx.getString(R.string.favorite_help)
-                    showAlert.value = true
+                .let {
+                    if (isEditing)
+                        it.clickable {
+                            alertTitle.value = ctx.getString(R.string.favorite)
+                            alertMessage.value = ctx.getString(R.string.favorite_help)
+                            showAlert.value = true
+                        }
+                    else
+                        it
                 },
         )
         Switch(
             checked = favorite,
-            onCheckedChange = onFavoriteChange
+            onCheckedChange = if (isEditing) onFavoriteChange else null
         )
     }
 }
