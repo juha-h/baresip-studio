@@ -246,20 +246,21 @@ private fun ContactScreen(
                 avatarImageUri = when (contact) {
                     is Contact.BaresipContact if contact.avatarImage != null && avatarFile.exists() ->
                         Uri.fromFile(avatarFile).toString()
+
                     is Contact.AndroidContact if contact.thumbnailUri != null ->
                         contact.thumbnailUri.toString()
+
                     else -> null
                 }
             )
-        } else {
-            screenState = screenState.copy(isEditing = false, tmpAvatarFile = null)
         }
+        else
+            screenState = screenState.copy(isEditing = false, tmpAvatarFile = null)
     }
 
     val onBack: () -> Unit = {
-        if (screenState.isEditing && !screenState.new) {
+        if (screenState.isEditing && !screenState.new)
             reloadContact()
-        }
         else {
             screenState.tmpAvatarFile?.let { tempFile ->
                 if (tempFile.exists()) {
@@ -455,14 +456,16 @@ private fun ContactContent(
             onEmailChange = { newEmail -> onStateChange(screenState.copy(email = newEmail)) }
         )
 
+        FavoriteSection(
+            ctx = ctx,
+            favorite = screenState.favorite,
+            isEditing = screenState.isEditing,
+            onFavoriteChange = { newFavorite ->
+                onStateChange(screenState.copy(favorite = newFavorite))
+            }
+        )
+
         if (screenState.isEditing) {
-            FavoriteSection(
-                ctx = ctx,
-                favorite = screenState.favorite,
-                onFavoriteChange = { newFavorite ->
-                    onStateChange(screenState.copy(favorite = newFavorite))
-                }
-            )
             if (screenState.new && BaresipService.contactsMode == "both")
                 AndroidSection(
                     ctx = ctx,
@@ -842,7 +845,7 @@ private fun EmailSection(ctx: Context, email: String, isEditing: Boolean, onEmai
 }
 
 @Composable
-private fun FavoriteSection(ctx: Context, favorite: Boolean, onFavoriteChange: (Boolean) -> Unit) {
+private fun FavoriteSection(ctx: Context, favorite: Boolean, isEditing: Boolean, onFavoriteChange: (Boolean) -> Unit) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -851,13 +854,21 @@ private fun FavoriteSection(ctx: Context, favorite: Boolean, onFavoriteChange: (
         Text(
             text = stringResource(R.string.favorite),
             modifier = Modifier.weight(1f)
-                .clickable {
-                    alertTitle.value = ctx.getString(R.string.favorite)
-                    alertMessage.value = ctx.getString(R.string.favorite_help)
-                    showAlert.value = true
+                .let {
+                    if (isEditing)
+                        it.clickable {
+                            alertTitle.value = ctx.getString(R.string.favorite)
+                            alertMessage.value = ctx.getString(R.string.favorite_help)
+                            showAlert.value = true
+                        }
+                    else
+                        it
                 },
         )
-        Switch(checked = favorite, onCheckedChange = onFavoriteChange)
+        Switch(
+            checked = favorite,
+            onCheckedChange = if (isEditing) onFavoriteChange else null
+        )
     }
 }
 
