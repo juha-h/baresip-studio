@@ -84,7 +84,7 @@
 \n • SRTP означает, что RTP/AVP предлагается в исходящем вызове и что RTP/SAVP или RTP/SAVPF используется, если предлагается во входящем вызове.</string>
     <string name="message_failed">Неудачно</string>
     <string name="new_account">SIP URI или Новый аккаунт</string>
-    <string name="new_chat_peer">Новый пир чата</string>
+    <string name="new_chat_peer">Новый чат-пир</string>
     <string name="new_contact">Новый контакт</string>
     <string name="new_message">Новое сообщение</string>
     <string name="new_messages">Новые сообщения</string>
