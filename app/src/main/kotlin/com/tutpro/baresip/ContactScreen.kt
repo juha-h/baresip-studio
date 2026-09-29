@@ -227,24 +227,38 @@ private fun ContactScreen(
         }
     }
 
+    val reloadContact: () -> Unit = {
+        val baresipContact = if (screenState.id != 0L) Contact.baresipContact(screenState.id) else Contact.baresipContact(uriOrNameArg)
+        val androidContact = if (screenState.id != 0L) Contact.androidContact(screenState.id) else Contact.androidContact(uriOrNameArg)
+        val contact = baresipContact ?: androidContact
+        if (contact != null) {
+            val avatarFile = File(BaresipService.filesPath, "${contact.id()}.png")
+            screenState = screenState.copy(
+                isEditing = false,
+                tmpAvatarFile = null,
+                name = contact.name(),
+                uris = contact.uris(),
+                email = contact.email(),
+                favorite = contact.favorite(),
+                color = contact.colorInt(),
+                id = contact.id(),
+                newId = contact.id(),
+                avatarImageUri = when (contact) {
+                    is Contact.BaresipContact if contact.avatarImage != null && avatarFile.exists() ->
+                        Uri.fromFile(avatarFile).toString()
+                    is Contact.AndroidContact if contact.thumbnailUri != null ->
+                        contact.thumbnailUri.toString()
+                    else -> null
+                }
+            )
+        } else {
+            screenState = screenState.copy(isEditing = false, tmpAvatarFile = null)
+        }
+    }
+
     val onBack: () -> Unit = {
         if (screenState.isEditing && !screenState.new) {
-            screenState = screenState.copy(isEditing = false)
-            // Reload original state
-            val contact = Contact.baresipContact(uriOrNameArg)!!
-            val avatarFile = File(BaresipService.filesPath, "${contact.id}.png")
-            screenState = screenState.copy(
-                name = contact.name,
-                uris = contact.uris,
-                email = contact.email,
-                favorite = contact.favorite,
-                color = contact.color,
-                avatarImageUri = if (contact.avatarImage != null && avatarFile.exists())
-                    Uri.fromFile(avatarFile).toString()
-                else
-                    null,
-                tmpAvatarFile = null
-            )
+            reloadContact()
         }
         else {
             screenState.tmpAvatarFile?.let { tempFile ->
@@ -265,24 +279,7 @@ private fun ContactScreen(
                 navController.navigateUp()
             }
             else {
-                // Update UI state with saved values
-                val contact = Contact.baresipContact(screenState.name)!!
-                val avatarFile = File(BaresipService.filesPath, "${contact.id}.png")
-                screenState = screenState.copy(
-                    isEditing = false,
-                    tmpAvatarFile = null,
-                    name = contact.name,
-                    uris = contact.uris,
-                    email = contact.email,
-                    favorite = contact.favorite,
-                    color = contact.color,
-                    id = contact.id,
-                    newId = contact.id,
-                    avatarImageUri = if (contact.avatarImage != null && avatarFile.exists())
-                        Uri.fromFile(avatarFile).toString()
-                    else
-                        null
-                )
+                reloadContact()
             }
         }
     }
