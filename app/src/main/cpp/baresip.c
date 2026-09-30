@@ -533,27 +533,28 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
         goto out;
     }
 
-    // Turn off DNS client cache (should be OK with async workers, but it not)
+    // Turn off DNS client cache
     dnsc_cache_max(net_dnsc(baresip_network()), 0);
 
     if (strlen(addrs) > 0) {
         char *addr_list = (char *)malloc(strlen(addrs) + 1);
         struct sa temp_sa;
         char buf[256];
+        char *saveptr = NULL;
         net_flush_addresses(baresip_network());
         strcpy(addr_list, addrs);
-        char *ptr = strtok(addr_list, ";");
+        char *ptr = strtok_r(addr_list, ";", &saveptr);
         while (ptr != NULL) {
             if (0 == sa_set_str(&temp_sa, ptr, 0)) {
                 sa_ntop(&temp_sa, buf, 256);
-                ptr = strtok(NULL, ";");
+                ptr = strtok_r(NULL, ";", &saveptr);
                 net_add_address_ifname(baresip_network(), &temp_sa, ptr);
             } else {
                 LOGE("invalid ip address (%s)\n", ptr);
-                ptr = strtok(NULL, ";");
+                ptr = strtok_r(NULL, ";", &saveptr);
             }
             *(ptr - 1) = ';';
-            ptr = strtok(NULL, ";");
+            ptr = strtok_r(NULL, ";", &saveptr);
         }
         free(addr_list);
     }
