@@ -553,6 +553,7 @@
     <string name="bullet_item" translatable="false">\u2022 %1$s</string>
     <string name="invalid_sip_or_tel_uri">Invalid SIP or tel URI \'%1$s\'</string>
     <string name="permission_denied">Permission Denied</string>
+    <string name="unlock_to_access_full_app">Please unlock the device</string>
     <string name="baresip" translatable="false">baresip</string>
     <string name="android" translatable="false">Android</string>
     <!-- Main Activity -->
