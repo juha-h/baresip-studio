@@ -91,6 +91,7 @@ import java.util.Locale
 import javax.net.ssl.HttpsURLConnection
 import android.provider.Settings
 import android.telephony.SubscriptionManager
+import org.xmlpull.v1.XmlPullParserException
 
 fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
     composable(
@@ -1779,95 +1780,91 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
             val audioCodecs = ArrayList(Api.audio_codecs().split(","))
             val videoCodecs = ArrayList(Api.video_codecs().split(","))
 
-            while (event != XmlPullParser.END_DOCUMENT) {
-                tag = parser.name
-                when (event) {
-                    XmlPullParser.TEXT ->
-                        text = parser.text
+            try {
+                while (event != XmlPullParser.END_DOCUMENT) {
+                    tag = parser.name
+                    when (event) {
+                        XmlPullParser.TEXT -> text = parser.text
 
-                    XmlPullParser.START_TAG -> {
-                        if (tag == "audio-codecs")
-                            acc.audioCodec.clear()
-                        if (tag == "video-codecs")
-                            acc.videoCodec.clear()
-                    }
+                        XmlPullParser.START_TAG -> {
+                            if (tag == "audio-codecs") acc.audioCodec.clear()
+                            if (tag == "video-codecs") acc.videoCodec.clear()
+                        }
 
-                    XmlPullParser.END_TAG ->
-                        when (tag) {
-                            "outbound-proxy-1" ->
-                                if (text.isNotEmpty()) acc.outbound.add(text)
+                        XmlPullParser.END_TAG ->
+                            when (tag) {
+                                "outbound-proxy-1" -> if (text.isNotEmpty()) acc.outbound.add(text)
 
-                            "outbound-proxy-2" ->
-                                if (text.isNotEmpty()) acc.outbound.add(text)
+                                "outbound-proxy-2" -> if (text.isNotEmpty()) acc.outbound.add(text)
 
-                            "registration-interval" ->
-                                acc.configuredRegInt = try {
-                                    text.toInt()
-                                } catch (_: NumberFormatException) {
-                                    900
-                                }
-
-                            "register" -> {
-                                acc.regint = if (text == "yes") acc.configuredRegInt else 0
-                                if (acc.regint > 0) acc.checkOrigin = true
-                            }
-
-                            "audio-codec" ->
-                                if (text in audioCodecs) acc.audioCodec.add(text)
-
-                            "video-codec" ->
-                                if (text in videoCodecs) acc.videoCodec.add(text)
-
-                            "media-encoding" -> {
-                                val enc = text.lowercase(Locale.ROOT)
-                                if (enc in mediaEncMap.keys && enc.isNotEmpty()) acc.mediaEnc = enc
-                            }
-
-                            "media-nat" -> {
-                                val nat = text.lowercase(Locale.ROOT)
-                                if (nat in mediaNatMap.keys && nat.isNotEmpty()) acc.mediaNat = nat
-                            }
-
-                            "stun-turn-server" ->
-                                if (text.isNotEmpty()) acc.stunServer = text
-
-                            "rtcp-mux" -> acc.rtcpMux = text == "yes"
-
-                            "100rel-mode" ->
-                                acc.rel100Mode = if (text == "yes")
-                                    Api.REL100_ENABLED
-                                else
-                                    Api.REL100_DISABLED
-
-                            "dtmf-mode" ->
-                                if (text in arrayOf("rtp-event", "sip-info", "auto"))
-                                    acc.dtmfMode = when (text) {
-                                        "rtp-event" -> Api.DTMFMODE_RTP_EVENT
-                                        "sip-info" -> Api.DTMFMODE_SIP_INFO
-                                        else -> Api.DTMFMODE_AUTO
+                                "registration-interval" ->
+                                    acc.configuredRegInt = try {
+                                        text.toInt()
+                                    } catch (_: NumberFormatException) {
+                                        900
                                     }
 
-                            "answer-mode" ->
-                                if (text in arrayOf("manual", "auto"))
-                                    acc.answerMode = if (text == "manual")
-                                        Api.ANSWERMODE_MANUAL
+                                "register" -> {
+                                    acc.regint = if (text == "yes") acc.configuredRegInt else 0
+                                    if (acc.regint > 0) acc.checkOrigin = true
+                                }
+
+                                "audio-codec" -> if (text in audioCodecs) acc.audioCodec.add(text)
+
+                                "video-codec" -> if (text in videoCodecs) acc.videoCodec.add(text)
+
+                                "media-encoding" -> {
+                                    val enc = text.lowercase(Locale.ROOT)
+                                    if (enc in mediaEncMap.keys && enc.isNotEmpty())
+                                        acc.mediaEnc = enc
+                                }
+
+                                "media-nat" -> {
+                                    val nat = text.lowercase(Locale.ROOT)
+                                    if (nat in mediaNatMap.keys && nat.isNotEmpty())
+                                        acc.mediaNat = nat
+                                }
+
+                                "stun-turn-server" -> if (text.isNotEmpty()) acc.stunServer = text
+
+                                "rtcp-mux" -> acc.rtcpMux = text == "yes"
+
+                                "100rel-mode" ->
+                                    acc.rel100Mode = if (text == "yes")
+                                        Api.REL100_ENABLED
                                     else
-                                        Api.ANSWERMODE_AUTO
+                                        Api.REL100_DISABLED
 
-                            "redirect-mode" ->
-                                acc.autoRedirect = text == "yes"
+                                "dtmf-mode" ->
+                                    if (text in arrayOf("rtp-event", "sip-info", "auto"))
+                                        acc.dtmfMode = when (text) {
+                                            "rtp-event" -> Api.DTMFMODE_RTP_EVENT
+                                            "sip-info" -> Api.DTMFMODE_SIP_INFO
+                                            else -> Api.DTMFMODE_AUTO
+                                        }
 
-                            "voicemail-uri" ->
-                                if (text.isNotEmpty()) acc.vmUri = text
+                                "answer-mode" ->
+                                    if (text in arrayOf("manual", "auto"))
+                                        acc.answerMode = if (text == "manual")
+                                            Api.ANSWERMODE_MANUAL
+                                        else
+                                            Api.ANSWERMODE_AUTO
 
-                            "country-code" ->
-                                acc.countryCode = text
+                                "redirect-mode" -> acc.autoRedirect = text == "yes"
 
-                            "tel-provider" ->
-                                acc.telProvider = text
-                        }
+                                "voicemail-uri" -> if (text.isNotEmpty()) acc.vmUri = text
+
+                                "country-code" -> acc.countryCode = text
+
+                                "tel-provider" -> acc.telProvider = text
+                            }
+                    }
+                    event = parser.next()
                 }
-                event = parser.next()
+            } catch (e: XmlPullParserException) {
+                val line = parser.lineNumber
+                val column = parser.columnNumber
+                Log.e(TAG, "Invalid XML at line $line, column $column: ${e.message}")
             }
         }
         onConfigLoaded()
