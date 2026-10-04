@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 // Sealed class for type-safe navigation events
 sealed class NavigationCommand {
     object NavigateToHome : NavigationCommand()
-    object NavigateToChats : NavigationCommand()
+    data class NavigateToChats(val aor: String) : NavigationCommand()
     data class NavigateToCalls(val aor: String) : NavigationCommand()
     data class NavigateToChat(val aor: String, val peerUri: String) : NavigationCommand()
 }
@@ -163,9 +163,9 @@ class ViewModel: ViewModel() {
         }
     }
 
-    fun navigateToChats() {
+    fun navigateToChats(aor: String) {
         viewModelScope.launch {
-            _navigationCommand.emit(NavigationCommand.NavigateToChats)
+            _navigationCommand.emit(NavigationCommand.NavigateToChats(aor))
         }
     }
 

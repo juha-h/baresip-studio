@@ -260,8 +260,11 @@ class MainActivity : ComponentActivity() {
                                 val route = "calls/$encodedAor"
                                 navController.navigate(route) { launchSingleTop = true }
                             }
-                            is NavigationCommand.NavigateToChats ->
-                                navController.navigate("chats") { launchSingleTop = true }
+                            is NavigationCommand.NavigateToChats -> {
+                                val encodedAor = Uri.encode(command.aor)
+                                val route = "chats/$encodedAor"
+                                navController.navigate(route) { launchSingleTop = true }
+                            }
                             is NavigationCommand.NavigateToHome ->
                                 navController.navigate("main") {
                                     popUpTo("main") { inclusive = true }
@@ -323,8 +326,11 @@ class MainActivity : ComponentActivity() {
                 val lastUnread = BaresipService.messages.lastOrNull { it.new }
                 if (lastUnread != null)
                     viewModel.onNewMessageReceived(lastUnread.aor, lastUnread.peerUri)
-                else
-                    viewModel.navigateToChats()
+                else {
+                    val ua = BaresipService.uas.value.firstOrNull()
+                    if (ua != null)
+                        viewModel.navigateToChats(ua.account.aor)
+                }
             }
         }
     }
