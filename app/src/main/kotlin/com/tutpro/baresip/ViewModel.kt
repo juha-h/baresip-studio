@@ -80,7 +80,11 @@ class ViewModel: ViewModel() {
     private val _hideKeyboard = MutableStateFlow(0)
     val hideKeyboard = _hideKeyboard.asStateFlow()
 
-    private val _navigationCommand = MutableSharedFlow<NavigationCommand>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _navigationCommand = MutableSharedFlow<NavigationCommand>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val navigationCommand = _navigationCommand.asSharedFlow()
 
     private var lastRenderedAor = ""

@@ -248,27 +248,37 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = viewModel) {
                     viewModel.navigationCommand.collect { command ->
                         Log.d(TAG, "MainActivity: Received NavigationCommand: $command")
-                        when (command) {
-                            is NavigationCommand.NavigateToChat -> {
-                                val encodedAor = Uri.encode(command.aor)
-                                val encodedPeer = Uri.encode(command.peerUri)
-                                val route = "chat/$encodedAor/$encodedPeer"
-                                navController.navigate(route) { launchSingleTop = true }
-                            }
-                            is NavigationCommand.NavigateToCalls -> {
-                                val encodedAor = Uri.encode(command.aor)
-                                val route = "calls/$encodedAor"
-                                navController.navigate(route) { launchSingleTop = true }
-                            }
-                            is NavigationCommand.NavigateToChats -> {
-                                val encodedAor = Uri.encode(command.aor)
-                                val route = "chats/$encodedAor"
-                                navController.navigate(route) { launchSingleTop = true }
-                            }
-                            is NavigationCommand.NavigateToHome ->
-                                navController.navigate("main") {
-                                    popUpTo("main") { inclusive = true }
+                        try {
+                            when (command) {
+                                is NavigationCommand.NavigateToChat -> {
+                                    if (command.aor.isNotBlank() && command.peerUri.isNotBlank()) {
+                                        val encodedAor = Uri.encode(command.aor)
+                                        val encodedPeer = Uri.encode(command.peerUri)
+                                        val route = "chat/$encodedAor/$encodedPeer"
+                                        navController.navigate(route) { launchSingleTop = true }
+                                    }
                                 }
+                                is NavigationCommand.NavigateToCalls -> {
+                                    if (command.aor.isNotBlank()) {
+                                        val encodedAor = Uri.encode(command.aor)
+                                        val route = "calls/$encodedAor"
+                                        navController.navigate(route) { launchSingleTop = true }
+                                    }
+                                }
+                                is NavigationCommand.NavigateToChats -> {
+                                    if (command.aor.isNotBlank()) {
+                                        val encodedAor = Uri.encode(command.aor)
+                                        val route = "chats/$encodedAor"
+                                        navController.navigate(route) { launchSingleTop = true }
+                                    }
+                                }
+                                is NavigationCommand.NavigateToHome ->
+                                    navController.navigate("main") {
+                                        popUpTo("main") { inclusive = true }
+                                    }
+                            }
+                        } catch (e: IllegalArgumentException) {
+                            Log.e(TAG, "Failed to navigate for command $command: ${e.message}")
                         }
                     }
                 }
