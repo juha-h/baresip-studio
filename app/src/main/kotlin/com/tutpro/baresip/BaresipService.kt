@@ -105,7 +105,7 @@ class BaresipService: Service() {
 
     internal lateinit var intent: Intent
     private lateinit var am: AudioManager
-    private lateinit var nt: Ringtone
+    private var nt: Ringtone? = null
     private lateinit var nm: NotificationManager
     private lateinit var snb: NotificationCompat.Builder
     private lateinit var cm: ConnectivityManager
@@ -171,12 +171,13 @@ class BaresipService: Service() {
         am = getSystemService(AUDIO_SERVICE) as AudioManager
 
         val ntUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION)
-        nt = RingtoneManager.getRingtone(this, ntUri)
+        nt = if (ntUri != null) RingtoneManager.getRingtone(this, ntUri) else null
 
-        val rtUri = if (Preferences(this).ringtoneUri == "")
+        val ringtoneUriPref = Preferences(this).ringtoneUri
+        val rtUri = if (ringtoneUriPref.isNullOrEmpty())
             Settings.System.DEFAULT_RINGTONE_URI
         else
-            Preferences(this).ringtoneUri!!.toUri()
+            ringtoneUriPref.toUri()
         rt = RingtoneManager.getRingtone(this, rtUri)
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -1830,7 +1831,7 @@ class BaresipService: Service() {
         }
 
         if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-            nt.play()
+            nt?.play()
 
         postServiceEvent(
             ServiceEvent(
@@ -2774,12 +2775,12 @@ class BaresipService: Service() {
 
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
-        rt!!.isLooping = true
-        rt!!.play()
+        rt?.isLooping = true
+        rt?.play()
         if (shouldVibrate()) {
             val effect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
             vbTimer = Timer()
-            vbTimer!!.schedule(object : TimerTask() {
+            vbTimer?.schedule(object : TimerTask() {
                 override fun run() {
                     if (VERSION.SDK_INT >= 33)
                         vibrator.vibrate(
@@ -2854,9 +2855,9 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        rt!!.stop()
+        rt?.stop()
         if (vbTimer != null) {
-            vbTimer!!.cancel()
+            vbTimer?.cancel()
             vbTimer = null
         }
     }

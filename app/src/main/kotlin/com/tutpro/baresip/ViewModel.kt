@@ -143,10 +143,6 @@ class ViewModel: ViewModel() {
         _isDialpadVisible.value = !_isDialpadVisible.value
     }
 
-    fun requestShowKeyboard() {
-        _showKeyboard.value += 1
-    }
-
     fun requestHideKeyboard() {
         _hideKeyboard.value += 1
     }
