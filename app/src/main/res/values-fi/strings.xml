@@ -568,6 +568,7 @@
     <string name="unknown">Tuntematon</string>
     <string name="invalid_sip_or_tel_uri">Virheellinen SIP tai TEL URI \'%1$s\'</string>
     <string name="permission_denied">Lupa evätty</string>
+    <string name="unlock_to_access_full_app">Ole hyvä ja avaa laite</string>
     <!-- Main Activity -->
     <string name="backup">Tallenna</string>
     <string name="restore">Palauta</string>

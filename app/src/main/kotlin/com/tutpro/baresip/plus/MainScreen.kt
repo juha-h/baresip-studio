@@ -232,6 +232,16 @@ private val selectItems = CustomElements.selectItems
 private val selectItemAction = CustomElements.selectItemAction
 private val showSelectItemDialog = CustomElements.showSelectItemDialog
 
+private fun checkLockedAndToast(ctx: Context): Boolean {
+    val kgm = ctx.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    if (kgm.isKeyguardLocked) {
+        Toast.makeText(ctx, ctx.getString(R.string.unlock_to_access_full_app), Toast.LENGTH_LONG).show()
+        (ctx as? Activity)?.let { Utils.requestDismissKeyguard(it) }
+        return true
+    }
+    return false
+}
+
 fun NavGraphBuilder.mainScreenRoute(
     navController: NavController,
     viewModel: ViewModel,
@@ -645,6 +655,7 @@ private fun TopAppBar(
                         .clip(CircleShape)
                         .combinedClickable(
                             onClick = {
+                                if (checkLockedAndToast(ctx)) return@combinedClickable
                                 if (Call.call("connected") == null) {
                                     BaresipService.isRecOn = !BaresipService.isRecOn
                                     if (BaresipService.isRecOn)
@@ -771,6 +782,7 @@ private fun TopAppBar(
                 ),
                 onItemClick = { selectedItem ->
                     menuExpanded = false
+                    if (checkLockedAndToast(ctx)) return@DropdownMenu
                     when (selectedItem) {
                         about -> { navController.navigate("about") }
                         settings -> { navController.navigate("settings") }
@@ -865,6 +877,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 DockedToolbarItem(
                     enabled = aor.isNotEmpty(),
                     onClick = {
+                        if (checkLockedAndToast(ctx)) return@DockedToolbarItem
                         val ua = UserAgent.ofAor(aor)!!
                         val acc = ua.account
                         if (acc.vmUri.isNotEmpty()) {
@@ -898,7 +911,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 )
 
             DockedToolbarItem(
-                onClick = { navController.navigate("contacts") },
+                onClick = {
+                    if (checkLockedAndToast(ctx)) return@DockedToolbarItem
+                    navController.navigate("contacts")
+                },
                 icon = Icons.Filled.Person,
                 contentDescription = contactsLabel,
                 iconSize = iconSize,
@@ -908,6 +924,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             DockedToolbarItem(
                 enabled = aor.isNotEmpty(),
                 onClick = {
+                    if (checkLockedAndToast(ctx)) return@DockedToolbarItem
                     if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
                         alertTitle.value = ctx.getString(R.string.notice)
                         alertMessage.value = ctx.getString(R.string.enable_default_messaging)
@@ -924,7 +941,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
 
             DockedToolbarItem(
                 enabled = aor.isNotEmpty(),
-                onClick = { navController.navigate("calls/$aor") },
+                onClick = {
+                    if (checkLockedAndToast(ctx)) return@DockedToolbarItem
+                    navController.navigate("calls/$aor")
+                },
                 icon = Icons.Filled.History,
                 contentDescription = historyLabel,
                 iconSize = iconSize,
@@ -932,7 +952,10 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
             )
 
             DockedToolbarItem(
-                onClick = { viewModel.toggleDialpadVisibility() },
+                onClick = {
+                    if (checkLockedAndToast(ctx)) return@DockedToolbarItem
+                    viewModel.toggleDialpadVisibility()
+                },
                 enabled = dialpadButtonEnabled.value,
                 icon = Icons.Filled.Dialpad,
                 contentDescription = dialpadLabel,
@@ -1250,6 +1273,10 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                 detectHorizontalDragGestures(
                     onDragStart = { offset = 0f },
                     onDragEnd = {
+                        if (checkLockedAndToast(ctx)) {
+                            offset = 0f
+                            return@detectHorizontalDragGestures
+                        }
                         if (offset < -swipeThreshold) {
                             if (uas.value.isNotEmpty()) {
                                 val curPos = UserAgent.findAorIndex(viewModel.selectedAor.value)
@@ -1332,12 +1359,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
     if (selected == "") {
         OutlinedButton(
             onClick = {
+                if (checkLockedAndToast(ctx)) return@OutlinedButton
                 navController.navigate("accounts")
             },
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .height(50.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(horizontal = 4.dp).height(50.dp).fillMaxWidth(),
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1351,6 +1376,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
     else
         OutlinedButton(
             onClick = {
+                if (checkLockedAndToast(ctx)) return@OutlinedButton
                 expanded = !expanded
             },
             enabled = true,
@@ -1360,7 +1386,8 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
-                            expanded = true
+                            if (!checkLockedAndToast(ctx))
+                                expanded = true
                         },
                         onLongPress = {
                             val ua = UserAgent.ofAor(selected)
@@ -1399,7 +1426,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 tint = Color.Unspecified,
                 modifier = Modifier
                     .padding(end = 10.dp)
-                    .clickable(onClick = { navController.navigate("account/$selected/old") })
+                    .clickable(onClick = {
+                        if (checkLockedAndToast(ctx)) return@clickable
+                        navController.navigate("account/$selected/old")
+                    })
             )
             Text(
                 text = Account.ofAor(selected)?.text() ?: "",
@@ -1410,7 +1440,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 modifier = Modifier
                     .weight(1f)
                     .combinedClickable(
-                        onClick = { expanded = true },
+                        onClick = {
+                            if (!checkLockedAndToast(ctx))
+                                expanded = true
+                        },
                         onLongClick = {
                             val ua = UserAgent.ofAor(selected)
                             if (ua != null) {
@@ -1448,6 +1481,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                     val acc = ua.account
                     DropdownMenuItem(
                         onClick = {
+                            if (checkLockedAndToast(ctx)) return@DropdownMenuItem
                             expanded = false
                             spinToAor(viewModel, acc.aor)
                         },
@@ -1902,6 +1936,7 @@ private fun CallRow(
             if (call.showHangupButton.value && !call.conferenceCall)
                 IconButton(    modifier = Modifier.size(48.dp),
                     onClick = {
+                        if (checkLockedAndToast(ctx)) return@IconButton
                         if (call.callOnHold.value) {
                             Log.d(TAG, "User requested resume for ${call.callp}")
                             call.resume() // This automatically holds other calls
@@ -1930,6 +1965,7 @@ private fun CallRow(
                     modifier = Modifier.size(48.dp),
                     enabled = call.transferButtonEnabled.value,
                     onClick = {
+                        if (checkLockedAndToast(ctx)) return@IconButton
                         if (call.onHoldCall != null) {
                             if (!Api.call_supported(call.callp, Api.REPLACES)) {
                                 alertTitle.value = ctx.getString(R.string.notice)
@@ -2308,6 +2344,7 @@ private fun CallRow(
                         .size(32.dp)
                         .clip(CircleShape)
                         .clickable {
+                            if (checkLockedAndToast(ctx)) return@clickable
                             when (call.securityIconTint.value) {
                                 R.color.colorTrafficRed -> {
                                     alertTitle.value = ctx.getString(R.string.alert)
