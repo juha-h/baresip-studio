@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.annotation.SuppressLint
 import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.content.ContentValues
@@ -9,6 +10,8 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds
 import android.provider.ContactsContract.Contacts.Data
@@ -16,7 +19,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -78,12 +80,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -91,6 +90,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -140,7 +142,7 @@ private data class ScreenState(
     val isBaresipContact: Boolean = false
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("ThreadConstraint")
 @Composable
 private fun ContactScreen(
     viewModel: ViewModel,
@@ -273,16 +275,20 @@ private fun ContactScreen(
     }
 
     val onCheck: () -> Unit = {
-        val result = checkOnClick(ctx = ctx, currentState = screenState, uriOrNameArg = uriOrNameArg)
-        if (result) {
-            if (screenState.new) {
-                navController.previousBackStackEntry?.savedStateHandle?.set("scrollToContact", screenState.name)
-                navController.navigateUp()
+        Thread {
+            val result = checkOnClick(ctx = ctx, currentState = screenState, uriOrNameArg = uriOrNameArg)
+            if (result) {
+                Handler(Looper.getMainLooper()).post {
+                    if (screenState.new) {
+                        navController.previousBackStackEntry?.savedStateHandle?.set("scrollToContact", screenState.name)
+                        navController.navigateUp()
+                    }
+                    else {
+                        reloadContact()
+                    }
+                }
             }
-            else {
-                reloadContact()
-            }
-        }
+        }.start()
     }
 
     val onEdit: () -> Unit = {
@@ -378,7 +384,6 @@ private val alertTitle = mutableStateOf("")
 private val alertMessage = mutableStateOf("")
 private val showAlert = mutableStateOf(false)
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ContactContent(
     ctx: Context,
@@ -478,7 +483,6 @@ private fun ContactContent(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AvatarSection(
     ctx: Context,
@@ -898,8 +902,8 @@ private fun checkOnClick(
     uriOrNameArg: String
 ): Boolean {
     val newUris = ArrayList<Contact.ContactUri>()
-    for (contactUri in currentState.uris) {
-        var u = contactUri.uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
+    for ((uri, label) in currentState.uris) {
+        var u = uri.filterNot { setOf('-', ' ', '(', ')').contains(it) }
         if (u == "") continue
         if (!u.startsWith("sip:") && !u.startsWith("tel:"))
             u = if (Utils.isTelNumber(u)) "tel:$u" else "sip:$u"
@@ -909,7 +913,7 @@ private fun checkOnClick(
             showAlert.value = true
             return false
         }
-        newUris.add(Contact.ContactUri(u, contactUri.label))
+        newUris.add(Contact.ContactUri(u, label))
     }
 
     var newName = currentState.name.trim()
@@ -1048,9 +1052,7 @@ private fun addAndroidContact(ctx: Context, contact: Contact.BaresipContact): Bo
             .withValue(Data.MIMETYPE, CommonDataKinds.Email.CONTENT_ITEM_TYPE)
             .withValue(CommonDataKinds.Email.ADDRESS, contact.email)
             .withValue(CommonDataKinds.Email.TYPE, CommonDataKinds.Email.TYPE_HOME).build())
-    for (contactUri in contact.uris) {
-        val uri = contactUri.uri
-        val label = contactUri.label
+    for ((uri, label) in contact.uris) {
         @Suppress("DEPRECATION")
         val mimeType = if (uri.startsWith("sip:"))
             CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE

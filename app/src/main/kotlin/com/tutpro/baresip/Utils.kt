@@ -289,9 +289,8 @@ object Utils {
     }
 
     fun checkStunUri(uri: String): Boolean {
-        if (uri.substringBefore(":").lowercase() !in setOf("stun", "stuns", "turn", "turns"))
-            return false
-        return checkHostPort(uri.substringAfter(":").substringBefore("?")) &&
+        return uri.substringBefore(":").lowercase() in setOf("stun", "stuns", "turn", "turns") &&
+                checkHostPort(uri.substringAfter(":").substringBefore("?")) &&
                 (uri.indexOf("?") == -1 || checkTransport(uri.substringAfter("?"), setOf("udp", "tcp")))
     }
 
@@ -569,7 +568,7 @@ object Utils {
         return true
     }
 
-    @Suppress("unused")
+    @Suppress("unused", "UsePropertyAccessSyntax")
     fun copyToClipboard(ctx: Context, text: String) {
         val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("text", text)
@@ -1043,6 +1042,7 @@ object Utils {
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
+    @Suppress("UsePropertyAccessSyntax")
     fun setCommunicationDevice(am: AudioManager, type: Int) {
         val current = am.communicationDevice?.type ?: AudioDeviceInfo.TYPE_UNKNOWN
         Log.d(TAG, "Current com dev/mode $current/${am.mode}")
@@ -1447,10 +1447,7 @@ object Utils {
             if (preferredHandle != null) return preferredHandle
             val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
             val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
-            return if (phoneAccounts.isNotEmpty())
-                phoneAccounts[0]
-            else
-                null
+            return phoneAccounts.firstOrNull()
         }
         else {
             Log.d(TAG, "READ_PHONE_STATE permission not granted")

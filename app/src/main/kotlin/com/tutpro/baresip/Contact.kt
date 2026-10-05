@@ -167,7 +167,7 @@ sealed class Contact {
                     ?: findContactWithUri(Utils.e164Uri("tel:$nameOrNumber", account.countryCode))
                 if (contactWithUri != null)
                     uris = contactWithUri.first.uris().filter {
-                        if (account.isMobile) it.uri.startsWith("tel:") else true
+                        !account.isMobile || it.uri.startsWith("tel:")
                     }
             }
             return uris

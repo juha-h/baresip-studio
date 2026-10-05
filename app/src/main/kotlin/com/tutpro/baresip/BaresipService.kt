@@ -933,8 +933,8 @@ class BaresipService: Service() {
                 linkAddresses = linkAddresses()
                 if (linkAddresses.isEmpty()) toast(getString(R.string.no_network), Toast.LENGTH_LONG)
                 var addresses = ""
-                for (la in linkAddresses)
-                    addresses = "$addresses;${la.key};${la.value}"
+                for ((key, value) in linkAddresses)
+                    addresses = "$addresses;$key;$value"
                 Log.i(TAG, "Link addresses: $addresses")
 
                 val userAgent = Config.variable("user_agent")
@@ -1971,8 +1971,8 @@ class BaresipService: Service() {
             val mobileUa = uas.value.find { it.account.isMobile }
             if (mobileUa != null)
                 synchronized(pendingMessages) {
-                    for (m in pendingMessages)
-                        handleIncomingMessage(mobileUa.uap, m.sender, m.body, m.time, m.images)
+                    for ((sender, body, time, images) in pendingMessages)
+                        handleIncomingMessage(mobileUa.uap, sender, body, time, images)
                     pendingMessages.clear()
                 }
 
@@ -2809,8 +2809,7 @@ class BaresipService: Service() {
         val currentFilter = nm.currentInterruptionFilter
         if (currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL) return true
         val channel = nm.getNotificationChannel(HIGH_CHANNEL_ID)
-        if (channel != null && channel.canBypassDnd()) return true
-        return isStarredContact(callerNumber)
+        return channel != null && channel.canBypassDnd() || isStarredContact(callerNumber)
     }
 
     private fun shouldVibrate(): Boolean {

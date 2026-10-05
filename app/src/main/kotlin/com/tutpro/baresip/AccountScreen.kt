@@ -1872,6 +1872,5 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
 }
 
 private fun checkOutboundUri(uri: String): Boolean {
-    if (!uri.startsWith("sip:")) return false
-    return Utils.checkHostPortParams(uri.substring(4))
+    return uri.startsWith("sip:") && Utils.checkHostPortParams(uri.substring(4))
 }

@@ -302,7 +302,6 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
     return durationText
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Duration(ctx: Context, detail: Details, durationText: String) {
 

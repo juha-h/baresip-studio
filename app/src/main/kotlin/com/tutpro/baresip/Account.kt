@@ -22,14 +22,14 @@ class Account(val accp: Long, virtualAor: String? = null) {
     var audioCodec = ArrayList<String>()
     var videoCodec = ArrayList<String>()
     var regint = if (accp != 0L) Api.account_regint(accp) else 0
-    var checkOrigin = if (accp != 0L) Api.account_check_origin(accp) else true
+    var checkOrigin = accp == 0L || Api.account_check_origin(accp)
     var configuredRegInt = REGISTRATION_INTERVAL
     var mediaEnc = if (accp != 0L) Api.account_mediaenc(accp) else ""
-    var rtcpMux = if (accp != 0L) Api.account_rtcp_mux(accp) else false
+    var rtcpMux = accp != 0L && Api.account_rtcp_mux(accp)
     var rel100Mode = if (accp != 0L) Api.account_rel100_mode(accp) else Api.REL100_DISABLED
     var dtmfMode = if (accp != 0L) Api.account_dtmfmode(accp) else Api.DTMFMODE_AUTO
     var answerMode = if (accp != 0L) Api.account_answermode(accp) else Api.ANSWERMODE_MANUAL
-    var autoRedirect = if (accp != 0L) Api.account_sip_autoredirect(accp) else false
+    var autoRedirect = accp != 0L && Api.account_sip_autoredirect(accp)
     var blockUnknown = false
     var blockHidden = false
     var vmUri = if (accp != 0L) Api.account_vm_uri(accp) else ""

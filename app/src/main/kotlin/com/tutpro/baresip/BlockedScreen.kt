@@ -74,7 +74,6 @@ fun NavGraphBuilder.blockedScreenRoute(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BlockedScreen(navController: NavController, request: String, aor: String) {
 
@@ -225,7 +224,6 @@ private fun Account(account: Account) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Blocked(
     ctx: Context,

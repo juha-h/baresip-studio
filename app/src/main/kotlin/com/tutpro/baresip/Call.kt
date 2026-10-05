@@ -100,13 +100,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     }
 
     open fun executeTransfer(): Boolean {
-        return if (onHoldCall != null) {
-            if (Api.call_hold(callp, true))
+        return onHoldCall != null && Api.call_hold(callp, true) &&
                 Api.call_replace_transfer(onHoldCall!!.callp, callp)
-            else
-                false
-        } else
-            false
     }
 
     open fun sendDigit(digit: Char): Int {
