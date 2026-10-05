@@ -1,6 +1,5 @@
 package com.tutpro.baresip.plus
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -175,7 +174,6 @@ private fun CodecsContent(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Codecs(codecs: SnapshotStateList<Codec>) {
 

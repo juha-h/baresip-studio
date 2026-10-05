@@ -30,7 +30,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -825,7 +824,6 @@ private fun DockedToolbarItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavController) {
 
@@ -833,19 +831,19 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
     val accountUpdate by viewModel.accountUpdate.collectAsState()
 
     val showVmIcon = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.vmUri?.isNotEmpty() ?: false else false
+        aor.isNotEmpty() && (Account.ofAor(aor)?.vmUri?.isNotEmpty() == true)
     }
     val hasNewVoicemail = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) (Account.ofAor(aor)?.vmNew ?: 0) > 0 else false
+        aor.isNotEmpty() && ((Account.ofAor(aor)?.vmNew ?: 0) > 0)
     }
     val isMobile = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.isMobile ?: false else false
+        aor.isNotEmpty() && (Account.ofAor(aor)?.isMobile == true)
     }
     val hasUnreadMessages = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.unreadMessages ?: false else false
+        aor.isNotEmpty() && (Account.ofAor(aor)?.unreadMessages == true)
     }
     val hasMissedCalls = remember(aor, accountUpdate) {
-        if (aor.isNotEmpty()) Account.ofAor(aor)?.missedCalls ?: false else false
+        aor.isNotEmpty() && (Account.ofAor(aor)?.missedCalls == true)
     }
 
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
@@ -1215,7 +1213,6 @@ private fun CallCard(
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainContent(navController: NavController, viewModel: ViewModel, contentPadding: PaddingValues) {
 
@@ -1335,7 +1332,6 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: NavController) {
 

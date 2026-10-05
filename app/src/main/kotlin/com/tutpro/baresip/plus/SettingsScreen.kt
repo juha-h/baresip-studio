@@ -1616,7 +1616,7 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         viewModel.save = true
     }
 
-    val sipTrace = if (debug) viewModel.sipTrace.value else false
+    val sipTrace = debug && viewModel.sipTrace.value
     if (BaresipService.sipTrace != sipTrace) {
         BaresipService.sipTrace = sipTrace
         Api.uag_enable_sip_trace(sipTrace)

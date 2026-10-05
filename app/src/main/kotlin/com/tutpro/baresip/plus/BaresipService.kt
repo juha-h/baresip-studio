@@ -109,7 +109,7 @@ class BaresipService: Service() {
 
     internal lateinit var intent: Intent
     private lateinit var am: AudioManager
-    private lateinit var nt: Ringtone
+    private var nt: Ringtone? = null
     private lateinit var nm: NotificationManager
     private lateinit var snb: NotificationCompat.Builder
     private lateinit var cm: ConnectivityManager
@@ -175,12 +175,13 @@ class BaresipService: Service() {
         am = getSystemService(AUDIO_SERVICE) as AudioManager
 
         val ntUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION)
-        nt = RingtoneManager.getRingtone(this, ntUri)
+        nt = if (ntUri != null) RingtoneManager.getRingtone(this, ntUri) else null
 
-        val rtUri = if (Preferences(this).ringtoneUri == "")
+        val ringtoneUriPref = Preferences(this).ringtoneUri
+        val rtUri = if (ringtoneUriPref.isNullOrEmpty())
             Settings.System.DEFAULT_RINGTONE_URI
         else
-            Preferences(this).ringtoneUri!!.toUri()
+            ringtoneUriPref.toUri()
         rt = RingtoneManager.getRingtone(this, rtUri)
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -939,8 +940,8 @@ class BaresipService: Service() {
                 linkAddresses = linkAddresses()
                 if (linkAddresses.isEmpty()) toast(getString(R.string.no_network), Toast.LENGTH_LONG)
                 var addresses = ""
-                for (la in linkAddresses)
-                    addresses = "$addresses;${la.key};${la.value}"
+                for ((key, value) in linkAddresses)
+                    addresses = "$addresses;$key;$value"
                 Log.i(TAG, "Link addresses: $addresses")
 
                 val userAgent = Config.variable("user_agent")
@@ -1866,8 +1867,9 @@ class BaresipService: Service() {
                 directReplyPendingIntent
             ).addRemoteInput(remoteInput)
                 .setAllowGeneratedReplies(true)
-                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).
-                build()
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                .setAuthenticationRequired(true)
+                .build()
 
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
@@ -1877,7 +1879,8 @@ class BaresipService: Service() {
                 R.drawable.ic_notification_save,
                 getString(R.string.save),
                 savePendingIntent
-            ).build()
+            ).setAuthenticationRequired(true)
+                .build()
 
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
@@ -1887,7 +1890,8 @@ class BaresipService: Service() {
                 R.drawable.ic_notification_delete,
                 getString(R.string.delete),
                 deletePendingIntent
-            ).build()
+            ).setAuthenticationRequired(true)
+                .build()
 
             nb.addAction(inlineReplyAction).addAction(saveAction).addAction(deleteAction)
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())
@@ -1896,7 +1900,7 @@ class BaresipService: Service() {
         }
 
         if (nm.currentInterruptionFilter <= NotificationManager.INTERRUPTION_FILTER_ALL)
-            nt.play()
+            nt?.play()
 
         postServiceEvent(
             ServiceEvent(
@@ -2043,8 +2047,8 @@ class BaresipService: Service() {
             val mobileUa = uas.value.find { it.account.isMobile }
             if (mobileUa != null)
                 synchronized(pendingMessages) {
-                    for (m in pendingMessages)
-                        handleIncomingMessage(mobileUa.uap, m.sender, m.body, m.time, m.images)
+                    for ((sender, body, time, images) in pendingMessages)
+                        handleIncomingMessage(mobileUa.uap, sender, body, time, images)
                     pendingMessages.clear()
                 }
 
@@ -2851,12 +2855,12 @@ class BaresipService: Service() {
 
     private fun startRinging() {
         am.mode = AudioManager.MODE_RINGTONE
-        rt!!.isLooping = true
-        rt!!.play()
+        rt?.isLooping = true
+        rt?.play()
         if (shouldVibrate()) {
             val effect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
             vbTimer = Timer()
-            vbTimer!!.schedule(object : TimerTask() {
+            vbTimer?.schedule(object : TimerTask() {
                 override fun run() {
                     if (VERSION.SDK_INT >= 33)
                         vibrator.vibrate(
@@ -2882,8 +2886,7 @@ class BaresipService: Service() {
         val currentFilter = nm.currentInterruptionFilter
         if (currentFilter <= NotificationManager.INTERRUPTION_FILTER_ALL) return true
         val channel = nm.getNotificationChannel(HIGH_CHANNEL_ID)
-        if (channel != null && channel.canBypassDnd()) return true
-        return isStarredContact(callerNumber)
+        return channel != null && channel.canBypassDnd() || isStarredContact(callerNumber)
     }
 
     private fun shouldVibrate(): Boolean {
@@ -2931,9 +2934,9 @@ class BaresipService: Service() {
     }
 
     private fun stopRinging() {
-        rt!!.stop()
+        rt?.stop()
         if (vbTimer != null) {
-            vbTimer!!.cancel()
+            vbTimer?.cancel()
             vbTimer = null
         }
     }

@@ -8,8 +8,7 @@ import java.io.File
 class BlockRule(val aor: String = "", val pattern: String) {
 
     fun matches(uri: String): Boolean {
-        if (uri.contains(pattern, ignoreCase = true)) return true
-        return try {
+        return uri.contains(pattern, ignoreCase = true) || try {
             Regex(pattern, RegexOption.IGNORE_CASE).containsMatchIn(uri)
         } catch (_: Exception) {
             false

@@ -3,7 +3,6 @@ package com.tutpro.baresip.plus
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -86,7 +85,6 @@ fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: Vi
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
@@ -253,7 +251,6 @@ private fun Account(account: Account) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Calls(
     ctx: Context,
@@ -492,16 +489,16 @@ private fun Calls(
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                         var count = 1
-                        for (d in callRow.details) {
-                            if (d.recording.isNotEmpty() && d.recording[0] != "") recordings = true
+                        for ((direction, _, _, recording) in callRow.details) {
+                            if (recording.isNotEmpty() && recording[0] != "") recordings = true
                             if (count > 3) continue
                             Icon(
-                                imageVector = if (callUp(d.direction))
+                                imageVector = if (callUp(direction))
                                     Icons.AutoMirrored.Filled.CallMade
                                 else
                                     Icons.AutoMirrored.Filled.CallReceived,
                                 modifier = Modifier.size(20.dp),
-                                tint = colorResource(id = callTint(d.direction)),
+                                tint = colorResource(id = callTint(direction)),
                                 contentDescription = "Direction"
                             )
                             count++
@@ -568,10 +565,10 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
 }
 
 private fun removeFromHistory(callHistory: MutableState<List<CallRow>>, callRow: CallRow) {
-    for (details in callRow.details) {
-        CallHistoryNew.deleteRecordingFiles(details.recording.toTypedArray())
+    for ((_, startTime, stopTime, recording) in callRow.details) {
+        CallHistoryNew.deleteRecordingFiles(recording.toTypedArray())
         BaresipService.callHistory.removeAll {
-            it.startTime == details.startTime && it.stopTime == details.stopTime
+            it.startTime == startTime && it.stopTime == stopTime
         }
     }
     CallHistoryNew.deleteRecordingFiles(callRow.recording.toTypedArray())

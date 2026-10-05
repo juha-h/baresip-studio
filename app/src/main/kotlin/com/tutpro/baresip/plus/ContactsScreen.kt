@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -150,18 +149,18 @@ private fun ContactsScreen(navController: NavController) {
                             val base64Image = Base64.encodeToString(outputStreamPhoto.toByteArray(), Base64.NO_WRAP)
                             writer.write("PHOTO;ENCODING=BASE64;JPEG:$base64Image\n")
                         }
-                        for (u in contact.uris) {
-                            if (u.uri.startsWith("tel:")) {
-                                if (u.label.isNotEmpty())
-                                    writer.write("TEL;X-${u.label}:${u.uri.substring(4)}\n")
+                        for ((uri, label) in contact.uris) {
+                            if (uri.startsWith("tel:")) {
+                                if (label.isNotEmpty())
+                                    writer.write("TEL;X-${label}:${uri.substring(4)}\n")
                                 else
-                                    writer.write("TEL:${u.uri.substring(4)}\n")
+                                    writer.write("TEL:${uri.substring(4)}\n")
                             }
-                            else if (u.uri.startsWith("sip:")) {
-                                if (u.label.isNotEmpty())
-                                    writer.write("X-SIP;X-${u.label}:${u.uri.substring(4)}\n")
+                            else if (uri.startsWith("sip:")) {
+                                if (label.isNotEmpty())
+                                    writer.write("X-SIP;X-${label}:${uri.substring(4)}\n")
                                 else
-                                    writer.write("X-SIP:${u.uri.substring(4)}\n")
+                                    writer.write("X-SIP:${uri.substring(4)}\n")
                             }
                         }
                         writer.write("END:VCARD\n")
@@ -566,7 +565,6 @@ private fun ContactsScreen(navController: NavController) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ContactsContent(
     ctx: Context,

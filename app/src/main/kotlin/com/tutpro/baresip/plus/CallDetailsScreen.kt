@@ -7,7 +7,6 @@ import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -302,7 +301,6 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
     return durationText
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Duration(ctx: Context, detail: Details, durationText: String) {
 

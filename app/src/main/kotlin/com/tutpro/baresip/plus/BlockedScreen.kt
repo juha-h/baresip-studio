@@ -2,7 +2,6 @@ package com.tutpro.baresip.plus
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -74,7 +73,6 @@ fun NavGraphBuilder.blockedScreenRoute(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BlockedScreen(navController: NavController, request: String, aor: String) {
 
@@ -225,7 +223,6 @@ private fun Account(account: Account) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Blocked(
     ctx: Context,

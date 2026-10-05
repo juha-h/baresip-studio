@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 // Sealed class for type-safe navigation events
 sealed class NavigationCommand {
     object NavigateToHome : NavigationCommand()
-    object NavigateToChats : NavigationCommand()
+    data class NavigateToChats(val aor: String) : NavigationCommand()
     data class NavigateToCalls(val aor: String) : NavigationCommand()
     data class NavigateToChat(val aor: String, val peerUri: String) : NavigationCommand()
 }
@@ -83,7 +83,11 @@ class ViewModel: ViewModel() {
     private val _hideKeyboard = MutableStateFlow(0)
     val hideKeyboard = _hideKeyboard.asStateFlow()
 
-    private val _navigationCommand = MutableSharedFlow<NavigationCommand>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _navigationCommand = MutableSharedFlow<NavigationCommand>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val navigationCommand = _navigationCommand.asSharedFlow()
 
     private var lastRenderedAor = ""
@@ -146,10 +150,6 @@ class ViewModel: ViewModel() {
         _isDialpadVisible.value = !_isDialpadVisible.value
     }
 
-    fun requestShowKeyboard() {
-        _showKeyboard.value += 1
-    }
-
     fun requestHideKeyboard() {
         _hideKeyboard.value += 1
     }
@@ -166,9 +166,9 @@ class ViewModel: ViewModel() {
         }
     }
 
-    fun navigateToChats() {
+    fun navigateToChats(aor: String) {
         viewModelScope.launch {
-            _navigationCommand.emit(NavigationCommand.NavigateToChats)
+            _navigationCommand.emit(NavigationCommand.NavigateToChats(aor))
         }
     }
 

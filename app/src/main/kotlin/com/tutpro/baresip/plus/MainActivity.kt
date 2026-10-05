@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.tutpro.baresip.plus
 
 import android.Manifest.permission.BLUETOOTH_CONNECT
@@ -30,13 +28,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import androidx.core.content.ContextCompat
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
@@ -72,9 +69,8 @@ class MainActivity : ComponentActivity() {
         BaresipService.darkTheme.value = Utils.isThemeDark(this)
 
         // Must be done after view has been created
-        this.setShowWhenLocked(true)
-        this.setTurnScreenOn( true)
-        Utils.requestDismissKeyguard(this)
+        this.setShowWhenLocked(Call.inCall())
+        this.setTurnScreenOn(Call.inCall())
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
@@ -256,24 +252,37 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = viewModel) {
                     viewModel.navigationCommand.collect { command ->
                         Log.d(TAG, "MainActivity: Received NavigationCommand: $command")
-                        when (command) {
-                            is NavigationCommand.NavigateToChat -> {
-                                val encodedAor = Uri.encode(command.aor)
-                                val encodedPeer = Uri.encode(command.peerUri)
-                                val route = "chat/$encodedAor/$encodedPeer"
-                                navController.navigate(route) { launchSingleTop = true }
-                            }
-                            is NavigationCommand.NavigateToCalls -> {
-                                val encodedAor = Uri.encode(command.aor)
-                                val route = "calls/$encodedAor"
-                                navController.navigate(route) { launchSingleTop = true }
-                            }
-                            is NavigationCommand.NavigateToChats ->
-                                navController.navigate("chats") { launchSingleTop = true }
-                            is NavigationCommand.NavigateToHome ->
-                                navController.navigate("main") {
-                                    popUpTo("main") { inclusive = true }
+                        try {
+                            when (command) {
+                                is NavigationCommand.NavigateToChat -> {
+                                    if (command.aor.isNotBlank() && command.peerUri.isNotBlank()) {
+                                        val encodedAor = Uri.encode(command.aor)
+                                        val encodedPeer = Uri.encode(command.peerUri)
+                                        val route = "chat/$encodedAor/$encodedPeer"
+                                        navController.navigate(route) { launchSingleTop = true }
+                                    }
                                 }
+                                is NavigationCommand.NavigateToCalls -> {
+                                    if (command.aor.isNotBlank()) {
+                                        val encodedAor = Uri.encode(command.aor)
+                                        val route = "calls/$encodedAor"
+                                        navController.navigate(route) { launchSingleTop = true }
+                                    }
+                                }
+                                is NavigationCommand.NavigateToChats -> {
+                                    if (command.aor.isNotBlank()) {
+                                        val encodedAor = Uri.encode(command.aor)
+                                        val route = "chats/$encodedAor"
+                                        navController.navigate(route) { launchSingleTop = true }
+                                    }
+                                }
+                                is NavigationCommand.NavigateToHome ->
+                                    navController.navigate("main") {
+                                        popUpTo("main") { inclusive = true }
+                                    }
+                            }
+                        } catch (e: IllegalArgumentException) {
+                            Log.e(TAG, "Failed to navigate for command $command: ${e.message}")
                         }
                     }
                 }
@@ -331,8 +340,11 @@ class MainActivity : ComponentActivity() {
                 val lastUnread = BaresipService.messages.lastOrNull { it.new }
                 if (lastUnread != null)
                     viewModel.onNewMessageReceived(lastUnread.aor, lastUnread.peerUri)
-                else
-                    viewModel.navigateToChats()
+                else {
+                    val ua = BaresipService.uas.value.firstOrNull()
+                    if (ua != null)
+                        viewModel.navigateToChats(ua.account.aor)
+                }
             }
         }
     }
@@ -372,8 +384,8 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
 
-        this.setShowWhenLocked(true)
-        this.setTurnScreenOn(true)
+        this.setShowWhenLocked(Call.inCall())
+        this.setTurnScreenOn(Call.inCall())
 
         Log.d(TAG, "onNewIntent action/type/data: ${intent.action}/${intent.type}/${intent.data}")
 
