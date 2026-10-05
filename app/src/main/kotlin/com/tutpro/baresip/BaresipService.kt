@@ -1801,8 +1801,9 @@ class BaresipService: Service() {
                 directReplyPendingIntent
             ).addRemoteInput(remoteInput)
                 .setAllowGeneratedReplies(true)
-                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).
-                build()
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                .setAuthenticationRequired(true)
+                .build()
 
             val saveIntent = Intent(this, BaresipService::class.java)
             saveIntent.action = "Message Save"
@@ -1812,7 +1813,8 @@ class BaresipService: Service() {
                 R.drawable.ic_notification_save,
                 getString(R.string.save),
                 savePendingIntent
-            ).build()
+            ).setAuthenticationRequired(true)
+                .build()
 
             val deleteIntent = Intent(this, BaresipService::class.java)
             deleteIntent.action = "Message Delete"
@@ -1822,7 +1824,8 @@ class BaresipService: Service() {
                 R.drawable.ic_notification_delete,
                 getString(R.string.delete),
                 deletePendingIntent
-            ).build()
+            ).setAuthenticationRequired(true)
+                .build()
 
             nb.addAction(inlineReplyAction).addAction(saveAction).addAction(deleteAction)
             nm.notify(MESSAGE_NOTIFICATION_ID, nb.build())

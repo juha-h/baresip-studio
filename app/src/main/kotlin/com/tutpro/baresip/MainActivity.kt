@@ -71,9 +71,8 @@ class MainActivity : ComponentActivity() {
         BaresipService.darkTheme.value = Utils.isThemeDark(this)
 
         // Must be done after view has been created
-        this.setShowWhenLocked(true)
-        this.setTurnScreenOn( true)
-        Utils.requestDismissKeyguard(this)
+        this.setShowWhenLocked(Call.inCall())
+        this.setTurnScreenOn(Call.inCall())
 
         nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(AUDIO_SERVICE) as AudioManager
@@ -380,8 +379,8 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
 
-        this.setShowWhenLocked(true)
-        this.setTurnScreenOn(true)
+        this.setShowWhenLocked(Call.inCall())
+        this.setTurnScreenOn(Call.inCall())
 
         Log.d(TAG, "onNewIntent action/type/data: ${intent.action}/${intent.type}/${intent.data}")
 
