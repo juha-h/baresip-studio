@@ -1,0 +1,4 @@
+- Do not allow non-secure actions during call if device is locked
+- Require unlocking of device before taking action on received message notification
+- Fixed potential crashes related to quitting and navigation between screens
+- Avoid crash if account template has invalid XML element
