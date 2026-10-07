@@ -48,10 +48,12 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.Manifest
 import android.os.PowerManager
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.provider.CallLog
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.system.OsConstants
@@ -2466,6 +2468,8 @@ class BaresipService: Service() {
         val call = calls.find { it.callp == callp }
         if (call != null) {
             val uap = call.ua.uap
+            val peerUri = call.peerUri
+            val isMobile = call.ua.account.isMobile
             stopRinging()
             stopMediaPlayer()
             if (call.ua.account.callHistory) {
@@ -2481,6 +2485,8 @@ class BaresipService: Service() {
             }
             synchronized(calls) { calls.remove(call) }
             postServiceEvent(ServiceEvent("call closed", arrayListOf(uap, callp), System.nanoTime()))
+            if (isMobile)
+                deleteSystemCallLog(peerUri)
         }
         if (!Call.inCall()) {
             proximitySensing(false)
@@ -2488,6 +2494,34 @@ class BaresipService: Service() {
         }
         updateStatusNotification()
         messageUpdate.postValue(System.currentTimeMillis())
+    }
+
+    private fun deleteSystemCallLog(peerUri: String) {
+        if (!Utils.checkPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG))) {
+            Log.d(TAG, "No WRITE_CALL_LOG permission to delete system call log")
+            return
+        }
+
+        val rawNumber = peerUri.removePrefix("tel:").removePrefix("sip:").split("@")[0]
+        val number = Utils.uriUnescape(rawNumber).trim()
+        if (number.isEmpty()) return
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                val cutoffTime = System.currentTimeMillis() - 300000
+                val e164Number = e164Uri(number, "")
+                val selection = "${CallLog.Calls.DATE} >= ? AND (${CallLog.Calls.NUMBER} = ? OR ${CallLog.Calls.NUMBER} = ? OR ${CallLog.Calls.NUMBER} LIKE ?)"
+                val selectionArgs = arrayOf(cutoffTime.toString(), number, e164Number, "%$number%")
+                val deleted = contentResolver.delete(
+                    CallLog.Calls.CONTENT_URI,
+                    selection,
+                    selectionArgs
+                )
+                Log.d(TAG, "Deleted $deleted system call log entry/entries for $number")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to delete system call log for $number: $e")
+            }
+        }, 1500)
     }
 
     fun addMobileUserAgent() {
@@ -3209,18 +3243,15 @@ class BaresipService: Service() {
         }
 
         val sipAccount = android.telecom.PhoneAccount.builder(sipHandle, getString(R.string.app_name))
-            .setCapabilities(android.telecom.PhoneAccount.CAPABILITY_SELF_MANAGED or
-                    android.telecom.PhoneAccount.CAPABILITY_SUPPORTS_VIDEO_CALLING)
+            .setCapabilities(android.telecom.PhoneAccount.CAPABILITY_SELF_MANAGED)
             .setIcon(android.graphics.drawable.Icon.createWithResource(this, R.mipmap.ic_launcher))
             .addSupportedUriScheme(android.telecom.PhoneAccount.SCHEME_SIP)
             .addSupportedUriScheme(android.telecom.PhoneAccount.SCHEME_TEL)
             .build()
 
         val pstnAccount = android.telecom.PhoneAccount.builder(pstnHandle, getString(R.string.app_name) + " Mobile")
-            .setCapabilities(android.telecom.PhoneAccount.CAPABILITY_CALL_PROVIDER or
-                    android.telecom.PhoneAccount.CAPABILITY_SUPPORTS_VIDEO_CALLING)
+            .setCapabilities(android.telecom.PhoneAccount.CAPABILITY_CALL_PROVIDER)
             .setIcon(android.graphics.drawable.Icon.createWithResource(this, R.mipmap.ic_launcher))
-            .addSupportedUriScheme(android.telecom.PhoneAccount.SCHEME_SIP)
             .addSupportedUriScheme(android.telecom.PhoneAccount.SCHEME_TEL)
             .build()
 
