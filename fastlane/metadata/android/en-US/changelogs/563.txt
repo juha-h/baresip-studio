@@ -1,0 +1,2 @@
+- For increased security, do not keep mobile calls in system call log
+- New translations (Chinese)
