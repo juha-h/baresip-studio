@@ -1,0 +1,4 @@
+- Removed Create Mobile Account setting (handled automatically now)
+- For increased security, do not keep mobile calls in system call log
+- Avoid possible crash when call is closed
+- New translations (Chinese, Finnish)
