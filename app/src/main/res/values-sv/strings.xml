@@ -390,8 +390,6 @@
     <string name="show_call">Visa</string>
     <string name="blocking_rules">Blockeringsregler</string>
     <string name="mobile_service_not_available">Mobiltjänsten är inte tillgänglig.</string>
-    <string name="create_mobile_account">Skapa mobilkonto</string>
-    <string name="create_mobile_account_help">Om alternativet är markerat skapas ett virtuellt mobilkonto för mobilsamtal.</string>
     <string name="ilbc_mode">iLBC-läge</string>
     <string name="ilbc_mode_help">Väljer standardvaraktighet för iLBC-ramen. 30 ms ger bättre kvalitet vid låg bithastighet medan 20 ms har lägre fördröjning.</string>
     <string name="blocked_action_question">Vill du lägga till motparten ”%1$s” bland kontakterna eller häva blockeringen?</string>

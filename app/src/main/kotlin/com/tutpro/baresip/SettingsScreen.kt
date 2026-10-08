@@ -960,12 +960,8 @@ private fun SettingsContent(
         val defaultPhoneAppTitle = stringResource(R.string.default_phone_app)
         val defaultPhoneAppHelp = stringResource(R.string.default_phone_app_help)
         val dialerRoleNotAvailableMessage = stringResource(R.string.dialer_role_not_available)
-        val createMobileAccountTitle = stringResource(R.string.create_mobile_account)
-        val createMobileAccountHelp = stringResource(R.string.create_mobile_account_help)
 
         val defaultDialer by viewModel.defaultDialer.collectAsState()
-        val mobileAccount by viewModel.mobileAccount.collectAsState()
-        val isSimReady = BaresipService.instance?.isSimReady() == true
 
         Column {
             Row(
@@ -1045,36 +1041,6 @@ private fun SettingsContent(
                     }
                 )
             }
-
-            if (defaultDialer && isSimReady) {
-                Row(
-                    Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(text = createMobileAccountTitle,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                alertTitle.value = createMobileAccountTitle
-                                alertMessage.value = createMobileAccountHelp
-                                showAlert.value = true
-                            },
-                        fontSize = 18.sp
-                    )
-                    Switch(
-                        checked = mobileAccount,
-                        onCheckedChange = {
-                            viewModel.mobileAccount.value = it
-                            BaresipService.mobileAccount = it
-                            Config.replaceVariable("mobile_account", if (it) "yes" else "no")
-                            Config.save()
-                            BaresipService.instance?.addMobileUserAgent()
-                            viewModel.restart = true
-                        }
-                    )
-                }
-            }
         }
     }
 
@@ -1103,12 +1069,38 @@ private fun SettingsContent(
             val defaultMessaging by viewModel.defaultMessaging.collectAsState()
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
 
+            val requestPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { results ->
+                if (results[Manifest.permission.READ_PHONE_STATE] == true)
+                    Log.d(TAG, "READ_PHONE_STATE permission granted")
+                if (results[Manifest.permission.READ_PHONE_NUMBERS] == true)
+                    Log.d(TAG, "READ_PHONE_NUMBERS permission granted")
+                BaresipService.instance?.addMobileUserAgent()
+                viewModel.restart = true
+            }
+
             val messagingRoleRequest = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { _ ->
                 val isHeld = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
                 viewModel.defaultMessaging.value = isHeld
-                viewModel.restart = true
+                if (isHeld) {
+                    val permissions = arrayOf(
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.READ_PHONE_NUMBERS
+                    )
+                    if (Utils.checkPermissions(ctx, permissions)) {
+                        BaresipService.instance?.addMobileUserAgent()
+                        viewModel.restart = true
+                    }
+                    else
+                        requestPermissionLauncher.launch(permissions)
+                }
+                else {
+                    BaresipService.instance?.addMobileUserAgent()
+                    viewModel.restart = true
+                }
             }
             Switch(
                 checked = defaultMessaging,
@@ -1124,12 +1116,15 @@ private fun SettingsContent(
                             if (!roleManager.isRoleHeld(RoleManager.ROLE_SMS))
                                 messagingRoleRequest.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS))
                     }
-                    else
+                    else {
                         try {
-                            messagingRoleRequest.launch(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
+                            messagingRoleRequest.launch(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
                         } catch (e: ActivityNotFoundException) {
                             Log.e(TAG, "ActivityNotFound exception: ${e.message}")
                         }
+                        BaresipService.instance?.addMobileUserAgent()
+                        viewModel.restart = true
+                    }
                 }
             )
         }

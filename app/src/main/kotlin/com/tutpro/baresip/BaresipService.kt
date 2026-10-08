@@ -9,6 +9,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.app.role.RoleManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothManager
@@ -326,7 +327,14 @@ class BaresipService: Service() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 if (intent.action == "android.intent.action.SIM_STATE_CHANGED") {
                     Log.d(TAG, "SIM state changed")
-                    if (VERSION.SDK_INT >= 29) updateMobileStatus()
+                    if (VERSION.SDK_INT >= 29) {
+                        if (isSimReady())
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                addMobileUserAgent()
+                            }, 2000)
+                        else
+                            updateMobileStatus()
+                    }
                 }
             }
         }
@@ -1019,10 +1027,10 @@ class BaresipService: Service() {
                     removeMobile = true
                 }
                 else if (Utils.pstnAccountHandle(this) == null || !isSimReady() ||
-                    (if (VERSION.SDK_INT >= 35) !telephonyManager.isDeviceVoiceCapable else !telephonyManager.isVoiceCapable) ||
-                        SubscriptionManager.getDefaultVoiceSubscriptionId() == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
-                        !mobileAccount) {
-                    Log.d(TAG, "Removing Mobile account (SIM not ready, not default dialer, not voice capable, or disabled by user)")
+                    (((if (VERSION.SDK_INT >= 35) !telephonyManager.isDeviceVoiceCapable else !telephonyManager.isVoiceCapable) &&
+                        (getSystemService(ROLE_SERVICE) as RoleManager).isRoleHeld(RoleManager.ROLE_DIALER))) ||
+                        SubscriptionManager.getDefaultVoiceSubscriptionId() == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+                    Log.d(TAG, "Removing Mobile account (SIM not ready, not default app, or not voice capable)")
                     removeMobile = true
                 }
             }
@@ -2529,10 +2537,13 @@ class BaresipService: Service() {
 
             val mobileAccountHandle = Utils.pstnAccountHandle(this)
             val isSimReady = isSimReady()
-            val isVoiceCapable = if (VERSION.SDK_INT >= 35)
+            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+            val isDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            val voiceCapable = if (VERSION.SDK_INT >= 35)
                 telephonyManager.isDeviceVoiceCapable
             else
                 telephonyManager.isVoiceCapable
+            val isVoiceCapable = !isDefaultDialer || voiceCapable
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
             mobileNumber = Utils.getLine1Number(this, voiceSubId) ?: ""
             val existingMobileUa = uas.value.find {
@@ -2540,7 +2551,7 @@ class BaresipService: Service() {
             }
 
             if (mobileAccountHandle == null || !isSimReady || !isVoiceCapable ||
-                    voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID || !mobileAccount) {
+                    voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
                 if (existingMobileUa != null) {
                     Log.d(TAG, "Removing existing Mobile account (SIM not ready, not default dialer, not voice capable, or disabled by user)")
                     if (existingMobileUa.uap != 0L) Api.ua_destroy(existingMobileUa.uap)
@@ -2609,16 +2620,18 @@ class BaresipService: Service() {
     private fun updateMobileStatus(newStatus: Int? = null) {
         val mobileAccountHandle = Utils.pstnAccountHandle(this)
         val isSimReady = isSimReady()
-        val isVoiceCapable = if (VERSION.SDK_INT >= 35)
+        val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+        val isDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+        val voiceCapable = if (VERSION.SDK_INT >= 35)
             telephonyManager.isDeviceVoiceCapable
         else
             telephonyManager.isVoiceCapable
+        val isVoiceCapable = !isDefaultDialer || voiceCapable
         val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
         val mobileUa = uas.value.find { it.account.isMobile }
 
         if (mobileUa == null || mobileAccountHandle == null || !isSimReady || !isVoiceCapable ||
-                voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
-                !mobileAccount) {
+                voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
             addMobileUserAgent()
             return
         }
@@ -2647,20 +2660,21 @@ class BaresipService: Service() {
         if (VERSION.SDK_INT >= 29) {
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
             val isSimReady = isSimReady()
-            val isVoiceCapable = if (VERSION.SDK_INT >= 35)
+            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+            val isDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            val voiceCapable = if (VERSION.SDK_INT >= 35)
                 telephonyManager.isDeviceVoiceCapable
             else
                 telephonyManager.isVoiceCapable
+            val isVoiceCapable = !isDefaultDialer || voiceCapable
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
             val mobileAccountHandle = Utils.pstnAccountHandle(this)
             val status = if (state == ServiceState.STATE_IN_SERVICE && isSimReady &&
                     mobileAccountHandle != null && isVoiceCapable &&
-                    voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID &&
-                    mobileAccount)
+                    voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID)
                 circleGreen.getValue(colorblind)
             else if (mobileAccountHandle == null || isAirplaneModeOn || !isSimReady ||
-                    !isVoiceCapable || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
-                    !mobileAccount)
+                    !isVoiceCapable || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID)
                 R.drawable.circle_white
             else
                 circleRed.getValue(colorblind)
@@ -3587,7 +3601,6 @@ class BaresipService: Service() {
         var isServiceRunning = false
         var isNativeReady = false
         var pendingCallIntent: Intent? = null
-        var mobileAccount = false
         var mobileNumber = ""
         var isStartReceived = false
         var isConfigInitialized = false

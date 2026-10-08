@@ -396,8 +396,6 @@
     <string name="blocked_action_question">Хотите добавить коллегу \'%1$s\' в контакты или разблокировать его?</string>
     <string name="blocked_unblock_question">Вы хотите разблокировать пира \'%1$s\'?</string>
     <string name="blocking_rules">Правила блокировки</string>
-    <string name="create_mobile_account">Создать мобильный аккаунт</string>
-    <string name="create_mobile_account_help">Если отмечено, для мобильных звонков создается виртуальный мобильный аккаунт.</string>
     <string name="long_chat_block_delete_question">Вы хотите заблокировать \'%1$s\' или удалить этот чат?</string>
     <string name="max_mms_images_size">Mакс объём MMS изображений</string>
     <string name="max_mms_images_size_help">Макс общий сжатый объём изображений MMS-сообщений</string>

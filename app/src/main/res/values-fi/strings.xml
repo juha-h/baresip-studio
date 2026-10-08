@@ -16,7 +16,7 @@
                 <li>Tarkista, että baresip-sovelluksen Asetukset vastaavat tarpeitasi.
                     Kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Jos laitteessasi on SIM ja haluat käyttää baresip-sovellusta mobiilipuheluihin,
-                    aktivoi Oletus puhelusovellus -asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
+                    aktivoi \'Oletus puhelusovellus\' asetus. Se luo Mobile-tilin mobiilipuheluita varten.</li>
                 <li>Sitten luo yksi tai useampi SIP-tili Tilit-sivulla. Jälleen kunkin otsikon kosketus tarjoaa apua.</li>
                 <li>Tilin rekisteröintitila kerrotaan värillisellä pisteellä: vihreä (rekisteröinti onnistui),
                     keltainen (rekisteröinti on meneillään), punainen (rekisteröinti epäonnistui),
@@ -361,8 +361,6 @@
     <string name="default_phone_app">Oletus puhelusovellus</string>
     <string name="dialer_role_not_available">Oletus puhelusovellusrooli ei ole saatavana</string>
     <string name="default_phone_app_help">Jos merkitty, baresip on oletus puhelusovellus</string>
-    <string name="create_mobile_account">Luo Mobile-tili</string>
-    <string name="create_mobile_account_help">Jos merkitty, mobiilipuheluita varten luodaan virtuaalinen Mobile-tili.</string>
     <string name="default_messaging_app">Oletus tekstiviestisovellus</string>
     <string name="default_messaging_app_help">Jos merkitty, baresip on tekstiviestien
         oletussovellus</string>
@@ -371,6 +369,8 @@
     <string name="messaging_role_not_available">Oletus tekstiviestisovellusrooli ei ole
         saatavana</string>
     <string name="enable_default_messaging">Ole hyvä ja merkitse \'Oletus tekstiviestisovellus\'
+        baresip asetuksissa</string>
+    <string name="enable_default_phone">Ole hyvä ja merkitse \'Oletus puhelusovellus\'
         baresip asetuksissa</string>
     <string name="listen_address">Kuunteluosoite</string>
     <string name="listen_address_help">IP-osoite ja portti muotoa
