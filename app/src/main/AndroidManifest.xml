@@ -50,6 +50,8 @@
         tools:ignore="SmsAndCallLogPolicy" />
     <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH"
         tools:ignore="SmsAndCallLogPolicy" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG"
+        tools:ignore="SmsAndCallLogPolicy" />
 
     <uses-feature
         android:name="android.hardware.camera"

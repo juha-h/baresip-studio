@@ -234,6 +234,8 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onReject() {
+            if (isDestroyed) return
+            isDestroyed = true
             Log.d(TAG, "Telecom Connection onReject $callp")
             Api.ua_hangup(uap, callp, 486, "Rejected")
             setDisconnected(DisconnectCause(DisconnectCause.REJECTED))
@@ -242,6 +244,9 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onDisconnect() {
+            if (isDestroyed) return
+            isDestroyed = true
+
             val now = System.currentTimeMillis()
             if (now - lastDisconnectTime < 500) return
             lastDisconnectTime = now
@@ -263,6 +268,8 @@ class ConnectionService : ConnectionService() {
         }
 
         override fun onAbort() {
+            if (isDestroyed) return
+            isDestroyed = true
             Log.d(TAG, "Telecom Connection onAbort $callp")
             if (callp != 0L) {
                 Api.ua_hangup(uap, callp, 0, "")

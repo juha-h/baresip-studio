@@ -51,6 +51,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     val dtmfEnabled: MutableState<Boolean> = mutableStateOf(false)
     val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
 
+    private var hangupped = false
+
     fun add() {
         synchronized(BaresipService.calls) { BaresipService.calls.add(this) }
     }
@@ -185,6 +187,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     }
 
     open fun hangup(code: Int, reason: String) {
+        if (hangupped) return
+        hangupped = true
         val connection = ConnectionService.connections[callp]
         if (connection != null)
             connection.onDisconnect()

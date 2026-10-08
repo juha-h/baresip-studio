@@ -2930,6 +2930,12 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
         showAlert.value = true
         return
     }
+    else if (ua.account.isMobile && !Utils.isDefaultDialer(ctx)) {
+        alertTitle.value = ctx.getString(R.string.notice)
+        alertMessage.value = ctx.getString(R.string.enable_default_phone)
+        showAlert.value = true
+        return
+    }
     else if (Utils.isAudioMode(ctx,AudioManager.MODE_IN_CALL) &&
             !Call.calls().any { it.ua.account.aor == ua.account.aor })
         Toast.makeText(ctx, R.string.call_already_active, Toast.LENGTH_SHORT).show()

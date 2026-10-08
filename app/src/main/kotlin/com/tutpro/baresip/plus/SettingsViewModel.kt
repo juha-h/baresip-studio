@@ -34,7 +34,6 @@ class SettingsViewModel: ViewModel() {
     val colorblind = MutableStateFlow(false)
     val proximitySensing = MutableStateFlow(false)
     val defaultDialer = MutableStateFlow(false)
-    val mobileAccount = MutableStateFlow(true)
     val defaultMessaging = MutableStateFlow(false)
     val maxMmsImagesSize = MutableStateFlow("600")
     val debug = MutableStateFlow(false)
@@ -87,7 +86,6 @@ class SettingsViewModel: ViewModel() {
         if (Build.VERSION.SDK_INT >= 29) {
             val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
             defaultDialer.value = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-            mobileAccount.value = BaresipService.mobileAccount
             defaultMessaging.value = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
         }
 

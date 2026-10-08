@@ -393,8 +393,6 @@
     <string name="show_call">Zobrazit hovor</string>
     <string name="calls_block_delete_question">Chcete zablokovat \'%1$s\', nebo odstranit %2$s z historie hovorů?</string>
     <string name="long_chat_block_delete_question">Chcete zablokovat \'%1$s\', nebo odstranit tento chat?</string>
-    <string name="create_mobile_account">Vytvořit mobilní účet</string>
-    <string name="create_mobile_account_help">Pokud je zaškrtnuto, vytvoří se virtuální mobilní účet pro mobilní volání.</string>
     <string name="ilbc_mode">Režim iLBC</string>
     <string name="ilbc_mode_help">Určuje výchozí délku rámce iLBC. Lepší kvalitu při nízkém datovém toku poskytuje 30 ms, zatímco 20 ms má nižší latenci.</string>
     <string name="unblock">Odblokovat</string>

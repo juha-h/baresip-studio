@@ -1300,7 +1300,7 @@ object Utils {
         val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
         if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
                     PackageManager.PERMISSION_GRANTED &&
-                roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
+                (roleManager.isRoleHeld(RoleManager.ROLE_DIALER) || roleManager.isRoleHeld(RoleManager.ROLE_SMS))) {
             val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
             if (preferredHandle != null) return preferredHandle
@@ -1309,7 +1309,7 @@ object Utils {
             return phoneAccounts.firstOrNull()
         }
         else {
-            Log.d(TAG, "READ_PHONE_STATE permission not granted")
+            Log.d(TAG, "READ_PHONE_STATE permission not granted or neither default dialer nor default messaging role held")
             return null
         }
     }
@@ -1575,6 +1575,15 @@ object Utils {
         else
             @Suppress("DEPRECATION")
             android.provider.Telephony.Sms.getDefaultSmsPackage(ctx) == ctx.packageName
+    }
+
+    fun isDefaultDialer(ctx: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= 29) {
+            val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
+            roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+        }
+        else
+            true
     }
 
     @Suppress("unused")

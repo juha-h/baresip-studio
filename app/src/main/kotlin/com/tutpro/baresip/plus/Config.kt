@@ -136,16 +136,6 @@ object Config {
         val userAgent = previousVariable("user_agent")
         if (userAgent != "") config = "${config}user_agent $userAgent\n"
 
-        val mobileAccount = previousVariable("mobile_account")
-        if (mobileAccount != "") {
-            config = "${config}mobile_account $mobileAccount\n"
-            BaresipService.mobileAccount = mobileAccount != "no"
-        }
-        else {
-            config = "${config}mobile_account yes\n"
-            BaresipService.mobileAccount = true
-        }
-
         val maxMmsImagesSize = previousVariable("max_mms_images_size")
         if (maxMmsImagesSize != "") {
             config = "${config}max_mms_images_size $maxMmsImagesSize\n"
