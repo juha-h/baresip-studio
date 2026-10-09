@@ -401,4 +401,5 @@
     <string name="max_mms_images_size">最大彩信图像大小</string>
     <string name="max_mms_images_size_help">彩信消息图片的最大总压缩大小</string>
     <string name="unlock_to_access_full_app">请解锁设备</string>
+    <string name="enable_default_phone">请在设置中默认通话应用</string>
 </resources>
