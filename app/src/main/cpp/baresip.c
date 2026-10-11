@@ -1254,8 +1254,6 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_Api_ua_1update_1account(
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_ua_1hangup(
-        JNIEnv *env, jobject obj, jlong ua, jlong call, jint code, jstring reason);
-void Java_com_tutpro_baresip_Api_ua_1hangup(
         JNIEnv *env, jobject obj, jlong ua, jlong call, jint code, jstring reason)
 {
     (void)obj;
