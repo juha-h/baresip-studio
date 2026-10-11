@@ -1,0 +1,2 @@
+- Added more safeguards to protect from call hangup related crash
+- New translations (Chinese)
