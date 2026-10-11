@@ -234,7 +234,8 @@ class ConnectionService : ConnectionService() {
             if (isDestroyed) return
             isDestroyed = true
             Log.d(TAG, "Telecom Connection onReject $callp")
-            Api.ua_hangup(uap, callp, 486, "Rejected")
+            if (Call.ofCallp(callp) != null)
+                Api.ua_hangup(uap, callp, 486, "Rejected")
             setDisconnected(DisconnectCause(DisconnectCause.REJECTED))
             connections.remove(callp)
             destroy()
@@ -257,7 +258,8 @@ class ConnectionService : ConnectionService() {
                 return
             }
 
-            Api.ua_hangup(uap, callp, 0, "")
+            if (Call.ofCallp(callp) != null)
+                Api.ua_hangup(uap, callp, 0, "")
 
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
             connections.remove(callp)
@@ -269,7 +271,8 @@ class ConnectionService : ConnectionService() {
             isDestroyed = true
             Log.d(TAG, "Telecom Connection onAbort $callp")
             if (callp != 0L) {
-                Api.ua_hangup(uap, callp, 0, "")
+                if (Call.ofCallp(callp) != null)
+                    Api.ua_hangup(uap, callp, 0, "")
                 connections.remove(callp)
             }
             else
