@@ -1362,10 +1362,26 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1hangup(
     const char *native_reason = (*env)->GetStringUTFChars(env, reason, 0);
     LOGD("hanging up call %ld/%ld\n", (long)ua, (long)call);
     re_thread_enter();
-    if (strlen(native_reason) == 0)
-        ua_hangup((struct ua *)ua, (struct call *)call, native_code, NULL);
-    else
-        ua_hangup((struct ua *)ua, (struct call *)call, native_code, native_reason);
+    struct ua *u = (struct ua *)ua;
+    struct call *c = (struct call *)call;
+    bool found = false;
+    if (u && c) {
+        struct le *call_le;
+        for (call_le = list_head(ua_calls(u)); call_le != NULL; call_le = call_le->next) {
+            if (call_le->data == c) {
+                found = true;
+                break;
+            }
+        }
+    }
+    if (found) {
+        if (strlen(native_reason) == 0)
+            ua_hangup(u, c, native_code, NULL);
+        else
+            ua_hangup(u, c, native_code, native_reason);
+    } else {
+        LOGW("ua_hangup: call %ld not found in active calls\n", (long)call);
+    }
     re_thread_leave();
     (*env)->ReleaseStringUTFChars(env, reason, native_reason);
 }

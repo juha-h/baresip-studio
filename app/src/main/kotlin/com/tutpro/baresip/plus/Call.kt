@@ -189,6 +189,7 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     open fun hangup(code: Int, reason: String) {
         if (hangupped) return
         hangupped = true
+        if (ofCallp(callp) == null) return
         val connection = ConnectionService.connections[callp]
         if (connection != null)
             connection.onDisconnect()
