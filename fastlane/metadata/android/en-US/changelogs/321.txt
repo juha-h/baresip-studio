@@ -1,0 +1,3 @@
+- Avoid crash and don't loose mobile account's chat history when baresip looses default phone app role
+- Added more safeguards to protect from call hangup related crash
+- New translations (Chinese)
