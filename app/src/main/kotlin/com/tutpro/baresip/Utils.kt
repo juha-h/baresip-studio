@@ -1441,16 +1441,34 @@ object Utils {
         val roleManager = ctx.getSystemService(ROLE_SERVICE) as RoleManager
         if (ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) ==
                     PackageManager.PERMISSION_GRANTED &&
-                (roleManager.isRoleHeld(RoleManager.ROLE_DIALER) || roleManager.isRoleHeld(RoleManager.ROLE_SMS))) {
-            val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            val preferredHandle: PhoneAccountHandle? = tm.userSelectedOutgoingPhoneAccount
-            if (preferredHandle != null) return preferredHandle
-            val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
-            val phoneAccounts = tm.callCapablePhoneAccounts.filter { it != baresipHandle }
-            return phoneAccounts.firstOrNull()
+                roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
+            try {
+                val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+                val preferredHandle: PhoneAccountHandle? = try {
+                    tm.userSelectedOutgoingPhoneAccount
+                } catch (e: SecurityException) {
+                    Log.w(TAG, "userSelectedOutgoingPhoneAccount SecurityException: $e")
+                    null
+                }
+                if (preferredHandle != null) return preferredHandle
+                val baresipHandle = BaresipService.getPhoneAccountHandle(ctx)
+                val phoneAccounts = try {
+                    tm.callCapablePhoneAccounts.filter { it != baresipHandle }
+                } catch (e: SecurityException) {
+                    Log.w(TAG, "callCapablePhoneAccounts SecurityException: $e")
+                    emptyList()
+                }
+                return phoneAccounts.firstOrNull()
+            } catch (e: SecurityException) {
+                Log.w(TAG, "SecurityException getting pstnAccountHandle: $e")
+                return null
+            } catch (e: Exception) {
+                Log.e(TAG, "Unexpected failure getting pstnAccountHandle", e)
+                return null
+            }
         }
         else {
-            Log.d(TAG, "READ_PHONE_STATE permission not granted or neither default dialer nor default messaging role held")
+            Log.d(TAG, "READ_PHONE_STATE permission not granted or default dialer role not held")
             return null
         }
     }

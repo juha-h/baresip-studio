@@ -1026,18 +1026,15 @@ class BaresipService: Service() {
                     Log.d(TAG, "Removing Mobile account on API < 29")
                     removeMobile = true
                 }
-                else if (Utils.pstnAccountHandle(this) == null || !isSimReady() ||
-                    (((if (VERSION.SDK_INT >= 35) !telephonyManager.isDeviceVoiceCapable else !telephonyManager.isVoiceCapable) &&
-                        (getSystemService(ROLE_SERVICE) as RoleManager).isRoleHeld(RoleManager.ROLE_DIALER))) ||
-                        SubscriptionManager.getDefaultVoiceSubscriptionId() == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
-                    Log.d(TAG, "Removing Mobile account (SIM not ready, not default app, or not voice capable)")
+                else if (!isSimReady() ||
+                    SubscriptionManager.getDefaultVoiceSubscriptionId() == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+                    Log.d(TAG, "Removing Mobile account (SIM not ready or invalid subscription ID)")
                     removeMobile = true
                 }
             }
 
             if (removeMobile) {
                 CallHistoryNew.clear(ua.account.aor)
-                Message.clearMessagesOfAor(ua.account.aor)
                 Blocked.clear(ua.account.aor)
                 BlockRule.clear(ua.account.aor)
                 Api.ua_destroy(uap)
@@ -2514,46 +2511,40 @@ class BaresipService: Service() {
         val number = Utils.uriUnescape(rawNumber).trim()
         if (number.isEmpty()) return
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            try {
-                val cutoffTime = System.currentTimeMillis() - 300000
-                val e164Number = e164Uri(number, "")
-                val selection = "${CallLog.Calls.DATE} >= ? AND (${CallLog.Calls.NUMBER} = ? OR ${CallLog.Calls.NUMBER} = ? OR ${CallLog.Calls.NUMBER} LIKE ?)"
-                val selectionArgs = arrayOf(cutoffTime.toString(), number, e164Number, "%$number%")
-                val deleted = contentResolver.delete(
-                    CallLog.Calls.CONTENT_URI,
-                    selection,
-                    selectionArgs
-                )
-                Log.d(TAG, "Deleted $deleted system call log entry/entries for $number")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to delete system call log for $number: $e")
-            }
-        }, 1500)
+        val handler = Handler(Looper.getMainLooper())
+        val delays = listOf(2000L, 4000L, 7000L)
+        for (delay in delays)
+            handler.postDelayed({
+                try {
+                    val cutoffTime = System.currentTimeMillis() - 1800000 // 30 minutes
+                    val e164Number = e164Uri(number, "")
+                    val selection = "${CallLog.Calls.DATE} >= ? AND (${CallLog.Calls.NUMBER} = ? OR ${CallLog.Calls.NUMBER} = ? OR ${CallLog.Calls.NUMBER} LIKE ?)"
+                    val selectionArgs = arrayOf(cutoffTime.toString(), number, e164Number, "%$number%")
+                    val deleted = contentResolver.delete(
+                        CallLog.Calls.CONTENT_URI,
+                        selection,
+                        selectionArgs
+                    )
+                    Log.d(TAG, "Deleted $deleted system call log entry/entries for $number (delay: $delay)")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to delete system call log for $number: $e")
+                }
+            }, delay)
     }
 
     fun addMobileUserAgent() {
         if (VERSION.SDK_INT >= 29) {
 
-            val mobileAccountHandle = Utils.pstnAccountHandle(this)
             val isSimReady = isSimReady()
-            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
-            val isDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-            val voiceCapable = if (VERSION.SDK_INT >= 35)
-                telephonyManager.isDeviceVoiceCapable
-            else
-                telephonyManager.isVoiceCapable
-            val isVoiceCapable = !isDefaultDialer || voiceCapable
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
             mobileNumber = Utils.getLine1Number(this, voiceSubId) ?: ""
             val existingMobileUa = uas.value.find {
                 it.account.isMobile || Utils.uriMatch(it.account.aor, "sip:mobile@pstn")
             }
 
-            if (mobileAccountHandle == null || !isSimReady || !isVoiceCapable ||
-                    voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+            if (!isSimReady || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
                 if (existingMobileUa != null) {
-                    Log.d(TAG, "Removing existing Mobile account (SIM not ready, not default dialer, not voice capable, or disabled by user)")
+                    Log.d(TAG, "Removing existing Mobile account (SIM not ready or invalid subscription ID)")
                     if (existingMobileUa.uap != 0L) Api.ua_destroy(existingMobileUa.uap)
                     existingMobileUa.remove()
                     if (isNativeReady) Account.saveAccounts()
@@ -2620,17 +2611,10 @@ class BaresipService: Service() {
     private fun updateMobileStatus(newStatus: Int? = null) {
         val mobileAccountHandle = Utils.pstnAccountHandle(this)
         val isSimReady = isSimReady()
-        val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
-        val isDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
-        val voiceCapable = if (VERSION.SDK_INT >= 35)
-            telephonyManager.isDeviceVoiceCapable
-        else
-            telephonyManager.isVoiceCapable
-        val isVoiceCapable = !isDefaultDialer || voiceCapable
         val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
         val mobileUa = uas.value.find { it.account.isMobile }
 
-        if (mobileUa == null || mobileAccountHandle == null || !isSimReady || !isVoiceCapable ||
+        if (mobileUa == null || !isSimReady ||
                 voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
             addMobileUserAgent()
             return
@@ -2638,7 +2622,7 @@ class BaresipService: Service() {
 
         mobileUa.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus ?: if (isAirplaneModeOn)
+            val status = newStatus ?: if (isAirplaneModeOn || mobileAccountHandle == null)
                 R.drawable.circle_white
             else if (previousMobileServiceState == ServiceState.STATE_IN_SERVICE)
                 circleGreen.getValue(colorblind)
@@ -3269,8 +3253,12 @@ class BaresipService: Service() {
             .addSupportedUriScheme(android.telecom.PhoneAccount.SCHEME_TEL)
             .build()
 
-        tm.registerPhoneAccount(sipAccount)
-        tm.registerPhoneAccount(pstnAccount)
+        try {
+            tm.registerPhoneAccount(sipAccount)
+            tm.registerPhoneAccount(pstnAccount)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to register phone accounts: $e")
+        }
     }
 
     fun isSimReady(): Boolean {
