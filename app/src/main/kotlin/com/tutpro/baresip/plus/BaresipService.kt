@@ -1035,15 +1035,24 @@ class BaresipService: Service() {
                     Log.d(TAG, "Removing Mobile account on API < 29")
                     removeMobile = true
                 }
-                else if (!isSimReady() ||
-                    SubscriptionManager.getDefaultVoiceSubscriptionId() == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
-                    Log.d(TAG, "Removing Mobile account (SIM not ready or invalid subscription ID)")
-                    removeMobile = true
+                else {
+                    val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+                    val hasDialerRole = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+                    val hasSmsRole = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+                    if (!isSimReady() ||
+                            SubscriptionManager.getDefaultVoiceSubscriptionId() ==
+                                SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
+                            (!hasDialerRole && !hasSmsRole)) {
+                        Log.d(TAG, "Removing Mobile account (SIM not ready, invalid subscription ID, " +
+                                "or both default roles disabled)")
+                        removeMobile = true
+                    }
                 }
             }
 
             if (removeMobile) {
                 CallHistoryNew.clear(ua.account.aor)
+                Message.clearMessagesOfAor(ua.account.aor)
                 Blocked.clear(ua.account.aor)
                 BlockRule.clear(ua.account.aor)
                 Api.ua_destroy(uap)
@@ -2614,14 +2623,23 @@ class BaresipService: Service() {
 
             val isSimReady = isSimReady()
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
+            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+            val hasDialerRole = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            val hasSmsRole = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
             mobileNumber = Utils.getLine1Number(this, voiceSubId) ?: ""
             val existingMobileUa = uas.value.find {
                 it.account.isMobile || Utils.uriMatch(it.account.aor, "sip:mobile@pstn")
             }
 
-            if (!isSimReady || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+            if (!isSimReady || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
+                    (!hasDialerRole && !hasSmsRole)) {
                 if (existingMobileUa != null) {
-                    Log.d(TAG, "Removing existing Mobile account (SIM not ready or invalid subscription ID)")
+                    Log.d(TAG, "Removing existing Mobile account (SIM not ready, invalid subscription ID, " +
+                            "or both default roles disabled)")
+                    CallHistoryNew.clear(existingMobileUa.account.aor)
+                    Message.clearMessagesOfAor(existingMobileUa.account.aor)
+                    Blocked.clear(existingMobileUa.account.aor)
+                    BlockRule.clear(existingMobileUa.account.aor)
                     if (existingMobileUa.uap != 0L) Api.ua_destroy(existingMobileUa.uap)
                     existingMobileUa.remove()
                     if (isNativeReady) Account.saveAccounts()
@@ -2686,20 +2704,24 @@ class BaresipService: Service() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun updateMobileStatus(newStatus: Int? = null) {
-        val mobileAccountHandle = Utils.pstnAccountHandle(this)
+        val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
+        val hasDialerRole = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+        val hasSmsRole = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+        val hasRole = hasDialerRole || hasSmsRole
         val isSimReady = isSimReady()
         val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
         val mobileUa = uas.value.find { it.account.isMobile }
 
         if (mobileUa == null || !isSimReady ||
-                voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+                voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
+                !hasRole) {
             addMobileUserAgent()
             return
         }
 
         mobileUa.let { ua ->
             val isAirplaneModeOn = Utils.isAirplaneModeOn(this)
-            val status = newStatus ?: if (isAirplaneModeOn || mobileAccountHandle == null)
+            val status = newStatus ?: if (isAirplaneModeOn)
                 R.drawable.circle_white
             else if (previousMobileServiceState == ServiceState.STATE_IN_SERVICE)
                 circleGreen.getValue(colorblind)
@@ -2723,18 +2745,19 @@ class BaresipService: Service() {
             val isSimReady = isSimReady()
             val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
             val isDefaultDialer = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            val hasSmsRole = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+            val hasRole = isDefaultDialer || hasSmsRole
             val voiceCapable = if (VERSION.SDK_INT >= 35)
                 telephonyManager.isDeviceVoiceCapable
             else
                 telephonyManager.isVoiceCapable
             val isVoiceCapable = !isDefaultDialer || voiceCapable
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
-            val mobileAccountHandle = Utils.pstnAccountHandle(this)
             val status = if (state == ServiceState.STATE_IN_SERVICE && isSimReady &&
-                    mobileAccountHandle != null && isVoiceCapable &&
+                    hasRole && isVoiceCapable &&
                     voiceSubId != SubscriptionManager.INVALID_SUBSCRIPTION_ID)
                 circleGreen.getValue(colorblind)
-            else if (mobileAccountHandle == null || isAirplaneModeOn || !isSimReady ||
+            else if (!hasRole || isAirplaneModeOn || !isSimReady ||
                     !isVoiceCapable || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID)
                 R.drawable.circle_white
             else

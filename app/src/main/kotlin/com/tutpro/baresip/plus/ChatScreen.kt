@@ -551,6 +551,7 @@ private fun NewMessage(
 
     val messageFailed = stringResource(R.string.message_failed)
     val noTelephonyProvider = stringResource(R.string.no_telephony_provider)
+    val enableDefaultMessaging = stringResource(R.string.enable_default_messaging)
 
     AlertDialog(
         showDialog = showDialog,
@@ -701,6 +702,20 @@ private fun NewMessage(
                     val msgText = newMessage.value.text
                     if (msgText.isNotEmpty() || attachedImages.isNotEmpty()) {
                         keyboardController?.hide()
+
+                        if (ua.account.isMobile) {
+                            if (ua.status != circleGreen.getValue(colorblind)) {
+                                dialogMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
+                                showDialog.value = true
+                                return@SmallFloatingActionButton
+                            }
+                            else if (!Utils.isDefaultSmsApp(ctx)) {
+                                dialogMessage.value = enableDefaultMessaging
+                                showDialog.value = true
+                                return@SmallFloatingActionButton
+                            }
+                        }
+
                         val time = System.currentTimeMillis()
 
                         // Copy attached images to internal storage to ensure persistence
@@ -733,11 +748,6 @@ private fun NewMessage(
                         viewModel.updateAorPeerMessage(aor, peerUri, "")
 
                         if (ua.account.isMobile) {
-                            if (ua.status != circleGreen.getValue(colorblind)) {
-                                dialogMessage.value = Utils.mobileStatusMessage(ctx, ua.status)
-                                showDialog.value = true
-                            }
-                            else {
                                 // Implement MMS Sending
                                 val destination = Utils.uriUserPart(peerUri).removeSuffix("/")
                                 when {
@@ -760,7 +770,6 @@ private fun NewMessage(
                                         msg.responseReason = messageFailed
                                     }
                                 }
-                            }
                         }
                         else {
                             // SIP message sending
