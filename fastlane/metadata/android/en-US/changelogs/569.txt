@@ -1,0 +1,1 @@
+- Keep call and chat history of mobile account as long as it has default phone app role or default messaging app role
