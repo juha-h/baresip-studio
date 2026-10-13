@@ -141,7 +141,11 @@ class MainActivity : ComponentActivity() {
             if (BaresipService.isServiceRunning) {
                 restart = true
                 baresipService.action = "Stop"
-                startService(baresipService)
+                try {
+                    startService(baresipService)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to stop service: ${e.message}")
+                }
             }
             else {
                 finishAndRemoveTask()
@@ -162,7 +166,11 @@ class MainActivity : ComponentActivity() {
             if (BaresipService.isServiceRunning) {
                 restart = false
                 baresipService.action = "Stop"
-                startService(baresipService)
+                try {
+                    startService(baresipService)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to stop service: ${e.message}")
+                }
             }
             else {
                 finishAndRemoveTask()
@@ -238,7 +246,11 @@ class MainActivity : ComponentActivity() {
                     )
                 else if (!BaresipService.isStartReceived) {
                     baresipService.action = "Start"
-                    ContextCompat.startForegroundService(this, baresipService)
+                    try {
+                        ContextCompat.startForegroundService(this, baresipService)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to start service: ${e.message}")
+                    }
                     if (atStartup) moveTaskToBack(true)
                 }
             }
@@ -353,10 +365,14 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         Log.d(TAG, "Main onResume")
         nm.cancelAll()
-        if (Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29 && BaresipService.isServiceRunning) {
             val baresipService = Intent(this, BaresipService::class.java)
             baresipService.action = "Check Roles"
-            startService(baresipService)
+            try {
+                startService(baresipService)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start service in onResume: ${e.message}")
+            }
         }
     }
 
@@ -448,12 +464,16 @@ class MainActivity : ComponentActivity() {
         if (BaresipService.isServiceRunning) {
             restart = reStart
             baresipService.action = "Stop"
-            startService(baresipService)
+            try {
+                startService(baresipService)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to stop service: ${e.message}")
+            }
         }
         else {
             finishAndRemoveTask()
             if (reStart)
-                quitRestart(true)
+                reStart()
             else
                 exitProcess(0)
         }
