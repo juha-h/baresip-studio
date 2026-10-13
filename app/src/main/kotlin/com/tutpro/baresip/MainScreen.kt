@@ -838,13 +838,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                 enabled = aor.isNotEmpty(),
                 onClick = {
                     if (checkLockedAndToast(ctx)) return@DockedToolbarItem
-                    if (isMobile && !Utils.isDefaultSmsApp(ctx)) {
-                        alertTitle.value = ctx.getString(R.string.notice)
-                        alertMessage.value = ctx.getString(R.string.enable_default_messaging)
-                        showAlert.value = true
-                    }
-                    else
-                        navController.navigate("chats/$aor")
+                    navController.navigate("chats/$aor")
                 },
                 icon = Icons.AutoMirrored.Filled.Chat,
                 contentDescription = chatsLabel,
