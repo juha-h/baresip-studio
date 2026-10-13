@@ -133,49 +133,8 @@ class MainActivity : ComponentActivity() {
 
         initialized = true
 
-        val restartApp = {
-            Log.i(TAG, "Restarting baresip")
-            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            if (BaresipService.isServiceRunning) {
-                restart = true
-                baresipService.action = "Stop"
-                try {
-                    startService(baresipService)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to stop service: ${e.message}")
-                }
-            }
-            else {
-                finishAndRemoveTask()
-                val pm = applicationContext.packageManager
-                val intent = pm.getLaunchIntentForPackage(applicationContext.packageName)
-                if (intent != null) {
-                    applicationContext.startActivity(intent)
-                    exitProcess(0)
-                }
-                else
-                    Log.e(TAG, "Failed to restart: Launch intent is null")
-            }
-        }
-
-        val quitApp = {
-            Log.i(TAG, "Quiting baresip")
-            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            if (BaresipService.isServiceRunning) {
-                restart = false
-                baresipService.action = "Stop"
-                try {
-                    startService(baresipService)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to stop service: ${e.message}")
-                }
-            }
-            else {
-                finishAndRemoveTask()
-                exitProcess(0)
-            }
-        }
+        val restartApp = { quitRestart(true) }
+        val quitApp = { quitRestart(false) }
 
         baresipService = Intent(this@MainActivity, BaresipService::class.java)
 
