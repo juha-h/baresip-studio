@@ -1,0 +1,3 @@
+- Keep call and chat history of mobile account as long as it has default phone app role or default messaging app role
+- Avoid crash and don't loose mobile account's chat history when baresip looses default phone app role
+- New translations (Chinese)
