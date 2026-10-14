@@ -1,0 +1,2 @@
+- Several fixes and improvements related to enabling/disabling video during call
+- Upstream fix of video call ZRTP negotiation 
