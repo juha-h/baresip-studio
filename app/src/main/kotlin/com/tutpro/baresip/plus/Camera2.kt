@@ -55,11 +55,18 @@ class Camera2(
     @RequiresPermission(Manifest.permission.CAMERA)
     @Suppress("unused")
     fun startCamera(previewSurface: Surface?, facing: Int) {
+        val width = if (w > 0) w else 640
+        val height = if (h > 0) h else 480
         this.previewSurface = previewSurface
         isFrontFacing = (facing == CameraCharacteristics.LENS_FACING_FRONT)
         startBackground()
-        imageReader = ImageReader.newInstance(w, h, ImageFormat.YUV_420_888, 3).apply {
-            setOnImageAvailableListener(imageAvailListener, bgHandler)
+        try {
+            imageReader = ImageReader.newInstance(width, height, ImageFormat.YUV_420_888, 3).apply {
+                setOnImageAvailableListener(imageAvailListener, bgHandler)
+            }
+        } catch (e: Exception) {
+            Log.e("Camera2", "Failed to create ImageReader: ${e.message}")
+            return
         }
         isRunning = true
         try {
@@ -69,7 +76,8 @@ class Camera2(
                 sensorOrientation = characteristics?.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
                 cameraManager?.openCamera(id, camStateCallback, bgHandler)
             }
-        } catch (e: CameraAccessException) {
+        } catch (e: Exception) {
+            Log.e("Camera2", "Exception opening camera: ${e.message}")
             e.printStackTrace()
         }
 
@@ -175,7 +183,11 @@ class Camera2(
                             try {
                                 session.setRepeatingRequest(builder.build(), null, bgHandler)
                             } catch (e: CameraAccessException) {
-                                e.printStackTrace()
+                                Log.e("Camera2", "CameraAccessException in setRepeatingRequest: ${e.message}")
+                            } catch (e: IllegalStateException) {
+                                Log.e("Camera2", "CameraDevice closed in setRepeatingRequest: ${e.message}")
+                            } catch (e: Exception) {
+                                Log.e("Camera2", "Exception in setRepeatingRequest: ${e.message}")
                             }
                         }
                         override fun onConfigureFailed(session: CameraCaptureSession) {
@@ -186,8 +198,8 @@ class Camera2(
 
                 camera.createCaptureSession(sessionConfig)
 
-            } catch (e: CameraAccessException) {
-                Log.e(TAG, "CameraAccessException: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("Camera2", "Exception in onOpened: ${e.message}")
                 e.printStackTrace()
             } catch (e: IllegalStateException) {
                 Log.e(TAG, "IllegalStateException: ${e.message}")

@@ -85,8 +85,16 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         Api.call_stop_video_display(callp)
     }
 
+    var currentVideoSource: Boolean? = null
+
     open fun setVideoSource(front: Boolean): Int {
-        return Api.call_set_video_source(callp, front)
+        if (currentVideoSource == front && videoEnabled()) {
+            Log.d("Baresip", "Video source already set to front=$front on enabled video, skipping redundant call")
+            return 0
+        }
+        val res = Api.call_set_video_source(callp, front)
+        currentVideoSource = if (videoEnabled()) front else null
+        return res
     }
 
     open fun resume(): Boolean {

@@ -1879,7 +1879,7 @@ private fun CallRow(
                 Spacer(modifier = Modifier.width(12.dp))
             }
 
-            if (call.showHangupButton.value && call.conferenceCall) {
+            if (call.showHangupButton.value && call.conferenceCall)
                 IconButton(
                     modifier = Modifier.size(48.dp),
                     enabled = !call.terminated.value,
@@ -1898,19 +1898,19 @@ private fun CallRow(
                     )
                 }
 
+            if (call.showHangupButton.value && !call.conferenceCall) {
                 if (call.videoIcon.value != Video.NONE)
                     IconButton(
                         modifier = Modifier.size(48.dp).padding(start = 4.dp),
                         onClick = {
+                            if (checkLockedAndToast(ctx) || call.callOnHold.value || call.held)
+                                return@IconButton
                             call.videoIcon.value = Video.PENDING
                             videoClick(ctx, call)
                         }
                     ) {
                         Icon(
-                            imageVector = if (call.videoIcon.value == Video.OFF)
-                                Icons.Filled.VideocamOff
-                            else // Video.ON, Video.PENDING
-                                Icons.Filled.VideoCall,
+                            imageVector = Icons.Filled.VideoCall,
                             modifier = Modifier.size(48.dp),
                             tint = if (call.videoIcon.value == Video.PENDING)
                                 colorResource(R.color.colorTrafficYellow)
@@ -1919,10 +1919,9 @@ private fun CallRow(
                             contentDescription = null,
                         )
                     }
-            }
 
-            if (call.showHangupButton.value && !call.conferenceCall)
-                IconButton(    modifier = Modifier.size(48.dp),
+                IconButton(
+                    modifier = Modifier.size(48.dp),
                     onClick = {
                         if (checkLockedAndToast(ctx)) return@IconButton
                         if (call.callOnHold.value) {
@@ -1945,6 +1944,7 @@ private fun CallRow(
                         contentDescription = null,
                     )
                 }
+            }
 
             var showTransferDialog by remember { mutableStateOf(false) }
 
@@ -2278,14 +2278,9 @@ private fun CallRow(
                         }
                         call.dtmfText.value = newText
                     },
-                    modifier = Modifier
-                        .width(80.dp)
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.width(60.dp).focusRequester(focusRequester),
                     enabled = call.dtmfEnabled.value,
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
+                    textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     singleLine = true,
@@ -2299,7 +2294,7 @@ private fun CallRow(
                             enabled = call.dtmfEnabled.value,
                             interactionSource = interactionSource,
                             label = { Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp)) },
-                            contentPadding = PaddingValues(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                            contentPadding = PaddingValues(start = 6.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -2315,7 +2310,6 @@ private fun CallRow(
                 CallTimer(
                     initialDurationSeconds = call.callDuration.toLong(),
                     modifier = Modifier.padding(end = 2.dp, top = 6.dp)
-
                 )
 
             if (call.showHangupButton.value)
@@ -2497,13 +2491,12 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
     var call by remember { mutableStateOf<Call?>(null) }
 
     LaunchedEffect(Unit) {
-        delay(1000.milliseconds)
         val ua = UserAgent.ofAor(viewModel.selectedAor.value)
         if (ua != null) {
             val currentCall = ua.currentCall()
             call = currentCall
-            Log.d(TAG, "Syncing video source to Front (sending ${isFrontCamera})")
-            call?.setVideoSource(isFrontCamera)
+            if (currentCall?.videoEnabled() == true && Utils.isCameraAvailable(ctx))
+                currentCall.setVideoSource(isFrontCamera)
         }
     }
 
@@ -2653,6 +2646,7 @@ fun VideoLayout(ctx: Context, viewModel: ViewModel, onCloseVideo: () -> Unit) {
                 IconButton(
                     onClick = {
                         call?.setVideoDirection(Api.SDP_INACTIVE)
+                        call?.videoIcon?.value = Video.OFF
                         onCloseVideo()
                     }
                 ) {
@@ -3023,10 +3017,6 @@ private fun answer(ctx: Context, call: Call, videoCall: Boolean) {
         else
             Api.SDP_RECVONLY
         call.setMediaDirection(Api.SDP_SENDRECV, videoDir)
-        if (call.videoEnabled()) {
-            Log.d(TAG, "Enabling video layout at answer")
-            showVideoLayout.value = true
-        }
     }
     else {
         call.setMediaDirection(Api.SDP_SENDRECV, Api.SDP_INACTIVE)
@@ -3187,8 +3177,16 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
                     call.securityIconTint.value = call.security
                 call.showCallButton.value = false
                 call.showCallVideoButton.value = false
-                if (call.hasVideo())
-                    call.videoIcon.value = Video.ON
+                if (call.hasVideo()) {
+                    if (call.videoEnabled()) {
+                        call.videoIcon.value = Video.ON
+                        showVideoLayout.value = true
+                    }
+                    else
+                        call.videoIcon.value = Video.OFF
+                }
+                else if (!call.ua.account.isMobile && Utils.isCameraAvailable(ctx))
+                    call.videoIcon.value = Video.OFF
                 call.showCancelButton.value = false
                 call.showHangupButton.value = true
                 call.showAnswerRejectButtons.value = false
@@ -3343,7 +3341,15 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.dialerState.callButtonsEnabled.value = true // Re-enable dialer
                 val callp = params[1] as Long
                 val call = Call.ofCallp(callp)
-                if (call != null) call.dtmfText.value = ""
+                if (call != null) {
+                    call.dtmfText.value = ""
+                    if (call.videoEnabled()) {
+                        Log.d(TAG, "Enabling video layout at call established")
+                        if (Utils.isCameraAvailable(ctx))
+                            call.setVideoSource(BaresipService.isCameraFront)
+                        showVideoLayout.value = true
+                    }
+                }
             }
         }
         "call update" -> {
@@ -3353,8 +3359,9 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 handleNextEvent("handleServiceEvent 'call update' did not find call $callp")
                 return
             }
-            if (call.hasVideo()) {
-                Log.d(TAG, "Enabling video layout at call update")
+            if (call.status.value == "connected" && call.hasVideo()) {
+                if (call.videoEnabled() && Utils.isCameraAvailable(ctx))
+                    call.setVideoSource(BaresipService.isCameraFront)
                 showVideoLayout.value = true
             }
         }
