@@ -1,0 +1,2 @@
+- Fixed crash that occurred when ZRTP peer verification was requested
+- Avoid settings related crash by checking that config has been initialized
