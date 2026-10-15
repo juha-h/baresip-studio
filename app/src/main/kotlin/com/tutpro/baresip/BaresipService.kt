@@ -3614,7 +3614,6 @@ class BaresipService: Service() {
         var pendingCallIntent: Intent? = null
         var mobileNumber = ""
         var isStartReceived = false
-        var isConfigInitialized = false
         var libraryLoaded = false
         var callVolume = 0
         var maxMmsImagesSize = 600 * 1024

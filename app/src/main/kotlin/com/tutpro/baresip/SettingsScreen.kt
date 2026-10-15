@@ -1340,6 +1340,8 @@ private fun SettingsContent(
 
 private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
 
+    if (!Config.isInitialized()) return true
+
     val noticeTitle = ctx.getString(R.string.notice)
 
     if ((Config.variable("auto_start") == "yes") != viewModel.autoStart.value) {
