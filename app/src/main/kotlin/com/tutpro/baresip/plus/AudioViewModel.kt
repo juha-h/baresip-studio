@@ -73,6 +73,8 @@ class AudioViewModel : ViewModel() {
     }
 
     fun saveSettings(ctx: Context): Result {
+        if (!Config.isInitialized()) return Result.OK
+
         var restart = false
         var save = false
 

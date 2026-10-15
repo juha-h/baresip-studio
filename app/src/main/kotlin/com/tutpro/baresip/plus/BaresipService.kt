@@ -3691,7 +3691,6 @@ class BaresipService: Service() {
         var pendingCallIntent: Intent? = null
         var mobileNumber = ""
         var isStartReceived = false
-        var isConfigInitialized = false
         var libraryLoaded = false
         var supportedCameras = false
         var isCameraFront = true

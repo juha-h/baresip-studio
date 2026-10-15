@@ -49,7 +49,6 @@ object Config {
         else
             previousConfig = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
         previousLines = previousConfig.split("\n")
-        initialized = true
 
         val logLevel = previousVariable("log_level")
         if (logLevel == "") {
@@ -314,9 +313,8 @@ object Config {
         else
             "${config}ilbc_mode 20\n"
 
+        initialized = true
         save()
-        BaresipService.isConfigInitialized = true
-
     }
 
     private fun previousVariable(name: String): String {
@@ -380,6 +378,7 @@ object Config {
     }
 
     fun save() {
+        if (!initialized) return
         Utils.putFileContents(configPath, config.toByteArray())
         Log.d(TAG, "Saved new config '$config'")
         // Api.reload_config()

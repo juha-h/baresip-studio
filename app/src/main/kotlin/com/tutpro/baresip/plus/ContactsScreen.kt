@@ -341,6 +341,7 @@ private fun ContactsScreen(navController: NavController) {
     )
 
     fun setContactsMode(mode: String) {
+        if (!Config.isInitialized()) return
         if (Config.variable("contacts_mode").lowercase() != mode) {
             Config.replaceVariable("contacts_mode", mode)
             BaresipService.contactsMode = mode
