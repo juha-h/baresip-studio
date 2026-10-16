@@ -1,0 +1,3 @@
+- No need anymore to restart app after account is configured from network
+- Un-escape tel URI received from external dialer via Telecom Framework (credits to Roger Albrecht)
+- Don't unregister phone accounts when baresip starts
