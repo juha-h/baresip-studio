@@ -113,7 +113,7 @@ fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
             checkOnClick = {
                 val ok = checkOnClick(ctx, viewModel, ua)
                 if (ok) {
-                    if (reRegister) ua.reRegister()
+                    if (reRegister || (kind == "new" && ua.account.regint > 0)) ua.reRegister()
                     navController.navigateUp()
                 }
             },
@@ -1814,9 +1814,16 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
 
                         XmlPullParser.END_TAG ->
                             when (tag) {
-                                "outbound-proxy-1" -> if (text.isNotEmpty()) acc.outbound.add(text)
+                                "outbound-proxy-1" -> if (text.isNotEmpty()) {
+                                    acc.outbound.add(text)
+                                    Api.account_set_outbound(acc.accp, text, 0)
+                                    Api.account_set_sipnat(acc.accp, "outbound")
+                                }
 
-                                "outbound-proxy-2" -> if (text.isNotEmpty()) acc.outbound.add(text)
+                                "outbound-proxy-2" -> if (text.isNotEmpty()) {
+                                    acc.outbound.add(text)
+                                    Api.account_set_outbound(acc.accp, text, 1)
+                                }
 
                                 "registration-interval" ->
                                     acc.configuredRegInt = try {
@@ -1828,6 +1835,8 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
                                 "register" -> {
                                     acc.regint = if (text == "yes") acc.configuredRegInt else 0
                                     if (acc.regint > 0) acc.checkOrigin = true
+                                    Api.account_set_regint(acc.accp, acc.regint)
+                                    Api.account_set_check_origin(acc.accp, acc.checkOrigin)
                                 }
 
                                 "audio-codec" -> if (text in audioCodecs) acc.audioCodec.add(text)
@@ -1836,44 +1845,66 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
 
                                 "media-encoding" -> {
                                     val enc = text.lowercase(Locale.ROOT)
-                                    if (enc in mediaEncMap.keys && enc.isNotEmpty())
+                                    if (enc in mediaEncMap.keys && enc.isNotEmpty()) {
                                         acc.mediaEnc = enc
+                                        Api.account_set_mediaenc(acc.accp, enc)
+                                    }
                                 }
 
                                 "media-nat" -> {
                                     val nat = text.lowercase(Locale.ROOT)
-                                    if (nat in mediaNatMap.keys && nat.isNotEmpty())
+                                    if (nat in mediaNatMap.keys && nat.isNotEmpty()) {
                                         acc.mediaNat = nat
+                                        Api.account_set_medianat(acc.accp, nat)
+                                    }
                                 }
 
-                                "stun-turn-server" -> if (text.isNotEmpty()) acc.stunServer = text
+                                "stun-turn-server" -> if (text.isNotEmpty()) {
+                                    acc.stunServer = text
+                                    Api.account_set_stun_uri(acc.accp, text)
+                                }
 
-                                "rtcp-mux" -> acc.rtcpMux = text == "yes"
+                                "rtcp-mux" -> {
+                                    acc.rtcpMux = text == "yes"
+                                    Api.account_set_rtcp_mux(acc.accp, acc.rtcpMux)
+                                }
 
-                                "100rel-mode" ->
+                                "100rel-mode" -> {
                                     acc.rel100Mode = if (text == "yes")
                                         Api.REL100_ENABLED
                                     else
                                         Api.REL100_DISABLED
+                                    Api.account_set_rel100_mode(acc.accp, acc.rel100Mode)
+                                }
 
                                 "dtmf-mode" ->
-                                    if (text in arrayOf("rtp-event", "sip-info", "auto"))
+                                    if (text in arrayOf("rtp-event", "sip-info", "auto")) {
                                         acc.dtmfMode = when (text) {
                                             "rtp-event" -> Api.DTMFMODE_RTP_EVENT
                                             "sip-info" -> Api.DTMFMODE_SIP_INFO
                                             else -> Api.DTMFMODE_AUTO
                                         }
+                                        Api.account_set_dtmfmode(acc.accp, acc.dtmfMode)
+                                    }
 
                                 "answer-mode" ->
-                                    if (text in arrayOf("manual", "auto"))
+                                    if (text in arrayOf("manual", "auto")) {
                                         acc.answerMode = if (text == "manual")
                                             Api.ANSWERMODE_MANUAL
                                         else
                                             Api.ANSWERMODE_AUTO
+                                        Api.account_set_answermode(acc.accp, acc.answerMode)
+                                    }
 
-                                "redirect-mode" -> acc.autoRedirect = text == "yes"
+                                "redirect-mode" -> {
+                                    acc.autoRedirect = text == "yes"
+                                    Api.account_set_sip_autoredirect(acc.accp, acc.autoRedirect)
+                                }
 
-                                "voicemail-uri" -> if (text.isNotEmpty()) acc.vmUri = text
+                                "voicemail-uri" -> if (text.isNotEmpty()) {
+                                    acc.vmUri = text
+                                    Api.account_set_mwi(acc.accp, true)
+                                }
 
                                 "country-code" -> acc.countryCode = text
 
@@ -1882,6 +1913,10 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
                     }
                     event = parser.next()
                 }
+                if (acc.audioCodec.isNotEmpty())
+                    Api.account_set_audio_codecs(acc.accp, acc.audioCodec.joinToString(","))
+                if (acc.videoCodec.isNotEmpty())
+                    Api.account_set_video_codecs(acc.accp, acc.videoCodec.joinToString(","))
             } catch (e: XmlPullParserException) {
                 val line = parser.lineNumber
                 val column = parser.columnNumber

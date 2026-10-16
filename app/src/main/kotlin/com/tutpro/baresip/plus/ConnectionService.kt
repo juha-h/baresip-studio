@@ -157,7 +157,7 @@ class ConnectionService : ConnectionService() {
 
         if (!pstnCall) {
             connection.audioModeIsVoip = true
-            val addressStr = request?.address?.toString() ?: ""
+            val addressStr = Utils.uriUnescape(request?.address?.toString() ?: "")
             val peerUri = if (addressStr.startsWith("tel:"))
                 addressStr
             else if (Utils.isTelNumber(destination))
