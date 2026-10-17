@@ -51,7 +51,6 @@ class InCallService : InCallService() {
     }
 
     companion object {
-        private const val TAG = "Baresip"
         private var _instance = WeakReference<InCallService>(null)
         var instance: InCallService?
             get() = _instance.get()
