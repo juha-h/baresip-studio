@@ -1,0 +1,3 @@
+- Förebyggde en möjlig krasch kopplad till kontaktförslag
+- Åtgärdade rensningen av missade samtal och meddelanden när man återgår till huvudskärmen
+- Nya översättningar (kinesiska och tjeckiska)

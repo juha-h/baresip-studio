@@ -1,0 +1,5 @@
+- Lade till möjlighet att ange etiketter för kontakter
+- Visar även kontaktens etikett tillsammans med namnet där det passar
+- Döljer Androids mikrofonikon i systemfältet när ljudet är avstängt under ett samtal
+- Rättade fel och förbättrade säkerhetskopiering och återställning
+- Nya översättningar (kinesiska och franska)

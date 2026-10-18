@@ -1,0 +1,6 @@
+- Lade till skärmen Blockering i kontoinställningarna, med en lista över blockerade nummer
+- Lade till möjlighet att blockera samtals- och meddelandekontakter
+- Lade till länken SIM-hanterare i mobilkontots inställningar
+- Åtgärdade bakgrundsfärgen på det nedre navigeringsfältet på vissa skärmar
+- Åtgärdade borttagning av aviseringen om inkommande samtal när samtalet avvisas
+- Nya översättningar (kinesiska och finska)

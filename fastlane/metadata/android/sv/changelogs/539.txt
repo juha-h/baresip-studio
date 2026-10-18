@@ -1,0 +1,4 @@
+- Skapar inte mobilkontot om SIM-kortet endast används för data
+- Förbättrade hjälptexten för Unik kontakt-URI
+- Undviker den felaktiga aviseringen ”Ingen nätverksanslutning”
+- Nya översättningar (kinesiska)

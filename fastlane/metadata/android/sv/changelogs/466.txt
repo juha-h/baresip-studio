@@ -1,0 +1,2 @@
+- Åtgärdade ett fel vid återställning av inställningen Blockera okända
+- Nya översättningar (kinesiska)

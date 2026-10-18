@@ -1,0 +1,2 @@
+- Åtgärdade en krasch som uppstod vid begäran om ZRTP-verifiering av motparten
+- Förebygger krascher kopplade till inställningar genom att kontrollera att konfigurationen har initierats

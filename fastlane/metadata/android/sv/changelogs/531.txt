@@ -1,0 +1,4 @@
+- Lade även till knappen Redigera i det övre fältet på Androids kontaktskärm
+- Använder även baresips avisering om missat samtal för missade mobilsamtal
+- Återställde möjligheten att aktivera högtalartelefonen innan samtalet börjar
+- Nya översättningar från Weblate (ryska)

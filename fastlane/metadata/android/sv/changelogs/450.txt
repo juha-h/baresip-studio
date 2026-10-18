@@ -1,0 +1,3 @@
+- Uteslut stjärnmarkerade Android-kontakter från Stör ej-läget
+- Förlora inte innehållet i ett nytt meddelande som ännu inte har skickats
+- Nya översättningar (svenska)

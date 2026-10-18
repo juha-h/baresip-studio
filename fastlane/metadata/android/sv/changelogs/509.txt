@@ -1,0 +1,4 @@
+- Inaktiverar långt tryck på kontoväljaren och svep mellan skärmar när mobilkontot är valt
+- Döljer inspelningsikonen i det övre fältet när mobilkontot är valt
+- Visar mobilkontots status i rött när mobilanslutningen bryts
+- Förebygger krascher vid ändringar av samtalsstatus

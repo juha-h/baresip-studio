@@ -1,0 +1,3 @@
+- Avbryter helskärmsaviseringen när samtalet avslutas
+- Skickar även en avisering om missat samtal när baresip-appen inte visas
+- Avbryter helskärmsaviseringen när samtalet avslutas

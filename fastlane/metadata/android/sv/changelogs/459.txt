@@ -1,0 +1,4 @@
+- Ersatte baresips startikon i PNG-format med en vektorgrafik
+- Ersatte ikonerna för samtal, avsluta samtal, lås, framåt-/bakåtriktad kamera och skärmbild med Material Design-ikoner
+- Lade till en kontur runt textfältet för DTMF-siffror
+- Förbättrade och rättade aviseringar

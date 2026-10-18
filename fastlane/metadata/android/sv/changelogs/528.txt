@@ -1,0 +1,2 @@
+- Åtgärdade hanteringen av aviseringar om missade mobilsamtal
+- Nya översättningar (spanska)

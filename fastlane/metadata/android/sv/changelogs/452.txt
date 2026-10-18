@@ -1,0 +1,3 @@
+- Behåll ändringar av konton och inställningar tills användaren trycker på bock- eller bakåtknappen
+- Använd även TLS-certifikat från CA-filen när ett konto förkonfigureras via nätverket
+- Lämna inte inställningarna om ett inmatningsfel uppstår

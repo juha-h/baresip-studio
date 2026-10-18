@@ -1,0 +1,3 @@
+- Förebygger en krasch vid skärmrotation
+- Hämtade en uppströmsrättning för SIP-svaret 183 Session Progress
+- Uppdaterade översättningar (engelska, finska)

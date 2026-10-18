@@ -1,0 +1,4 @@
+- Spelar upp en ringsignal i två sekunder före svar när automatiskt svar är valt
+- Förbättrade placeringen av samtalsknappen
+- Släpper ljudfokus när samtalet avslutas
+- Nya översättningar (kinesiska)

@@ -1,0 +1,4 @@
+- Tillåter inte osäkra åtgärder under ett samtal när enheten är låst
+- Kräver att enheten låses upp innan man agerar på en avisering om ett mottaget meddelande
+- Förebygger möjliga krascher när appen avslutas eller man navigerar mellan skärmar
+- Förebygger en krasch om kontomallen innehåller en ogiltig XML-post

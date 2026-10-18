@@ -1,0 +1,3 @@
+- Appen behöver inte längre startas om när kontot konfigureras via nätverket
+- Avkodar tel-URI:n från en extern uppringningsapp via Telecom Framework (tack till Roger Albrecht)
+- Avregistrerar inte telefonkonton när baresip startar

@@ -1,0 +1,6 @@
+= Flyttade valet av kontaktläge från inställningsskärmen till menyn på kontaktskärmen
+- Flyttade ringsignalen från inställningsskärmen till ljudinställningarna
+- Rättade fel och förbättrade högtalartelefonen
+- Förbättrade inställningen Starta automatiskt
+- Stöder både MODE_IN_CALL och MODE_IN_COMMUNICATION som samtalslägen
+- Förebygger en krasch kopplad till inmatningsmetoden på vissa enheter

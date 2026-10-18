@@ -1,0 +1,3 @@
+- Visar även kontakter vars TEL-URI matchar söktexten vid sökning på kontaktskärmen
+- Förbättrade etiketter för kontaktens URI
+- Åtgärdade att man behövde trycka två gånger på bakåtknappen för att lämna chattskärmen

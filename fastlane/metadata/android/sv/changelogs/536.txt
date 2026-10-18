@@ -1,0 +1,5 @@
+- Tog bort tomt ikonmellanrum från menyalternativen för samtal och kontakter
+- Bytte namn på strängen blocking_list till blocking_rules
+- Begränsade blockeringsreglerna till respektive konto
+- Rensar alla blockeringsrelaterade uppgifter för kontot när det tas bort
+- Nya översättningar (kinesiska)

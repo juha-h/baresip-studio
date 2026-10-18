@@ -1,0 +1,2 @@
+- Rättade fel och förbättrade blockeringen
+- Nya översättningar (kinesiska och finska)

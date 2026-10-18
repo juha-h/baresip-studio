@@ -1,0 +1,3 @@
+- Chattskärmen för mobilkontot stöder nu sändning av MMS
+- Förbättrade samtalsgränssnittet på huvudskärmen
+- Nya översättningar (flera språk)

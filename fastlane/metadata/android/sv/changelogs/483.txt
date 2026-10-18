@@ -1,0 +1,2 @@
+- Åtgärdade ett fel på codecskärmen
+- Nya översättningar (franska och hebreiska)

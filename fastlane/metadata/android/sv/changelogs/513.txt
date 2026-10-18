@@ -1,0 +1,3 @@
+- Lade till möjlighet att kopiera URI:er till urklipp från samtals- och kontaktskärmarna
+- Tog bort tel:-URI-schemat när telefonnumret visas på vissa skärmar
+- Nya översättningar (flera språk)

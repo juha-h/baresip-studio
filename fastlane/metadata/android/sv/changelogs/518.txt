@@ -1,0 +1,6 @@
+- Förbättrade kontrollen av om ett SIM-kort finns
+- Kör tunga startåtgärder i en bakgrundstråd för att undvika att gränssnittet låser sig
+- Kontrollerar om baresips standardapproller har ändrats när appen återupptas
+- Tillåter rollen som standardapp för meddelanden utan att baresip är standardapp för samtal
+- Visar inställningen för batterioptimering bara när baresip inte är standardapp för samtal eller meddelanden
+- Tog bort stödet för den gamla samtalshistoriken

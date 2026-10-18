@@ -1,0 +1,5 @@
+- Visar knappen för att avsluta samtalet på en egen rad
+- Stänger inte av högtalartelefonen efter samtalet om ljudinställningen Högtalartelefon är aktiverad
+- Åtgärdade tillägg av deltagare till konferenssamtal
+- Tog in en uppströmsrättning för avisering om misslyckad avregistrering
+- Nya översättningar (kinesiska och indonesiska)

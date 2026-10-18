@@ -1,0 +1,3 @@
+- Tog bort G.726-codecen eftersom den hade för många beroenden
+- Lade till den mindre beroendetunga G.722-codecen
+- Nya översättningar (svenska, tjeckiska och kinesiska)

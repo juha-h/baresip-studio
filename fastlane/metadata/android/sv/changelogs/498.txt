@@ -1,0 +1,5 @@
+- Lade till hantering av svara-, avvisa- och avsluta-knappar på Bluetooth-enheter i Telecom Framework
+- Åtgärdade aktivering och inaktivering av samtalsknappar
+- Återställer rätt mörkt tema efter återställning
+- Lade till null-kontroller för att förebygga möjliga krascher
+- Nya översättningar (kinesiska och spanska)

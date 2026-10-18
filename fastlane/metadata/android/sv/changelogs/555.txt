@@ -1,0 +1,2 @@
+- Tar bort behörigheter till samtalsloggen (de behövs inte och Google godkänner dem inte)
+- Nya översättningar (kinesiska och svenska)

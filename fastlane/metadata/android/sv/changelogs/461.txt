@@ -1,0 +1,3 @@
+- Använder en Compose-baserad samtalstidtagare
+- Åtgärdade ett möjligt race condition när skärmen roteras
+- Nya översättningar (kinesiska)

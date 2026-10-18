@@ -1,0 +1,7 @@
+- Förbättrade identifieringen av SIM-kort
+- Kör tunga startjobb i bakgrunden så gränssnittet inte låser sig
+- Kontrollerar baresips standardapproller när appen återupptas
+- Tillåter standardroll för meddelanden utan standardroll för samtal
+- Visar batterioptimering endast om baresip inte är standardapp för samtal eller meddelanden
+- Tog bort stödet för gammal samtalshistorik
+- Åtgärdade den felaktiga varningen ”Inget nätverk” i version 85.1.0

@@ -1,0 +1,7 @@
+- Skapar mobilkontot bara om ett SIM-kort finns
+- Säkerställer att SIP-användaragenten bara skapas en gång
+- Lade till wss bland kontots transportprotokoll
+- Förbättrade hjälptexterna Om, Konton och Utgående proxyservrar
+- Lade till strängen mobile_service_not_available och motsvarande avisering
+- Förbättrade aviseringsdialogrutan
+- Nya översättningar (flera språk)

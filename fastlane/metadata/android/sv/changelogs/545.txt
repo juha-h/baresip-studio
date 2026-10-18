@@ -1,0 +1,5 @@
+- Lade till ljudinställningen iLBC-läge
+- Förbättrade visningen av kontaktens namn i URI-fältet för samtal och nya chattar
+- Aktiverar åter inställningen Unik kontakt-URI som standard
+- Ökade storleken på meddelandehistoriken till 256
+- Nya översättningar (kinesiska)

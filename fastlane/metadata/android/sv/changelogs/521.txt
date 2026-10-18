@@ -1,0 +1,3 @@
+- Lade till stöd för USSD (ostrukturerade tilläggstjänster) till mobilkontot
+- Åtgärdade matchning av blockeringsregler för inkommande mobilsamtal
+- Nya översättningar (tjeckiska och indonesiska)

@@ -1,0 +1,3 @@
+- Tillåter tomt lösenord för säkerhetskopiering och återställning
+- Förbättrade kompatibiliteten med kant-till-kant-visning
+- Optimerade avkodningen av avatarbilder

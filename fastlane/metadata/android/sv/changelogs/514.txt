@@ -1,0 +1,3 @@
+- Tillåter mobilsamtal i flygplansläge när Wi-Fi-samtal är aktiverat
+- Åtgärdade visningen av plustecknet vid mobilsamtal till utländska nummer
+- Nya översättningar (flera språk)

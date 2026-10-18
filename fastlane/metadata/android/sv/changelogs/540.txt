@@ -1,0 +1,1 @@
+- Lade till underinställningen Skapa mobilkonto till Standardapp för telefoni, eftersom det inte går att avgöra tillförlitligt om enheten har ett SIM-kort som kan ringa samtal och skicka SMS

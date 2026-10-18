@@ -1,0 +1,2 @@
+- Lade till stöd för att ta emot MMS
+- Förbättrade chattlistan något

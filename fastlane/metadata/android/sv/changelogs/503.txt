@@ -1,0 +1,2 @@
+- Baresip-appen kan nu användas som standardapp för telefoni och även hantera mobilsamtal (se användningstipsen på skärmen Om)
+- Det här är en större uppgradering som kan innehålla fel

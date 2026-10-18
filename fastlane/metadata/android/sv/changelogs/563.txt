@@ -1,0 +1,2 @@
+- Sparar av säkerhetsskäl inte längre mobilsamtal i systemets samtalslogg
+- Nya översättningar (kinesiska)

@@ -1,0 +1,2 @@
+- Lade till skärmar för blockerade samtal och meddelanden
+- Undviker att visa en tom skärm när man trycker upprepade gånger på bakåt- eller bockikonen

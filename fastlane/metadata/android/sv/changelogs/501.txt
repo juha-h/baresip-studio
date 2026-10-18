@@ -1,0 +1,5 @@
+- Visar även den som vidarekopplar ett inkommande samtal i aviseringen, om sådan finns
+- Lade till avsändarens avatar i aviseringen om inkommande meddelande
+- Sänkte tidsgränsen för inkommande samtal till 60 sekunder
+- Tog bort rekommendationen att stänga av batterioptimering
+- Nya översättningar (kinesiska, finska och spanska)

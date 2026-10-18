@@ -1,0 +1,3 @@
+- Åtgärdade bakgrunden för startikonen
+- Förbättrade visningen av samtalsikoner
+- Nya översättningar (hebreiska)

@@ -1,0 +1,3 @@
+- Rensar efter återställning markeringar om inspelade samtal från samtalslistan och samtalsdetaljerna
+- Lade till möjlighet att spara en samtalsinspelning med ett långt tryck på samtalstiden och att radera samtalshistoriken med ett långt tryck på samtalstidpunkten på skärmen med samtalsdetaljer
+- Lade till förloppsindikator och stoppknapp i dialogrutan för uppspelning av inspelningar

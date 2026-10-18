@@ -1,0 +1,1 @@
+- Förbättrade synligheten för fältet ”Ring från” på huvudskärmen och SIP-URI-fältet på kontoskärmen
