@@ -4,6 +4,6 @@ Static libraries and include files need to be generated to distribution director
 
 Video calling is possible on devices that include Camera2 API at hardware support level LIMITED or higher.
 
-Ready to be installed baresip+ app is available from <a href="https://f-droid.org/en/packages/com.tutpro.baresip.plus">F-Droid</a> and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.
+Ready to be installed baresip+ app is available from <a href="https://f-droid.org/en/packages/com.tutpro.baresip.plus">F-Droid</a>, <a href="https://play.google.com/store/apps/details?id=com.tutpro.baresip.plus">Play Store</a>, and from <a href="https://github.com/juha-h/baresip-studio/releases">GitHub</a>.
 
 Copyright (c) 2020 TutPro Inc. Distributed under GNU GPL license.
