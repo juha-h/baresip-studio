@@ -92,6 +92,13 @@ class ViewModel: ViewModel() {
     private var lastRenderedStatus = ""
     private var lastRenderedSecurity = -1
 
+    fun resetUIRendered() {
+        lastRenderedAor = ""
+        lastRenderedCallp = 0L
+        lastRenderedStatus = ""
+        lastRenderedSecurity = -1
+    }
+
     fun isUIRedundant(aor: String, callp: Long, status: String, security: Int): Boolean {
         return aor == lastRenderedAor && callp == lastRenderedCallp &&
                 status == lastRenderedStatus && security == lastRenderedSecurity

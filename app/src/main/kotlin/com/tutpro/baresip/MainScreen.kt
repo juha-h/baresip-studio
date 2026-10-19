@@ -271,11 +271,14 @@ private fun MainScreen(
                         (ctx as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     else
                         (ctx as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+                    viewModel.resetUIRendered()
+
                     (Call.call("incoming") ?: Call.calls().lastOrNull())?.let {
-                        spinToAor(viewModel, it.ua.account.aor, it)
+                        spinToAor(viewModel, it.ua.account.aor, it, force = true)
                     } ?: run {
                         if (uas.value.isNotEmpty() && viewModel.selectedAor.value == "")
-                            spinToAor(viewModel, uas.value.first().account.aor)
+                            spinToAor(viewModel, uas.value.first().account.aor, force = true)
                         else
                             viewModel.triggerAccountUpdate()
                     }
@@ -1277,7 +1280,13 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
         else if (selected == "" || UserAgent.ofAor(selected) == null)
             viewModel.updateSelectedAor(uas.value.first().account.aor)
         val ua = UserAgent.ofAor(viewModel.selectedAor.value)
-        if (ua != null) showCall(ctx, viewModel, ua, viewModel.focusedCall.value)
+        if (ua != null) {
+            val callToShow = if (viewModel.focusedCall.value?.ua?.account?.aor == ua.account.aor)
+                viewModel.focusedCall.value
+            else
+                ua.currentCall()
+            showCall(ctx, viewModel, ua, callToShow)
+        }
     }
 
     if (selected == "") {
@@ -2304,11 +2313,11 @@ private fun OnHoldNotice() {
     }
 }
 
-private fun spinToAor(viewModel: ViewModel, aor: String, call: Call? = null) {
+private fun spinToAor(viewModel: ViewModel, aor: String, call: Call? = null, force: Boolean = false) {
     val aorChanged = aor != viewModel.selectedAor.value
     val callChanged = call != viewModel.focusedCall.value
     val statusChanged = call != null && call.status.value != viewModel.focusedCall.value?.status?.value
-    if (aorChanged || callChanged || statusChanged) {
+    if (force || aorChanged || callChanged || statusChanged) {
         if (aorChanged) viewModel.updateSelectedAor(aor)
         viewModel.triggerAccountUpdate(call)
     }
