@@ -2582,6 +2582,7 @@ class BaresipService: Service() {
         if (!Call.inCall()) {
             proximitySensing(false)
             stopMediaPlayer()
+            ensureCommunicationMode()
         }
         updateStatusNotification()
         messageUpdate.postValue(System.currentTimeMillis())
@@ -3081,14 +3082,15 @@ class BaresipService: Service() {
     private fun ensureCommunicationMode() {
         val currentMode = am.mode
         val isAnyCallMode = currentMode == MODE_IN_COMMUNICATION || currentMode == MODE_IN_CALL
+        val isCallActive = Call.inCall() || currentMode == MODE_IN_CALL
 
-        if (Call.inCall() && isAnyCallMode)
+        if (isCallActive && isAnyCallMode)
             cleanupRunnable?.let {
                 Log.d(TAG, "Canceling pending speakerphone cleanup because call is active")
                 Handler(Looper.getMainLooper()).removeCallbacks(it)
                 cleanupRunnable = null
             }
-        else if (!Call.inCall() && currentMode == MODE_NORMAL)
+        else if (!isCallActive && currentMode == MODE_NORMAL)
             return
 
         Log.d(TAG, "Scheduling ensureCommunicationMode (current: $currentMode) in 500ms " +
@@ -3098,7 +3100,8 @@ class BaresipService: Service() {
 
         val runnable = Runnable {
             cleanupRunnable = null
-            if (Call.inCall()) {
+            val isCallActiveNow = Call.inCall() || am.mode == MODE_IN_CALL
+            if (isCallActiveNow) {
                 val hasTelecom = Call.hasTelecomCall()
                 if (!hasTelecom && am.mode != MODE_IN_COMMUNICATION && am.mode != MODE_IN_CALL) {
                     am.mode = MODE_IN_COMMUNICATION
@@ -3116,8 +3119,8 @@ class BaresipService: Service() {
                     else if (currentRoute == android.telecom.CallAudioState.ROUTE_SPEAKER)
                         InCallService.instance!!.setAudioRoute(android.telecom.CallAudioState.ROUTE_EARPIECE)
                 }
-                else if (!hasTelecom) {
-                    Log.d(TAG, "No Telecom connection, using AudioManager for speaker")
+                else if (!hasTelecom || am.mode == MODE_IN_CALL) {
+                    Log.d(TAG, "No Telecom connection or PSTN call, using AudioManager for speaker")
                     Utils.setSpeakerPhone(am, speakerPhone)
                 }
                 else
