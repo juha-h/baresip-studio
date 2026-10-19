@@ -1776,18 +1776,24 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
 private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
     val scope = CoroutineScope(Job() + Dispatchers.Main)
     scope.launch(Dispatchers.IO) {
-        val url = "https://${Utils.uriHostPart(acc.aor)}/baresip/account_config.xml"
-        val urlConnection = URL(url).openConnection() as HttpsURLConnection
-        urlConnection.connectTimeout = 5000
-        urlConnection.readTimeout = 3000
-        val caFile = File(BaresipService.filesPath + "/ca_certs.crt")
-        val template = try {
-            if (caFile.exists())
-                Utils.readUrlWithCustomCAs(urlConnection, caFile)
-            else
-                urlConnection.inputStream.bufferedReader().use { it.readText() }
-        } catch (e: java.lang.Exception) {
-            Log.d(TAG, "Failed to get account template from network: ${e.message}")
+        val host = Utils.uriHostPart(acc.aor)
+        val template = if (host.isNotEmpty()) {
+            try {
+                val url = "https://$host/baresip/plus/account_config.xml"
+                val urlConnection = URL(url).openConnection() as HttpsURLConnection
+                urlConnection.connectTimeout = 5000
+                urlConnection.readTimeout = 3000
+                val caFile = File(BaresipService.filesPath + "/ca_certs.crt")
+                if (caFile.exists())
+                    Utils.readUrlWithCustomCAs(urlConnection, caFile)
+                else
+                    urlConnection.inputStream.bufferedReader().use { it.readText() }
+            } catch (e: Exception) {
+                Log.d(TAG, "Failed to get account template from network: ${e.message}")
+                null
+            }
+        } else {
+            Log.d(TAG, "Failed to get account template from network: empty host")
             null
         }
         if (template != null) {
