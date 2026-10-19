@@ -1,0 +1,3 @@
+- Fixed showing of active mobile call when resuming to baresip app
+- Fixed enabling/disabling speakerphone during mobile call
+- Avoid crash if invalid string is given in hostpart of SIP URI of New Account
