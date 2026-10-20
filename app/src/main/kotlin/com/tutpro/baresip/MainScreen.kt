@@ -39,7 +39,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,7 +47,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -498,18 +496,15 @@ private fun MainScreen(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(
-                    viewModel = viewModel,
-                    navController = navController,
-                    onBackupClick = { launchBackupRequest() },
-                    onRestoreClick = { launchRestoreRequest() },
-                    onLogcatClick = { launchLogcatRequest() },
-                    onRestartClick = onRestartClick,
-                    onQuitClick = onQuitClick
-                )
-            }
+            TopAppBar(
+                viewModel = viewModel,
+                navController = navController,
+                onBackupClick = { launchBackupRequest() },
+                onRestoreClick = { launchRestoreRequest() },
+                onLogcatClick = { launchLogcatRequest() },
+                onRestartClick = onRestartClick,
+                onQuitClick = onQuitClick
+            )
         },
         bottomBar = { BottomBar(ctx, viewModel, navController) },
         content = { contentPadding -> MainContent(navController, viewModel, contentPadding) }
@@ -547,14 +542,19 @@ private fun TopAppBar(
 
     TopAppBar(
         title = {
-            Text(text = stringResource(R.string.baresip), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = stringResource(R.string.baresip),
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+            actionIconContentColor = MaterialTheme.colorScheme.secondary
         ),
-        windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
 
             val selectedAor by viewModel.selectedAor.collectAsState()
@@ -601,7 +601,7 @@ private fun TopAppBar(
                         tint = if (isRecOn)
                             MaterialTheme.colorScheme.error
                         else
-                            MaterialTheme.colorScheme.onPrimary,
+                            MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -640,7 +640,7 @@ private fun TopAppBar(
                     tint = if (BaresipService.isMicMuted)
                         MaterialTheme.colorScheme.error
                     else
-                        MaterialTheme.colorScheme.onPrimary,
+                        MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -669,7 +669,7 @@ private fun TopAppBar(
                     tint = if (isSpeakerOn)
                         MaterialTheme.colorScheme.error
                     else
-                        MaterialTheme.colorScheme.onPrimary,
+                        MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -680,7 +680,7 @@ private fun TopAppBar(
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "Menu",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
 

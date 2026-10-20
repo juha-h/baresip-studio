@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -184,18 +183,13 @@ private fun ChatScreen(
         }
     }
 
-    BackHandler(enabled = true) {
-        navController.navigateUp()
-    }
+    BackHandler(enabled = true) { navController.navigateUp() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(navController, viewModel, account, peerUri)
-            }
+            TopAppBar(navController, viewModel, account, peerUri)
         },
         bottomBar = {
             NewMessage(
@@ -244,10 +238,10 @@ private fun TopAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+            actionIconContentColor = MaterialTheme.colorScheme.secondary
         ),
         navigationIcon = {
             IconButton(
@@ -258,7 +252,6 @@ private fun TopAppBar(
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
-        windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
             IconButton(
                 onClick = {
