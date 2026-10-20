@@ -1,0 +1,4 @@
+- Förebyggde en krasch på samtalsinformationsskärmen när hämtning av ljudkodekar misslyckas
+- Förbättrade visningen av samtalsinformation
+- Frågar inte igen om val av kontakt-URI vid återuppringning
+- Nya översättningar (kinesiska och spanska)

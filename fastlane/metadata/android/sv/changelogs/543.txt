@@ -1,0 +1,3 @@
+- Åtgärdade ett fel som ibland skapade två mobilkonton
+- Lade till ljudkodeken iLBC (för närvarande stöds endast läge 20)
+- Åtgärdade omstartsaviseringen efter ändringar av ljudinställningarna

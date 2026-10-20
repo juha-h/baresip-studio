@@ -1,0 +1,2 @@
+- Lade till fler skydd mot krascher när samtal avslutas
+- Nya översättningar (kinesiska)

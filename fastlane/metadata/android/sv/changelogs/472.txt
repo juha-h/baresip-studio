@@ -1,0 +1,2 @@
+- Matchar även diakritiska tecken i kontaktsökningen
+- Markerar tecknen som matchar sökningen

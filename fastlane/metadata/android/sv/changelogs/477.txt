@@ -1,0 +1,5 @@
+- Bytte aviseringsdialogrutor till Material Design-stilen
+- Förbättrade färgerna i rullgardinsmenyer
+- Lade till en tidsgräns för hämtning av kontomallar från nätverket
+- Åtgärdade URI:n för vidarekoppling av samtal
+- Nya översättningar (hebreiska)

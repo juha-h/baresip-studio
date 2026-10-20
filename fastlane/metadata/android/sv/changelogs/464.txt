@@ -1,0 +1,4 @@
+- Lade till kontoinställningen Blockera okända, som kan blockera samtal och meddelanden från personer som inte finns bland kontakterna
+- Lade till kontoinställningen Kontrollera ursprung, som kan blockera SIP-begäranden om källans IP-adress inte stämmer med IP-adressen som registreringsbegäranden skickas till
+- Lade till inställningen för tillåtna transportprotokoll
+- Nya översättningar (kinesiska och ryska)

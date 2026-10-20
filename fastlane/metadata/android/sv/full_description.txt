@@ -1,9 +1,7 @@
-Detta är en <a href="https://github.com/baresip/baresip">baresip-baserad</a> SIP User Agent-applikation för Android.
+Baresip är en säkerhetsinriktad kommunikationsapp med öppen källkod för Android. Från början hade appen bara stöd för SIP-baserade VoIP-samtal och meddelanden. Nu kan baresip även väljas som Androids standardapp för mobilsamtal och meddelanden. Appen har också integrerade kontakter. Vid VoIP-samtal finns konferenssamtal, avisering om röstmeddelanden samt obevakad och assisterad samtalskoppling.
 
-För närvarande stöder baresip-appen röstsamtal, textmeddelanden, röstbrevlåda Message Waiting Indication samt blinda och uppvaktade samtalsöverföringar.  Röst kan kodas med Opus, AMR, Codec2, G.729, G.722, G.722.1, G.726 eller PCMU/PCMA-codecs. Säkerhet uppnås via TLS- eller WSS SIP-signaltransport och ZRTP- eller (DTLS) SRTP-mediekapsling.
+Vid VoIP-samtal kan ljudet kodas med AMR-, Codec2-, G.729-, G.722-, G.722.1-, iLBC-, Opus- eller PCMU/PCMA-kodekar. Säkerheten bygger på SIP-signalering via TLS eller WSS och mediekapsling med ZRTP eller (DTLS) SRTP.
 
-Utvecklingen av baresip-appen motiveras av behovet av en säker SIP-baserad VoIP-användaragent med öppen källkod för Android som inte är beroende av proprietära push-notifikationstjänster från tredje part.
+Baresip-appen kan installeras på Android-enheter med Android 9 eller senare. Mobilsamtal och meddelanden kräver Android 10 eller senare. Om du behöver videosamtal kan du i stället installera systerappen baresip+.
 
-Om du behöver videosamtal och har en enhet med Android version 9 eller nyare som stöder Camera2 API på hårdvarusupportnivå LEVEL3 eller FULL, kan du istället för den här applikationen installera dess systerapplikation baresip+.
-
-Källkoden finns tillgänglig på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, där även problem kan rapporteras.
+Källkoden finns på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, där du även kan rapportera problem.

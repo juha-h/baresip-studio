@@ -1,0 +1,2 @@
+- Lade till sökning på kontaktskärmen
+- Nya översättningar (tjeckiska)

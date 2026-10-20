@@ -1,0 +1,10 @@
+- SMS via mobilkontot
+- Skickar e-post, ringer eller chattar med kontakter
+- Samlade baresips och Androids kontakter på en skärm
+- Stöd för flera URI:er per baresip-kontakt
+- Importerar VCF-kontakter
+- Mobilkontots status visas i vitt i flygplansläge
+- Aviserar om samtal eller SMS i flygplansläge
+- Aviserar om kontakt saknar samtals- eller meddelande-URI
+- Åtgärdade högtalarväxling vid mobilsamtal
+- Nya översättningar (kinesiska, finska, indonesiska och tjeckiska)

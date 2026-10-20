@@ -1,0 +1,2 @@
+- Lade till inställningen Unik kontakt-URI
+- Nya översättningar (kinesiska)

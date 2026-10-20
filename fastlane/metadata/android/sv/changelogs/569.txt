@@ -1,0 +1,1 @@
+- Bevarar mobilkontots samtals- och chatthistorik så länge baresip har rollen som standardapp för telefoni eller meddelanden

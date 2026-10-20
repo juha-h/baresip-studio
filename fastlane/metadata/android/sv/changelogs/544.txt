@@ -1,0 +1,2 @@
+- Visar kontaktens namn och SIP-URI i samtalets URI-fält om ingen etikett har angetts
+- iLBC-kodeken stöder nu både läge 20 och 30

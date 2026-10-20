@@ -1,0 +1,3 @@
+- Lade till kontoinställningen Anpassade parametrar
+- Behåller värdet för Kontrollera ursprung när Registrera växlas
+- Nya översättningar (kinesiska)

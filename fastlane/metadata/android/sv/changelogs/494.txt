@@ -1,0 +1,5 @@
+- Åtgärdade kontoinställningen Mediekodning
+- Förhindrar att Google tar bort kopplings-, upptaget- och vänteton
+- Säkerställer att kopplingston och upptagetton spelas upp i kommunikationsläget
+- Förbättrade hanteringen av nätverks- och DNS-serveruppdateringar
+- Nya översättningar (spanska)

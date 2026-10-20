@@ -1,0 +1,4 @@
+- Rättade fel och förbättrade hanteringen av TEL-URI:er
+- Stänger av närhetssensorn direkt när det sista samtalet avslutas
+- Uppdaterar statusaviseringen när någon svarar
+- Nya översättningar (hebreiska)

@@ -1,0 +1,5 @@
+- Förbättrade valet av kontaktläge i menyn på kontaktskärmen
+- Förbättrade sökningen och layouten för nya kontakter på kontaktskärmen
+- Matchar söktexten mot kontaktens TEL-URI även på huvudskärmen och chattskärmarna
+- Tillåter kontakter som bara har ett namn
+- Förbättrade layouten för redigering av kontakter

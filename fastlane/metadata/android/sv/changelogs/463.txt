@@ -1,0 +1,1 @@
+- Optimerade AMR-, G.722.1- och Opus-kodekarna

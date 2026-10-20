@@ -1,0 +1,4 @@
+- Förbättrade hanteringen av USSD- och MMI-koder
+- Undviker onödig omregistrering när man lämnar kontoskärmen
+- Undviker onödig konfigurationssparning och omstartsavisering när man lämnar inställningsskärmen
+- Nya översättningar (spanska)

@@ -1,0 +1,3 @@
+- Åtgärdade en möjlig krasch vid assisterad samtalskoppling
+- Visa det ursprungliga samtalet som parkerat medan en obevakad koppling väntar
+- Använder Material 3-färger även på knapparna Parkera, Koppla och Info

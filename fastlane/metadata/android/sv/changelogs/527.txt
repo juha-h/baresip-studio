@@ -1,0 +1,4 @@
+- Lade till alternativet Ring/visa knappsats i menyn på kontaktskärmen
+- Öppnar automatiskt chatten eller samtalshistoriken när man trycker på baresip-ikonen med en aviseringsprick
+- Försöker undvika färgändringar i det övre systemfältet och det nedre navigeringsfältet
+- Nya översättningar (kinesiska)

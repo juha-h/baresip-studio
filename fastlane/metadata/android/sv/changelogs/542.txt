@@ -1,0 +1,2 @@
+- Förebygger en krasch vid start om baresip inte är standardapp för telefoni
+- Tillämpar landskodsinställningen för kontot enbart vid kontaktsökning, i enlighet med hjälptexten

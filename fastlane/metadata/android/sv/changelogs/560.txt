@@ -1,0 +1,6 @@
+- Lade till inställningen Maximal storlek för MMS-bilder
+- Åtgärdade SIP-URI:n för inkommande samtal via Telecom Framework
+- Åtgärdade visningen av aviseringen om inkommande samtal när baresip startas av Telecom Framework
+- Döljer inställningen Standardapp för meddelanden om enheten saknar SIM-kort
+- Startar baresip automatiskt när en extern uppringningsapp ringer via Telecom Framework
+- Nya översättningar (flera språk)

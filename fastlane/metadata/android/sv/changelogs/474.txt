@@ -1,0 +1,2 @@
+- Lade till BaresipApp för att förhindra att baresip-tjänsten startar innan baresip-biblioteket har lästs in
+- Förbättrade visningen av förslag på mottagare vid samtalskoppling

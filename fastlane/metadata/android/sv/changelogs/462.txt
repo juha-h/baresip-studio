@@ -1,0 +1,2 @@
+- Lägger till korrekt svarskod och orsak i användaragentens begäran om att avsluta samtal
+- Tar bort eventuella gamla inspelningar när baresip återställs

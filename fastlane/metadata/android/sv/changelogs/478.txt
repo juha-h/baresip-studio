@@ -1,0 +1,3 @@
+- Förhindrar upprepade tryck på samtalsknapparna från att utlösa flera åtgärder
+- Undviker en krasch om det inte går att hämta information om samtalets codec
+- Förebygger en möjlig krasch i inställningarnas ViewModel

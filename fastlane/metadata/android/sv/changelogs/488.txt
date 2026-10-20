@@ -1,0 +1,9 @@
+- Baresip integreras nu med Androids Telecom Framework
+- Stöd för flera samtidiga samtal (ett åt gången)
+- Kan avsluta enskilda deltagare i konferenssamtal
+- Förbättrade statusaviseringarna
+- Partiellt väckningslås vid aktiva samtal eller registreringar
+- Wi-Fi-lås även när nätet inte används aktivt
+- Återgår till aktivt samtal på huvudskärmen
+- Kontrollerar REPLACES-stöd vid assisterad koppling
+- Loggar nätverksfelsökning endast vid ändring

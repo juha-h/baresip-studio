@@ -1,0 +1,2 @@
+- Åtgärdade aviseringen vid långt tryck på en baresip-kontakt
+- Nya översättningar (kinesiska)

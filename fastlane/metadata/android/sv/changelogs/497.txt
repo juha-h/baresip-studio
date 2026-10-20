@@ -1,0 +1,3 @@
+- Lade till ljudinställningen Telecom Framework, som gör det möjligt att stänga av användningen av Androids Telecom Framework
+- Visar samtalsknappen i gult medan ett utgående samtal kopplas upp
+- Åtgärdade Bluetooth-stödet när Telecom Framework används

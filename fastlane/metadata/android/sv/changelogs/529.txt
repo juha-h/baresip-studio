@@ -1,0 +1,3 @@
+- Lade även till knappen Redigera i det övre fältet på Androids kontaktskärm
+- Använder även baresips avisering om missat samtal för missade mobilsamtal
+- Nya översättningar från Weblate (ryska)

@@ -1,0 +1,3 @@
+- Försöker registrera igen en gång efter ett misslyckande
+- Tar bort behörigheter till samtalsloggen (de behövs inte och Google godkänner dem inte)
+- Nya översättningar (kinesiska och svenska)

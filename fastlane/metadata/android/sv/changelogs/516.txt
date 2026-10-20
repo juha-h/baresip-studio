@@ -1,0 +1,3 @@
+- Förbättrade kant-till-kant-visningen på alla skärmar
+- Startar baresip och visar en avisering om ett samtal eller meddelande kommer när appen inte körs
+- Nya översättningar (spanska)

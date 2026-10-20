@@ -1,0 +1,2 @@
+- Fokuserar inte automatiskt på DTMF-fältet när samtalet kopplas upp
+- Nya översättningar (kinesiska)

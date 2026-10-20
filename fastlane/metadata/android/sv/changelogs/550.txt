@@ -1,0 +1,3 @@
+- Förbättrade gränssnittet för inkommande samtal
+- Åtgärdade borttagningen av statusaviseringen från låsskärmen när samtalet avslutas
+- Åtgärdade visningen av kontaktetiketter

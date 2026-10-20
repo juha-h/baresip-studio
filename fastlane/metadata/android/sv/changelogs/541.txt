@@ -1,0 +1,7 @@
+- Rättade fel och förbättrade mobilkontot och mobilsamtal
+- Söker även bland kontaktens TEL-URI:er och användardelen i SIP-URI:n när kontaktförslag visas
+- Visar kontaktens URI eller etikett tillsammans med namnet i förslagen
+- Avvisar inkommande mobilsamtal om ett SIP-samtal redan pågår och omvänt
+- Inaktiverar nu inställningen Unik kontakt-URI som standard
+- Gjorde SIP-spårning till en underinställning till Felsökning
+- Nya översättningar (kinesiska)

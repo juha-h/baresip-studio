@@ -1,0 +1,3 @@
+- Visar båda mobilkontots TEL-URI:er när olika SIM-kort används för samtal och meddelanden
+- Visar ändrade kontakt-URI:er direkt när man trycker på bockikonen
+- Nya översättningar (kinesiska)

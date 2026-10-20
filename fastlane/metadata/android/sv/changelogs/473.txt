@@ -1,0 +1,2 @@
+- Förbättrade visningen av kontaktförslag på huvudskärmen och chattskärmen
+- Nya översättningar (tjeckiska)

@@ -1,0 +1,2 @@
+- Aviseringen från baresips förgrundstjänst visas nu alltid även i Android 14 och senare
+- Nya översättningar (kinesiska och tjeckiska)

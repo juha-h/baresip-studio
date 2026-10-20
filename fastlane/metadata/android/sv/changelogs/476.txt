@@ -1,0 +1,6 @@
+- Åtgärdade en krasch vid radering av meddelanden
+- Startar automatiskt även när en ny version av baresip har installerats
+- Förbättrade kontrollen av ljudinställningarna
+- Förbättrade bakgrundsfärgen i avisningsdialogrutan
+- Förbättrade färgerna på förslag
+- Nya översättningar (kinesiska och hebreiska)

@@ -1,0 +1,2 @@
+- Samtal och meddelanden säkerhetskopieras nu i JSON-format (gör en säkerhetskopia nu och kontrollera att den går att återställa senare)
+- Lade till ikoner för menyalternativen på huvudskärmen

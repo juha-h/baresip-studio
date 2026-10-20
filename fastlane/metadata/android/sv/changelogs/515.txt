@@ -1,0 +1,4 @@
+- Lade till kontoinställningen Blockera dolda
+- Tillåter tel:-URI som URI för röstbrevlådan i SIP-konton
+- Förbättrade aviseringarna om avvisade samtal
+- Nya översättningar (kinesiska och hebreiska)

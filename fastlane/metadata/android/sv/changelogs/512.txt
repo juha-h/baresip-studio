@@ -1,0 +1,2 @@
+- Förbättrade mobilkontots hantering av flygplansläge i API-versioner före 31
+- Tar även med mobilkontots samtals- och chatthistorik i säkerhetskopian

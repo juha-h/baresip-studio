@@ -1,0 +1,3 @@
+- Lade till grundläggande stöd för dynamiska färger på många skärmar
+- Förbättrade visningen och döljningen av skärmtangentbordet
+- Nya översättningar (förenklad kinesiska)

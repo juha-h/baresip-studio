@@ -1,0 +1,2 @@
+- Låser upp den låsta skärmen och tänder den när ett nytt samtal kommer in
+- Nya översättningar (brasiliansk portugisiska)

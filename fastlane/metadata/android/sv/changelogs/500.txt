@@ -1,0 +1,4 @@
+- Färgen på det nedre navigeringsfältet följer nu skärmens bakgrundsfärg
+- Visar även den som vidarekopplar ett inkommande samtal
+- Förebyggde en möjlig krasch när aviseringen om inkommande samtal visas
+- Nya översättningar (kinesiska)

@@ -1,0 +1,3 @@
+- Rättade fel och förbättrade ljudet (testat i Android 10 till 16)
+- Kontrollerar i inställningarna om en omstart krävs även när man trycker på bakåtknappen
+- Ändrade hjälptexten för Telecom Framework

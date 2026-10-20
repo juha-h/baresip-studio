@@ -1,0 +1,4 @@
+- Tog bort inställningen Skapa mobilkonto (hanteras nu automatiskt)
+- Sparar av säkerhetsskäl inte längre mobilsamtal i systemets samtalslogg
+- Förebygger en möjlig krasch när samtalet avslutas
+- Nya översättningar (kinesiska)

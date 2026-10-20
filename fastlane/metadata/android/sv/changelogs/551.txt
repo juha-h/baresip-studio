@@ -1,0 +1,3 @@
+- Förbättrade gränssnittet för utgående samtal
+- Förebyggde ett möjligt race condition när nya konton skapas
+- Nya översättningar (indonesiska)

@@ -1,0 +1,3 @@
+- Ersatte de flesta bilder med Material Design-ikoner
+- Förebyggde en möjlig minnesläcka i tidtagaren
+- Nya översättningar (kinesiska)

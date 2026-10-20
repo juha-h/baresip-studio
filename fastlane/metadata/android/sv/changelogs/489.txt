@@ -1,0 +1,4 @@
+- Förhindrar att andra konferenssamtal avslutas när en deltagare lägger på
+- Åtgärdade initieringen av kontoinställningen Kontrollera ursprung
+- Förbättrade ljudet
+- Nya översättningar (kinesiska och spanska)

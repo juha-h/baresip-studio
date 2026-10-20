@@ -1,0 +1,3 @@
+- Förbättrade identifieringen av SIM-kort
+- Tar inte bort mobilkontot när approllen ändras
+- Nya översättningar (kinesiska)

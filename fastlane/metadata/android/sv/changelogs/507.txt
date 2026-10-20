@@ -1,0 +1,10 @@
+- Mobilkontot kan skicka och ta emot SMS
+- Skicka e-post, ring eller chatta med en kontakt
+- Slog ihop baresips och Androids kontakter på en ny kontaktskärm
+- Stöd för flera URI:er per baresip-kontakt
+- Importerar VCF-kontakter
+- Mobilkontots status visas i vitt i flygplansläge
+- Lade till export och radering i kontaktmenyn
+- Åtgärdade växling av högtalartelefon under mobilsamtal
+- Förebyggde en krasch när kontaktlistan är tom
+- Nya översättningar (kinesiska, finska, indonesiska och tjeckiska)

@@ -1,0 +1,7 @@
+- Förbättrade menyerna
+- Förbättrade visningen av emojier i mottagna SMS
+- Huvudskärmens nedre fält har nu utseendet hos Material 3:s dockade verktygsfält
+- Förebygger kraschen ForegroundServiceDidNotStartInTimeException
+- Visar inte längre en röd prick på chatten när ett meddelande skickas
+- Kortade ned strängen show_call
+- Nya översättningar (finska)
