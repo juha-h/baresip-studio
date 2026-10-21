@@ -1,0 +1,3 @@
+- Migrated app to satisfy edge-to-edge guidelines
+- Show avatar of peer on chat and call details screens
+- New translations (several languages)
