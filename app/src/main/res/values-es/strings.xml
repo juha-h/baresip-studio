@@ -66,7 +66,6 @@
     <string name="enable_history">Activar</string>
     <string name="delete_history_alert">¿Quiere eliminar el historial de llamadas de la cuenta «%1$s»\?</string>
     <!-- Chat Activity -->
-    <string name="chat_with">Chatear con %1$s</string>
     <string name="new_message">Mensaje nuevo</string>
     <string name="short_message_question">¿Quiere eliminar este mensaje?</string>
     <string name="add_contact">Añadir contacto</string>

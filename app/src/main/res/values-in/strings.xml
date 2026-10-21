@@ -120,7 +120,6 @@
     <string name="save_recording_question">Apakah Anda ingin menyimpan rekaman ini?</string>
     <string name="recording_saved">Rekaman tersimpan</string>
     <string name="delete_call_alert">Apakah Anda ingin menghapus panggilan ini dari riwayat?</string>
-    <string name="chat_with">Obrolan dengan %1$s</string>
     <string name="new_message">Pesan baru</string>
     <string name="short_message_question">Apakah Anda ingin menghapus pesan ini?</string>
     <string name="add_contact">Tambah Kontak</string>

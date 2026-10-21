@@ -101,7 +101,6 @@
     <string name="call_answered_elsewhere">通话已在别处接听</string>
     <string name="call_missed">通话未接</string>
     <string name="call_rejected">通话遭拒</string>
-    <string name="chat_with">与 %1$s 聊天</string>
     <string name="new_message">新消息</string>
     <string name="short_message_question">您要删除此消息吗？</string>
     <string name="add_contact">添加联系人</string>

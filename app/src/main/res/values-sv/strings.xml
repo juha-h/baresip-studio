@@ -139,7 +139,6 @@
     <string name="audio_modules_help">Ljudkodekar som tillhandahålls av de förkryssade modulerna är tillgängliga för konton.</string>
     <string name="tls_ca_file">TLS CA-fil</string>
     <string name="verify_server">Verifiera servercertifikat</string>
-    <string name="chat_with">Chatta med %1$s</string>
     <string name="transfer_request_to">Begäran att koppla samtalet till</string>
     <string name="account_allocation_failure">Kunde inte skapa ett nytt konto.</string>
     <string name="default_account_help">Kryssa i för att välja detta konto när baresip startar.</string>

@@ -20,7 +20,6 @@
     <string name="calls_calls">Вызовы</string>
     <string name="calls_delete_question">Удалить %2$s из истории вызовов?</string>
     <string name="cancel">Отмена</string>
-    <string name="chat_with">Чат с %1$s</string>
     <string name="chats">История чата</string>
     <string name="codecs">Кодеки</string>
     <string name="config_restart">Хотите перегрузить для активации новых установок?</string>
