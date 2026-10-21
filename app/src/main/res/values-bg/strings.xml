@@ -68,7 +68,6 @@
     <string name="enable_history">Разреши история на обаждания</string>
     <string name="delete_history_alert">Искате ли да изтриете историята на обажданията на акаунта \'%1$s\'?</string>
     <!-- Chat Activity -->
-    <string name="chat_with">Чатя с %1$s</string>
     <string name="new_message">Ново съобщение</string>
     <string name="short_message_question">Искате ли да изтриете съобщението?</string>
     <string name="add_contact">Добави контакт</string>

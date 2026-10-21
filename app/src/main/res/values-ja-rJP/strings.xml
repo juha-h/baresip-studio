@@ -159,7 +159,6 @@
     <string name="default_account">既定のアカウント</string>
     <string name="account_exists">アカウント %1$s は既に存在します</string>
     <string name="account_allocation_failure">新しいアカウントの割り当てに失敗しました。</string>
-    <string name="chat_with"> %1$s とチャット</string>
     <string name="short_message_question">メッセージを削除しますか?</string>
     <string name="message_failed">失敗</string>
     <string name="chats">チャット履歴</string>

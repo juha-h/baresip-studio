@@ -145,7 +145,6 @@
     <string name="save_recording">שמירת הקלטה</string>
     <string name="save_recording_question">האם ברצונך לשמור הקלטה זו?</string>
     <string name="recording_saved">ההקלטה נשמרה</string>
-    <string name="chat_with">צ\'אט עם %1$s</string>
     <string name="new_message">הודעה חדשה</string>
     <string name="short_message_question">האם ברצונך למחוק את ההודעה?</string>
     <string name="add_contact">הוספת איש קשר</string>
