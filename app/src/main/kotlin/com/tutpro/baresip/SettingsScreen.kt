@@ -224,27 +224,26 @@ private fun SettingsContent(
     activity: Activity,
     onRestartApp: () -> Unit
 ) {
-    val ctx = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var pendingAutoStart by remember { mutableStateOf(false) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                if (pendingAutoStart && isAppearOnTopPermissionGranted(ctx)) {
+                if (pendingAutoStart && isAppearOnTopPermissionGranted(activity)) {
                     viewModel.autoStart.value = true
                     pendingAutoStart = false
                 }
-                if (viewModel.autoStart.value && !isAppearOnTopPermissionGranted(ctx)) {
+                if (viewModel.autoStart.value && !isAppearOnTopPermissionGranted(activity)) {
                     viewModel.autoStart.value = false
                     if (Config.variable("auto_start") == "yes") {
                         Config.replaceVariable("auto_start", "no")
                         Config.save()
                     }
                 }
-                val powerManager = ctx.getSystemService(POWER_SERVICE) as PowerManager
+                val powerManager = activity.getSystemService(POWER_SERVICE) as PowerManager
                 viewModel.batteryOptimizations.value =
-                    !powerManager.isIgnoringBatteryOptimizations(ctx.packageName)
+                    !powerManager.isIgnoringBatteryOptimizations(activity.packageName)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
