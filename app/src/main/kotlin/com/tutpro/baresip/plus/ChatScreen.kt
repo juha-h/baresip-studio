@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,19 +26,21 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Clear
@@ -104,7 +105,6 @@ import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.String.format
 import java.text.DateFormat
 import java.util.GregorianCalendar
 
@@ -185,18 +185,13 @@ private fun ChatScreen(
         }
     }
 
-    BackHandler(enabled = true) {
-        navController.navigateUp()
-    }
+    BackHandler(enabled = true) { navController.navigateUp() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(navController, viewModel, account, peerUri)
-            }
+            TopAppBar(navController, viewModel, account, peerUri)
         },
         bottomBar = {
             NewMessage(
@@ -230,25 +225,56 @@ private fun TopAppBar(
     val aor = account.aor
     TopAppBar(
         title = {
-            Text(
-                text = format(
-                    stringResource(R.string.chat_with),
-                    Utils.friendlyUri(
-                        uri = peerUri,
-                        account = account,
-                        anonymous = stringResource(R.string.anonymous),
-                        unknown = stringResource(R.string.unknown)
-                    )
-                ),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val avatarSize = 28.dp
+                when (val contact = Contact.findContact(peerUri)) {
+                    is Contact.BaresipContact -> {
+                        val avatarImage = contact.avatarImage
+                        if (avatarImage != null)
+                            CustomElements.ImageAvatar(avatarImage, size = avatarSize)
+                        else
+                            CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+                    }
+                    is Contact.AndroidContact -> {
+                        val thumbNailUri = contact.thumbnailUri
+                        if (thumbNailUri != null)
+                            AsyncImage(
+                                model = thumbNailUri,
+                                contentDescription = "Avatar",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(avatarSize).clip(CircleShape),
+                            )
+                        else
+                            CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+                    }
+                    null -> {
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(avatarSize),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text =
+                        Utils.friendlyUri(
+                            uri = peerUri,
+                            account = account,
+                            anonymous = stringResource(R.string.anonymous),
+                            unknown = stringResource(R.string.unknown)
+                        ),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+            actionIconContentColor = MaterialTheme.colorScheme.secondary
         ),
         navigationIcon = {
             IconButton(
@@ -259,7 +285,6 @@ private fun TopAppBar(
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
-        windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
             if (!account.isMobile)
                 IconButton(

@@ -5,8 +5,8 @@
     <string name="about_title_plus">baresip+ sovelluksesta</string>
     <string name="about_text">
         <![CDATA[
-            <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva
-                SIP-äänipuhelut ja -pikaviestit sekä mobiilipuhelut mahdollistava sovellus</h1>
+            <h1>SIP- ja mobiilipuhelut sekä pikaviestit mahdollistava
+                <a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva sovellus</h1>
             <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>
@@ -55,9 +55,10 @@
                 </ul>
         ]]>
     </string>
-    <string name="about_text_plus"><![CDATA[
-            <h1><a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva
-                 videopuhelut ja pikaviestit mahdollistava SIP-sovellus</h1>
+    <string name="about_text_plus">
+        <![CDATA[
+            <h1>SIP- ja mobiilipuhelut sekä pikaviestit mahdollistava
+                <a href="https://github.com/baresip/baresip">Baresip</a>-kirjastoon perustuva sovellus</h1>
             <br>
             <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
             <p>Versio %1$s</p>

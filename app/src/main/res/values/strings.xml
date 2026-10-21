@@ -7,7 +7,7 @@
     <string name="about_title_plus">About baresip+</string>
     <string name="about_text">
         <![CDATA[
-        <h1>SIP and mobile calling User Agent based on
+        <h1>SIP and mobile calling and messaging app based on
             <a href="https://github.com/baresip/baresip">baresip</a> library</h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
@@ -59,7 +59,7 @@
     </string>
     <string name="about_text_plus">
         <![CDATA[
-        <h1>SIP User Agent with video calls based on <a href="https://github.com/baresip/baresip">baresip</a> library</h1>
+        <h1>SIP and mobile calling and messaging app based on <a href="https://github.com/baresip/baresip">baresip</a> library</h1>
         <br>
         <p>Juha Heinanen &lt;jh@tutpro.com&gt;</p>
         <p>Version %1$s</p>

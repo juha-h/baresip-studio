@@ -2,8 +2,8 @@ package com.tutpro.baresip.plus
 
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import android.text.format.DateUtils.isToday
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -141,10 +140,7 @@ private fun ChatsScreen(navController: NavController, aor: String) {
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(navController, account, uaMessages)
-            }
+            TopAppBar(navController, account, uaMessages)
         },
         bottomBar = { NewChatPeer(navController, account) },
         content = { contentPadding ->
@@ -179,10 +175,10 @@ private fun TopAppBar(
     TopAppBar(
         title = { Text(text = stringResource(R.string.chats), fontWeight = FontWeight.Bold) },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+            actionIconContentColor = MaterialTheme.colorScheme.secondary
         ),
         navigationIcon = {
             IconButton(
@@ -193,7 +189,7 @@ private fun TopAppBar(
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         },
-        windowInsets = WindowInsets(0, 0, 0, 0),
+        //windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
             IconButton(onClick = { menuExpanded = !menuExpanded }) {
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")

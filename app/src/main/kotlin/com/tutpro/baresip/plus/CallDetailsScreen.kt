@@ -16,13 +16,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.CallMade
 import androidx.compose.material.icons.automirrored.filled.CallReceived
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -57,16 +57,17 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import coil.compose.AsyncImage
 import com.tutpro.baresip.plus.CallRow.Details
 import com.tutpro.baresip.plus.CustomElements.AlertDialog
 import com.tutpro.baresip.plus.CustomElements.verticalScrollbar
@@ -95,31 +96,28 @@ private fun CallDetailsScreen(navController: NavController, callRow: CallRow) {
         modifier = Modifier.fillMaxSize().imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.statusBarsPadding())
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.call_details),
-                            fontWeight = FontWeight.Bold
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.call_details),
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+                    actionIconContentColor = MaterialTheme.colorScheme.secondary
+                ),
+                navigationIcon = {
+                    IconButton(onClick = navController::navigateUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
                         )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-                    windowInsets = WindowInsets(0, 0, 0, 0),
-                    navigationIcon = {
-                        IconButton(onClick = navController::navigateUp) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                            )
-                        }
-                    },
-                )
-            }
+                    }
+                },
+            )
         },
         content = { contentPadding ->
             CallDetailsContent(
@@ -152,22 +150,62 @@ private fun CallDetailsContent(
             .padding(top = 16.dp, start = 16.dp, end = 4.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Peer(ctx, callRow)
+        Peer(callRow)
         Details(ctx, details, onDelete)
     }
 }
 
 @Composable
-private fun Peer(ctx: Context, callRow: CallRow) {
+private fun Peer(callRow: CallRow) {
     val account = Account.ofAor(callRow.aor)!!
-    val headerText = stringResource(R.string.peer) + " " + Utils.friendlyUri(ctx, callRow.peerUri, account)
-    Text(
-        text = headerText,
+    val peerUri = callRow.peerUri
+    val avatarSize = 24.dp
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center
-    )
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        when (val contact = Contact.findContact(peerUri)) {
+            is Contact.BaresipContact -> {
+                val avatarImage = contact.avatarImage
+                if (avatarImage != null)
+                    CustomElements.ImageAvatar(avatarImage, size = avatarSize)
+                else
+                    CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+            }
+            is Contact.AndroidContact -> {
+                val thumbNailUri = contact.thumbnailUri
+                if (thumbNailUri != null)
+                    AsyncImage(
+                        model = thumbNailUri,
+                        contentDescription = "Avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(avatarSize).clip(CircleShape),
+                    )
+                else
+                    CustomElements.TextAvatar(contact.name, contact.color, size = avatarSize)
+            }
+            null -> {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Avatar",
+                    modifier = Modifier.size(avatarSize),
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = Utils.friendlyUri(
+                uri = peerUri,
+                account = account,
+                anonymous = stringResource(R.string.anonymous),
+                unknown = stringResource(R.string.unknown)
+            ),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
 
 @Composable
