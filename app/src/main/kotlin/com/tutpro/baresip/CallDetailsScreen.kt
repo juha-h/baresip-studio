@@ -59,16 +59,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import coil.compose.AsyncImage
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import coil.compose.AsyncImage
 import com.tutpro.baresip.CallRow.Details
 import com.tutpro.baresip.CustomElements.AlertDialog
 import com.tutpro.baresip.CustomElements.verticalScrollbar
@@ -151,13 +150,13 @@ private fun CallDetailsContent(
             .padding(top = 16.dp, start = 16.dp, end = 4.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Peer(ctx, callRow)
+        Peer(callRow)
         Details(ctx, details, onDelete)
     }
 }
 
 @Composable
-private fun Peer(ctx: Context, callRow: CallRow) {
+private fun Peer(callRow: CallRow) {
     val account = Account.ofAor(callRow.aor)!!
     val peerUri = callRow.peerUri
     val avatarSize = 24.dp
