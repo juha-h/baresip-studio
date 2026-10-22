@@ -302,9 +302,9 @@ object Utils {
         return Regex("^(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4})$").matches(ip)
     }
 
-    private fun checkIpv6InBrackets(bracketedIp: String): Boolean {
+    private fun checkIpV6InBrackets(bracketedIp: String): Boolean {
         return bracketedIp.startsWith("[") && bracketedIp.endsWith("]") &&
-                checkIpV6(bracketedIp.substring(1, bracketedIp.length - 2))
+                bracketedIp.length > 2 && checkIpV6(bracketedIp.substring(1, bracketedIp.length - 1))
     }
 
     fun checkUriUser(user: String): Boolean {
@@ -330,7 +330,7 @@ object Utils {
 
     fun checkIpPort(ipPort: String): Boolean {
         return if (ipPort.startsWith("["))
-            checkIpv6InBrackets(ipPort.substringBeforeLast(":")) &&
+            checkIpV6InBrackets(ipPort.substringBeforeLast(":")) &&
                     checkPort(ipPort.substringAfterLast(":"))
         else
             checkIpV4(ipPort.substringBeforeLast(":")) &&
@@ -343,7 +343,7 @@ object Utils {
     }
 
     private fun checkHostPort(hostPort: String): Boolean {
-        return checkIpV4(hostPort) || checkIpv6InBrackets(hostPort) || checkDomain(hostPort) ||
+        return checkIpV4(hostPort) || checkIpV6InBrackets(hostPort) || checkDomain(hostPort) ||
                 checkIpPort(hostPort) || checkDomainPort(hostPort)
     }
 
