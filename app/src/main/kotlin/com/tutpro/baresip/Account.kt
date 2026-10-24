@@ -223,7 +223,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
     }
 
     fun host() : String {
-        return aor.split("@")[1]
+        return Utils.aorDomain(aor)
     }
 
     fun text(): String {
