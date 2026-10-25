@@ -1,4 +1,3 @@
 - Fixed checking of malformed IPv6 address (avoids possible crash)
 - Fixed getting hostpart of account's SIP URI (avoids possible crash)
 - Upgraded OpenSSL version to 4.0
-

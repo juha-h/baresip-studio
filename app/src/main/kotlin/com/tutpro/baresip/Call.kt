@@ -5,6 +5,7 @@ import android.media.AudioManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
 import java.util.*
 
@@ -43,7 +44,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
     val callOnHold: MutableState<Boolean> = mutableStateOf(false)
     val transferButtonEnabled: MutableState<Boolean> = mutableStateOf(false)
     val callTransfer: MutableState<Boolean> = mutableStateOf(false)
-    val dtmfText: MutableState<String> = mutableStateOf("")
+    val dtmfText: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
+    val dtmfTypes: MutableState<List<Boolean>> = mutableStateOf(emptyList())
     val dtmfEnabled: MutableState<Boolean> = mutableStateOf(false)
     val focusDtmf: MutableState<Boolean> = mutableStateOf(false)
 

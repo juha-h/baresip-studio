@@ -254,6 +254,9 @@ static void event_handler(enum bevent_ev ev, struct bevent *event, void *arg)
             call_hold(call, false);
             len = re_snprintf(event_buf, sizeof event_buf, "transfer failed,%s", prm);
             break;
+        case BEVENT_CALL_DTMF_START:
+            len = re_snprintf(event_buf, sizeof event_buf, "call dtmf,%s", prm);
+            break;
         case BEVENT_CALL_CLOSED:
             tone = call_scode(call) ? translate_errorcode(call_scode(call)) : "";
             len = re_snprintf(event_buf, sizeof event_buf, "call closed,%s,%s", prm, tone);
