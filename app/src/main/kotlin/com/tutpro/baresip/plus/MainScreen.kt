@@ -156,12 +156,17 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -2274,12 +2279,20 @@ private fun CallRow(
                 BasicTextField(
                     value = call.dtmfText.value,
                     onValueChange = { newText ->
-                        if (newText.length > call.dtmfText.value.length) {
-                            val char = newText.last()
-                            if (char.isDigit() || char == '*' || char == '#') {
-                                Log.d(TAG, "Got DTMF digit '$char'")
-                                call.sendDigit(char)
-                            }
+                        if (newText.text.length > call.dtmfText.value.text.length) {
+                            val addedChars = newText.text.substring(call.dtmfText.value.text.length)
+                            val newTypes = call.dtmfTypes.value.toMutableList()
+                            for (char in addedChars)
+                                if (char.isDigit() || char == '*' || char == '#') {
+                                    Log.d(TAG, "Got DTMF digit '$char'")
+                                    call.sendDigit(char)
+                                    newTypes.add(false)
+                                }
+                            call.dtmfTypes.value = newTypes
+                        }
+                        else if (newText.text.length < call.dtmfText.value.text.length) {
+                            if (newText.text.length <= call.dtmfTypes.value.size)
+                                call.dtmfTypes.value = call.dtmfTypes.value.take(newText.text.length)
                         }
                         call.dtmfText.value = newText
                     },
@@ -2290,9 +2303,10 @@ private fun CallRow(
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     singleLine = true,
                     interactionSource = interactionSource,
+                    visualTransformation = DtmfVisualTransformation(call.dtmfTypes.value, MaterialTheme.colorScheme.primary),
                     decorationBox = { innerTextField ->
                         OutlinedTextFieldDefaults.DecorationBox(
-                            value = call.dtmfText.value,
+                            value = call.dtmfText.value.text,
                             visualTransformation = VisualTransformation.None,
                             innerTextField = innerTextField,
                             singleLine = true,
@@ -3347,7 +3361,8 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 val callp = params[1] as Long
                 val call = Call.ofCallp(callp)
                 if (call != null) {
-                    call.dtmfText.value = ""
+                    call.dtmfText.value = TextFieldValue("")
+                    call.dtmfTypes.value = emptyList()
                     if (call.videoEnabled()) {
                         Log.d(TAG, "Enabling video layout at call established")
                         if (Utils.isCameraAvailable(ctx))
@@ -3474,6 +3489,18 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         }
         "transfer failed" -> {
             showCall(ctx, viewModel, ua)
+        }
+        "call dtmf" -> {
+            val callp = params[1] as Long
+            val call = Call.ofCallp(callp)
+            if (call != null) {
+                val digit = if (ev.size > 1) ev[1] else ""
+                if (digit.isNotEmpty()) {
+                    val newText = call.dtmfText.value.text + digit
+                    call.dtmfText.value = TextFieldValue(newText, selection = TextRange(newText.length))
+                    call.dtmfTypes.value = call.dtmfTypes.value + true
+                }
+            }
         }
         "call closed" -> {
             val calls = Call.calls()
@@ -3798,4 +3825,25 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     showDialog.value = true
 
     downloadsInputUri = null
+}
+
+private class DtmfVisualTransformation(
+    private val receivedFlags: List<Boolean>,
+    private val receivedColor: Color
+) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val annotatedString = buildAnnotatedString {
+            for (i in text.indices) {
+                val isReceived = i < receivedFlags.size && receivedFlags[i]
+                if (isReceived) {
+                    pushStyle(SpanStyle(color = receivedColor))
+                    append(text[i])
+                    pop()
+                }
+                else
+                    append(text[i])
+            }
+        }
+        return TransformedText(annotatedString, OffsetMapping.Identity)
+    }
 }

@@ -1560,6 +1560,8 @@ class BaresipService: Service() {
                         if (!isMainVisible) return
                     }
 
+                    "call dtmf" -> {}
+
                     "call closed" -> {
                         Log.d(TAG, "AoR $aor call $callp is closed prm: ${ev[1]}")
                         nm.cancel(CALL_NOTIFICATION_ID)
