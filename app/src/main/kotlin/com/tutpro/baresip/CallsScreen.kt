@@ -194,7 +194,7 @@ private fun TopAppBar(navController: NavController, ua: UserAgent, callHistory: 
                     when (selectedItem) {
                         delete -> {
                             lastAction.value = {
-                                CallHistoryNew.clear(account.aor)
+                                CallHistory.clear(account.aor)
                                 callHistory.value = emptyList()
                                 Blocked.clear(account.aor)
                             }
@@ -541,15 +541,15 @@ private fun loadCallHistory(aor: String): MutableList<CallRow> {
 
 private fun removeFromHistory(callHistory: MutableState<List<CallRow>>, callRow: CallRow) {
     for ((_, startTime, stopTime, recording) in callRow.details) {
-        CallHistoryNew.deleteRecordingFiles(recording.toTypedArray())
+        CallHistory.deleteRecordingFiles(recording.toTypedArray())
         BaresipService.callHistory.removeAll {
             it.startTime == startTime && it.stopTime == stopTime
         }
     }
-    CallHistoryNew.deleteRecordingFiles(callRow.recording.toTypedArray())
+    CallHistory.deleteRecordingFiles(callRow.recording.toTypedArray())
     val updatedList = callHistory.value.filterNot { it == callRow }
     callHistory.value = updatedList
-    CallHistoryNew.save()
+    CallHistory.save()
 }
 
 fun callUp(direction: Int): Boolean {

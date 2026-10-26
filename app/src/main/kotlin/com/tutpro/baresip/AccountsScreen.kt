@@ -139,7 +139,7 @@ fun AccountsContent(contentPadding: PaddingValues, navController: NavController)
                         onClick = {
                             message.value = String.format(deleteAccountMessage, text)
                             lastAction.value = {
-                                CallHistoryNew.clear(aor)
+                                CallHistory.clear(aor)
                                 Message.clearMessagesOfAor(aor)
                                 Blocked.clear(aor)
                                 BlockRule.clear(aor)

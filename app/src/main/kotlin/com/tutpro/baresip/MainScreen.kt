@@ -2381,7 +2381,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
         }
         else {
             val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-            val latestPeerUri = CallHistoryNew.aorLatestPeerUri(ua.account.aor)
+            val latestPeerUri = CallHistory.aorLatestPeerUri(ua.account.aor)
             if (latestPeerUri != null) {
                 dialerState.redialUri = latestPeerUri
                 dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account, unique = true)
@@ -2753,7 +2753,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.dialerState.callUri.value = ""
             }
             if (acc.callHistory) {
-                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
+                val history = CallHistory(aor, "tel:" + (params[1] as String), "out")
                 history.startTime = GregorianCalendar()
                 history.add()
             }
@@ -2767,7 +2767,7 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
                 viewModel.dialerState.callUri.value = ""
             }
             if (acc.callHistory) {
-                val history = CallHistoryNew(aor, "tel:" + (params[1] as String), "out")
+                val history = CallHistory(aor, "tel:" + (params[1] as String), "out")
                 history.rejected = true
                 history.add()
             }

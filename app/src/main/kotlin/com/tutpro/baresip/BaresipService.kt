@@ -917,7 +917,7 @@ class BaresipService: Service() {
                 }
                 Contact.contactsUpdate()
 
-                CallHistoryNew.restore()
+                CallHistory.restore()
                 Blocked.restore()
                 BlockRule.restore()
                 Message.restore()
@@ -927,8 +927,8 @@ class BaresipService: Service() {
                 val restored = File(filesPath, "restored")
                 if (restored.exists()) {
                     Log.d(TAG, "Clearing recordings")
-                    CallHistoryNew.clearRecordings()
-                    CallHistoryNew.save()
+                    CallHistory.clearRecordings()
+                    CallHistory.save()
                     Message.save()
                     Blocked.save()
                     BlockRule.save()
@@ -1042,7 +1042,7 @@ class BaresipService: Service() {
             }
 
             if (removeMobile) {
-                CallHistoryNew.clear(ua.account.aor)
+                CallHistory.clear(ua.account.aor)
                 Message.clearMessagesOfAor(ua.account.aor)
                 Blocked.clear(ua.account.aor)
                 BlockRule.clear(ua.account.aor)
@@ -1301,7 +1301,7 @@ class BaresipService: Service() {
                                 else
                                     Log.e(TAG, "Callwaiting tone $name.wav not found")
                                 if (ua.account.callHistory) {
-                                    CallHistoryNew(aor, peerUri, "in").add()
+                                    CallHistory(aor, peerUri, "in").add()
                                     ua.account.missedCalls = true
                                 }
                             }
@@ -1569,7 +1569,7 @@ class BaresipService: Service() {
                                 val completedElsewhere = missed && ev[2].startsWith("SIP") &&
                                         ev[2].contains(";cause=200")
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    val history = CallHistoryNew(aor, call.peerUri, call.dir)
+                                    val history = CallHistory(aor, call.peerUri, call.dir)
                                     history.stopTime = GregorianCalendar()
                                     history.startTime = if (completedElsewhere)
                                         history.stopTime
@@ -1593,7 +1593,7 @@ class BaresipService: Service() {
                                         if (Utils.mergeWavFiles(rxFile, txFile, mergedFile)) {
                                             Log.d(TAG, "Automatic merge succeeded.")
                                             history.recording = arrayOf(mergedFile.absolutePath, "")
-                                            CallHistoryNew.save()
+                                            CallHistory.save()
                                             try {
                                                 rxFile.delete()
                                                 txFile.delete()
@@ -1980,7 +1980,7 @@ class BaresipService: Service() {
             isNativeReady = true
             addMobileUserAgent()
             Account.saveAccounts()
-            CallHistoryNew.save()
+            CallHistory.save()
             Message.save()
             Blocked.save()
             BlockRule.save()
@@ -2354,7 +2354,7 @@ class BaresipService: Service() {
                         Utils.friendlyUri(this, uri, ua.account, unique = true))
                 )
                 if (ua.account.callHistory) {
-                    CallHistoryNew(ua.account.aor, uri, "in").add()
+                    CallHistory(ua.account.aor, uri, "in").add()
                     ua.account.missedCalls = true
                 }
                 return
@@ -2489,7 +2489,7 @@ class BaresipService: Service() {
             stopRinging()
             stopMediaPlayer()
             if (call.ua.account.callHistory) {
-                val history = CallHistoryNew(call.ua.account.aor, call.peerUri, call.dir)
+                val history = CallHistory(call.ua.account.aor, call.peerUri, call.dir)
                 history.stopTime = GregorianCalendar()
                 history.startTime = call.startTime
                 history.rejected = call.rejected
@@ -2562,7 +2562,7 @@ class BaresipService: Service() {
                 if (existingMobileUa != null) {
                     Log.d(TAG, "Removing existing Mobile account (SIM not ready, invalid subscription ID, " +
                             "or both default roles disabled)")
-                    CallHistoryNew.clear(existingMobileUa.account.aor)
+                    CallHistory.clear(existingMobileUa.account.aor)
                     Message.clearMessagesOfAor(existingMobileUa.account.aor)
                     Blocked.clear(existingMobileUa.account.aor)
                     BlockRule.clear(existingMobileUa.account.aor)
@@ -2608,7 +2608,7 @@ class BaresipService: Service() {
 
             registerTelephony()
             if (isNativeReady) Account.saveAccounts()
-            CallHistoryNew.save()
+            CallHistory.save()
             Message.save()
             updateStatusNotification()
         }
@@ -3649,7 +3649,7 @@ class BaresipService: Service() {
         val serviceEvents = mutableListOf<ServiceEvent>()
 
         val calls = ArrayList<Call>()
-        var callHistory = ArrayList<CallHistoryNew>()
+        var callHistory = ArrayList<CallHistory>()
         var blocked = ArrayList<Blocked>()
         var blockRules = mutableListOf<BlockRule>()
 

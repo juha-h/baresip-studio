@@ -323,7 +323,7 @@ private fun startTime(detail: Details, onDelete: (Details) -> Unit): String {
         firstButtonText = stringResource(R.string.cancel),
         lastButtonText = stringResource(R.string.delete),
         onLastClicked = {
-            CallHistoryNew.remove(detail.startTime, detail.stopTime)
+            CallHistory.remove(detail.startTime, detail.stopTime)
             onDelete(detail)
         },
     )
@@ -486,7 +486,7 @@ private fun Duration(ctx: Context, detail: Details, durationText: String) {
                                             try {
                                                 if (fileIn.exists()) fileIn.delete()
                                                 if (fileOut.exists()) fileOut.delete()
-                                                CallHistoryNew.save()
+                                                CallHistory.save()
                                             } catch (e: Exception) {
                                                 Log.w(
                                                     TAG,
