@@ -1,0 +1,2 @@
+- Show also incoming DTMF digits in DTMF field of the call
+- Backup now if you your latest backup is done before August 2026
