@@ -1,0 +1,3 @@
+- Åtgärdade kontrollen av felaktigt formaterade IPv6-adresser för att förebygga en möjlig krasch
+- Åtgärdade hämtningen av värddelen i kontots SIP-URI för att förebygga en möjlig krasch
+- Uppgraderade OpenSSL till version 4.0
