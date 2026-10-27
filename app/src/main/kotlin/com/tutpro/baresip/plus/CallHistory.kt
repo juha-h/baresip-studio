@@ -8,10 +8,11 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.ObjectStreamClass
 import java.util.GregorianCalendar
 
 @Serializable
-class CallHistoryNew(val aor: String, val peerUri: String, val direction: String) : java.io.Serializable {
+class CallHistory(val aor: String, val peerUri: String, val direction: String) : java.io.Serializable {
 
     // Set to time when call is established (if ever) or stopTime if call was completed elsewhere
     @Serializable(with = Utils.GregorianCalendarSerializer::class)
@@ -105,7 +106,7 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                 val content = file.readText()
                 if (content.startsWith("[")) {
                     try {
-                        val restoredHistory = Json.decodeFromString<List<CallHistoryNew>>(content)
+                        val restoredHistory = Json.decodeFromString<List<CallHistory>>(content)
                         synchronized(BaresipService.callHistory) {
                             BaresipService.callHistory.clear()
                             BaresipService.callHistory.addAll(restoredHistory)
@@ -118,9 +119,16 @@ class CallHistoryNew(val aor: String, val peerUri: String, val direction: String
                 }
                 try {
                     val fis = FileInputStream(file)
-                    val ois = ObjectInputStream(fis)
+                    val ois = object : ObjectInputStream(fis) {
+                        override fun readClassDescriptor(): ObjectStreamClass {
+                            val desc = super.readClassDescriptor()
+                            if (desc.name == "com.tutpro.baresip.plus.CallHistoryNew")
+                                return ObjectStreamClass.lookup(CallHistory::class.java)
+                            return desc
+                        }
+                    }
                     @Suppress("UNCHECKED_CAST")
-                    val restoredHistory = ois.readObject() as? List<CallHistoryNew>
+                    val restoredHistory = ois.readObject() as? List<CallHistory>
                     if (restoredHistory != null) {
                         synchronized(BaresipService.callHistory) {
                             BaresipService.callHistory.clear()
