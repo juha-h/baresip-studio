@@ -1,0 +1,3 @@
+- Anpassade appen till riktlinjerna för kant-till-kant-visning
+- Visar motpartens profilbild i chatt- och samtalsdetaljer
+- Nya översättningar till flera språk

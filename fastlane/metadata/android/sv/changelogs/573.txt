@@ -1,0 +1,3 @@
+- Åtgärdade visningen av pågående mobilsamtal när man återgår till baresip
+- Åtgärdade aktivering och inaktivering av högtalartelefonen under mobilsamtal
+- Förebygger en krasch om värddelen i SIP-URI:n för ett nytt konto är ogiltig
