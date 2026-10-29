@@ -362,10 +362,14 @@ private fun ContactsScreen(navController: NavController) {
             }
             Contact.contactsUpdate()
             Config.save()
-            if (BaresipService.isServiceRunning)
-                ctx.startService(baresipService)
-            else
-                ContextCompat.startForegroundService(ctx, baresipService)
+            try {
+                if (BaresipService.isServiceRunning)
+                    ctx.startService(baresipService)
+                else
+                    ContextCompat.startForegroundService(ctx, baresipService)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start service: $e")
+            }
         }
     }
 

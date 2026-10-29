@@ -1461,10 +1461,14 @@ private fun checkOnClick(ctx: Context, viewModel: SettingsViewModel): Boolean {
         UserAgent.updateColorblindStatus()
         val baresipService = Intent(ctx, BaresipService::class.java)
         baresipService.action = "Update Notification"
-        if (BaresipService.isServiceRunning)
-            ctx.startService(baresipService)
-        else
-            ContextCompat.startForegroundService(ctx, baresipService)
+        try {
+            if (BaresipService.isServiceRunning)
+                ctx.startService(baresipService)
+            else
+                ContextCompat.startForegroundService(ctx, baresipService)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service: $e")
+        }
         viewModel.save = true
     }
 

@@ -101,7 +101,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
         val serviceIntent = Intent(ctx, BaresipService::class.java)
         serviceIntent.action = "Clear Missed"
         serviceIntent.putExtra("uap", ua.uap)
-        ctx.startService(serviceIntent)
+        try {
+            ctx.startService(serviceIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service to clear missed: $e")
+        }
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }

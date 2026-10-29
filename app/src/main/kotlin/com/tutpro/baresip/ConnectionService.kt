@@ -220,7 +220,11 @@ class ConnectionService : ConnectionService() {
             answerIntent.action = "Call Answer"
             answerIntent.putExtra("uap", uap)
             answerIntent.putExtra("callp", callp)
-            startService(answerIntent)
+            try {
+                startService(answerIntent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start service for Call Answer: $e")
+            }
             val intent = Intent(this@ConnectionService, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             intent.putExtra("action", "call answer")
