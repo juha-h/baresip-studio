@@ -1,0 +1,2 @@
+- Visa även inkommande DTMF-siffror i samtalets DTMF-fält
+- Säkerhetskopiera nu om din senaste säkerhetskopiering gjordes före augusti 2026
