@@ -52,7 +52,14 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
         val media = backStackEntry.arguments?.getString("media")!!
-        val account = UserAgent.ofAor(aor)?.account!!
+        val ua = UserAgent.ofAor(aor)
+        if (ua == null) {
+            LaunchedEffect(Unit) {
+                navController.navigateUp()
+            }
+            return@composable
+        }
+        val account = ua.account
         CodecsScreen(
             onBack = { navController.navigateUp() },
             checkOnClick = { updatedCodecs ->
@@ -89,7 +96,13 @@ private fun CodecsScreen(
     aor: String,
     media: String
 ) {
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)
+    if (ua == null) {
+        LaunchedEffect(Unit) {
+            onBack()
+        }
+        return
+    }
     val acc = ua.account
     val codecs = remember { mutableStateListOf<Codec>() }
 

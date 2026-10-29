@@ -101,7 +101,13 @@ fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
         val viewModel = viewModel<AccountViewModel>()
         val aor = backStackEntry.arguments?.getString("aor")!!
         val kind = backStackEntry.arguments?.getString("kind")!!
-        val ua = UserAgent.ofAor(aor)!!
+        val ua = UserAgent.ofAor(aor)
+        if (ua == null) {
+            LaunchedEffect(Unit) {
+                navController.navigateUp()
+            }
+            return@composable
+        }
         AccountScreen(
             viewModel = viewModel,
             navController = navController,
@@ -131,7 +137,13 @@ private fun AccountScreen(
     aor: String,
     kind: String
 ) {
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)
+    if (ua == null) {
+        LaunchedEffect(Unit) {
+            navController.navigateUp()
+        }
+        return
+    }
     val acc = ua.account
     val lifecycleOwner = LocalLifecycleOwner.current
     var resumeToggle by remember { mutableLongStateOf(0L) }

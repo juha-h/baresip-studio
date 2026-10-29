@@ -86,7 +86,13 @@ fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: Vi
 @Composable
 private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)
+    if (ua == null) {
+        LaunchedEffect(Unit) {
+            navController.navigateUp()
+        }
+        return
+    }
 
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
     var isHistoryLoaded by remember { mutableStateOf(false) }
