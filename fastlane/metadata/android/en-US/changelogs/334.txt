@@ -1,0 +1,1 @@
+- Fixed showing of outgoing call when contacts' Call Action is Show
