@@ -1,0 +1,2 @@
+- Fixed crash that can happen when SMS is received and baresip app is not running
+- Check that UA of AoR exists in order to avoid possible crash
