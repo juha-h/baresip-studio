@@ -1454,7 +1454,9 @@ private fun CallUriRow(
 
     val isDialer = dialerState != null
 
-    var filteredSuggestions by remember { mutableStateOf<List<Triple<Contact, AnnotatedString, Contact.ContactUri?>>>(emptyList()) }
+    var filteredSuggestions by remember {
+        mutableStateOf<List<Triple<Contact, AnnotatedString, Contact.ContactUri?>>>(emptyList())
+    }
     val focusRequester = remember { FocusRequester() }
     val lazyListState = rememberLazyListState()
     val isDialpadVisible by viewModel.isDialpadVisible.collectAsState()
@@ -1473,6 +1475,8 @@ private fun CallUriRow(
                         if (input != dialerState.callUri.value) {
                             dialerState.callUri.value = input
                             dialerState.redialUri = ""
+                            val account = Account.ofAor(viewModel.selectedAor.value)
+                            if (account != null) account.resumeUri = input
                             if (input == "") {
                                 dialerState.showCallButton.value = true
                                 dialerState.showCallConferenceButton.value = true
@@ -1493,7 +1497,8 @@ private fun CallUriRow(
                                         (u.uri.startsWith("tel:") && numericInput.isNotEmpty() &&
                                                 (u.uri.substring(4).contains(numericInput) ||
                                                         (e164Input != "" && u.uri.substring(4).contains(e164Input)))) ||
-                                                (u.uri.startsWith("sip:") && Utils.uriUserPart(u.uri).contains(normalizedInput, ignoreCase = true))
+                                                (u.uri.startsWith("sip:") &&
+                                                        Utils.uriUserPart(u.uri).contains(normalizedInput, ignoreCase = true))
                                     }
                                     if (nameMatch) {
                                         val annotatedName = Utils.buildAnnotatedStringWithHighlight(contact.name(), input)
@@ -1519,6 +1524,8 @@ private fun CallUriRow(
                                 if (dialerState.showSuggestions.value)
                                     dialerState.showSuggestions.value = false
                                 dialerState.callUri.value = ""
+                                val account = Account.ofAor(viewModel.selectedAor.value)
+                                if (account != null) account.resumeUri = ""
                                 dialerState.showCallButton.value = true
                                 dialerState.showCallConferenceButton.value = true
                             },
@@ -1609,8 +1616,10 @@ private fun CallUriRow(
                                             val aor = viewModel.selectedAor.value
                                             val account = Account.ofAor(aor)
                                             if (account != null) {
-                                                dialerState.callUri.value = Utils.friendlyUri(ctx, uri, account, unique = true)
+                                                val friendly = Utils.friendlyUri(ctx, uri, account, unique = true)
+                                                dialerState.callUri.value = friendly
                                                 dialerState.redialUri = uri
+                                                account.resumeUri = friendly
                                             }
                                             else
                                                 dialerState.callUri.value = uri.substringAfter(":")
@@ -2384,7 +2393,9 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
             val latestPeerUri = CallHistory.aorLatestPeerUri(ua.account.aor)
             if (latestPeerUri != null) {
                 dialerState.redialUri = latestPeerUri
-                dialerState.callUri.value = Utils.friendlyUri(ctx, latestPeerUri, ua.account, unique = true)
+                val friendly = Utils.friendlyUri(ctx, latestPeerUri, ua.account, unique = true)
+                dialerState.callUri.value = friendly
+                ua.account.resumeUri = friendly
             }
         }
     }
@@ -2979,8 +2990,10 @@ fun handleIntent(ctx: Context, viewModel: ViewModel, intent: Intent, action: Str
             }
             viewModel.navigateToHome()
             val peer = intent.getStringExtra("peer")!!
-            viewModel.dialerState.callUri.value = Utils.friendlyUri(ctx, peer, ua.account, unique = true)
+            val friendly = Utils.friendlyUri(ctx, peer, ua.account, unique = true)
+            viewModel.dialerState.callUri.value = friendly
             viewModel.dialerState.redialUri = peer
+            ua.account.resumeUri = friendly
             spinToAor(viewModel, ua.account.aor)
             if (ev[0] == "call") {
                 viewModel.dialerState.showCallConferenceButton.value = false
