@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +67,13 @@ fun NavGraphBuilder.blockingScreenRoute(navController: NavController) {
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
         val viewModel = viewModel<AccountViewModel>()
-        val ua = UserAgent.ofAor(aor)!!
+        val ua = UserAgent.ofAor(aor)
+        if (ua == null) {
+            LaunchedEffect(Unit) {
+                navController.navigateUp()
+            }
+            return@composable
+        }
         BlockingScreen(navController, viewModel, ua)
     }
 }

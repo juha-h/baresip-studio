@@ -2950,10 +2950,14 @@ private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
         baresipService.action = "Start Call"
         baresipService.putExtra("uap", ua.uap)
         baresipService.putExtra("uri", uri)
-        if (BaresipService.isServiceRunning)
-            ctx.startService(baresipService)
-        else
-            ContextCompat.startForegroundService(ctx, baresipService)
+        try {
+            if (BaresipService.isServiceRunning)
+                ctx.startService(baresipService)
+            else
+                ContextCompat.startForegroundService(ctx, baresipService)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service: $e")
+        }
     }
     else {
         viewModel.dialerState.callButtonsEnabled.value = false

@@ -86,7 +86,13 @@ fun NavGraphBuilder.callsScreenRoute(navController: NavController, viewModel: Vi
 @Composable
 private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor: String) {
 
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor)
+    if (ua == null) {
+        LaunchedEffect(Unit) {
+            navController.navigateUp()
+        }
+        return
+    }
 
     val callHistory: MutableState<List<CallRow>> = remember { mutableStateOf(emptyList()) }
     var isHistoryLoaded by remember { mutableStateOf(false) }
@@ -101,7 +107,11 @@ private fun CallsScreen(navController: NavController, viewModel: ViewModel, aor:
         val serviceIntent = Intent(ctx, BaresipService::class.java)
         serviceIntent.action = "Clear Missed"
         serviceIntent.putExtra("uap", ua.uap)
-        ctx.startService(serviceIntent)
+        try {
+            ctx.startService(serviceIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service to clear missed: $e")
+        }
         callHistory.value = loadCallHistory(aor)
         isHistoryLoaded = true
     }

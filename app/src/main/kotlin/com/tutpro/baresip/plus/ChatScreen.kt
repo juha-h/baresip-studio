@@ -160,7 +160,11 @@ private fun ChatScreen(
         serviceIntent.action = "Clear Unread"
         serviceIntent.putExtra("uap", account.accp)
         serviceIntent.putExtra("peer", peerUri)
-        ctx.startService(serviceIntent)
+        try {
+            ctx.startService(serviceIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service to clear unread: $e")
+        }
         Message.updateMessagesFromPearRead(aor, peerUri)
         account.unreadMessages = Message.unreadMessages(aor)
         chatMessages = loadPeerMessages(aor, peerUri)

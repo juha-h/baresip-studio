@@ -982,10 +982,8 @@ class BaresipService: Service() {
 
             if (!supportedCameras) toast(getString(R.string.no_cameras), Toast.LENGTH_LONG)
 
-            if (VERSION.SDK_INT >= 29) {
-                val baresipService = Intent(this, BaresipService::class.java)
-                baresipService.action = "Check Roles"
-                startService(baresipService)
+            if (VERSION.SDK_INT >= 29 && isNativeReady) {
+                addMobileUserAgent()
             }
         }
 

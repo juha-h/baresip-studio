@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -119,7 +118,11 @@ private fun ChatsScreen(navController: NavController, aor: String) {
         val serviceIntent = Intent(ctx, BaresipService::class.java)
         serviceIntent.action = "Clear Unread"
         serviceIntent.putExtra("uap", account.accp)
-        ctx.startService(serviceIntent)
+        try {
+            ctx.startService(serviceIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service to clear unread: $e")
+        }
         uaMessages.value = loadMessages(account)
         areMessagesLoaded = true
     }
