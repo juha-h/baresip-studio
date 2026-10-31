@@ -3248,16 +3248,17 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
 
     if (event == "started") {
         val uriString = params[0] as String
-        Log.d(TAG, "Handling service event 'started' with URI '$uriString'")
+        val action = if (params.size > 1 && params[1] is String && (params[1] as String).isNotEmpty())
+            params[1] as String
+        else
+            "dial"
+        Log.d(TAG, "Handling service event 'started' with URI '$uriString' and action '$action'")
         if (uriString != "")
-            callAction(ctx, viewModel, uriString.toUri(), "dial")
-        else {
-            if (viewModel.selectedAor.value == "" && uas.value.isNotEmpty())
-                viewModel.updateSelectedAor(uas.value.first().account.aor)
-        }
-        if (Preferences(ctx).displayTheme != AppCompatDelegate.getDefaultNightMode()) {
+            callAction(ctx, viewModel, uriString.toUri(), action)
+        else if (viewModel.selectedAor.value == "" && uas.value.isNotEmpty())
+            viewModel.updateSelectedAor(uas.value.first().account.aor)
+        if (Preferences(ctx).displayTheme != AppCompatDelegate.getDefaultNightMode())
             AppCompatDelegate.setDefaultNightMode(Preferences(ctx).displayTheme)
-        }
         handleNextEvent()
         return
     }
