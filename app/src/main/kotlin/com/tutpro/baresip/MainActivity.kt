@@ -141,19 +141,23 @@ class MainActivity : ComponentActivity() {
         atStartup = intent.hasExtra("onStartup")
 
         when (intent?.action) {
-            ACTION_DIAL, ACTION_CALL, ACTION_VIEW ->
+            ACTION_DIAL, ACTION_CALL, ACTION_VIEW -> {
+                val action = if (intent?.action == ACTION_CALL) "call" else "dial"
                 if (BaresipService.isServiceRunning)
                     callAction(
                         this,
                         viewModel,
                         intent.data,
-                        if (intent?.action == ACTION_CALL) "call" else "dial"
+                        action
                     )
-                else
+                else {
+                    BaresipService.callActionType = action
                     BaresipService.callActionUri = intent.data
                         .toString().replace("%2B", "+")
                         .replace("%20", "")
-                        .filterNot{setOf('-', ' ', '(', ')').contains(it)}
+                        .filterNot { setOf('-', ' ', '(', ')').contains(it) }
+                }
+            }
         }
 
         val permissions = if (Build.VERSION.SDK_INT >= 33)
