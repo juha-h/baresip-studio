@@ -2358,7 +2358,6 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                     dialerState.redialUri
                 else
                     uriText
-
                 dialerState.redialUri = ""
                 makeCall(ctx, viewModel, uriToCall, dialerState)
             }
