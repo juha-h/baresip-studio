@@ -389,7 +389,7 @@
     <string name="blocked_messages_history">blokované zprávy</string>
     <string name="blocked_action_question">Chcete přidat \'%1$s\' do kontaktů, nebo ho odblokovat?</string>
     <string name="blocked_unblock_question">Chcete odblokovat \'%1$s\'?</string>
-    <string name="show_call">Zobrazit hovor</string>
+    <string name="show_call">Zobrazit</string>
     <string name="calls_block_delete_question">Chcete zablokovat \'%1$s\', nebo odstranit %2$s z historie hovorů?</string>
     <string name="long_chat_block_delete_question">Chcete zablokovat \'%1$s\', nebo odstranit tento chat?</string>
     <string name="ilbc_mode">Režim iLBC</string>
@@ -400,4 +400,10 @@
     <string name="ussd_failed">Požadavek USSD se nezdařil</string>
     <string name="ussd_service_unavailable">Služba USSD není dostupná</string>
     <string name="ussd_unknown_error">Neznámá chyba USSD</string>
+    <string name="max_mms_images_size">Max. velikost obrázků v MMS</string>
+    <string name="max_mms_images_size_help">Max. celková komprimovaná velikost obrázků v MMS zprávách</string>
+    <string name="enable_default_phone">Povolte prosím výchozí aplikaci telefonu v nastavení</string>
+    <string name="contact_mode">Režim kontaktů</string>
+    <string name="call_action">Režim hovoru</string>
+    <string name="unlock_to_access_full_app">Odemkněte prosím zařízení</string>
 </resources>
