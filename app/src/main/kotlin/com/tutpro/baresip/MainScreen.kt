@@ -2356,31 +2356,8 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                 val uriToCall = if (dialerState.redialUri != "" &&
                         uriText == Utils.friendlyUri(ctx, dialerState.redialUri, ua!!.account, unique = true))
                     dialerState.redialUri
-                else {
-                    val uris = Contact.contactUrisOfNameOrNumber(uriText, ua!!.account)
-                    if (uris.isEmpty()) {
-                        if (Contact.nameExists(uriText, BaresipService.contacts, true)) {
-                            alertTitle.value = ctx.getString(R.string.notice)
-                            alertMessage.value = if (ua.account.isMobile)
-                                String.format(ctx.getString(R.string.contact_no_tel_uri), uriText)
-                            else
-                                String.format(ctx.getString(R.string.contact_no_sip_or_tel_uri), uriText)
-                            showAlert.value = true
-                            return
-                        }
-                        uriText
-                    }
-                    else if (uris.size == 1)
-                        uris[0].uri
-                    else {
-                        selectItems.value = uris.map { it.label.ifEmpty { it.uri.substringAfter(":") } }
-                        selectItemAction.value = { index ->
-                            makeCall(ctx, viewModel, uris[index].uri, dialerState)
-                        }
-                        showSelectItemDialog.value = true
-                        return
-                    }
-                }
+                else
+                    uriText
 
                 dialerState.redialUri = ""
                 makeCall(ctx, viewModel, uriToCall, dialerState)
