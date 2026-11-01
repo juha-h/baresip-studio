@@ -1,0 +1,1 @@
+- Make call directly to given destination if no contact suggestion is selected
