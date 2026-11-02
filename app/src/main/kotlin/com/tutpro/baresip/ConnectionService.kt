@@ -1,7 +1,6 @@
 package com.tutpro.baresip
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.telecom.CallAudioState
@@ -12,6 +11,7 @@ import android.telecom.DisconnectCause
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
@@ -66,7 +66,8 @@ class ConnectionService : ConnectionService() {
 
         val connection = BaresipConnection(uap, callp)
         connections[callp] = connection
-        connection.setAddress(Uri.fromParts("sip", peerUri, null),
+        val telecomUri = (if (peerUri.startsWith("sip:") || peerUri.startsWith("tel:")) peerUri else "sip:$peerUri").toUri()
+        connection.setAddress(telecomUri,
             TelecomManager.PRESENTATION_ALLOWED)
         connection.connectionCapabilities = Connection.CAPABILITY_SUPPORT_HOLD or
                 Connection.CAPABILITY_HOLD or
@@ -128,7 +129,7 @@ class ConnectionService : ConnectionService() {
         val onHoldCallp = rootExtras?.getLong("onHoldCallp", 0L).takeIf { it != 0L }
             ?: nestedExtras?.getLong("onHoldCallp") ?: 0L
 
-        val destination = request?.address?.schemeSpecificPart ?: ""
+        val destination = request?.address?.encodedSchemeSpecificPart ?: ""
 
         Log.d(TAG, "onCreateOutgoingConnection to $destination (uap=$uap)")
 
@@ -154,7 +155,7 @@ class ConnectionService : ConnectionService() {
 
         if (!pstnCall) {
             connection.audioModeIsVoip = true
-            val addressStr = Utils.uriUnescape(request?.address?.toString() ?: "")
+            val addressStr = request?.address?.toString() ?: ""
             val peerUri = if (addressStr.startsWith("tel:"))
                 addressStr
             else if (Utils.isTelNumber(destination))

@@ -2521,7 +2521,7 @@ class BaresipService: Service() {
             return
         }
 
-        val rawNumber = peerUri.removePrefix("tel:").removePrefix("sip:").split("@")[0]
+        val rawNumber = peerUri.removePrefix("tel:").removePrefix("sip:").split("@")[0].replace("%23", "#")
         val number = Utils.uriUnescape(rawNumber).trim()
         if (number.isEmpty()) return
 

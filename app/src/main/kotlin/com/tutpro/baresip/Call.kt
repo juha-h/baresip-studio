@@ -90,7 +90,8 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
             callOnHold.value = false
             showOnHoldNotice.value = false
             // 3. Telecom Sync
-            connection?.setAddress("sip:$peerUri".toUri(), android.telecom.TelecomManager.PRESENTATION_ALLOWED)
+            val telecomUri = (if (peerUri.startsWith("sip:") || peerUri.startsWith("tel:")) peerUri else "sip:$peerUri").toUri()
+            connection?.setAddress(telecomUri, android.telecom.TelecomManager.PRESENTATION_ALLOWED)
             connection?.setActive()
             return true
         }

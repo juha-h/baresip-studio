@@ -266,7 +266,7 @@ object Utils {
 
     fun uriUnescape(uri: String): String {
         return uri.replace("%2B" to "+", "%3A" to ":", "%3B" to ";", "%40" to "@", "%3D" to "=",
-            "%23" to "#", "%2A" to "*", "%20" to "")
+            "%2A" to "*", "%20" to "")
     }
 
     fun aorDomain(aor: String): String {
@@ -423,7 +423,7 @@ object Utils {
     }
 
     fun isUssd(uri: String): Boolean {
-        val u = uriUserPart(uri)
+        val u = uriUserPart(uri).replace("%23", "#")
         // Must start with * or # and must end with #, but exclude "Secret Code" pattern (*#*#...#*#*)
         return (u.startsWith("*") || u.startsWith("#")) && u.endsWith("#") && !u.startsWith("*#*#")
     }
