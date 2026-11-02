@@ -1,0 +1,2 @@
+- Do not decode %23 to # in SIP URI userpart
+- New translations (Czech)
