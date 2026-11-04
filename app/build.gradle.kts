@@ -96,3 +96,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.mmslib)
 }
+
+// BusyCall: download prebuilt native libraries into distribution/ (see BUILDING.md).
+apply(from = rootProject.file("gradle/native-libs.gradle.kts"))

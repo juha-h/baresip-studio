@@ -11,7 +11,7 @@ This repo is built on [juha-h/baresip-studio](https://github.com/juha-h/baresip-
 | Upstream repo | https://github.com/juha-h/baresip-studio |
 | Upstream version | `94.1.5` (`app/build.gradle.kts` `versionName`) |
 | Upstream commit | `6db813f10740ca835d8f7fbdca9c837315974a6e` ("Submodule update", 2026-11-03) |
-| Native libraries | `libbaresip-android` submodule → https://github.com/juha-h/libbaresip-android (`master`); static libs go in `distribution/` (empty until built) |
+| Native libraries | `libbaresip-android` submodule → https://github.com/juha-h/libbaresip-android (`master`, pinned at `bf8448d`). Built by `.github/workflows/native-libs.yml` and published as release `native-libs-<version>` (`native-libs.properties`); the build downloads it into `distribution/` |
 
 ## Changes to upstream files
 
@@ -21,6 +21,7 @@ upstream PR if one was offered. Keep each change as small as possible.
 | File | Change | Why | Upstream PR |
 |---|---|---|---|
 | `app/build.gradle.kts` | `applicationId` `com.tutpro.baresip` → `com.busycall.app` | Installs next to the real baresip app instead of replacing it. `namespace` stays `com.tutpro.baresip` so upstream code compiles and merges unchanged. | No (fork-only) |
+| `app/build.gradle.kts` | One `apply(from = "gradle/native-libs.gradle.kts")` line at the end | Downloads the prebuilt native libraries into `distribution/` so the app builds in Android Studio on Windows. All the logic is in our own file (`gradle/native-libs.gradle.kts`); see BUILDING.md. | No (fork-only) |
 | `app/src/main/res/values/strings.xml` | `app_name` `baresip` → `BusyCall` | Launcher, notification and phone-account name. The other "baresip" strings credit the library and stay. Untranslatable, so no translation files change. | No (fork-only) |
 
 ## Notes
@@ -39,4 +40,6 @@ upstream PR if one was offered. Keep each change as small as possible.
 2. Merge into a branch, resolve conflicts (most should be in upstream UI files we
    deleted: keep them deleted).
 3. Update the "Current base" table above.
-4. Run the S1 smoke test on a real phone before merging to `master`.
+4. If the `libbaresip-android` submodule or `ndkVersion` changed, bump
+   `version` in `native-libs.properties` and let the workflow publish new libraries.
+5. Run the S1 smoke test on a real phone before merging to `master`.

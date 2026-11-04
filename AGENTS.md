@@ -80,7 +80,9 @@ app/src/main/kotlin/
     ├── ui/                  FlipBaseActivity, footer, SystemBars, focus drawables, menus
     ├── home/ dialer/ contacts/ call/ calllog/ numbers/ settings/
     └── update/              Self-update from GitHub Releases (from FlipWeather)
-distribution/                libbaresip static libs + headers (built from juha-h/libbaresip-android)
+distribution/                libbaresip static libs + headers. Not in git: downloaded by
+                             gradle/native-libs.gradle.kts from the release that
+                             .github/workflows/native-libs.yml builds (BUILDING.md)
 libbaresip-android/          upstream JNI glue (CMake). Don't edit.
 docs/                        UX-SPEC.md, SPIKES.md, PBX-NOTES.md, DEVICES.md
 UPSTREAM.md                  upstream version we're on + every change to upstream files
