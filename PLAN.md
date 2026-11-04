@@ -190,7 +190,7 @@ listed in `UPSTREAM.md`, and offered back upstream where they make sense.
 | Codecs | G.711 µ-law/a-law, G.722, Opus. No G.729 by default. | Every PBX supports the first three |
 | Security | TLS + SRTP when the PBX supports them | UCM supports TLS |
 | Updates | Self-update from GitHub Releases, FlipWeather's `UpdateChecker` | The guide §7 |
-| Naming | The visible name is a **working name** and may change. The Android `applicationId` is **`com.benshowalter.busycall`** and **never changes**, even if the visible name does. The name lives only in `strings.xml` (`app_name`) and `AppIdentity.kt` (link scheme, setup-file name, update repo). Old link schemes stay accepted forever. | Changing the `applicationId` after install forces every phone to uninstall and lose its settings |
+| Naming | The visible name is a **working name** and may change. The Android `applicationId` is **`com.busycall.app`** and **never changes**, even if the visible name does. The name lives only in `strings.xml` (`app_name`) and `AppIdentity.kt` (link scheme, setup-file name, update repo). Old link schemes stay accepted forever. | Changing the `applicationId` after install forces every phone to uninstall and lose its settings |
 | Colors | **Dark red** title and softkey bars (`#6E0A12`, white text 12:1); near-black background; focus = light-red ring `#FF6B6B` on a dark-red tint; accents `#FF8F8F` / `#FFB4B4`. Call/Answer green, Decline/End a brighter red `#C62828`, always with a label. | Owner's choice; all text passes the guide's 7:1 / 4.5:1 |
 | QR decoding | ZXing core (Apache-2.0), the decoder only; no Google ML Kit | Works offline, no Play Services |
 | Outer display (Kyocera) | Incoming call card: caller name + number called, one line | The guide §4 outer-display rules |
@@ -358,7 +358,7 @@ one hosted SIP provider. Optional: 3CX, Yeastar.
 ## 8. Spikes — throwaway code, a written answer each, before UI work
 
 1. **S1 — Fork builds and runs.** Build the fork with upstream's UI still in
-   place, as `com.benshowalter.busycall`, `minSdk 28`. Install on the Android 9
+   place, as `com.busycall.app`, `minSdk 28`. Install on the Android 9
    and 10 phones. Register to a UCM and make one call. (Code review of going
    below Android 9 is recorded in SPIKES S1; not pursued for now.)
 2. **S2 — CALL and END keys.** On every test phone, log the CALL, END, outer END and

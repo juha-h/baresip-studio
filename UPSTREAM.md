@@ -20,7 +20,7 @@ upstream PR if one was offered. Keep each change as small as possible.
 
 | File | Change | Why | Upstream PR |
 |---|---|---|---|
-| `app/build.gradle.kts` | `applicationId` `com.tutpro.baresip` → `com.benshowalter.busycall` | Installs next to the real baresip app instead of replacing it. `namespace` stays `com.tutpro.baresip` so upstream code compiles and merges unchanged. | No (fork-only) |
+| `app/build.gradle.kts` | `applicationId` `com.tutpro.baresip` → `com.busycall.app` | Installs next to the real baresip app instead of replacing it. `namespace` stays `com.tutpro.baresip` so upstream code compiles and merges unchanged. | No (fork-only) |
 
 ## Notes
 

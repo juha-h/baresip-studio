@@ -48,7 +48,7 @@ guide alive" section), not only here.
   as a placeholder). Never hard-code it in layouts, Kotlin, or log tags.
 - The link scheme (`busycall:`), the setup-page file name, and the GitHub repo
   used by the update checker are constants in `AppIdentity.kt`, nowhere else.
-- **Never change `applicationId`** (`com.benshowalter.busycall`), even if the
+- **Never change `applicationId`** (`com.busycall.app`), even if the
   visible name changes. Phones would have to uninstall and lose their settings.
 - If the scheme changes, the parser keeps accepting every old scheme.
 

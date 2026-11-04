@@ -10,7 +10,7 @@ configure<ApplicationExtension> {
     compileSdk = 37
     ndkVersion = "30.0.16248370"
     defaultConfig {
-        applicationId = "com.benshowalter.busycall"
+        applicationId = "com.busycall.app"
         minSdk = 28
         targetSdk = 36
         versionCode = 581
