@@ -21,6 +21,7 @@ upstream PR if one was offered. Keep each change as small as possible.
 | File | Change | Why | Upstream PR |
 |---|---|---|---|
 | `app/build.gradle.kts` | `applicationId` `com.tutpro.baresip` → `com.busycall.app` | Installs next to the real baresip app instead of replacing it. `namespace` stays `com.tutpro.baresip` so upstream code compiles and merges unchanged. | No (fork-only) |
+| `app/src/main/res/values/strings.xml` | `app_name` `baresip` → `BusyCall` | Launcher, notification and phone-account name. The other "baresip" strings credit the library and stay. Untranslatable, so no translation files change. | No (fork-only) |
 
 ## Notes
 
