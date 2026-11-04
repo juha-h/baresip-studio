@@ -167,11 +167,10 @@ What we found in the upstream code (Nov 2026, v94.1.5):
 - **It already uses a self-managed `ConnectionService`**, so cell-call priority
   and the system's in-call state come with it.
 - **No Google push.** It keeps registrations alive from its own foreground service.
-- **`minSdk` is 28 (Android 9).** The Kyocera E4610 is on Android 7, so lowering
-  to 24 is **spike S1**. The code has very few `Build.VERSION` checks, so most
-  of the work is finding the API 26–28 calls and guarding them.
-  Self-managed `ConnectionService` needs API 26; on 24–25 use `AudioManager` +
-  audio focus.
+- **`minSdk` stays 28 (Android 9), as upstream (owner's decision,
+  2026-11-04).** Going lower needs a non-Telecom call path and OpenSL ES audio
+  (`docs/SPIKES.md` S1), so Android 7 phones such as the Kyocera E4610 are not
+  supported for now.
 - **The backend holds some state in Compose runtime types** (`mutableStateOf` in
   `BaresipService` and `Call`). Keep the `compose-runtime` dependency (state only,
   no Compose UI) so upstream merges stay easy. Our ViewModels read it through a
@@ -187,11 +186,11 @@ listed in `UPSTREAM.md`, and offered back upstream where they make sense.
 | Area | Choice | Why |
 |---|---|---|
 | UI | Kotlin, **Android Views** | The guide §4; FlipWeather and MatChat do the same |
-| Android versions | `minSdk 24` (after S1), `targetSdk 28–34`, JVM 1.8, `minifyEnabled false` | The guide §5 |
+| Android versions | `minSdk 28` (Android 9), as upstream; `targetSdk` and build settings as upstream | Android 7 needs backend work (SPIKES S1); not worth it yet |
 | Codecs | G.711 µ-law/a-law, G.722, Opus. No G.729 by default. | Every PBX supports the first three |
 | Security | TLS + SRTP when the PBX supports them | UCM supports TLS |
 | Updates | Self-update from GitHub Releases, FlipWeather's `UpdateChecker` | The guide §7 |
-| Naming | The visible name is a **working name** and may change. The Android `applicationId` is neutral and **never changes** (proposed `com.benshowalter.sipphone`). The name lives only in `strings.xml` (`app_name`) and `AppIdentity.kt` (link scheme, setup-file name, update repo). Old link schemes stay accepted forever. | Changing the `applicationId` after install forces every phone to uninstall and lose its settings |
+| Naming | The visible name is a **working name** and may change. The Android `applicationId` is **`com.benshowalter.busycall`** and **never changes**, even if the visible name does. The name lives only in `strings.xml` (`app_name`) and `AppIdentity.kt` (link scheme, setup-file name, update repo). Old link schemes stay accepted forever. | Changing the `applicationId` after install forces every phone to uninstall and lose its settings |
 | Colors | **Dark red** title and softkey bars (`#6E0A12`, white text 12:1); near-black background; focus = light-red ring `#FF6B6B` on a dark-red tint; accents `#FF8F8F` / `#FFB4B4`. Call/Answer green, Decline/End a brighter red `#C62828`, always with a label. | Owner's choice; all text passes the guide's 7:1 / 4.5:1 |
 | QR decoding | ZXing core (Apache-2.0), the decoder only; no Google ML Kit | Works offline, no Play Services |
 | Outer display (Kyocera) | Incoming call card: caller name + number called, one line | The guide §4 outer-display rules |
@@ -263,7 +262,7 @@ Ask your admin for a BusyCall code."
   internet can still make a code. "Save setup page to phone" writes it to the
   phone's public **Download** folder:
   - API 29+: `MediaStore.Downloads` insert, no permission needed.
-  - API 24–28: `WRITE_EXTERNAL_STORAGE` with `maxSdkVersion="28"`, asked at the
+  - API 28: `WRITE_EXTERNAL_STORAGE` with `maxSdkVersion="28"`, asked at the
     moment of saving with a plain reason; write to
     `Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)` (the
     guide §5 storage rules; the E4811 has a storage-permission bug on API 29+,
@@ -358,16 +357,17 @@ one hosted SIP provider. Optional: 3CX, Yeastar.
 
 ## 8. Spikes — throwaway code, a written answer each, before UI work
 
-1. **S1 — Fork builds and runs low.** Build the fork with upstream's UI still in
-   place. Lower `minSdk` to 24 and fix what breaks. Install on the E4610
-   (Android 7) and the E4810. Register to a UCM and make one call.
+1. **S1 — Fork builds and runs.** Build the fork with upstream's UI still in
+   place, as `com.benshowalter.busycall`, `minSdk 28`. Install on the Android 9
+   and 10 phones. Register to a UCM and make one call. (Code review of going
+   below Android 9 is recorded in SPIKES S1; not pursued for now.)
 2. **S2 — CALL and END keys.** On every test phone, log the CALL, END, outer END and
    headset codes, with and without a call in progress. Decides how much of G3 is possible.
 3. **S3 — Ringing and battery with two accounts.** Idle 1 h, screen off: ring time
    and battery used.
 4. **S4 — Audio routing.** Earpiece, speaker, the flip closed during a call.
 5. **S5 — Off-network.** Mobile data to a UCM behind NAT.
-6. **S6 — Camera, QR and the setup page.** On each phone: save the setup page to Download (API 24–28 and 29+ paths) and move it to a Windows PC and a Mac over USB, Bluetooth and SD card, noting which routes each phone supports. Can we open the camera and decode a
+6. **S6 — Camera, QR and the setup page.** On each phone: save the setup page to Download (API 28 and 29+ paths) and move it to a Windows PC and a Mac over USB, Bluetooth and SD card, noting which routes each phone supports. Can we open the camera and decode a
    QR code at arm's length with ZXing? Also scan a Grandstream UCM's Wave QR code
    and record exactly what it contains, to decide whether BusyCall can read it.
 
@@ -386,7 +386,6 @@ one hosted SIP provider. Optional: 3CX, Yeastar.
 
 1. **App name** (BusyCall is a placeholder) and **license** (BSD-3 to match
    upstream is simplest).
-2. **Test phones:** E4810, E4610, one Sonim, one touch phone? Does a Sonim on
-   Android 5.1 need to work? (That would need `minSdk 22`, and there's no
-   self-managed `ConnectionService` below 26.)
+2. **Test phones:** E4810, E4811, one Sonim (Android 9+), one touch phone?
+   Phones below Android 9 (E4610, older Sonims) are out of scope for now.
 3. **SMS over SIP:** baresip supports it. Leave it out of v1 (current plan)?

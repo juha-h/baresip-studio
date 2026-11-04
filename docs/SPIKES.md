@@ -27,7 +27,9 @@ What stands between upstream and older Android versions:
 - **Android 7 (API 24):** both big changes above. Needed only for phones like
   the E4610.
 
-Decision pending from the owner (see PLAN §8 S1).
+**Decision (owner, 2026-11-04): stay on Android 9 (`minSdk 28`), as upstream.**
+Android 7 support is out of scope for now; the notes above stay as the starting
+point if it comes back.
 
 ## S2 — CALL and END keys
 _Not started._ Record per phone: keycode and scan code for CALL, END, outer END,
