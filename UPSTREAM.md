@@ -20,15 +20,17 @@ upstream PR if one was offered. Keep each change as small as possible.
 
 | File | Change | Why | Upstream PR |
 |---|---|---|---|
-| _(none yet)_ | | | |
+| `app/build.gradle.kts` | `applicationId` `com.tutpro.baresip` → `com.benshowalter.busycall` | Installs next to the real baresip app instead of replacing it. `namespace` stays `com.tutpro.baresip` so upstream code compiles and merges unchanged. | No (fork-only) |
 
-## Planned first changes (spike S1)
+## Notes
 
-- `app/build.gradle.kts`: `applicationId` → `com.benshowalter.sipphone` so it
-  installs next to the real baresip app and never collides with it. `namespace`
-  stays `com.tutpro.baresip` so upstream code keeps compiling and merging.
-- `app/build.gradle.kts`: `minSdk` 28 → 24, then guard every API 26–28 call
-  that breaks.
+- `minSdk` stays **28**, as upstream (owner's decision, 2026-11-04). See
+  `docs/SPIKES.md` S1 for what going lower would take.
+- Hard-coded `com.tutpro.baresip…` strings (intent actions, notification
+  channel IDs, wakelock tags) are only names, so they keep working under the
+  new `applicationId`. `BaresipService.onCreate` sets an `intent` with
+  `setPackage("com.tutpro.baresip")`, but that field is never broadcast, so it
+  is left alone. File providers already use `${applicationId}`.
 
 ## Merging a new upstream release
 

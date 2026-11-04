@@ -10,7 +10,7 @@ configure<ApplicationExtension> {
     compileSdk = 37
     ndkVersion = "30.0.16248370"
     defaultConfig {
-        applicationId = "com.tutpro.baresip"
+        applicationId = "com.benshowalter.busycall"
         minSdk = 28
         targetSdk = 36
         versionCode = 581
