@@ -66,8 +66,11 @@ jobs:
         if: steps.existing.outputs.skip != 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget make libtool m4 autoconf automake pkg-config unzip zip
-          cmake --version
+          # cmake from apt, in /usr/bin: libbaresip-android's Makefile sets
+          # PATH to the NDK plus /usr/bin:/bin only, so the runner's own cmake in
+          # /usr/local/bin isn't found ("cmake: not found").
+          sudo apt-get install -y cmake wget make libtool m4 autoconf automake pkg-config unzip zip
+          /usr/bin/cmake --version
 
       - name: Install the Android NDK
         if: steps.existing.outputs.skip != 'true'
