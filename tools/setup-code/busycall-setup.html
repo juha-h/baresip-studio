@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FlipCall Setup Code</title>
+<title>BusyCall Setup Code</title>
 <!--
-  FlipCall setup-code maker. Save this one file anywhere and open it in a browser.
+  BusyCall setup-code maker. Save this one file anywhere and open it in a browser.
   It works offline and never sends anything over the network: everything you
   type stays in this page. Closing or reloading the page forgets it.
 
-  Link format (version 1), read by FlipCall's SetupCodeParser:
-    flipcall:add?v=1&name=<label>&server=<host>&port=<n>&user=<ext>
+  Link format (version 1), read by BusyCall's SetupCodeParser:
+    busycall:add?v=1&name=<label>&server=<host>&port=<n>&user=<ext>
                  &auth=<auth id>&pass=<password>&transport=udp|tcp|tls&vm=<voicemail>
   Every value is URL-encoded. Empty fields are left out. Only v, server and user are required.
 -->
@@ -137,7 +137,7 @@ ol { margin: 0; padding-left: 20px; font-size: 14px; color: var(--muted); }
 </head>
 <body>
 <header>
-  <h1>FlipCall setup code</h1>
+  <h1>BusyCall setup code</h1>
   <p>Works offline. Nothing you type leaves this computer.</p>
 </header>
 <main>
@@ -201,7 +201,7 @@ ol { margin: 0; padding-left: 20px; font-size: 14px; color: var(--muted); }
     </div>
     <p id="status"></p>
     <ol>
-      <li>On the phone: <strong>FlipCall › Options › Numbers › + Add a number</strong>.</li>
+      <li>On the phone: <strong>BusyCall › Options › Numbers › + Add a number</strong>.</li>
       <li>Choose <strong>Scan QR setup code</strong> and point the camera at this screen, or send yourself the link and choose <strong>Paste setup link</strong>.</li>
       <li>Check the details, then <strong>Save and connect</strong>.</li>
     </ol>
@@ -2533,7 +2533,7 @@ var qrcode = function() {
     var parts = [['v', '1'], ['name', value('name')], ['server', server], ['port', port],
                  ['user', user], ['auth', value('auth')], ['pass', el.pass.value],
                  ['transport', el.transport.value], ['vm', value('vm')]];
-    return 'flipcall:add?' + parts
+    return 'busycall:add?' + parts
       .filter(function (p) { return p[1] !== ''; })
       .map(function (p) { return p[0] + '=' + encodeURIComponent(p[1]); })
       .join('&');
@@ -2560,8 +2560,8 @@ var qrcode = function() {
     }
     el.qr.innerHTML = makeQr(current).createSvgTag({ cellSize: 4, margin: 2, scalable: true });
     var svg = el.qr.querySelector('svg');
-    if (svg) { svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'FlipCall setup QR code'); }
-    el.qrLabel.textContent = (value('name') || 'FlipCall') + ' · ' + value('user');
+    if (svg) { svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'BusyCall setup QR code'); }
+    el.qrLabel.textContent = (value('name') || 'BusyCall') + ' · ' + value('user');
     el.link.textContent = current;
   }
 
@@ -2636,7 +2636,7 @@ var qrcode = function() {
     ctx.fillText(label, size / 2, size + 36);
     var a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
-    a.download = 'flipcall-setup-' + (value('name') || 'number').replace(/[^A-Za-z0-9_-]+/g, '-') + '-' + value('user').replace(/[^A-Za-z0-9_-]+/g, '-') + '.png';
+    a.download = 'busycall-setup-' + (value('name') || 'number').replace(/[^A-Za-z0-9_-]+/g, '-') + '-' + value('user').replace(/[^A-Za-z0-9_-]+/g, '-') + '.png';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

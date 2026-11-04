@@ -1,6 +1,6 @@
-# AGENTS.md — instructions for AI agents working on FlipCall
+# AGENTS.md — instructions for AI agents working on BusyCall
 
-FlipCall is a **SIP softphone for keypad ("dumb") Android phones** that also
+BusyCall is a **SIP softphone for keypad ("dumb") Android phones** that also
 works on touchscreen phones. It is a **fork of
 [baresip-studio](https://github.com/juha-h/baresip-studio)**: the backend
 (SIP, audio, accounts, calls) is upstream's; **we build only the UI.**
@@ -10,7 +10,7 @@ works on touchscreen phones. It is a **fork of
    the house rules for every keypad-phone app. They all apply here, except the
    three deviations in §3 below.
 2. `PLAN.md`: what we're building and why.
-3. This file: FlipCall-specific rules.
+3. This file: BusyCall-specific rules.
 
 If a rule here conflicts with your habits, this file wins. If a human in the
 task says otherwise, the human wins, and you update this file in the same PR.
@@ -42,11 +42,11 @@ guide alive" section), not only here.
 
 ## 0a. The name is not final
 
-"FlipCall" is a working name. Keep a rename to a one-file change:
+"BusyCall" is a working name. Keep a rename to a one-file change:
 
 - The visible name appears only as `@string/app_name` (and strings that use it
   as a placeholder). Never hard-code it in layouts, Kotlin, or log tags.
-- The link scheme (`flipcall:`), the setup-page file name, and the GitHub repo
+- The link scheme (`busycall:`), the setup-page file name, and the GitHub repo
   used by the update checker are constants in `AppIdentity.kt`, nowhere else.
 - **Never change `applicationId`** (`com.benshowalter.sipphone`). It is not the
   brand and doesn't follow it.
@@ -96,7 +96,7 @@ Rules:
 
 ## 3. Deviations from the guide (the only three)
 
-| Guide | FlipCall |
+| Guide | BusyCall |
 |---|---|
 | Left softkey = primary action | **Options is the only softkey.** Right by default, left after the first MENU press. The other softkey has no label and no job (consume it, do nothing). |
 | Hide the system navigation bar on every screen | Hide it on **keypad** phones. On a phone with **no hardware number keys** (`configuration.keyboard != KEYBOARD_12KEY`), leave it visible: it's their only Back. |
@@ -167,7 +167,7 @@ The full key table is `PLAN.md §3.1`. In code:
 - **"Phone (SIM)" is one more entry in the same list** (PLAN §5.2), not a SIP
   account. Calling from it only fires `ACTION_DIAL` with a `tel:` URI on key UP,
   and stops there. Never use `ACTION_CALL`, never request `CALL_PHONE`, and
-  never try to answer, track or log SIM calls. FlipCall is **not** the default
+  never try to answer, track or log SIM calls. BusyCall is **not** the default
   phone app.
 
 ## 6a. Setup codes (PLAN §5.1)
@@ -190,7 +190,7 @@ The full key table is `PLAN.md §3.1`. In code:
   task. Never hand-edit the asset copy.
 - Saving to Download: MediaStore on API 29+, legacy path with
   `WRITE_EXTERNAL_STORAGE maxSdkVersion=28` below that. Replace an existing
-  `flipcall-setup.html`; show the exact saved path on screen.
+  `busycall-setup.html`; show the exact saved path on screen.
 - Hide "Scan QR setup code" on phones without a camera
   (`FEATURE_CAMERA_ANY`), and declare the camera `required="false"` (guide §5).
 
@@ -225,7 +225,7 @@ labels 14 sp, metadata 11 sp, headers 18 sp, ≥ 7:1 contrast, dark background,
 `minHeight` rows, one-line ellipsized labels, `isFakeBoldText` for bold, ≤ 150 ms
 alpha-only animation.
 
-FlipCall additions:
+BusyCall additions:
 
 - Call/Answer = green, Decline/End = red, **always with a text label too**.
 - **Dark red theme.** Title and softkey bars `#6E0A12` with white text; background

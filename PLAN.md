@@ -1,4 +1,4 @@
-# FlipCall — plan
+# BusyCall — plan
 
 > Working name. A SIP softphone for keypad ("dumb") phones that also works on
 > touchscreen phones. First target phone system: **Grandstream UCM**. Second:
@@ -9,7 +9,7 @@
 
 This is the *why* and the *what*. `AGENTS.md` is the *how*. Device rules come
 from the [Flip-DumbPhoneGuide](https://github.com/Ben-Showalter/Flip-DumbPhoneGuide/blob/main/AGENTS.md);
-the few places FlipCall deliberately differs are listed in §3.5.
+the few places BusyCall deliberately differs are listed in §3.5.
 
 ---
 
@@ -127,18 +127,18 @@ highlighted one, and the matched part is underlined.
 
 END behaves like END in the phone's own dialer:
 
-1. **During a call or ringing:** FlipCall hangs up (or declines) first.
+1. **During a call or ringing:** BusyCall hangs up (or declines) first.
 2. **Then the key is passed on** (`return super...`, never consumed), so the
    system does whatever END normally does on that phone, usually closing the
    app and going to Home. We don't fight it or bring the app back.
-3. **Outside a call:** FlipCall doesn't touch END at all.
+3. **Outside a call:** BusyCall doesn't touch END at all.
 
 On-screen **End call** and Options › **Hang up** end the call and **stay** in the
 app (back to the screen before the call), since those aren't END.
 
-### 3.5 Where FlipCall deliberately differs from the guide
+### 3.5 Where BusyCall deliberately differs from the guide
 
-| Guide says | FlipCall does | Why |
+| Guide says | BusyCall does | Why |
 |---|---|---|
 | Left softkey = the screen's primary action | **Only one softkey is used: Options.** It starts on the right and moves left automatically on phones with a MENU key (Sonim). The other softkey does nothing. The primary action is CALL / OK / an on-screen button. | Owner's decision: works on phones whose left softkey is missing, mapped to MENU, or taken by the T9 keyboard |
 | Hide the system navigation bar on every screen | Hide it on **keypad** phones only. Leave it on **touch-only** phones. | On a touch phone it's the only Back button |
@@ -176,7 +176,7 @@ What we found in the upstream code (Nov 2026, v94.1.5):
   `BaresipService` and `Call`). Keep the `compose-runtime` dependency (state only,
   no Compose UI) so upstream merges stay easy. Our ViewModels read it through a
   small adapter that turns it into `StateFlow`s.
-- **License: BSD-3-Clause.** We may use any license for FlipCall. We must keep
+- **License: BSD-3-Clause.** We may use any license for BusyCall. We must keep
   TutPro's copyright notice and license text (in the repo and the About screen).
 
 **Staying close to upstream is a goal.** Backend changes are kept small, each
@@ -199,7 +199,7 @@ listed in `UPSTREAM.md`, and offered back upstream where they make sense.
 ## 5. Screens
 
 Each screen fits about one 240×320 screen. Previews:
-**[FlipCall screen previews](https://claude.ai/artifact/QRtWmnoJU3WSiBCMCRoSai)**.
+**[BusyCall screen previews](https://claude.ai/artifact/QRtWmnoJU3WSiBCMCRoSai)**.
 
 | # | Screen | Contents | Options menu |
 |---|---|---|---|
@@ -211,7 +211,7 @@ Each screen fits about one 240×320 screen. Previews:
 | S6 | **Call log** | All calls; missed in red; which number each was on | Call back · Call from… · Add to contacts · Delete |
 | S7 | **Numbers** | Every account with status; ★ marks the default for the Dialer; "+ Add a number" opens a menu: **Type it in** (S8) · **Paste setup link** · **Scan QR setup code** (§5.1) | Make default · Edit · Turn off · Delete |
 | S7b | **Scan: code ready?** | Dialog on choosing Scan QR setup code: "Do you have a QR setup code ready?" · **Yes, scan it** (opens the scanner) · **No, help me set it up** (S7c) | — |
-| S7c | **Make a setup code** | Step 1: **Save setup page to phone** button + result line; steps 2–4: "Move flipcall-setup.html to a computer over USB, Bluetooth, or SD card", open it and fill it in, then come back and scan (§5.1) | Save again · Save to SD card · Send by Bluetooth |
+| S7c | **Make a setup code** | Step 1: **Save setup page to phone** button + result line; steps 2–4: "Move busycall-setup.html to a computer over USB, Bluetooth, or SD card", open it and fill it in, then come back and scan (§5.1) | Save again · Save to SD card · Send by Bluetooth |
 | S7a | **Setup code found** | After a paste or scan: Name, Server, Extension · Password (hidden), Connection; OK on a line edits it; **Save and connect** | — |
 | S8 | **Number setup** (Type it in) | Name (e.g. "Office"), Server, Extension, Auth ID, Password, Transport, "Test connection"; a "More options…" row (the guide §3: Options may not work while typing) | Advanced (codecs, DTMF mode, voicemail number) |
 | S9 | **Settings** | Audio · Advanced (Options on left, check for updates) · About (licenses) | — |
@@ -225,24 +225,24 @@ guide: "Never make the user type an API key"). So a number can arrive as a
 
 **There is no standard SIP setup QR code.** Every app uses its own format
 (Linphone, SessionTalk, Grandstream Wave, 3CX, Yeastar Linkus, Zoiper), so
-FlipCall reads several and the parsing lives in **one** place
+BusyCall reads several and the parsing lives in **one** place
 (`numbers/setup/SetupCodeParser`):
 
 | Format | Looks like | Where it comes from |
 |---|---|---|
-| **FlipCall link** (ours, preferred) | `flipcall:add?v=1&name=Office&server=pbx.school.org&port=5061&user=104&auth=…&pass=…&transport=udp\|tcp\|tls&vm=*97`, every value URL-encoded, empty fields left out; only `v`, `server`, `user` required. Later also `https://<host>/flipcall#add?…` with the same fields (see below). | The setup-code page (below) |
+| **BusyCall link** (ours, preferred) | `busycall:add?v=1&name=Office&server=pbx.school.org&port=5061&user=104&auth=…&pass=…&transport=udp\|tcp\|tls&vm=*97`, every value URL-encoded, empty fields left out; only `v`, `server`, `user` required. Later also `https://<host>/busycall#add?…` with the same fields (see below). | The setup-code page (below) |
 | **baresip account line** | `<sip:104@pbx.school.org;transport=tls>;auth_pass=…` | The backend's own format, so admins who already use baresip can reuse it |
 | **SIP URI with password** | `sip:104:secret@pbx.school.org;transport=tls` | Some PBX tools; old but common |
 | **Linphone-style provisioning URL** | `https://…/provisioning.xml`: fetch (HTTPS only), read Linphone's XML (`proxy_0`, `auth_info_0`) | Systems that provision Linphone |
 | **Grandstream UCM QR** | Unknown: reportedly a provisioning URL to a Grandstream-format file | Read it only if spike S6 shows the format is usable |
 
-Anything else gets a plain message: "This code isn't a FlipCall setup code.
-Ask your admin for a FlipCall code."
+Anything else gets a plain message: "This code isn't a BusyCall setup code.
+Ask your admin for a BusyCall code."
 
 - **Paste setup link** reads the clipboard. If it's empty: "Nothing copied yet:
   copy the setup link from your text or email, then try again."
-- **Opening the link** from a text or email (`flipcall:` scheme or the `#add`
-  link) opens FlipCall straight to "Setup code found".
+- **Opening the link** from a text or email (`busycall:` scheme or the `#add`
+  link) opens BusyCall straight to "Setup code found".
 - **Scan QR setup code** opens the camera in our own screen (the camera key
   is swallowed by the OS; this is reached from the menu). Uses **ZXing core**
   (Apache-2.0, offline, no Google services) for decoding. Phones with no camera
@@ -251,15 +251,15 @@ Ask your admin for a FlipCall code."
   is never shown, logged or kept in the clipboard (cleared after reading),
   and the camera image is never saved.
 - **Setup-code page:** one self-contained HTML file,
-  `tools/setup-code/flipcall-setup.html`, that an admin saves and opens on their
+  `tools/setup-code/busycall-setup.html`, that an admin saves and opens on their
   own PC. It works offline (the QR library, qrcode-generator 1.4.4, MIT, is
   inlined), makes no network requests, and keeps nothing after it's closed. It
-  builds the `flipcall:` link and its QR code, and can copy the link, save the
+  builds the `busycall:` link and its QR code, and can copy the link, save the
   QR as a PNG, or print it. It says plainly: "This code contains the password.
   Treat it like one." The source is `tools/setup-code/src/page.html`, with the
   library inlined at build time.
 - **Getting the page from the phone itself** (S7b → S7c): the app ships
-  `flipcall-setup.html` in its `assets/`, so a user with no admin and no
+  `busycall-setup.html` in its `assets/`, so a user with no admin and no
   internet can still make a code. "Save setup page to phone" writes it to the
   phone's public **Download** folder:
   - API 29+: `MediaStore.Downloads` insert, no permission needed.
@@ -269,11 +269,11 @@ Ask your admin for a FlipCall code."
     guide §5 storage rules; the E4811 has a storage-permission bug on API 29+,
     which is why 29+ uses MediaStore).
   - An existing file of that name is replaced, not duplicated as
-    `flipcall-setup (1).html`, so the instructions stay true.
-  - Result line on screen: "✓ Saved: Download › flipcall-setup.html", or the
+    `busycall-setup (1).html`, so the instructions stay true.
+  - Result line on screen: "✓ Saved: Download › busycall-setup.html", or the
     failure in plain words with Retry ("Phone storage is full", "Storage
     permission was turned off: Options › Allow storage").
-  - Steps on screen: "Move flipcall-setup.html to a computer over USB,
+  - Steps on screen: "Move busycall-setup.html to a computer over USB,
     Bluetooth, or SD card", open it on the computer and fill it in, then come
     back and choose Scan QR setup code.
   - Options on that screen make the other two routes one step:
@@ -283,15 +283,15 @@ Ask your admin for a FlipCall code."
     - **Send by Bluetooth**: shares the file with `ACTION_SEND` (via a
       `FileProvider` URI) so the phone's own Bluetooth share screen opens. If
       no app can take it (the guide: `resolveActivity()` may return the
-      chooser), say "This phone can't send files by Bluetooth from FlipCall"
+      chooser), say "This phone can't send files by Bluetooth from BusyCall"
       instead of failing silently.
   - The page in `assets/` is built from `tools/setup-code/` at build time, so
     the app and the standalone file are always the same version.
 - **Tapping a link in a text:** many flip-phone message apps only make
-  `http(s)` links tappable, so a `flipcall:` link may have to be copied and
+  `http(s)` links tappable, so a `busycall:` link may have to be copied and
   pasted (Paste setup link) rather than tapped. If tapping matters later, host
   the same page somewhere free (GitHub Pages) and let it also produce the
-  `https://…/flipcall#add?…` form; the settings after `#` never reach the server.
+  `https://…/busycall#add?…` form; the settings after `#` never reach the server.
 
 **Choosing a number for outgoing calls:** the ★ default, unless the user
 changes "Call from" on the Dialer, or calls back from Recents / Call log (which
@@ -306,16 +306,16 @@ and as a row on the Numbers screen. It can be the ★ default.
 - **Calling "from Phone (SIM)" opens the phone's own dialer** with the number
   already typed (`Intent.ACTION_DIAL`, `tel:` URI), the same way TurboText
   hands off. The user presses CALL once more there, and the call is entirely
-  the phone's: FlipCall doesn't show it, time it or log it.
+  the phone's: BusyCall doesn't show it, time it or log it.
 - No permission is needed (`ACTION_DIAL`, not `ACTION_CALL`).
 - Launch on key **UP** (the guide: otherwise the UP reaches the dialer and types
   or dials again). If `resolveActivity()` returns Android's chooser or nothing,
-  show "This phone has no dialer app FlipCall can open" (the guide §5).
+  show "This phone has no dialer app BusyCall can open" (the guide §5).
 - Shown only on phones with telephony (`FEATURE_TELEPHONY`). On the Numbers
   screen its status reads "Opens the phone's dialer"; it has no settings and
   can't be deleted, only hidden (Settings › Advanced).
-- **Incoming** SIM calls still ring in the phone's dialer, not FlipCall
-  (owner's decision, 2026-11-04). Making FlipCall the default phone app is out of
+- **Incoming** SIM calls still ring in the phone's dialer, not BusyCall
+  (owner's decision, 2026-11-04). Making BusyCall the default phone app is out of
   scope for now.
 
 ## 6. Risks — test these on hardware first
@@ -324,7 +324,7 @@ and as a row on the Numbers screen. It can be the ★ default.
 |---|---|---|---|
 | R1 | **END (`KEYCODE_ENDCALL`) may never reach the app** on Kyocera: the guide says it "acts as Home", which the system may do before we see the key. The user would land on Home with the call **still running**. | G3 | S2 |
 | R2 | ~~CALL may open the phone's own dialer~~ **Resolved:** the owner confirmed CALL/Send reaches apps on the target phones. S2 still logs its keycode per phone. | — | S2 |
-| R3 | baresip-studio's `minSdk` is 28; the fleet includes Android 7 | Which phones can run FlipCall at all | S1 |
+| R3 | baresip-studio's `minSdk` is 28; the fleet includes Android 7. **Code review (docs/SPIKES.md S1):** Android 8 is a small change; Android 7 needs a non-Telecom call path and OpenSL ES audio, a real backend change. | Which phones can run BusyCall at all | S1 |
 | R4 | Keeping several registrations alive drains the battery or gets killed | G8 | S3 |
 | R5 | Audio routing (earpiece / speaker / flip closed) differs per phone | Calls feel broken | S4 |
 | R6 | One-way audio off the office network (NAT) | Remote use | S5 |
@@ -369,7 +369,7 @@ one hosted SIP provider. Optional: 3CX, Yeastar.
 5. **S5 — Off-network.** Mobile data to a UCM behind NAT.
 6. **S6 — Camera, QR and the setup page.** On each phone: save the setup page to Download (API 24–28 and 29+ paths) and move it to a Windows PC and a Mac over USB, Bluetooth and SD card, noting which routes each phone supports. Can we open the camera and decode a
    QR code at arm's length with ZXing? Also scan a Grandstream UCM's Wave QR code
-   and record exactly what it contains, to decide whether FlipCall can read it.
+   and record exactly what it contains, to decide whether BusyCall can read it.
 
 ## 9. Milestones
 
@@ -384,7 +384,7 @@ one hosted SIP provider. Optional: 3CX, Yeastar.
 
 ## 10. Open questions for the owner
 
-1. **App name** (FlipCall is a placeholder) and **license** (BSD-3 to match
+1. **App name** (BusyCall is a placeholder) and **license** (BSD-3 to match
    upstream is simplest).
 2. **Test phones:** E4810, E4610, one Sonim, one touch phone? Does a Sonim on
    Android 5.1 need to work? (That would need `minSdk 22`, and there's no
