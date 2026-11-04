@@ -10,7 +10,7 @@ configure<ApplicationExtension> {
     compileSdk = 37
     ndkVersion = "30.0.16248370"
     defaultConfig {
-        applicationId = "com.tutpro.baresip"
+        applicationId = "com.busycall.app"
         minSdk = 28
         targetSdk = 36
         versionCode = 581
@@ -96,3 +96,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.mmslib)
 }
+
+// BusyCall: download prebuilt native libraries into distribution/ (see BUILDING.md).
+apply(from = rootProject.file("gradle/native-libs.gradle.kts"))

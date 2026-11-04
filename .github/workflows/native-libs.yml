@@ -1,0 +1,120 @@
+# Builds baresip's native libraries (distribution/) on GitHub's Linux servers
+# and publishes them as a release, so the app itself can be built in Android
+# Studio on any computer, Windows included. See BUILDING.md.
+name: Native libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: Rebuild and replace the release even if it already exists
+        type: boolean
+        default: false
+  push:
+    paths:
+      - native-libs.properties
+      - libbaresip-android
+      - .github/workflows/native-libs.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: native-libs
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Read versions
+        id: v
+        run: |
+          version=$(sed -n 's/^version=//p' native-libs.properties | tr -d '[:space:]')
+          ndk=$(sed -n 's/.*ndkVersion *= *"\(.*\)".*/\1/p' app/build.gradle.kts)
+          test -n "$version" && test -n "$ndk"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "ndk=$ndk" >> "$GITHUB_OUTPUT"
+          echo "tag=native-libs-$version" >> "$GITHUB_OUTPUT"
+          echo "Native libraries $version, NDK $ndk"
+
+      - name: Check for an existing release
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+          REBUILD: ${{ inputs.rebuild }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            if [ "$REBUILD" = "true" ]; then
+              echo "Release $TAG exists; rebuilding as requested."
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Release $TAG already exists. Bump version in native-libs.properties, or run with 'rebuild'."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install build tools
+        if: steps.existing.outputs.skip != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget make libtool m4 autoconf automake pkg-config unzip zip
+          cmake --version
+
+      - name: Install the Android NDK
+        if: steps.existing.outputs.skip != 'true'
+        env:
+          NDK: ${{ steps.v.outputs.ndk }}
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK" > /dev/null
+          echo "NDK_PATH=$ANDROID_HOME/ndk/$NDK" >> "$GITHUB_ENV"
+
+      - name: Download library sources
+        if: steps.existing.outputs.skip != 'true'
+        working-directory: libbaresip-android
+        run: make download-sources NDK_PATH="$NDK_PATH" OUTPUT_DIR="$GITHUB_WORKSPACE/distribution"
+
+      - name: Build for arm64-v8a, armeabi-v7a and x86_64
+        if: steps.existing.outputs.skip != 'true'
+        working-directory: libbaresip-android
+        # `debug` builds the two phone ABIs (`all`) plus x86_64 for the emulator,
+        # which Android Studio's debug build also needs.
+        run: make debug NDK_PATH="$NDK_PATH" OUTPUT_DIR="$GITHUB_WORKSPACE/distribution"
+
+      - name: Package distribution.zip
+        if: steps.existing.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          cd distribution
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            test -f "re/lib/$abi/libre.a" || { echo "Missing re/lib/$abi/libre.a"; exit 1; }
+            test -f "baresip/lib/$abi/libbaresip.a" || { echo "Missing baresip/lib/$abi/libbaresip.a"; exit 1; }
+          done
+          echo "$VERSION" > .native-libs-version
+          zip -qr ../distribution.zip . -x .gitignore
+          cd ..
+          ls -lh distribution.zip
+
+      - name: Publish the release
+        if: steps.existing.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+          VERSION: ${{ steps.v.outputs.version }}
+          NDK: ${{ steps.v.outputs.ndk }}
+        run: |
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" distribution.zip \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Native libraries $VERSION" \
+            --notes "Prebuilt baresip native libraries for the Android Studio build (not an app release). Built from libbaresip-android $(git -C libbaresip-android rev-parse --short HEAD) with NDK $NDK, for arm64-v8a, armeabi-v7a and x86_64."

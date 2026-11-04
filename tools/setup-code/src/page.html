@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BusyCall Setup Code</title>
+<!--
+  BusyCall setup-code maker. Save this one file anywhere and open it in a browser.
+  It works offline and never sends anything over the network: everything you
+  type stays in this page. Closing or reloading the page forgets it.
+
+  Link format (version 1), read by BusyCall's SetupCodeParser:
+    busycall:add?v=1&name=<label>&server=<host>&port=<n>&user=<ext>
+                 &auth=<auth id>&pass=<password>&transport=udp|tcp|tls&vm=<voicemail>
+  Every value is URL-encoded. Empty fields are left out. Only v, server and user are required.
+-->
+<style>
+:root {
+  --bg: #0B0B0C;
+  --panel: #18181B;
+  --field: #232327;
+  --line: #3A3A3E;
+  --text: #F2F2F2;
+  --muted: #B8B8B8;
+  --bar: #6E0A12;
+  --accent: #FF8F8F;
+  --focus: #FF6B6B;
+  --ok: #1E7A34;
+  --warn-bg: #3A1418;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+header {
+  background: var(--bar);
+  padding: 14px 20px;
+}
+header h1 { margin: 0; font-size: 22px; }
+header p { margin: 2px 0 0; color: #FFD6D6; font-size: 14px; }
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+}
+form.card { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+section.card { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+h2 { margin: 0 0 4px; font-size: 18px; color: var(--accent); }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--muted); }
+label .req { color: var(--accent); }
+input, select {
+  font: inherit;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  width: 100%;
+}
+input:focus, select:focus, button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+.row { display: flex; gap: 10px; }
+.row > * { flex: 1 1 0; min-width: 0; }
+.row > .narrow { flex: 0 0 110px; }
+.pass { display: flex; gap: 8px; }
+.pass input { flex: 1; }
+button {
+  font: inherit;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 14px;
+}
+button.primary { background: var(--ok); border-color: var(--ok); color: #fff; font-weight: 600; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+.warn {
+  background: var(--warn-bg);
+  border: 1px solid #7A2A31;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+#qr {
+  align-self: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  width: 300px;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #444;
+  text-align: center;
+  font-size: 14px;
+}
+#qr svg { width: 100%; height: 100%; display: block; }
+#qrLabel { text-align: center; font-weight: 600; min-height: 1.4em; }
+#link {
+  font: 13px/1.4 ui-monospace, Consolas, monospace;
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  word-break: break-all;
+  min-height: 3em;
+  color: var(--text);
+}
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#status { font-size: 14px; color: #9BE7A9; min-height: 1.3em; margin: 0; }
+ol { margin: 0; padding-left: 20px; font-size: 14px; color: var(--muted); }
+@media print {
+  header, form.card, .actions, .warn, ol, #link, #status, .hint, h2 { display: none !important; }
+  body, main, section.card { background: #fff !important; color: #000 !important; border: 0 !important; }
+  #qr { width: 70mm; padding: 0; }
+  #qrLabel { color: #000; font-size: 16pt; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>BusyCall setup code</h1>
+  <p>Works offline. Nothing you type leaves this computer.</p>
+</header>
+<main>
+  <form class="card" id="form" autocomplete="off" onsubmit="return false">
+    <h2>Phone number details</h2>
+    <label>Name shown on the phone
+      <input id="name" placeholder="Office" maxlength="40">
+    </label>
+    <div class="row">
+      <label><span>Server <span class="req">(required)</span></span>
+        <input id="server" placeholder="pbx.example.com or 192.168.1.10" spellcheck="false">
+      </label>
+      <label class="narrow">Port
+        <input id="port" inputmode="numeric" placeholder="auto" maxlength="5">
+      </label>
+    </div>
+    <div class="row">
+      <label><span>Extension / username <span class="req">(required)</span></span>
+        <input id="user" placeholder="104" spellcheck="false">
+      </label>
+      <label>Auth ID
+        <input id="auth" placeholder="same as extension" spellcheck="false">
+      </label>
+    </div>
+    <label>SIP password
+      <span class="pass">
+        <input id="pass" type="password" spellcheck="false">
+        <button type="button" id="showPass" aria-pressed="false">Show</button>
+      </span>
+    </label>
+    <div class="row">
+      <label>Connection
+        <select id="transport">
+          <option value="udp">UDP</option>
+          <option value="tcp">TCP</option>
+          <option value="tls" selected>TLS (secure)</option>
+        </select>
+      </label>
+      <label>Voicemail number
+        <input id="vm" placeholder="*97" spellcheck="false">
+      </label>
+    </div>
+    <p class="hint">Grandstream UCM: use the extension number, its SIP/IAX password, and the UCM's address. Leave Port empty unless the UCM uses a non-standard port.</p>
+    <div class="actions">
+      <button type="button" id="clear">Clear all</button>
+    </div>
+  </form>
+
+  <section class="card" aria-live="polite">
+    <h2>Setup code</h2>
+    <div id="qr">Fill in Server and Extension to make a code.</div>
+    <div id="qrLabel"></div>
+    <div class="warn"><strong>This code contains the password.</strong> Treat it like one: don't post it, and delete it after the phone is set up.</div>
+    <label>Setup link
+      <div id="link"></div>
+    </label>
+    <div class="actions">
+      <button type="button" class="primary" id="copy" disabled>Copy link</button>
+      <button type="button" id="png" disabled>Save QR as image</button>
+      <button type="button" id="print" disabled>Print QR</button>
+    </div>
+    <p id="status"></p>
+    <ol>
+      <li>On the phone: <strong>BusyCall › Options › Numbers › + Add a number</strong>.</li>
+      <li>Choose <strong>Scan QR setup code</strong> and point the camera at this screen, or send yourself the link and choose <strong>Paste setup link</strong>.</li>
+      <li>Check the details, then <strong>Save and connect</strong>.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+/*__QRCODE_LIBRARY__*/
+</script>
+<script>
+(function () {
+  'use strict';
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+
+  var ids = ['name', 'server', 'port', 'user', 'auth', 'pass', 'transport', 'vm'];
+  var el = {};
+  ids.concat(['qr', 'qrLabel', 'link', 'copy', 'png', 'print', 'clear', 'showPass', 'status']).forEach(function (id) {
+    el[id] = document.getElementById(id);
+  });
+
+  var current = '';
+
+  function value(id) { return el[id].value.trim(); }
+
+  function buildLink() {
+    var server = value('server');
+    var user = value('user');
+    if (!server || !user) return '';
+    var port = value('port');
+    if (port && !/^\d{1,5}$/.test(port)) return '';
+    var parts = [['v', '1'], ['name', value('name')], ['server', server], ['port', port],
+                 ['user', user], ['auth', value('auth')], ['pass', el.pass.value],
+                 ['transport', el.transport.value], ['vm', value('vm')]];
+    return 'busycall:add?' + parts
+      .filter(function (p) { return p[1] !== ''; })
+      .map(function (p) { return p[0] + '=' + encodeURIComponent(p[1]); })
+      .join('&');
+  }
+
+  function makeQr(text) {
+    var qr = qrcode(0, 'M');
+    qr.addData(text, 'Byte');
+    qr.make();
+    return qr;
+  }
+
+  function render() {
+    current = buildLink();
+    var ready = current !== '';
+    el.copy.disabled = el.png.disabled = el.print.disabled = !ready;
+    el.status.textContent = '';
+    if (!ready) {
+      var badPort = value('port') && !/^\d{1,5}$/.test(value('port'));
+      el.qr.textContent = badPort ? 'Port must be a number, like 5060.' : 'Fill in Server and Extension to make a code.';
+      el.qrLabel.textContent = '';
+      el.link.textContent = '';
+      return;
+    }
+    el.qr.innerHTML = makeQr(current).createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    var svg = el.qr.querySelector('svg');
+    if (svg) { svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'BusyCall setup QR code'); }
+    el.qrLabel.textContent = (value('name') || 'BusyCall') + ' · ' + value('user');
+    el.link.textContent = current;
+  }
+
+  ids.forEach(function (id) {
+    el[id].addEventListener('input', render);
+    el[id].addEventListener('change', render);
+  });
+
+  el.showPass.addEventListener('click', function () {
+    var show = el.pass.type === 'password';
+    el.pass.type = show ? 'text' : 'password';
+    el.showPass.textContent = show ? 'Hide' : 'Show';
+    el.showPass.setAttribute('aria-pressed', String(show));
+  });
+
+  el.clear.addEventListener('click', function () {
+    ids.forEach(function (id) { if (id !== 'transport') el[id].value = ''; });
+    el.transport.value = 'tls';
+    render();
+    el.name.focus();
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  el.copy.addEventListener('click', function () {
+    if (!current) return;
+    var done = function () { el.status.textContent = 'Link copied.'; };
+    var failed = function () {
+      if (fallbackCopy(current)) done();
+      else el.status.textContent = 'Couldn’t copy automatically. Select the link above and copy it.';
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(current).then(done, failed);
+    } else {
+      failed();
+    }
+  });
+
+  el.png.addEventListener('click', function () {
+    if (!current) return;
+    var qr = makeQr(current);
+    var cell = 10, margin = 4;
+    var size = qr.getModuleCount() * cell + margin * 2 * cell;
+    var label = el.qrLabel.textContent;
+    var canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size + 60;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000000';
+    var n = qr.getModuleCount();
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        if (qr.isDark(r, c)) ctx.fillRect(margin * cell + c * cell, margin * cell + r * cell, cell, cell);
+      }
+    }
+    ctx.font = 'bold 26px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, size / 2, size + 36);
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'busycall-setup-' + (value('name') || 'number').replace(/[^A-Za-z0-9_-]+/g, '-') + '-' + value('user').replace(/[^A-Za-z0-9_-]+/g, '-') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    el.status.textContent = 'Image saved. Delete it once the phone is set up.';
+  });
+
+  el.print.addEventListener('click', function () { if (current) window.print(); });
+
+  render();
+  el.name.focus();
+})();
+</script>
+</body>
+</html>
