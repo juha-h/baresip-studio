@@ -98,16 +98,20 @@ fun NavGraphBuilder.chatsScreenRoute(navController: NavController) {
         arguments = listOf(navArgument("aor") { type = NavType.StringType })
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
-        ChatsScreen(navController, aor)
+        val account = Account.ofAor(aor)
+        if (account == null) {
+            navController.navigateUp()
+            return@composable
+        }
+        ChatsScreen(navController, account)
     }
 }
 
 @Composable
-private fun ChatsScreen(navController: NavController, aor: String) {
+private fun ChatsScreen(navController: NavController, account: Account) {
 
     val ctx = LocalContext.current
-
-    val account = Account.ofAor(aor)!!
+    val aor = account.aor
     val uaMessages: MutableState<List<Message>> = remember { mutableStateOf(emptyList()) }
     var areMessagesLoaded by remember { mutableStateOf(false) }
 

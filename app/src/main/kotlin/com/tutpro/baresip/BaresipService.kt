@@ -3377,7 +3377,8 @@ class BaresipService: Service() {
         }, 1000)
 
         val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        val caller = Utils.friendlyUri(this, peerUri, Account.ofAor(aor)!!)
+        val account = Account.ofAor(aor) ?: UserAgent.ofUap(uap)?.account ?: Account.accounts().firstOrNull()
+        val caller = if (account != null) Utils.friendlyUri(this, peerUri, account) else peerUri
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK

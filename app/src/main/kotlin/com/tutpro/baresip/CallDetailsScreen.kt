@@ -84,7 +84,11 @@ import kotlin.time.Duration.Companion.milliseconds
 fun NavGraphBuilder.callDetailsScreenRoute(navController: NavController, viewModel: ViewModel) {
     composable("call_details") { _ ->
         val callRow = remember { viewModel.consumeSelectedCallRow() }
-        CallDetailsScreen(navController, callRow!!)
+        if (callRow == null) {
+            navController.navigateUp()
+            return@composable
+        }
+        CallDetailsScreen(navController, callRow)
     }
 }
 
@@ -157,7 +161,7 @@ private fun CallDetailsContent(
 
 @Composable
 private fun Peer(callRow: CallRow) {
-    val account = Account.ofAor(callRow.aor)!!
+    val account = Account.ofAor(callRow.aor) ?: Account.accounts().firstOrNull() ?: return
     val peerUri = callRow.peerUri
     val avatarSize = 24.dp
     Row(

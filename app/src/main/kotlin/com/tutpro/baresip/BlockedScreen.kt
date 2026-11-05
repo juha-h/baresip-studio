@@ -67,14 +67,19 @@ fun NavGraphBuilder.blockedScreenRoute(navController: NavController) {
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
         val request = backStackEntry.arguments?.getString("request")!!
-        BlockedScreen(navController, request, aor)
+        val account = Account.ofAor(aor)
+        if (account == null) {
+            navController.navigateUp()
+            return@composable
+        }
+        BlockedScreen(navController, request, account)
     }
 }
 
 @Composable
-private fun BlockedScreen(navController: NavController, request: String, aor: String) {
+private fun BlockedScreen(navController: NavController, request: String, account: Account) {
 
-    val account = Account.ofAor(aor)!!
+    val aor = account.aor
 
     val blocked: MutableState<List<Blocked>> = remember { mutableStateOf(emptyList()) }
     var isBlockedLoaded by remember { mutableStateOf(false) }
