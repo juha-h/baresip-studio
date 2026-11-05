@@ -36,13 +36,14 @@ object Config {
                 throw e
             }
         }
-        if (!File(configPath).exists()) {
+        val fileBytes = if (File(configPath).exists()) Utils.getFileContents(configPath) else null
+        if (fileBytes == null) {
             for (module in audioModules)
                 config = "${config}module ${module}.so\n"
             previousConfig = config
         }
         else
-            previousConfig = String(Utils.getFileContents(configPath)!!, StandardCharsets.ISO_8859_1)
+            previousConfig = String(fileBytes, StandardCharsets.ISO_8859_1)
         previousLines = previousConfig.split("\n")
 
         val logLevel = previousVariable("log_level")
@@ -119,11 +120,13 @@ object Config {
         }
         else {
             config = "${config}dyn_dns yes\n"
-            for (dnsServer in BaresipService.dnsServers)
-                config = if (Utils.checkIpV4(dnsServer.hostAddress!!))
-                    "${config}dns_server ${dnsServer.hostAddress}:53\n"
+            for (dnsServer in BaresipService.dnsServers) {
+                val hostAddress = dnsServer.hostAddress ?: continue
+                config = if (Utils.checkIpV4(hostAddress))
+                    "${config}dns_server ${hostAddress}:53\n"
                 else
-                    "${config}dns_server [${dnsServer.hostAddress}]:53\n"
+                    "${config}dns_server [${hostAddress}]:53\n"
+            }
             BaresipService.dynDns = true
         }
 
@@ -353,8 +356,8 @@ object Config {
     fun updateDnsServers(dnsServers: List<InetAddress>): Int {
         var servers = ""
         for (dnsServer in dnsServers) {
-            if (dnsServer.hostAddress == null) continue
-            var address = dnsServer.hostAddress!!.removePrefix("/")
+            val hostAddr = dnsServer.hostAddress ?: continue
+            var address = hostAddr.removePrefix("/")
             address = if (Utils.checkIpV4(address))
                 "${address}:53"
             else

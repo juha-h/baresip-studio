@@ -484,9 +484,10 @@ private fun MainScreen(
     LaunchedEffect(Unit) {
         if (!BaresipService.isServiceRunning) {
             val path = ctx.filesDir.absolutePath + "/accounts"
-            if (File(path).exists()) {
+            val fileBytes = if (File(path).exists()) Utils.getFileContents(path) else null
+            if (fileBytes != null) {
                 passwordAccounts = String(
-                    Utils.getFileContents(path)!!,
+                    fileBytes,
                     Charsets.UTF_8
                 ).lines().toMutableList()
                 showPasswordsDialog.value = true
