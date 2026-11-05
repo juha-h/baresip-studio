@@ -1,0 +1,2 @@
+- Avoid possible crashes when navigating to screens without an account
+- Avoid race condition related crash when loading configuration
