@@ -118,10 +118,15 @@ fun NavGraphBuilder.chatScreenRoute(navController: NavController, viewModel: Vie
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
         val peerUri = backStackEntry.arguments?.getString("peer")!!
+        val account = Account.ofAor(aor)
+        if (account == null) {
+            navController.navigateUp()
+            return@composable
+        }
         ChatScreen(
             navController = navController,
             viewModel = viewModel,
-            account = Account.ofAor(aor)!!,
+            account = account,
             peerUri = peerUri
         )
     }
@@ -555,7 +560,7 @@ private fun NewMessage(
 ) {
     val ctx = LocalContext.current
     val aor = account.aor
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor) ?: BaresipService.uas.value.firstOrNull() ?: return
     val coroutineScope = rememberCoroutineScope()
 
     val newMessage = rememberSaveable(stateSaver = TextFieldValue.Saver) {

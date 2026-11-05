@@ -396,9 +396,10 @@ private fun MainScreen(
     LaunchedEffect(Unit) {
         if (!BaresipService.isServiceRunning) {
             val path = ctx.filesDir.absolutePath + "/accounts"
-            if (File(path).exists()) {
+            val fileBytes = if (File(path).exists()) Utils.getFileContents(path) else null
+            if (fileBytes != null) {
                 passwordAccounts = String(
-                    Utils.getFileContents(path)!!,
+                    fileBytes,
                     Charsets.UTF_8
                 ).lines().toMutableList()
                 showPasswordsDialog.value = true
@@ -880,7 +881,7 @@ private fun BottomBar(ctx: Context, viewModel: ViewModel, navController: NavCont
                     enabled = aor.isNotEmpty(),
                     onClick = {
                         if (checkLockedAndToast(ctx)) return@DockedToolbarItem
-                        val ua = UserAgent.ofAor(aor)!!
+                        val ua = UserAgent.ofAor(aor) ?: return@DockedToolbarItem
                         val acc = ua.account
                         if (acc.vmUri.isNotEmpty()) {
                             if (isMobile) {
@@ -1257,8 +1258,8 @@ private fun MainContent(navController: NavController, viewModel: ViewModel, cont
                     if (uas.value.isNotEmpty()) {
                         if (viewModel.selectedAor.value == "")
                             spinToAor(viewModel, uas.value.first().account.aor)
-                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
-                        if (ua.account.regint > 0)
+                        val ua = UserAgent.ofAor(viewModel.selectedAor.value)
+                        if (ua != null && ua.account.regint > 0)
                             Api.ua_register(ua.uap)
                     }
                 },
@@ -2855,7 +2856,7 @@ private fun callClick(ctx: Context, viewModel: ViewModel, dialerState: ViewModel
                 Toast.makeText(ctx, R.string.no_calls, Toast.LENGTH_SHORT).show()
         }
         else {
-            val ua = UserAgent.ofAor(viewModel.selectedAor.value)!!
+            val ua = UserAgent.ofAor(viewModel.selectedAor.value) ?: return
             val latestPeerUri = CallHistory.aorLatestPeerUri(ua.account.aor)
             if (latestPeerUri != null) {
                 dialerState.redialUri = latestPeerUri
@@ -2885,7 +2886,7 @@ fun videoClick(ctx: Context, call: Call) {
 private fun makeCall(ctx: Context, viewModel: ViewModel, uriText: String,
                      dialerState: ViewModel.DialerState, videoCall: Boolean, onHoldCallp: Long = 0L) {
     val aor = viewModel.selectedAor.value
-    val ua = UserAgent.ofAor(aor)!!
+    val ua = UserAgent.ofAor(aor) ?: return
     val peerUri = if (Utils.isTelNumber(uriText))
         "tel:$uriText"
     else
@@ -3679,7 +3680,12 @@ fun callAction(ctx: Context, viewModel: ViewModel, uri: Uri?, action: String) {
                     Log.w(TAG, "No telephony providers for '$uriStr'")
                     return
                 }
-                uap = UserAgent.ofAor(account.aor)!!.uap
+                val ua = UserAgent.ofAor(account.aor)
+                if (ua == null) {
+                    Log.w(TAG, "No UserAgent for account '${account.aor}'")
+                    return
+                }
+                uap = ua.uap
             }
             else -> {
                 Log.w(TAG, "Unsupported URI scheme ${uri.scheme}")
