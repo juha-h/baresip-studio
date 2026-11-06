@@ -1,0 +1,1 @@
+- Avoid crash when SMS/MMS is send via baresip by an external application
