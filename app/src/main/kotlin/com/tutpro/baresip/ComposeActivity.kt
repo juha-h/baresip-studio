@@ -16,6 +16,7 @@ class ComposeActivity : ComponentActivity() {
         val sanitizedIntent = IntentSanitizer.Builder()
             .allowAction(Intent.ACTION_SEND)
             .allowAction(Intent.ACTION_SENDTO)
+            .allowAction(Intent.ACTION_VIEW)
             .allowType { it.startsWith("text/") }
             .allowData { uri ->
                 uri.scheme in listOf("sms", "smsto", "mms", "mmsto")
@@ -25,6 +26,7 @@ class ComposeActivity : ComponentActivity() {
             .allowExtra("address") { it is String }
             .allowExtra(Intent.EXTRA_STREAM) { true }
             .allowExtra("exit_on_sent") { it is Boolean }
+            .allowAnyComponent()
             .build()
             .sanitizeByFiltering(intent)
 
