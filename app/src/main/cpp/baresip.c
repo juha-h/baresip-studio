@@ -17,6 +17,8 @@ typedef struct baresip_context
 
 BaresipContext g_ctx;
 
+static volatile bool engine_running = false;
+
 enum
 {
     ASYNC_WORKERS = 4
@@ -411,6 +413,7 @@ static void mqueue_handler(int id, void *data, void *arg)
 {
     (void)arg;
     if (id == ID_UA_STOP_ALL) {
+        engine_running = false;
         LOGD("calling ua_stop_all with force %u\n", (unsigned)(uintptr_t)data);
         ua_stop_all((bool)(uintptr_t)data);
     }
@@ -606,9 +609,12 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
     (*env)->CallVoidMethod(env, g_ctx.mainActivityObj, startedId);
 
     LOGI("running main loop ...\n");
+    engine_running = true;
     err = re_main(signal_handler);
+    engine_running = false;
 
 out:
+    engine_running = false;
     if (err) {
         LOGE("stopping UAs due to error: (%d)\n", err);
         ua_stop_all(true);
@@ -1204,6 +1210,10 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_ua_1register(JNIEnv *env, job
     (void)obj;
     LOGD("registering UA '%ld'\n", (long)ua);
     re_thread_enter();
+    if (!engine_running) {
+        re_thread_leave();
+        return ENODEV;
+    }
     int res = ua_register((struct ua *)ua);
     re_thread_leave();
     return res;
@@ -1215,6 +1225,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_ua_1unregister(
     (void)env;
     (void)obj;
     re_thread_enter();
+    if (!engine_running) {
+        re_thread_leave();
+        return;
+    }
     ua_unregister((struct ua *)ua);
     re_thread_leave();
 }
@@ -1233,6 +1247,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_ua_1destroy(JNIEnv *env, jobj
     (void)obj;
     LOGD("destroying ua %ld\n", (long)ua);
     re_thread_enter();
+    if (!engine_running) {
+        re_thread_leave();
+        return;
+    }
     (void)ua_destroy((struct ua *)ua);
     re_thread_leave();
 }
@@ -1410,13 +1428,20 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_call_1connect(
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     LOGD("connecting call %ld to %s\n", (long)call, native_peer);
     re_thread_enter();
+    if (!engine_running) {
+        re_thread_leave();
+        if (native_peer)
+            (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
+        return ENODEV;
+    }
     struct pl pl;
     pl_set_str(&pl, native_peer);
     int err = call_connect((struct call *)call, &pl);
     re_thread_leave();
     if (err)
         LOGW("call_connect error: %d\n", err);
-    (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
+    if (native_peer)
+        (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
     return err;
 }
 
