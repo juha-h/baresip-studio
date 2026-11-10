@@ -467,7 +467,11 @@ class BaresipService: Service() {
             override fun onFinish() {
                 when (stopState) {
                     "initial" -> {
-                        if (isServiceRunning) baresipStop(true)
+                        if (isServiceRunning) {
+                            isNativeReady = false
+                            isServiceRunning = false
+                            baresipStop(true)
+                        }
                         stopState = "force"
                         quitTimer.start()
                     }
@@ -870,9 +874,12 @@ class BaresipService: Service() {
             }
 
             "Stop" -> {
+                val wasRunning = isServiceRunning
+                isNativeReady = false
+                isServiceRunning = false
                 updateStatusNotification()
                 cleanService()
-                if (isServiceRunning) {
+                if (wasRunning) {
                     baresipStop(false)
                     quitTimer.start()
                 }
