@@ -2703,6 +2703,22 @@ fun handleServiceEvent(ctx: Context, viewModel: ViewModel, event: String, params
         return
     }
 
+    if (event == "stopped") {
+        Log.d(TAG, "Handling service event 'stopped' with start error '${params[0]}'")
+        if ((params[0] as String) != "")
+            handleDialog(
+                ctx = ctx,
+                title = ctx.getString(R.string.notice),
+                message = ctx.getString(R.string.start_failed)
+            )
+        else {
+            (ctx as? Activity)?.finishAndRemoveTask()
+            kotlin.system.exitProcess(0)
+        }
+        handleNextEvent()
+        return
+    }
+
     val ev = event.split(",")
     val uap = params[0] as Long
 
