@@ -2150,143 +2150,155 @@ class BaresipService: Service() {
             Log.e(TAG, "Failed to start foreground service: ${e.message}")
             // Fallback to standard notification if background start is denied
             nm.notify(STATUS_NOTIFICATION_ID, notification)
+            if (!isStartReceived && !isServiceRunning)
+                stopSelf()
         }
     }
 
     fun updateStatusNotification() {
 
-        Handler(Looper.getMainLooper()).post {
+        val performUpdate = {
             val incomingCall = synchronized(calls) {
                 calls.find {
                     it.status.value == "incoming" && !it.terminated.value
                 }
             }
-            if (incomingCall != null) {
-                return@post
-            }
-
-            val activeCall = synchronized(calls) {
-                calls.find {
-                    (it.status.value == "connected" || it.status.value == "outgoing"
-                            || it.status.value == "answered") && !it.terminated.value
+            if (incomingCall != null)
+                showIncomingCallNotification(incomingCall)
+            else {
+                val activeCall = synchronized(calls) {
+                    calls.find {
+                        (it.status.value == "connected" || it.status.value == "outgoing"
+                                || it.status.value == "answered") && !it.terminated.value
+                    }
                 }
-            }
 
-            val targetId = if (activeCall != null) CALL_NOTIFICATION_ID else STATUS_NOTIFICATION_ID
-            val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
-            val intent = Intent(this, MainActivity::class.java)
-                .setAction(Intent.ACTION_MAIN)
-                .addCategory(Intent.CATEGORY_LAUNCHER)
+                val targetId = if (activeCall != null) CALL_NOTIFICATION_ID else STATUS_NOTIFICATION_ID
+                val builder = NotificationCompat.Builder(this, LOW_CHANNEL_ID)
+                val intent = Intent(this, MainActivity::class.java)
+                    .setAction(Intent.ACTION_MAIN)
+                    .addCategory(Intent.CATEGORY_LAUNCHER)
 
-            val pi = PendingIntent.getActivity(
-                this,
-                STATUS_REQ_CODE,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
-            val deleteIntent = Intent(this, BaresipService::class.java).setAction("Notification Dismissed")
-            val dpi = PendingIntent.getService(
-                this,
-                STATUS_REQ_CODE,
-                deleteIntent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
-
-            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.ic_notification_b)
-                .setContentIntent(pi)
-                .setDeleteIntent(dpi)
-                .setOngoing(true)
-
-            if (activeCall != null) {
-                val peerUri = activeCall.peerUri
-                val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account, unique = true)
-                val person = Person.Builder().setName(caller).build()
-
-                val hangupIntent = Intent(this, BaresipService::class.java)
-                hangupIntent.action = "Call Hangup"
-                hangupIntent.putExtra("callp", activeCall.callp)
-                val hpi = PendingIntent.getService(
+                val pi = PendingIntent.getActivity(
                     this,
-                    REJECT_REQ_CODE,
-                    hangupIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    STATUS_REQ_CODE,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+                val deleteIntent = Intent(this, BaresipService::class.java).setAction("Notification Dismissed")
+                val dpi = PendingIntent.getService(
+                    this,
+                    STATUS_REQ_CODE,
+                    deleteIntent,
+                    PendingIntent.FLAG_IMMUTABLE
                 )
 
-                builder.setStyle(NotificationCompat.CallStyle.forOngoingCall(person, hpi))
-                    .setCategory(Notification.CATEGORY_CALL)
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-                    .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
-                    .setUsesChronometer(true)
-                    .setContentText(
-                        if (activeCall.onhold)
-                            getString(R.string.call_is_on_hold)
-                        else
-                            when (activeCall.status.value) {
-                                "outgoing", "incoming" -> getString(R.string.call_is_ringing)
-                                "connected", "answered" -> getString(R.string.call_is_connected)
-                                else -> getString(R.string.call)
-                            }
+                builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setSmallIcon(R.drawable.ic_notification_b)
+                    .setContentIntent(pi)
+                    .setDeleteIntent(dpi)
+                    .setOngoing(true)
+
+                if (activeCall != null) {
+                    val peerUri = activeCall.peerUri
+                    val caller = Utils.friendlyUri(this, peerUri, activeCall.ua.account, unique = true)
+                    val person = Person.Builder().setName(caller).build()
+
+                    val hangupIntent = Intent(this, BaresipService::class.java)
+                    hangupIntent.action = "Call Hangup"
+                    hangupIntent.putExtra("callp", activeCall.callp)
+                    val hpi = PendingIntent.getService(
+                        this,
+                        REJECT_REQ_CODE,
+                        hangupIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
-            }
-            else {
-                builder.setStyle(null)
-                builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                    .setCategory(Notification.CATEGORY_SERVICE)
-                    .setPriority(NotificationCompat.PRIORITY_MIN)
-                    .setWhen(0)
-                    .setShowWhen(false)
-                    .setUsesChronometer(false)
-                    .setContentTitle(getString(R.string.app_name))
-                    .setContentText("")
 
-                val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
-                for (i in 0..3) {
-                    val resId = when (i) {
-                        0 -> R.id.status0
-                        1 -> R.id.status1
-                        2 -> R.id.status2
-                        else -> R.id.status3
-                    }
-                    if (i < uas.value.size) {
-                        notificationLayout.setImageViewResource(resId, uas.value[i].status)
-                        notificationLayout.setViewVisibility(resId, View.VISIBLE)
-                    }
-                    else
-                        notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+                    builder.setStyle(NotificationCompat.CallStyle.forOngoingCall(person, hpi))
+                        .setCategory(Notification.CATEGORY_CALL)
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .setWhen(activeCall.startTime?.timeInMillis ?: System.currentTimeMillis())
+                        .setUsesChronometer(true)
+                        .setContentText(
+                            if (activeCall.onhold)
+                                getString(R.string.call_is_on_hold)
+                            else
+                                when (activeCall.status.value) {
+                                    "outgoing", "incoming" -> getString(R.string.call_is_ringing)
+                                    "connected", "answered" -> getString(R.string.call_is_connected)
+                                    else -> getString(R.string.call)
+                                }
+                        )
                 }
-                if (uas.value.size > 4)
-                    notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
-                else
-                    notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
+                else {
+                    builder.setStyle(null)
+                    builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                        .setCategory(Notification.CATEGORY_SERVICE)
+                        .setPriority(NotificationCompat.PRIORITY_MIN)
+                        .setWhen(0)
+                        .setShowWhen(false)
+                        .setUsesChronometer(false)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText("")
 
-                builder.setCustomContentView(notificationLayout)
-            }
+                    val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
+                    for (i in 0..3) {
+                        val resId = when (i) {
+                            0 -> R.id.status0
+                            1 -> R.id.status1
+                            2 -> R.id.status2
+                            else -> R.id.status3
+                        }
+                        if (i < uas.value.size) {
+                            notificationLayout.setImageViewResource(resId, uas.value[i].status)
+                            notificationLayout.setViewVisibility(resId, View.VISIBLE)
+                        }
+                        else
+                            notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+                    }
+                    if (uas.value.size > 4)
+                        notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
+                    else
+                        notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
 
-            if (VERSION.SDK_INT >= 31)
-                builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+                    builder.setCustomContentView(notificationLayout)
+                }
 
-            builder.setOngoing(true)
-            val notification = builder.build()
-            notification.flags =
-                notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
+                if (VERSION.SDK_INT >= 31)
+                    builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
 
-            try {
-                val fgsType = foregroundServiceType(activeCall)
-                if (VERSION.SDK_INT >= 29)
-                    startForeground(targetId, notification, fgsType)
-                else
-                    startForeground(targetId, notification)
+                builder.setOngoing(true)
+                val notification = builder.build()
+                notification.flags =
+                    notification.flags or Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
 
-                if (activeCall == null)
-                    nm.cancel(CALL_NOTIFICATION_ID)
-                else
-                    nm.cancel(STATUS_NOTIFICATION_ID)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to update notification: ${e.message}")
-                nm.notify(targetId, notification)
+                try {
+                    val fgsType = foregroundServiceType(activeCall)
+                    if (VERSION.SDK_INT >= 29)
+                        startForeground(targetId, notification, fgsType)
+                    else
+                        startForeground(targetId, notification)
+
+                    if (activeCall == null)
+                        nm.cancel(CALL_NOTIFICATION_ID)
+                    else
+                        nm.cancel(STATUS_NOTIFICATION_ID)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to update notification: ${e.message}")
+                    nm.notify(targetId, notification)
+                    if (!isStartReceived && !isServiceRunning) {
+                        stopSelf()
+                    }
+                }
             }
         }
+
+        if (Looper.myLooper() == Looper.getMainLooper())
+            performUpdate()
+        else
+            Handler(Looper.getMainLooper()).post {
+                performUpdate()
+            }
     }
 
     private fun foregroundServiceType(activeCall: Call? = null): Int {
@@ -2742,66 +2754,7 @@ class BaresipService: Service() {
         if (call !is Call.ExternalCall && shouldStartRinging(callerNumber)) startRinging()
 
         if (!Utils.isVisible()) {
-            val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            val intent = Intent(this, MainActivity::class.java)
-                .putExtra("action", "call show")
-                .putExtra("callp", callp)
-            intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_NEW_TASK
-            val pi = PendingIntent.getActivity(
-                this,
-                CALL_REQ_CODE,
-                intent,
-                piFlags
-            )
-
-            val diverterUri = call.diverterUri()
-            val contentText = if (diverterUri != "")
-                "${getString(R.string.is_calling)} (${getString(R.string.diverted_by)} ${Utils.friendlyUri(this, diverterUri, ua.account)})"
-            else
-                getString(R.string.is_calling)
-            val caller = createPerson(this, peerUri, ua.account)
-            val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
-            nb.setSmallIcon(R.drawable.ic_notification_call)
-                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                .setContentIntent(pi)
-                .setCategory(Notification.CATEGORY_CALL)
-                .setAutoCancel(false)
-                .setOngoing(true)
-                .setContentText(contentText)
-                .setWhen(System.currentTimeMillis())
-                .setShowWhen(true)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .addPerson(caller)
-                .setFullScreenIntent(pi, true)
-
-            val answerIntent = Intent(this, MainActivity::class.java)
-                .putExtra("action", "call answer")
-                .putExtra("callp", callp)
-            val api = PendingIntent.getActivity(
-                this,
-                ANSWER_REQ_CODE,
-                answerIntent,
-                piFlags
-            )
-
-            val rejectIntent = Intent(this, BaresipService::class.java)
-            rejectIntent.action = "Call Reject"
-            rejectIntent.putExtra("callp", callp)
-            val rpi = PendingIntent.getService(
-                this,
-                REJECT_REQ_CODE,
-                rejectIntent,
-                piFlags
-            )
-
-            nb.setStyle(NotificationCompat.CallStyle.forIncomingCall(
-                caller,
-                rpi,
-                api
-            ))
-            nm.notify(CALL_NOTIFICATION_ID, nb.build())
+            showIncomingCallNotification(call)
         }
 
         postServiceEvent(ServiceEvent(
@@ -2809,6 +2762,90 @@ class BaresipService: Service() {
             arrayListOf(ua.uap, callp),
             System.nanoTime()
         ))
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag", "FullScreenIntentPolicy")
+    fun showIncomingCallNotification(call: Call) {
+        val ua = call.ua
+        val peerUri = call.peerUri
+        val callp = call.callp
+
+        val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        val intent = Intent(this, MainActivity::class.java)
+            .putExtra("action", "call show")
+            .putExtra("callp", callp)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_NEW_TASK
+        val pi = PendingIntent.getActivity(
+            this,
+            CALL_REQ_CODE,
+            intent,
+            piFlags
+        )
+
+        val diverterUri = call.diverterUri()
+        val contentText = if (diverterUri != "")
+            "${getString(R.string.is_calling)} (${getString(R.string.diverted_by)} ${Utils.friendlyUri(this, diverterUri, ua.account)})"
+        else
+            getString(R.string.is_calling)
+        val caller = createPerson(this, peerUri, ua.account)
+        val nb = NotificationCompat.Builder(this, HIGH_CHANNEL_ID)
+        nb.setSmallIcon(R.drawable.ic_notification_call)
+            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setContentIntent(pi)
+            .setCategory(Notification.CATEGORY_CALL)
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setContentText(contentText)
+            .setWhen(System.currentTimeMillis())
+            .setShowWhen(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .addPerson(caller)
+            .setFullScreenIntent(pi, true)
+
+        val answerIntent = Intent(this, MainActivity::class.java)
+            .putExtra("action", "call answer")
+            .putExtra("callp", callp)
+        val api = PendingIntent.getActivity(
+            this,
+            ANSWER_REQ_CODE,
+            answerIntent,
+            piFlags
+        )
+
+        val rejectIntent = Intent(this, BaresipService::class.java)
+        rejectIntent.action = "Call Reject"
+        rejectIntent.putExtra("callp", callp)
+        val rpi = PendingIntent.getService(
+            this,
+            REJECT_REQ_CODE,
+            rejectIntent,
+            piFlags
+        )
+
+        nb.setStyle(NotificationCompat.CallStyle.forIncomingCall(
+            caller,
+            rpi,
+            api
+        ))
+        if (VERSION.SDK_INT >= 31)
+            nb.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+
+        val notification = nb.build()
+        val fgsType = foregroundServiceType(call)
+        try {
+            if (VERSION.SDK_INT >= 29)
+                startForeground(CALL_NOTIFICATION_ID, notification, fgsType)
+            else
+                startForeground(CALL_NOTIFICATION_ID, notification)
+            nm.cancel(STATUS_NOTIFICATION_ID)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start foreground for incoming call: ${e.message}")
+            nm.notify(CALL_NOTIFICATION_ID, notification)
+            if (!isStartReceived && !isServiceRunning)
+                stopSelf()
+        }
     }
 
     private fun createPerson(ctx: Context, peerUri: String, account: Account): Person {
