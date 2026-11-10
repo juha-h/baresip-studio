@@ -2163,7 +2163,7 @@ class BaresipService: Service() {
                     it.status.value == "incoming" && !it.terminated.value
                 }
             }
-            if (incomingCall != null)
+            if (incomingCall != null && !Utils.isVisible())
                 showIncomingCallNotification(incomingCall)
             else {
                 val activeCall = synchronized(calls) {
@@ -2753,9 +2753,10 @@ class BaresipService: Service() {
         val callerNumber = Utils.uriUserPart(peerUri)
         if (call !is Call.ExternalCall && shouldStartRinging(callerNumber)) startRinging()
 
-        if (!Utils.isVisible()) {
+        if (!Utils.isVisible())
             showIncomingCallNotification(call)
-        }
+        else
+            updateStatusNotification()
 
         postServiceEvent(ServiceEvent(
             "call incoming",
