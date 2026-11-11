@@ -1,6 +1,7 @@
 package com.tutpro.baresip
 
 import android.content.Context
+import android.util.Log
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.Locale
@@ -261,6 +262,10 @@ class Account(val accp: Long, virtualAor: String? = null) {
         }
 
         fun saveAccounts() {
+            if (!BaresipService.isServiceRunning && accounts().isEmpty()) {
+                Log.w("Account", "Skipping saveAccounts while service is not running with empty accounts.")
+                return
+            }
             var accounts = ""
             for (a in accounts()) accounts = accounts + a.print() + "\n"
             Utils.putFileContents(

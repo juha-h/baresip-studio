@@ -502,6 +502,11 @@ class BaresipService: Service() {
             Log.d(TAG, "Received onStartCommand action $action")
         }
 
+        if (isQuitting && action == "Start") {
+            Log.d(TAG, "Ignoring Start action while quitting")
+            return START_NOT_STICKY
+        }
+
         val isFreshStart = !isStartReceived && !isServiceRunning
 
         if (action != "Stop") {
@@ -874,6 +879,7 @@ class BaresipService: Service() {
             }
 
             "Stop" -> {
+                isQuitting = true
                 val wasRunning = isServiceRunning
                 isNativeReady = false
                 isServiceRunning = false
@@ -3660,6 +3666,7 @@ class BaresipService: Service() {
         var instance: BaresipService? = null
         var isServiceRunning = false
         var isNativeReady = false
+        var isQuitting = false
         var pendingCallIntent: Intent? = null
         var mobileNumber = ""
         var isStartReceived = false

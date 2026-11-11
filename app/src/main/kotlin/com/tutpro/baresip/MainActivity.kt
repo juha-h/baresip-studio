@@ -199,7 +199,7 @@ class MainActivity : ComponentActivity() {
                         message = getString(R.string.audio_permissions),
                         action = { requestPermissionsLauncher.launch(permissions) }
                     )
-                else if (!BaresipService.isStartReceived) {
+                else if (!BaresipService.isStartReceived && !BaresipService.isQuitting) {
                     baresipService.action = "Start"
                     try {
                         ContextCompat.startForegroundService(this, baresipService)
