@@ -1,0 +1,2 @@
+- Call StartForeground without delay in order to avoid incoming call/message notification related crash
+- Properly handle quitting of baresip app in order to avoid crashes and loss of accounts
