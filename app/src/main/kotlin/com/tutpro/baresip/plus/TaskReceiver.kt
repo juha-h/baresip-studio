@@ -13,6 +13,10 @@ class TaskReceiver : BroadcastReceiver() {
         when (intent.action) {
 
             "com.tutpro.baresip.plus.REGISTER", "com.tutpro.baresip.plus.UNREGISTER" -> {
+                if (!BaresipService.isNativeReady || !BaresipService.isServiceRunning) {
+                    Log.i(TAG, "TaskReceiver: native engine is not ready or service is not running")
+                    return
+                }
                 var aor = intent.getStringExtra("aor")
                 if (aor == null) {
                     Log.i(TAG, "TaskReceiver: 'aor' extra is missing")
