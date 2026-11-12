@@ -2223,7 +2223,7 @@ class BaresipService: Service() {
         )
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.ic_notification_b)
-            .setContentTitle(getString(R.string.app_name))
+            .setContentTitle(getString(R.string.app_name_plus))
             .setContentText(getString(R.string.status))
             .setContentIntent(pi)
             .setDeleteIntent(dpi)
