@@ -2221,15 +2221,16 @@ class BaresipService: Service() {
             deleteIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
-        val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.ic_notification_b)
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.status))
             .setContentIntent(pi)
             .setDeleteIntent(dpi)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setCustomContentView(notificationLayout)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+
         val notification = buildStatusNotification()
         try {
             if (VERSION.SDK_INT >= 29)
