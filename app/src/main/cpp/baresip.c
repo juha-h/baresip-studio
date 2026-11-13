@@ -1401,6 +1401,24 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_bevent_1stop(
     re_thread_leave();
 }
 
+static bool call_is_active(const struct call *c)
+{
+    struct le *ua_le;
+    struct le *call_le;
+
+    if (!c)
+        return false;
+
+    for (ua_le = list_head(uag_list()); ua_le != NULL; ua_le = ua_le->next) {
+        const struct ua *ua = ua_le->data;
+        for (call_le = list_head(ua_calls(ua)); call_le != NULL; call_le = call_le->next) {
+            if (call_le->data == c)
+                return true;
+        }
+    }
+    return false;
+}
+
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_calls_1mute(
         JNIEnv *env, jobject obj, jboolean mute)
 {
@@ -1532,9 +1550,15 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_call_1send_1digit(
     const uint16_t native_digit = digit;
     LOGD("sending DTMF digit '%c' to call %ld\n", (char)native_digit, (long)call);
     re_thread_enter();
-    int res = call_send_digit((struct call *)call, (char)native_digit);
+    struct call *c = (struct call *)call;
+    if (!call_is_active(c)) {
+        LOGW("call_send_digit: call %ld not found in active calls\n", (long)call);
+        re_thread_leave();
+        return EINVAL;
+    }
+    int res = call_send_digit(c, (char)native_digit);
     if (!res)
-        res = call_send_digit((struct call *)call, KEYCODE_REL);
+        res = call_send_digit(c, KEYCODE_REL);
     re_thread_leave();
     return res;
 }
