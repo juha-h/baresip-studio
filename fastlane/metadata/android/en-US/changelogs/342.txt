@@ -1,0 +1,2 @@
+- Check that call is still active before sending DTMF digit
+- Added NULL checks to contact name related actions
