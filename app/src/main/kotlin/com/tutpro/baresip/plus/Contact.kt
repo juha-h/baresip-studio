@@ -64,7 +64,8 @@ sealed class Contact {
 
         // Return contact name of uri or uri itself if contact with uri is not found
         // Return contact name of uri or uri itself if contact with uri is not found
-        fun contactName(uri: String, includeLabel: Boolean = false, unique: Boolean = false): String {
+        fun contactName(uri: String?, includeLabel: Boolean = false, unique: Boolean = false): String {
+            if (uri.isNullOrEmpty()) return ""
             val contactWithUri = findContactWithUri(uri)
             if (contactWithUri != null) {
                 val contact = contactWithUri.first
@@ -109,7 +110,8 @@ sealed class Contact {
             return uri
         }
 
-        fun baresipContact(name: String): BaresipContact? {
+        fun baresipContact(name: String?): BaresipContact? {
+            if (name == null) return null
             synchronized(BaresipService.baresipContacts) {
                 for (c in BaresipService.baresipContacts.value)
                     if (c.name == name) return c
@@ -117,7 +119,8 @@ sealed class Contact {
             return null
         }
 
-        fun androidContact(name: String): AndroidContact? {
+        fun androidContact(name: String?): AndroidContact? {
+            if (name == null) return null
             synchronized(BaresipService.androidContacts) {
                 for (c in BaresipService.androidContacts.value)
                     if (c.name == name) return c
@@ -141,7 +144,8 @@ sealed class Contact {
             return null
         }
 
-        fun contactUris(name: String, tel: Boolean = false): List<ContactUri> {
+        fun contactUris(name: String?, tel: Boolean = false): List<ContactUri> {
+            if (name == null) return emptyList()
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts) {
                     val contactUris = if (tel)
@@ -161,7 +165,8 @@ sealed class Contact {
             return emptyList()
         }
 
-        fun contactUrisOfNameOrNumber(nameOrNumber: String, account: Account): List<ContactUri> {
+        fun contactUrisOfNameOrNumber(nameOrNumber: String?, account: Account): List<ContactUri> {
+            if (nameOrNumber == null) return emptyList()
             var uris = contactUris(nameOrNumber, account.isMobile)
             if (uris.isEmpty() && Utils.isTelNumber(nameOrNumber)) {
                 val contactWithUri = findContactWithUri("tel:$nameOrNumber")
@@ -174,7 +179,8 @@ sealed class Contact {
             return uris
         }
 
-        fun findContactWithUri(uri: String): Pair<Contact, ContactUri>? {
+        fun findContactWithUri(uri: String?): Pair<Contact, ContactUri>? {
+            if (uri.isNullOrEmpty()) return null
             synchronized(BaresipService.contacts) {
                 for (c in BaresipService.contacts)
                     when (c) {
@@ -196,11 +202,13 @@ sealed class Contact {
             return null
         }
 
-        fun findContact(uri: String): Contact? {
+        fun findContact(uri: String?): Contact? {
+            if (uri.isNullOrEmpty()) return null
             return findContactWithUri(uri)?.first
         }
 
-        fun nameExists(name: String, list: List<Contact>, ignoreCase: Boolean): Boolean {
+        fun nameExists(name: String?, list: List<Contact>, ignoreCase: Boolean): Boolean {
+            if (name == null) return false
             for (c in list)
                 if (c.name().equals(name, ignoreCase = ignoreCase))
                     return true
@@ -239,8 +247,15 @@ sealed class Contact {
                 ContactsContract.Data.MIMETYPE + "='" + sipMime + "' OR " +
                         ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "' OR " +
                         ContactsContract.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE + "'"
-            val cur: Cursor? = ctx.contentResolver.query(ContactsContract.Data.CONTENT_URI, projection,
-                    selection, null, null)
+            val cur: Cursor? = try {
+                ctx.contentResolver.query(
+                    ContactsContract.Data.CONTENT_URI, projection,
+                    selection, null, null
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to query Android contacts: ${e.message}")
+                null
+            }
             BaresipService.androidContacts.value = listOf()
             val contacts = HashMap<Long, AndroidContact>()
             while (cur != null && cur.moveToNext()) {
@@ -257,7 +272,7 @@ sealed class Contact {
                 else
                     AndroidContact(name, ArrayList<ContactUri>(), "", Utils.randomColor(), thumb, id, starred == 1)
                 if (contact.name == "" && name != "") contact.name = name
-                if (contact.thumbnailUri == null &&  thumb != null) contact.thumbnailUri = thumb
+                if (contact.thumbnailUri == null && thumb != null) contact.thumbnailUri = thumb
                 when (mime) {
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
                         val uri = "tel:${data.filterNot { setOf('-', ' ', '(', ')').contains(it) }}"
@@ -277,7 +292,7 @@ sealed class Contact {
             cur?.close()
             val newList = mutableListOf<AndroidContact>()
             for ((_, value) in contacts)
-                if (value.name != "") newList.add(value)
+                if (value.name.isNotEmpty()) newList.add(value)
             BaresipService.androidContacts.value = newList.toList()
         }
 
@@ -371,8 +386,8 @@ sealed class Contact {
             }
             newContacts.sortBy {
                 when (it) {
-                    is BaresipContact -> if (it.favorite) "0" + it.name else "1" + it.name
-                    is AndroidContact -> if (it.favorite) "0" + it.name else "1" + it.name
+                    is BaresipContact -> if (it.favorite) "0" + it.name() else "1" + it.name()
+                    is AndroidContact -> if (it.favorite) "0" + it.name() else "1" + it.name()
                 }
             }
             BaresipService.contacts = newContacts
@@ -411,17 +426,13 @@ sealed class Contact {
         private fun generateContactNames () {
             val newList = mutableListOf<String>()
             for (c in BaresipService.contacts)
-                when (c) {
-                    is BaresipContact ->
-                        newList.add(c.name)
-                    is AndroidContact ->
-                        newList.add(c.name)
-                }
+                newList.add(c.name())
             contactNames.value = newList.toList()
         }
 
         private fun avatarFileNames(): MutableList<String> {
-            return File(BaresipService.filesPath).list()!!.filter{ it.endsWith(".png")}.toMutableList()
+            val list = File(BaresipService.filesPath).list() ?: return mutableListOf()
+            return list.filter { it.endsWith(".png") }.toMutableList()
         }
     }
 }
