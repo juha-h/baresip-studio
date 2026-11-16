@@ -7,6 +7,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir: String, initialStatus: String) {
@@ -156,8 +159,13 @@ open class Call(val callp: Long, val ua: UserAgent, val peerUri: String, val dir
         val connection = ConnectionService.connections[callp]
         if (connection != null)
             connection.onDisconnect()
-        else
-            Api.ua_hangup(ua.uap, callp, code, reason)
+        else {
+            val u = ua.uap
+            val c = callp
+            CoroutineScope(Dispatchers.IO).launch {
+                Api.ua_hangup(u, c, code, reason)
+            }
+        }
     }
 
     open fun answer() {
