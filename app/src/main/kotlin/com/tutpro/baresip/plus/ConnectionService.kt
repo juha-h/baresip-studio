@@ -12,6 +12,9 @@ import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionService : ConnectionService() {
@@ -242,8 +245,12 @@ class ConnectionService : ConnectionService() {
             if (isDestroyed) return
             isDestroyed = true
             Log.d(TAG, "Telecom Connection onReject $callp")
-            if (Call.ofCallp(callp) != null)
-                Api.ua_hangup(uap, callp, 486, "Rejected")
+            val u = uap
+            val c = callp
+            CoroutineScope(Dispatchers.IO).launch {
+                if (Call.ofCallp(c) != null)
+                    Api.ua_hangup(u, c, 486, "Rejected")
+            }
             setDisconnected(DisconnectCause(DisconnectCause.REJECTED))
             connections.remove(callp)
             destroy()
@@ -266,8 +273,12 @@ class ConnectionService : ConnectionService() {
                 return
             }
 
-            if (Call.ofCallp(callp) != null)
-                Api.ua_hangup(uap, callp, 0, "")
+            val u = uap
+            val c = callp
+            CoroutineScope(Dispatchers.IO).launch {
+                if (Call.ofCallp(c) != null)
+                    Api.ua_hangup(u, c, 0, "")
+            }
 
             setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
             connections.remove(callp)
@@ -279,8 +290,12 @@ class ConnectionService : ConnectionService() {
             isDestroyed = true
             Log.d(TAG, "Telecom Connection onAbort $callp")
             if (callp != 0L) {
-                if (Call.ofCallp(callp) != null)
-                    Api.ua_hangup(uap, callp, 0, "")
+                val u = uap
+                val c = callp
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (Call.ofCallp(c) != null)
+                        Api.ua_hangup(u, c, 0, "")
+                }
                 connections.remove(callp)
             }
             else

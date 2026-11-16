@@ -1375,6 +1375,24 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1update_1account(
     return ua_update_account((struct ua *)ua);
 }
 
+static bool call_is_active(const struct call *c)
+{
+    struct le *ua_le;
+    struct le *call_le;
+
+    if (!c)
+        return false;
+
+    for (ua_le = list_head(uag_list()); ua_le != NULL; ua_le = ua_le->next) {
+        const struct ua *ua = ua_le->data;
+        for (call_le = list_head(ua_calls(ua)); call_le != NULL; call_le = call_le->next) {
+            if (call_le->data == c)
+                return true;
+        }
+    }
+    return false;
+}
+
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1hangup(
         JNIEnv *env, jobject obj, jlong ua, jlong call, jint code, jstring reason)
 {
@@ -1385,17 +1403,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1hangup(
     re_thread_enter();
     struct ua *u = (struct ua *)ua;
     struct call *c = (struct call *)call;
-    bool found = false;
-    if (u && c) {
-        struct le *call_le;
-        for (call_le = list_head(ua_calls(u)); call_le != NULL; call_le = call_le->next) {
-            if (call_le->data == c) {
-                found = true;
-                break;
-            }
-        }
-    }
-    if (found) {
+    if (call_is_active(c)) {
         if (strlen(native_reason) == 0)
             ua_hangup(u, c, native_code, NULL);
         else
@@ -1503,23 +1511,7 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_bevent_1stop(
     re_thread_leave();
 }
 
-static bool call_is_active(const struct call *c)
-{
-    struct le *ua_le;
-    struct le *call_le;
 
-    if (!c)
-        return false;
-
-    for (ua_le = list_head(uag_list()); ua_le != NULL; ua_le = ua_le->next) {
-        const struct ua *ua = ua_le->data;
-        for (call_le = list_head(ua_calls(ua)); call_le != NULL; call_le = call_le->next) {
-            if (call_le->data == c)
-                return true;
-        }
-    }
-    return false;
-}
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_calls_1mute(
         JNIEnv *env, jobject obj, jboolean mute)
