@@ -998,7 +998,6 @@ private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
         else -> return bitmap
     }
     val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-    bitmap.recycle()
     return rotatedBitmap
 }
 

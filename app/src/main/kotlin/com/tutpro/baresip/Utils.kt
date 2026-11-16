@@ -1686,7 +1686,6 @@ object Utils {
 
             Log.d(TAG, "Resized image from ${file.length()} to ${output.size} bytes " +
                     "(target: $maxSize, dims: ${bitmap.width}×${bitmap.height}, orientation: $orientation)")
-            bitmap.recycle()
             return output
         } catch (e: Exception) {
             Log.e(TAG, "Resizing failed: ${e.message}")
@@ -1718,7 +1717,6 @@ object Utils {
         }
         return try {
             val bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-            bitmap.recycle()
             bmRotated
         } catch (e: Exception) {
             Log.e(TAG, "Rotation failed: ${e.message}")
