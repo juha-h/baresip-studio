@@ -1,0 +1,2 @@
+- Avoid potential crash be calling ua_hangup from CoroutineScope
+- Avoid potential crash by removing bitmap.recycle() calls
