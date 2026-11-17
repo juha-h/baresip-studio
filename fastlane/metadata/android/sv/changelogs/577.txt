@@ -1,0 +1,2 @@
+- Åtgärdat en krasch som kan inträffa när ett SMS tas emot och appen baresip inte körs
+- Kontrollerar att UA för AoR existerar för att undvika en eventuell krasch

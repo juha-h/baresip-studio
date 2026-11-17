@@ -1,0 +1,2 @@
+- Undvik potentiell krasch genom att anropa ua_hangup från CoroutineScope
+- Undvik potentiell krasch genom att ta bort anrop till bitmap.recycle()

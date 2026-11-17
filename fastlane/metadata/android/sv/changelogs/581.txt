@@ -1,0 +1,2 @@
+- Avkoda inte %23 till # i användardelen av en SIP-URI
+- Nya översättningar (tjeckiska)
