@@ -234,6 +234,10 @@ sealed class Contact {
         }
 
         fun loadAndroidContacts(ctx: Context) {
+            if (!Utils.checkPermissions(ctx, arrayOf(android.Manifest.permission.READ_CONTACTS))) {
+                BaresipService.androidContacts.value = listOf()
+                return
+            }
             // If phone type is needed, add DATA2 to projection. Then phone type can be got from
             // cursor using getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)
             val projection = arrayOf(ContactsContract.Data.CONTACT_ID, ContactsContract.Data.DISPLAY_NAME,
