@@ -1552,6 +1552,9 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newMediaNat != "") {
         if ((newMediaNat == "stun" || newMediaNat == "ice") && newStunServer == "")
             newStunServer = ctx.getString(R.string.stun_server_default)
+    }
+
+    if (newStunServer.isNotEmpty() || newMediaNat != "") {
         if (!Utils.checkStunUri(newStunServer) ||
             (newMediaNat == "turn" &&
                     newStunServer.substringBefore(":") !in setOf("turn", "turns"))) {
