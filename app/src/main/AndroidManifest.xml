@@ -65,6 +65,10 @@
         android:name="android.hardware.telephony"
         android:required="false" />
 
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+
     <application
         android:name=".BaresipApp"
         android:icon="@mipmap/ic_launcher"
