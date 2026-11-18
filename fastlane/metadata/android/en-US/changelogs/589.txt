@@ -1,0 +1,4 @@
+- Do not remove mobile account if SIM is present but not ready
+- Do not create UserAgent twice when adding new account
+- Added permissions check to loadAndroidContacts function
+- Fixed account's STUN URI related crash
