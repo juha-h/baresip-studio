@@ -285,7 +285,8 @@ object Utils {
     }
 
     private fun checkTransport(transport: String, transports: Set<String>): Boolean {
-        return transport.split("=")[0] == "transport" && transport.split("=")[1].lowercase() in transports
+        val parts = transport.split("=")
+        return parts.size == 2 && parts[0] == "transport" && parts[1].lowercase() in transports
     }
 
     fun checkStunUri(uri: String): Boolean {

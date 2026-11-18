@@ -1478,7 +1478,10 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                 shape = RoundedCornerShape(16.dp),
             ) {
-                uas.value.forEachIndexed { index, ua ->
+                val visibleUas = uas.value.filter { ua ->
+                    !ua.account.isMobile || BaresipService.instance?.isSimReady() == true
+                }
+                visibleUas.forEachIndexed { index, ua ->
                     val acc = ua.account
                     DropdownMenuItem(
                         onClick = {
@@ -1499,7 +1502,7 @@ private fun AccountSpinner(ctx: Context, viewModel: ViewModel, navController: Na
                             )
                         }
                     )
-                    if (index < uas.value.size - 1)
+                    if (index < visibleUas.size - 1)
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }

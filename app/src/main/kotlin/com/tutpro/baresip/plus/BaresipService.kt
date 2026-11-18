@@ -1040,7 +1040,9 @@ class BaresipService: Service() {
 
         if (ev[0] == "create") {
 
-            val ua = UserAgent(uap)
+            val existing = UserAgent.ofUap(uap)
+            val ua = existing ?: UserAgent(uap)
+
             if (Utils.uriMatch(ua.account.aor, "sip:mobile@pstn")) ua.account.isMobile = true
 
             var removeMobile = false
@@ -1053,11 +1055,11 @@ class BaresipService: Service() {
                     val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
                     val hasDialerRole = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
                     val hasSmsRole = roleManager.isRoleHeld(RoleManager.ROLE_SMS)
-                    if (!isSimReady() ||
+                    if (isSimAbsent() ||
                             SubscriptionManager.getDefaultVoiceSubscriptionId() ==
                                 SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
                             (!hasDialerRole && !hasSmsRole)) {
-                        Log.d(TAG, "Removing Mobile account (SIM not ready, invalid subscription ID, " +
+                        Log.d(TAG, "Removing Mobile account (SIM absent, invalid subscription ID, " +
                                 "or both default roles disabled)")
                         removeMobile = true
                     }
@@ -1090,6 +1092,7 @@ class BaresipService: Service() {
                 R.drawable.circle_white
             else
                 circleYellow.getValue(colorblind)
+
             ua.add()
 
             val acc = ua.account
@@ -2652,7 +2655,6 @@ class BaresipService: Service() {
     fun addMobileUserAgent() {
         if (VERSION.SDK_INT >= 29) {
 
-            val isSimReady = isSimReady()
             val voiceSubId = SubscriptionManager.getDefaultVoiceSubscriptionId()
             val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
             val hasDialerRole = roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
@@ -2662,10 +2664,10 @@ class BaresipService: Service() {
                 it.account.isMobile || Utils.uriMatch(it.account.aor, "sip:mobile@pstn")
             }
 
-            if (!isSimReady || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
+            if (isSimAbsent() || voiceSubId == SubscriptionManager.INVALID_SUBSCRIPTION_ID ||
                     (!hasDialerRole && !hasSmsRole)) {
                 if (existingMobileUa != null) {
-                    Log.d(TAG, "Removing existing Mobile account (SIM not ready, invalid subscription ID, " +
+                    Log.d(TAG, "Removing existing Mobile account (SIM absent, invalid subscription ID, " +
                             "or both default roles disabled)")
                     CallHistory.clear(existingMobileUa.account.aor)
                     Message.clearMessagesOfAor(existingMobileUa.account.aor)
@@ -3416,6 +3418,11 @@ class BaresipService: Service() {
     fun isSimReady(): Boolean {
         val tm = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         return tm.simState == TelephonyManager.SIM_STATE_READY
+    }
+
+    fun isSimAbsent(): Boolean {
+        val tm = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        return tm.simState == TelephonyManager.SIM_STATE_ABSENT
     }
 
     private fun cleanService() {

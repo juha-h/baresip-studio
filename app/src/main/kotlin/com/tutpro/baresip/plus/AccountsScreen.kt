@@ -201,6 +201,7 @@ fun NewAccount(navController: NavController) {
         val uap = UserAgent.uaAlloc(
             "<$aor>;stunserver=\"stun:stun.l.google.com:19302\";regq=0.5;pubint=0;regint=0;check_origin=no;mwi=no"
         )
+
         if (uap == 0L) {
             alertTitle.value = ctx.getString(R.string.notice)
             alertMessage.value = ctx.getString(R.string.account_allocation_failure)
@@ -208,8 +209,15 @@ fun NewAccount(navController: NavController) {
             return null
         }
 
-        val ua = UserAgent(uap)
-        ua.add()
+        val ua = UserAgent.ofUap(uap)
+        if (ua == null) {
+            Log.e(TAG, "UA $uap was allocated, but was not added to the service's UA list")
+            Api.ua_destroy(uap)
+            alertTitle.value = ctx.getString(R.string.notice)
+            alertMessage.value = ctx.getString(R.string.account_allocation_failure)
+            showAlert.value = true
+            return null
+        }
 
         val acc = ua.account
         acc.checkOrigin = true
