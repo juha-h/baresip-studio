@@ -1,0 +1,2 @@
+- Kontrollera att samtalet fortfarande är aktivt innan en DTMF-siffra skickas
+- Lade till NULL-kontroller för åtgärder kopplade till kontaktnamn

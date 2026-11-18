@@ -1,0 +1,2 @@
+- Förhindra potentiella krascher vid navigering till skärmar utan ett konto
+- Förhindra krascher orsakade av kapplöpningstillstånd (race conditions) vid inläsning av konfiguration

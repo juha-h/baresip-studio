@@ -1,0 +1,1 @@
+- Åtgärdat visning av utgående samtal när kontaktens samtalsåtgärd är inställd på ”Visa”

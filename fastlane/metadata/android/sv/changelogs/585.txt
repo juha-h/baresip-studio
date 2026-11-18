@@ -1,0 +1,2 @@
+- Anropa StartForeground utan dröjsmål för att undvika krascher kopplade till aviseringar om inkommande samtal/meddelanden
+- Hantera avslutning av appen baresip på korrekt sätt för att undvika krascher och förlust av konton

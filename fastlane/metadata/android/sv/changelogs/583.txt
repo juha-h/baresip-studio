@@ -1,0 +1,1 @@
+- Undvik krasch när SMS/MMS skickas via baresip av en extern applikation

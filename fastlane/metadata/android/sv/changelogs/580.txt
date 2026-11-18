@@ -1,0 +1,1 @@
+- Ring direkt till angiven destination om inget kontaktförslag har valts
