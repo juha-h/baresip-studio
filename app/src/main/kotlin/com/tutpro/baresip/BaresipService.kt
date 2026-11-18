@@ -1031,7 +1031,9 @@ class BaresipService: Service() {
 
         if (ev[0] == "create") {
 
-            val ua = UserAgent(uap)
+            val existing = UserAgent.ofUap(uap)
+            val ua = existing ?: UserAgent(uap)
+
             if (Utils.uriMatch(ua.account.aor, "sip:mobile@pstn")) ua.account.isMobile = true
 
             var removeMobile = false
@@ -1081,6 +1083,7 @@ class BaresipService: Service() {
                 R.drawable.circle_white
             else
                 circleYellow.getValue(colorblind)
+
             ua.add()
 
             val acc = ua.account
