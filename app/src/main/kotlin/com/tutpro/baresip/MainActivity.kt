@@ -1,5 +1,6 @@
 package com.tutpro.baresip
 
+import android.Manifest.permission.ACCESS_LOCAL_NETWORK
 import android.Manifest.permission.BLUETOOTH_CONNECT
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
@@ -160,7 +161,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val permissions = if (Build.VERSION.SDK_INT >= 33)
+        val permissions = if (Build.VERSION.SDK_INT >= 37)
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT, ACCESS_LOCAL_NETWORK)
+        else if (Build.VERSION.SDK_INT >= 33)
             arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
         else if (Build.VERSION.SDK_INT >= 31)
             arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
