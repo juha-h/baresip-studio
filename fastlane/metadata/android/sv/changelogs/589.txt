@@ -1,0 +1,4 @@
+- Tar inte bort mobilkontot om SIM-kortet är installerat men inte klart
+- Skaparinte UserAgent två gånger när ett nytt konto läggs till
+- Lade till behörighetskontroll för att ladda AndroidContacts funktionen
+- Åtgärdade kontots STUN URI relaterad krasch
