@@ -1,5 +1,8 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest.permission.ACCESS_LOCAL_NETWORK
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.RECORD_AUDIO
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -394,7 +397,18 @@ private fun MainScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (!BaresipService.isServiceRunning) {
+        val permissions = if (VERSION.SDK_INT >= 37)
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT, ACCESS_LOCAL_NETWORK)
+        else if (VERSION.SDK_INT >= 33)
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
+        else if (VERSION.SDK_INT >= 31)
+            arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
+        else if (VERSION.SDK_INT < 29)
+            arrayOf(RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+        else
+            arrayOf(RECORD_AUDIO)
+
+        if (!BaresipService.isServiceRunning || !Utils.checkPermissions(ctx, permissions)) {
             val path = ctx.filesDir.absolutePath + "/accounts"
             val fileBytes = if (File(path).exists()) Utils.getFileContents(path) else null
             if (fileBytes != null) {
@@ -405,7 +419,7 @@ private fun MainScreen(
                 showPasswordsDialog.value = true
             }
             else
-                // Baresip is started for the first time
+                // Baresip is started for the first time or permissions are missing
                 onRequestPermissions()
         }
     }

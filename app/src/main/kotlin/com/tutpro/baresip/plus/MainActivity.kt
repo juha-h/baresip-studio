@@ -1,5 +1,6 @@
 package com.tutpro.baresip.plus
 
+import android.Manifest.permission.ACCESS_LOCAL_NETWORK
 import android.Manifest.permission.BLUETOOTH_CONNECT
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.POST_NOTIFICATIONS
@@ -161,7 +162,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        var permissions = if (Build.VERSION.SDK_INT >= 33)
+        var permissions = if (Build.VERSION.SDK_INT >= 37)
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT, ACCESS_LOCAL_NETWORK)
+        else if (Build.VERSION.SDK_INT >= 33)
             arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
         else if (Build.VERSION.SDK_INT >= 31)
             arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
