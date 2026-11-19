@@ -486,23 +486,11 @@ private fun MainScreen(
 
     LaunchedEffect(Unit) {
         val permissions = if (VERSION.SDK_INT >= 37)
-            arrayOf(
-                POST_NOTIFICATIONS,
-                RECORD_AUDIO,
-                BLUETOOTH_CONNECT,
-                ACCESS_LOCAL_NETWORK
-            )
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT, ACCESS_LOCAL_NETWORK)
         else if (VERSION.SDK_INT >= 33)
-            arrayOf(
-                POST_NOTIFICATIONS,
-                RECORD_AUDIO,
-                BLUETOOTH_CONNECT
-            )
+            arrayOf(POST_NOTIFICATIONS, RECORD_AUDIO, BLUETOOTH_CONNECT)
         else if (VERSION.SDK_INT >= 31)
-            arrayOf(
-                android.Manifest.permission.RECORD_AUDIO,
-                android.Manifest.permission.BLUETOOTH_CONNECT
-            )
+            arrayOf(RECORD_AUDIO, BLUETOOTH_CONNECT)
         else if (VERSION.SDK_INT < 29)
             arrayOf(RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
         else
