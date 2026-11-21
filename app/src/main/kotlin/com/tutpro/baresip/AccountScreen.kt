@@ -1375,9 +1375,11 @@ private fun AccountContent(
         Answer()
         Voicemail()
         CountryCode()
-        if (!ua.account.isMobile) TelProvider()
+        if (!ua.account.isMobile) {
+            TelProvider()
+            ConferenceCalls()
+        }
         NumericKeypad()
-        ConferenceCalls()
         DefaultAccount()
         if (!ua.account.isMobile) CustomParams()
     }
