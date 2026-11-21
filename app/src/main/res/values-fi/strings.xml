@@ -247,6 +247,8 @@
     <string name="numeric_keypad">Numeronäppäimistö</string>
     <string name="numeric_keypad_help">Jos valittu, \"Puhelu ulos …\" kentässä käytetään
         numeronäppäimistöä.</string>
+    <string name="conference_calls">Konferenssipuhelut</string>
+    <string name="conference_calls_help">Jos valittu, konferenssipuheluikoni näytetään pääsivulla.</string>
     <string name="invalid_sip_uri_hostpart">Virheellinen SIP URI:n domain-osa \'%1$s\'</string>
     <string name="default_account">Oletustili</string>
     <string name="default_account_help">Jos merkitty, niin tämä tili on

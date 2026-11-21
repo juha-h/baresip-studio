@@ -1239,6 +1239,33 @@ private fun AccountContent(
     }
 
     @Composable
+    fun ConferenceCalls() {
+        val conferenceCallsTitle = stringResource(R.string.conference_calls)
+        val conferenceCallsHelp = stringResource(R.string.conference_calls_help)
+        val conferenceCalls by viewModel.conferenceCalls.collectAsState()
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(text = conferenceCallsTitle,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        alertTitle.value = conferenceCallsTitle
+                        alertMessage.value = conferenceCallsHelp
+                        showAlert.value = true
+                    },
+                fontSize = 18.sp
+            )
+            Switch(
+                checked = conferenceCalls,
+                onCheckedChange = { viewModel.conferenceCalls.value = it }
+            )
+        }
+    }
+
+    @Composable
     fun DefaultAccount() {
         val defaultAccountTitle = stringResource(R.string.default_account)
         val defaultAccountHelp = stringResource(R.string.default_account_help)
@@ -1350,6 +1377,7 @@ private fun AccountContent(
         CountryCode()
         if (!ua.account.isMobile) TelProvider()
         NumericKeypad()
+        ConferenceCalls()
         DefaultAccount()
         if (!ua.account.isMobile) CustomParams()
     }
@@ -1737,6 +1765,12 @@ private fun checkOnClick(ctx: Context, viewModel: AccountViewModel, ua: UserAgen
     if (newNumericKeypad != acc.numericKeypad) {
         acc.numericKeypad = newNumericKeypad
         Log.d(TAG, "New numericKeyboard is ${acc.numericKeypad}")
+    }
+
+    val newConferenceCalls = viewModel.conferenceCalls.value
+    if (newConferenceCalls != acc.conferenceCalls) {
+        acc.conferenceCalls = newConferenceCalls
+        Log.d(TAG, "New conferenceCalls is ${acc.conferenceCalls}")
     }
 
     val newCustomParams = viewModel.customParams.value

@@ -1497,7 +1497,7 @@ private fun CallUriRow(
                             if (account != null) account.resumeUri = input
                             if (input == "") {
                                 dialerState.showCallButton.value = true
-                                dialerState.showCallConferenceButton.value = true
+                                dialerState.showCallConferenceButton.value = account != null && account.conferenceCalls && !account.isMobile
                             }
                             if (input.length > 1) {
                                 val normalizedInput = Utils.unaccent(input)
@@ -1545,7 +1545,7 @@ private fun CallUriRow(
                                 val account = Account.ofAor(viewModel.selectedAor.value)
                                 if (account != null) account.resumeUri = ""
                                 dialerState.showCallButton.value = true
-                                dialerState.showCallConferenceButton.value = true
+                                dialerState.showCallConferenceButton.value = account != null && account.conferenceCalls && !account.isMobile
                             },
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -2597,7 +2597,7 @@ private fun showCall(ctx: Context, viewModel: ViewModel, ua: UserAgent?, showCal
             viewModel.dialerState.callUriEnabled.value = true
         }, 100)
         viewModel.dialerState.showCallButton.value = true
-        viewModel.dialerState.showCallConferenceButton.value = !ua.account.isMobile
+        viewModel.dialerState.showCallConferenceButton.value = ua.account.conferenceCalls && !ua.account.isMobile
         viewModel.dialerState.callButtonsEnabled.value = true
         viewModel.dialerState.showSuggestions.value = false
         dialpadButtonEnabled.value = true
