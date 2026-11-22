@@ -2,6 +2,6 @@ Baresip är en säkerhetsinriktad kommunikationsapp med öppen källkod för And
 
 Vid VoIP-samtal kan ljudet kodas med AMR-, Codec2-, G.729-, G.722-, G.722.1-, iLBC-, Opus- eller PCMU/PCMA-kodekar. Säkerheten bygger på SIP-signalering via TLS eller WSS och mediekapsling med ZRTP eller (DTLS) SRTP.
 
-Baresip-appen kan installeras på Android-enheter med Android 9 eller senare. Mobilsamtal och meddelanden kräver Android 10 eller senare. Om du behöver videosamtal kan du i stället installera systerappen baresip+.
+Baresip-appen kan installeras på Android-enheter med Android 9 eller senare även om krascher kan förekomma på grund av ljudrelaterade buggar i Android-versioner lägre än 11.. Mobilsamtal och meddelanden kräver Android 10 eller senare. Om du behöver videosamtal kan du i stället installera systerappen baresip+.
 
 Källkoden finns på <a href="https://github.com/juha-h/baresip-studio">GitHub</a>, där du även kan rapportera problem.
