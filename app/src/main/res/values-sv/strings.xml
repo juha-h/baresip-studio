@@ -406,4 +406,6 @@
     <string name="max_mms_images_size_help">Största sammanlagda komprimerade storlek för bilder i MMS</string>
     <string name="enable_default_phone">Aktivera Standardapp för telefoni i inställningarna</string>
     <string name="unlock_to_access_full_app">Lås upp enheten för att använda appen</string>
+    <string name="conference_calls">Konferenssamtal</string>
+    <string name="conference_calls_help">Om markerat visas ikonen för konferenssamtal på huvudskärmen.</string>
 </resources>
