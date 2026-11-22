@@ -3317,6 +3317,11 @@ class BaresipService: Service() {
         val sipHandle = getPhoneAccountHandle(this, SIP_ACCOUNT_ID)
         val pstnHandle = getPhoneAccountHandle(this, PSTN_ACCOUNT_ID)
 
+        try {
+            // Clean up old handle if it was previously registered
+            tm.unregisterPhoneAccount(getPhoneAccountHandle(this, "baresip_phone_account"))
+        } catch (_: Exception) {}
+
         val sipAccount = android.telecom.PhoneAccount.builder(sipHandle, getString(R.string.app_name))
             .setCapabilities(android.telecom.PhoneAccount.CAPABILITY_SELF_MANAGED)
             .setIcon(android.graphics.drawable.Icon.createWithResource(this, R.mipmap.ic_launcher))
@@ -3776,7 +3781,7 @@ class BaresipService: Service() {
 
         internal const val KEY_TEXT_REPLY = "key_text_reply_baresip"
         const val SIP_ACCOUNT_ID = "baresip_sip_account"
-        const val PSTN_ACCOUNT_ID = "baresip_phone_account"
+        const val PSTN_ACCOUNT_ID = "baresip_pstn_account"
 
         fun getPhoneAccountHandle(ctx: Context, id: String = SIP_ACCOUNT_ID): PhoneAccountHandle {
             val componentName = android.content.ComponentName(ctx, ConnectionService::class.java)
