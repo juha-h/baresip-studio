@@ -983,7 +983,7 @@ class BaresipService: Service() {
             activeNetwork = cm.activeNetwork
             Log.i(TAG, "Active network: $activeNetwork")
 
-            registerPhoneAccount()
+            registerPhoneAccounts()
 
             Log.i(TAG, "AEC/AGC/NS available = $aecAvailable/$agcAvailable/$nsAvailable")
 
@@ -3313,7 +3313,7 @@ class BaresipService: Service() {
         }
     }
 
-    private fun registerPhoneAccount() {
+    private fun registerPhoneAccounts() {
         val sipHandle = getPhoneAccountHandle(this, SIP_ACCOUNT_ID)
         val pstnHandle = getPhoneAccountHandle(this, PSTN_ACCOUNT_ID)
 
