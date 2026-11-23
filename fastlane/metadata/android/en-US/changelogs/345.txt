@@ -1,0 +1,5 @@
+- Added Conference Calls account option
+- Added ACCESS_LOCAL_NETWORK permission for API 37
+- Fixed baresip+ app upgrade by renaming PSTN account handle
+- Updated full description
+- Translated using Weblate (Swedish, Chinese)
