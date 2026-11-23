@@ -43,6 +43,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
     var telProvider = if (accp != 0L) Utils.aorDomain(aor) else ""
     var resumeUri = ""
     var numericKeypad = false
+    var conferenceCalls = true
     var customParams = ""
 
     init {
@@ -95,6 +96,7 @@ class Account(val accp: Long, virtualAor: String? = null) {
         if (Utils.paramExists(extra, "tel_provider"))
             telProvider = URLDecoder.decode(Utils.paramValue(extra, "tel_provider"), "UTF-8")
         numericKeypad = Utils.paramExists(extra, "numeric_keypad")
+        conferenceCalls = Utils.paramValue(extra, "conference_calls") != "no"
         customParams = extra.substringAfter("last=empty").substringAfter(";")
     }
 
@@ -201,6 +203,8 @@ class Account(val accp: Long, virtualAor: String? = null) {
         if (configuredRegInt != REGISTRATION_INTERVAL) extra += ";regint=$configuredRegInt"
 
         if (numericKeypad) extra += ";numeric_keypad=yes"
+
+        if (!conferenceCalls) extra += ";conference_calls=no"
 
         extra += ";last=empty"
 
