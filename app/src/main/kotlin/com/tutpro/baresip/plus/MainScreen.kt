@@ -1866,7 +1866,7 @@ private fun CallRow(
             }
 
             if (dialerState.showCallVideoButton.value) {
-                if (dialerState.showCallConferenceButton.value)
+                if (dialerState.showCallButton.value || dialerState.showCallConferenceButton.value)
                     Spacer(modifier = Modifier.width(48.dp))
                 IconButton(
                     modifier = Modifier.size(48.dp),
