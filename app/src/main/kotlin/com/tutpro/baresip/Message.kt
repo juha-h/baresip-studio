@@ -111,10 +111,20 @@ class Message(val aor: String, val peerUri: String, val message: String, val tim
             val updatedMessages = synchronized(BaresipService.messagesLock) {
                 BaresipService.messages.toMutableList()
             }
-            for (message in updatedMessages.reversed())
+            for ((index, message) in updatedMessages.withIndex().reversed())
                 if (message.aor == aor && message.timeStamp == time) {
-                    message.direction = direction
-                    if (reason != "") message.responseReason = reason
+                    val newMessage = Message(
+                        message.aor,
+                        message.peerUri,
+                        message.message,
+                        message.timeStamp,
+                        direction,
+                        message.responseCode,
+                        if (reason != "") reason else message.responseReason,
+                        message.new,
+                        message.images
+                    )
+                    updatedMessages[index] = newMessage
                     synchronized(BaresipService.messagesLock) {
                         BaresipService.messages = updatedMessages.toList()
                     }

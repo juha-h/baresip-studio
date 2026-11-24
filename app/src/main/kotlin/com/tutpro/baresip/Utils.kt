@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.PendingIntent
 import android.app.role.RoleManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -1569,18 +1570,30 @@ object Utils {
         return null
     }
 
-    fun sendSms(ctx: Context, destination: String, message: String): Boolean {
+    fun sendSms(ctx: Context, aor: String, destination: String, message: String, time: Long): Boolean {
         return try {
             val smsManager = if (Build.VERSION.SDK_INT >= 31)
                 ctx.getSystemService(SmsManager::class.java)
             else
                 @Suppress("DEPRECATION")
                 SmsManager.getDefault()
-            smsManager.sendTextMessage(destination, null, message, null, null)
-            Log.d(TAG, "Sent SMS message to $destination")
+
+            val sentIntent = Intent(ctx, SmsSentReceiver::class.java).apply {
+                putExtra("aor", aor)
+                putExtra("time", time)
+            }
+            val sentPI = PendingIntent.getBroadcast(
+                ctx, time.toInt(), sentIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            pendingSms.add(Pair(aor, time))
+            smsManager.sendTextMessage(destination, null, message, sentPI, null)
+            Log.d(TAG, "Sent SMS message trigger to $destination for $time")
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to send SMS: ${e.message}")
+            pendingSms.remove(Pair(aor, time))
             false
         }
     }
@@ -1618,7 +1631,7 @@ object Utils {
                 }
             }
 
-            val mmsSentIntent = Intent(ctx, BaresipMmsSentReceiver::class.java).apply {
+            val mmsSentIntent = Intent(ctx, MmsSentReceiver::class.java).apply {
                 putExtra("aor", aor)
                 putExtra("time", time)
             }
@@ -1642,6 +1655,14 @@ object Utils {
     fun popPendingMms(): Pair<String, Long>? {
         val res = pendingMms.poll()
         Log.d(TAG, "Popped pending MMS: $res (remaining: ${pendingMms.size})")
+        return res
+    }
+
+    private val pendingSms = ConcurrentLinkedQueue<Pair<String, Long>>()
+
+    fun popPendingSms(): Pair<String, Long>? {
+        val res = pendingSms.poll()
+        Log.d(TAG, "Popped pending SMS: $res (remaining: ${pendingSms.size})")
         return res
     }
 
