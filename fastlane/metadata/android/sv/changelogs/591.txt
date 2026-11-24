@@ -1,0 +1,5 @@
+- Lade till alternativ för konferenssamtalskonto
+- Lade till ACCESS_LOCAL_NETWORK-behörighet för API 37
+- Åtgärdade uppgraderingen av baresip app genom att byta namn på PSTN-kontots användarnamn.
+- Uppdaterade fullständig beskrivning
+- Översatt med Weblate (svenska, kinesiska)
