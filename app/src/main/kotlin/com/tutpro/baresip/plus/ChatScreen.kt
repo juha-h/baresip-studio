@@ -42,10 +42,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -513,9 +516,37 @@ private fun Messages(
                             MaterialTheme.colorScheme.onSecondaryContainer
                         else
                             MaterialTheme.colorScheme.onPrimaryContainer
-                        Row {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(text = sender, fontSize = 12.sp, color = textColor)
                             Spacer(modifier = Modifier.weight(1f))
+                            if (!down) {
+                                when (message.direction) {
+                                    MESSAGE_UP -> {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Sent",
+                                            modifier = Modifier.size(14.dp).padding(end = 2.dp),
+                                            tint = textColor
+                                        )
+                                    }
+                                    MESSAGE_UP_FAIL -> {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Failed",
+                                            modifier = Modifier.size(14.dp).padding(end = 2.dp),
+                                            tint = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                    MESSAGE_UP_WAIT -> {
+                                        Icon(
+                                            imageVector = Icons.Default.Schedule,
+                                            contentDescription = "Waiting",
+                                            modifier = Modifier.size(14.dp).padding(end = 2.dp),
+                                            tint = textColor
+                                        )
+                                    }
+                                }
+                            }
                             Text(text = info, fontSize = 12.sp, color = textColor)
                         }
                         Row {
@@ -796,12 +827,15 @@ private fun NewMessage(
                                             }
                                             Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
                                         }
-                                    Utils.sendSms(ctx, destination, msgText) ->
-                                        msg.direction = MESSAGE_UP
+                                    Utils.sendSms(ctx, aor, destination, msgText, time) -> {
+                                        msg.direction = MESSAGE_UP_WAIT
+                                        Message.updateMessageStatus(aor, time, msg.direction)
+                                    }
                                     else -> {
                                         Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
                                         msg.direction = MESSAGE_UP_FAIL
                                         msg.responseReason = messageFailed
+                                        Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
                                     }
                                 }
                         }

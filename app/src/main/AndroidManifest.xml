@@ -236,13 +236,17 @@
         </receiver>
 
         <receiver
-            android:name=".BaresipMmsSentReceiver"
+            android:name=".MmsSentReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.tutpro.baresip.plus.MMS_SENT" />
                 <action android:name="com.klinker.android.messaging.MMS_SENT" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".SmsSentReceiver"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

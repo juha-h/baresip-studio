@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.klinker.android.send_message.MmsSentReceiver
+import com.klinker.android.send_message.MmsSentReceiver as LibMmsSentReceiver
 import java.io.File
 
-class BaresipMmsSentReceiver : MmsSentReceiver() {
+class MmsSentReceiver : LibMmsSentReceiver() {
     override fun onMessageStatusUpdated(context: Context, intent: Intent, resultCode: Int) {
         super.onMessageStatusUpdated(context, intent, resultCode)
 
