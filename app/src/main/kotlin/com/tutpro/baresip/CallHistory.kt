@@ -1,5 +1,8 @@
 package com.tutpro.baresip
 
+import android.Manifest
+import android.content.Context
+import android.provider.CallLog
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -10,6 +13,7 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.ObjectStreamClass
 import java.util.GregorianCalendar
+import java.util.concurrent.Executors
 
 @Serializable
 class CallHistory(val aor: String, val peerUri: String, val direction: String) : java.io.Serializable {
@@ -148,6 +152,107 @@ class CallHistory(val aor: String, val peerUri: String, val direction: String) :
         fun deleteRecordingFiles(recording: Array<String>) {
             Utils.deleteFile(File(recording[0]))
             Utils.deleteFile(File(recording[1]))
+        }
+
+        fun copyFromSystemCallLog(context: Context, mobileAor: String) {
+            if (!Utils.checkPermissions(context, arrayOf(Manifest.permission.READ_CALL_LOG))) return
+
+            Executors.newSingleThreadExecutor().execute {
+                try {
+                    val projection = arrayOf(
+                        CallLog.Calls.NUMBER,
+                        CallLog.Calls.TYPE,
+                        CallLog.Calls.DATE,
+                        CallLog.Calls.DURATION
+                    )
+
+                    val cursor = context.contentResolver.query(
+                        CallLog.Calls.CONTENT_URI,
+                        projection,
+                        null,
+                        null,
+                        "${CallLog.Calls.DATE} DESC"
+                    ) ?: return@execute
+
+                    val newEntries = mutableListOf<CallHistory>()
+
+                    cursor.use {
+                        val numberCol = it.getColumnIndex(CallLog.Calls.NUMBER)
+                        val typeCol = it.getColumnIndex(CallLog.Calls.TYPE)
+                        val dateCol = it.getColumnIndex(CallLog.Calls.DATE)
+                        val durationCol = it.getColumnIndex(CallLog.Calls.DURATION)
+
+                        while (it.moveToNext()) {
+                            val number = it.getString(numberCol) ?: continue
+                            if (number.isEmpty()) continue
+                            val type = it.getInt(typeCol)
+                            val dateMs = it.getLong(dateCol)
+                            val durationSec = it.getLong(durationCol)
+
+                            val rawNumber = number.removePrefix("tel:").removePrefix("sip:").split("@")[0].replace("%23", "#")
+                            val cleanNumber = Utils.uriUnescape(rawNumber).trim()
+                            if (cleanNumber.isEmpty()) continue
+                            val peerUri = "tel:$cleanNumber"
+
+                            val direction = if (type == CallLog.Calls.OUTGOING_TYPE) "out" else "in"
+                            val history = CallHistory(mobileAor, peerUri, direction)
+
+                            val startDate = GregorianCalendar().apply { timeInMillis = dateMs }
+                            val endDate = GregorianCalendar().apply { timeInMillis = dateMs + (durationSec * 1000) }
+
+                            when (type) {
+                                CallLog.Calls.INCOMING_TYPE, CallLog.Calls.OUTGOING_TYPE -> {
+                                    history.startTime = startDate
+                                    history.stopTime = endDate
+                                }
+                                CallLog.Calls.MISSED_TYPE -> {
+                                    history.startTime = null
+                                    history.stopTime = startDate
+                                    history.rejected = false
+                                }
+                                CallLog.Calls.REJECTED_TYPE -> {
+                                    history.startTime = null
+                                    history.stopTime = startDate
+                                    history.rejected = true
+                                }
+                                else -> continue
+                            }
+
+                            val isDuplicate = synchronized(BaresipService.callHistory) {
+                                BaresipService.callHistory.any { existing ->
+                                    existing.aor == mobileAor &&
+                                    existing.peerUri == history.peerUri &&
+                                    existing.stopTime.timeInMillis == history.stopTime.timeInMillis
+                                }
+                            }
+
+                            if (!isDuplicate) {
+                                newEntries.add(history)
+                            }
+                        }
+                    }
+
+                    if (newEntries.isNotEmpty()) {
+                        synchronized(BaresipService.callHistory) {
+                            BaresipService.callHistory.addAll(newEntries)
+                            BaresipService.callHistory.sortBy { it.stopTime.timeInMillis }
+                            val mobileHistory = BaresipService.callHistory.filter { it.aor == mobileAor }
+                            if (mobileHistory.size > CALL_HISTORY_SIZE) {
+                                val toRemoveCount = mobileHistory.size - CALL_HISTORY_SIZE
+                                val toRemove = mobileHistory.take(toRemoveCount)
+                                for (old in toRemove) {
+                                    deleteRecordingFiles(old.recording)
+                                    BaresipService.callHistory.remove(old)
+                                }
+                            }
+                        }
+                        save()
+                        Log.d(TAG, "Copied ${newEntries.size} system call log entries to mobile call history")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to copy system call log: $e")
+                }
+            }
         }
 
         fun clearRecordings() {
