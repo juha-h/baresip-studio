@@ -1,0 +1,3 @@
+- Copy calls from system call log to baresip call history when Default Phone App setting is enabled
+- Added SMS message sent indicator to outgoing SMS message
+- Avoid potential crash by adding safety checks that user agent is still active
