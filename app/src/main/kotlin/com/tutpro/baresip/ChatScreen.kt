@@ -447,12 +447,6 @@ private fun Messages(
                 DateFormat.getDateInstance(DateFormat.SHORT)
             info = fmt.format(cal.time)
             if (info.length < 6) info = "${stringResource(R.string.today)} $info"
-            if (message.direction == MESSAGE_UP_FAIL) {
-                info = if (message.responseCode != 0)
-                    "$info - ${stringResource(R.string.message_failed)}: " + "${message.responseCode} ${message.responseReason}"
-                else
-                    "$info - ${stringResource(R.string.sending_failed)}"
-            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(end = 12.dp)
@@ -491,7 +485,10 @@ private fun Messages(
                             MaterialTheme.colorScheme.onSecondaryContainer
                         else
                             MaterialTheme.colorScheme.onPrimaryContainer
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
                             Text(text = sender, fontSize = 12.sp, color = textColor)
                             Spacer(modifier = Modifier.weight(1f))
                             if (!down) {
@@ -500,7 +497,7 @@ private fun Messages(
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = "Sent",
-                                            modifier = Modifier.size(14.dp).padding(end = 2.dp),
+                                            modifier = Modifier.size(14.dp),
                                             tint = textColor
                                         )
                                     }
@@ -508,15 +505,26 @@ private fun Messages(
                                         Icon(
                                             imageVector = Icons.Default.Close,
                                             contentDescription = "Failed",
-                                            modifier = Modifier.size(14.dp).padding(end = 2.dp),
+                                            modifier = Modifier.size(14.dp),
                                             tint = MaterialTheme.colorScheme.error
+                                        )
+                                        val failureText = when {
+                                            message.responseReason.isNotEmpty() -> message.responseReason
+                                            message.responseCode != 0 -> message.responseCode.toString()
+                                            else -> stringResource(R.string.sending_failed)
+                                        }
+                                        Text(
+                                            text = failureText,
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.error,
+                                            maxLines = 1
                                         )
                                     }
                                     MESSAGE_UP_WAIT -> {
                                         Icon(
                                             imageVector = Icons.Default.Schedule,
                                             contentDescription = "Waiting",
-                                            modifier = Modifier.size(14.dp).padding(end = 2.dp),
+                                            modifier = Modifier.size(14.dp),
                                             tint = textColor
                                         )
                                     }
@@ -828,10 +836,16 @@ private fun NewMessage(
                             else
                                 peerUri
 
-                            if (msgUri.isNotEmpty() && Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
-                                Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
-                                msg.direction = MESSAGE_UP_FAIL
-                                msg.responseReason = messageFailed
+                            if (msgUri.isNotEmpty()) {
+                                if (Api.message_send(ua.uap, msgUri, msgText, time.toString()) != 0) {
+                                    Toast.makeText(ctx, "$messageFailed!", Toast.LENGTH_SHORT).show()
+                                    msg.direction = MESSAGE_UP_FAIL
+                                    msg.responseReason = messageFailed
+                                    Message.updateMessageStatus(aor, time, msg.direction, msg.responseReason)
+                                } else {
+                                    msg.direction = MESSAGE_UP
+                                    Message.updateMessageStatus(aor, time, msg.direction)
+                                }
                             }
                         }
                     }

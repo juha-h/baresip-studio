@@ -1885,20 +1885,37 @@ class BaresipService: Service() {
     fun messageResponse(responseCode: Int, responseReason: String, time: String) {
         Log.d(TAG, "Message response '$responseCode $responseReason' at $time")
         val timeStamp = time.toLong()
-        for (m in messages.reversed())
-            if (m.timeStamp == timeStamp) {
-                if (responseCode < 300)
-                    m.direction = MESSAGE_UP
-                else {
-                    m.direction = MESSAGE_UP_FAIL
-                    m.responseCode = responseCode
-                    m.responseReason = responseReason
+        val updatedMessages = synchronized(messagesLock) {
+            messages.toMutableList()
+        }
+        for ((index, message) in updatedMessages.withIndex().reversed()) {
+            if (message.timeStamp == timeStamp) {
+                val newDirection = if (responseCode < 300) MESSAGE_UP else MESSAGE_UP_FAIL
+                val newResponseCode = if (responseCode >= 300) responseCode else message.responseCode
+                val newResponseReason = if (responseCode >= 300) responseReason else message.responseReason
+
+                val newMessage = Message(
+                    message.aor,
+                    message.peerUri,
+                    message.message,
+                    message.timeStamp,
+                    newDirection,
+                    newResponseCode,
+                    newResponseReason,
+                    message.new,
+                    message.images
+                )
+                updatedMessages[index] = newMessage
+                synchronized(messagesLock) {
+                    messages = updatedMessages.toList()
                 }
+                Message.save()
                 messageUpdate.postValue(System.currentTimeMillis())
                 break
-            }
-            else if (m.timeStamp < timeStamp - 60000)
+            } else if (message.timeStamp < timeStamp - 60000) {
                 break
+            }
+        }
     }
 
     private var audioModeChangedListener: AudioManager.OnModeChangedListener? = null
