@@ -2699,6 +2699,8 @@ class BaresipService: Service() {
                     if (isMainVisible)
                         registrationUpdate.postValue(System.currentTimeMillis())
                 }
+                if (hasDialerRole)
+                    CallHistory.copyFromSystemCallLog(this, mobileAor)
                 return
             }
 
@@ -2718,6 +2720,8 @@ class BaresipService: Service() {
             CallHistory.save()
             Message.save()
             updateStatusNotification()
+            if (hasDialerRole)
+                CallHistory.copyFromSystemCallLog(this, mobileAor)
         }
     }
 
