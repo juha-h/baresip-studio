@@ -1305,8 +1305,21 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1alloc(
     return (jlong)ua;
 }
 
-JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_ua_1register(
-        JNIEnv *env, jobject obj, jlong ua)
+static bool ua_is_active(const struct ua *u)
+{
+    struct le *ua_le;
+
+    if (!u)
+        return false;
+
+    for (ua_le = list_head(uag_list()); ua_le != NULL; ua_le = ua_le->next) {
+        if (ua_le->data == u)
+            return true;
+    }
+    return false;
+}
+
+JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_ua_1register(JNIEnv *env, jobject obj, jlong ua)
 {
     (void)env;
     (void)obj;
@@ -1315,6 +1328,11 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_ua_1register(
     if (!engine_running) {
         re_thread_leave();
         return ENODEV;
+    }
+    if (!ua_is_active((struct ua *)ua)) {
+        LOGW("ua_register: ua %ld is not active\n", (long)ua);
+        re_thread_leave();
+        return EINVAL;
     }
     int res = ua_register((struct ua *)ua);
     re_thread_leave();
@@ -1331,6 +1349,11 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1unregister(
         re_thread_leave();
         return;
     }
+    if (!ua_is_active((struct ua *)ua)) {
+        LOGW("ua_unregister: ua %ld is not active\n", (long)ua);
+        re_thread_leave();
+        return;
+    }
     ua_unregister((struct ua *)ua);
     re_thread_leave();
 }
@@ -1340,7 +1363,11 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_ua_1isregistered(
 {
     (void)env;
     (void)obj;
-    return ua_isregistered((struct ua *)ua) ? true : false;
+    bool res;
+    re_thread_enter();
+    res = ua_is_active((struct ua *)ua) ? ua_isregistered((struct ua *)ua) : false;
+    re_thread_leave();
+    return res ? true : false;
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1destroy(
@@ -1354,6 +1381,11 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_ua_1destroy(
         re_thread_leave();
         return;
     }
+    if (!ua_is_active((struct ua *)ua)) {
+        LOGW("ua_destroy: ua %ld is not active\n", (long)ua);
+        re_thread_leave();
+        return;
+    }
     (void)ua_destroy((struct ua *)ua);
     re_thread_leave();
 }
@@ -1364,8 +1396,10 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1account(
     (void)env;
     (void)obj;
     struct account *acc = 0;
-    if (ua)
+    re_thread_enter();
+    if (ua_is_active((struct ua *)ua))
         acc = ua_account((struct ua *)ua);
+    re_thread_leave();
     return (jlong)acc;
 }
 
@@ -1375,7 +1409,15 @@ JNIEXPORT jlong JNICALL Java_com_tutpro_baresip_plus_Api_ua_1update_1account(
     (void)env;
     (void)obj;
     LOGD("updating account of ua %ld\n", (long)ua);
-    return ua_update_account((struct ua *)ua);
+    re_thread_enter();
+    if (!ua_is_active((struct ua *)ua)) {
+        LOGW("ua_update_account: ua %ld is not active\n", (long)ua);
+        re_thread_leave();
+        return EINVAL;
+    }
+    int res = ua_update_account((struct ua *)ua);
+    re_thread_leave();
+    return res;
 }
 
 static bool call_is_active(const struct call *c)

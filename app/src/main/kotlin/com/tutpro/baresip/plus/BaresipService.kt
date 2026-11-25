@@ -1238,7 +1238,7 @@ class BaresipService: Service() {
                                 registrationRetries[uap] = retries + 1
                                 Log.d(TAG, "Registration failed for $aor, retrying in 1s...")
                                 Handler(Looper.getMainLooper()).postDelayed({
-                                    if (isServiceRunning) {
+                                    if (isServiceRunning && UserAgent.ofUap(uap) != null) {
                                         Log.d(TAG, "Retrying registration for $aor")
                                         Api.ua_register(uap)
                                     }
