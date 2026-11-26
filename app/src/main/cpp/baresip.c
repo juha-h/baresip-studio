@@ -1832,7 +1832,6 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1use_1nameserver(
     struct sa nsv[NET_MAX_NS];
     uint32_t count = 0;
     char *comma;
-    int res;
     int err;
     LOGD("setting dns servers '%s'\n", native_servers);
     if (str_len(native_servers) > 255) {
@@ -1861,9 +1860,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1use_1nameserver(
         count++;
     }
     re_thread_enter();
-    res = net_use_nameserver(baresip_network(), nsv, count);
+    err = net_use_nameserver(baresip_network(), nsv, count);
     re_thread_leave();
-    return res;
+    return err;
 }
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(
