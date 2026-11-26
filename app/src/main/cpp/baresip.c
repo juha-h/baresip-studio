@@ -2106,7 +2106,10 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_net_1use_1nameserver(
         }
         count++;
     }
-    return net_use_nameserver(baresip_network(), nsv, count);
+    re_thread_enter();
+    err = net_use_nameserver(baresip_network(), nsv, count);
+    re_thread_leave();
+    return err;
 }
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_Api_uag_1reset_1transp(
