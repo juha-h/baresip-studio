@@ -847,15 +847,6 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1set_1audio_1codecs(
     return res;
 }
 
-JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1set_1video_1codecs(
-        JNIEnv *env, jobject obj, jlong acc, jstring jCodecs)
-{
-    (void)obj;
-    const char *codecs = (*env)->GetStringUTFChars(env, jCodecs, 0);
-    int res = account_set_video_codecs((struct account *)acc, codecs);
-    (*env)->ReleaseStringUTFChars(env, jCodecs, codecs);
-    return res;
-}
 
 JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_account_1regint(
         JNIEnv *env, jobject obj, jlong acc)
@@ -1803,32 +1794,6 @@ JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_Api_audio_1codecs(JNIEnv *env,
     return (*env)->NewStringUTF(env, codec_buf);
 }
 
-JNIEXPORT jstring JNICALL Java_com_tutpro_baresip_Api_video_1codecs(JNIEnv *env, jobject obj)
-{
-    (void)obj;
-    struct list *vidcodecl = baresip_vidcodecl();
-    struct le *le;
-    char codec_buf[256];
-    char *start = &(codec_buf[0]);
-    unsigned int left = sizeof codec_buf;
-    int len;
-    for (le = list_head(vidcodecl); le != NULL; le = le->next) {
-        const struct vidcodec *vc = le->data;
-        if (start == &(codec_buf[0]))
-            len = re_snprintf(start, left, "%s", vc->name);
-        else
-            len = re_snprintf(start, left, ",%s", vc->name);
-        if (len == -1) {
-            LOGE("failed to print codec to buffer\n");
-            codec_buf[0] = '\0';
-            return (*env)->NewStringUTF(env, codec_buf);
-        }
-        start = start + len;
-        left = left - len;
-    }
-    *start = '\0';
-    return (*env)->NewStringUTF(env, codec_buf);
-}
 
 JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_log_1level_1set(
         JNIEnv *env, jobject obj, jint level)

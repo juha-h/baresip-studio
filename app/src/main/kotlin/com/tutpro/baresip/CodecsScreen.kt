@@ -45,13 +45,11 @@ import com.tutpro.baresip.CustomElements.verticalScrollbar
 
 fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
     composable(
-        route = "codecs/{aor}/{media}",
+        route = "codecs/{aor}",
         arguments = listOf(
-            navArgument("aor") { type = NavType.StringType },
-            navArgument("media") { type = NavType.StringType })
+            navArgument("aor") { type = NavType.StringType })
     ) { backStackEntry ->
         val aor = backStackEntry.arguments?.getString("aor")!!
-        val media = backStackEntry.arguments?.getString("media")!!
         val ua = UserAgent.ofAor(aor)
         if (ua == null) {
             LaunchedEffect(Unit) {
@@ -65,16 +63,10 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
             checkOnClick = { updatedCodecs ->
                 val enabledCodecNames = updatedCodecs.filter { it.enabled.value }.map { it.name }
                 val codecList = Utils.implode(enabledCodecNames, ",")
-                Log.d(TAG, "Saving codecs for ${account.aor} (${media}): $codecList")
-                val success = if (media == "audio")
-                    Api.account_set_audio_codecs(account.accp, codecList)
-                else
-                    Api.account_set_video_codecs(account.accp, codecList)
+                Log.d(TAG, "Saving codecs for ${account.aor}: $codecList")
+                val success = Api.account_set_audio_codecs(account.accp, codecList)
                 if (success == 0) {
-                    if (media == "audio")
-                        account.audioCodec = ArrayList(enabledCodecNames)
-                    else
-                        account.videoCodec = ArrayList(enabledCodecNames)
+                    account.audioCodec = ArrayList(enabledCodecNames)
                     Account.saveAccounts()
                     Log.d("CodecsSave", "Codecs saved successfully.")
                 }
@@ -82,8 +74,7 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
                     Log.e(TAG, "Failed to set $aor codecs.")
                 navController.navigateUp()
             },
-            aor = aor,
-            media = media
+            aor = aor
         )
     }
 }
@@ -93,8 +84,7 @@ fun NavGraphBuilder.codecsScreenRoute(navController: NavController) {
 private fun CodecsScreen(
     onBack: () -> Unit,
     checkOnClick: (List<Codec>) -> Unit,
-    aor: String,
-    media: String
+    aor: String
 ) {
     val ua = UserAgent.ofAor(aor)
     if (ua == null) {
@@ -106,15 +96,9 @@ private fun CodecsScreen(
     val acc = ua.account
     val codecs = remember { mutableStateListOf<Codec>() }
 
-    LaunchedEffect(acc, media) {
-        val allCodecs: List<String> = if (media == "audio")
-            Api.audio_codecs().split(",")
-        else
-            Api.video_codecs().split(",").distinct()
-        val accCodecs: List<String> = if (media == "audio")
-            acc.audioCodec
-        else
-            acc.videoCodec
+    LaunchedEffect(acc) {
+        val allCodecs: List<String> = Api.audio_codecs().split(",")
+        val accCodecs: List<String> = acc.audioCodec
         val currentCodecs = mutableListOf<Codec>()
         for (codec in accCodecs)
             currentCodecs.add(Codec(codec, mutableStateOf(true)))
@@ -131,10 +115,7 @@ private fun CodecsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (media == "audio")
-                            stringResource(R.string.audio_codecs)
-                        else
-                            stringResource(R.string.video_codecs),
+                        text = stringResource(R.string.audio_codecs),
                         fontWeight = FontWeight.Bold
                     )
                 },

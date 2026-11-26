@@ -21,7 +21,6 @@ class Account(val accp: Long, virtualAor: String? = null) {
     var stunUser = if (accp != 0L) Api.account_stun_user(accp) else ""
     var stunPass = if (accp != 0L) Api.account_stun_pass(accp) else ""
     var audioCodec = ArrayList<String>()
-    var videoCodec = ArrayList<String>()
     var regint = if (accp != 0L) Api.account_regint(accp) else 0
     var checkOrigin = accp == 0L || Api.account_check_origin(accp)
     var configuredRegInt = REGISTRATION_INTERVAL

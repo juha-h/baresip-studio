@@ -657,7 +657,7 @@ private fun AccountContent(
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        val route = "codecs/$aor/audio"
+                        val route = "codecs/$aor"
                         navController.navigate(route)
                     },
                 fontSize = 18.sp,
@@ -1827,7 +1827,6 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
             var text = ""
             var event = parser.eventType
             val audioCodecs = ArrayList(Api.audio_codecs().split(","))
-            val videoCodecs = ArrayList(Api.video_codecs().split(","))
 
             try {
                 while (event != XmlPullParser.END_DOCUMENT) {
@@ -1837,7 +1836,6 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
 
                         XmlPullParser.START_TAG -> {
                             if (tag == "audio-codecs") acc.audioCodec.clear()
-                            if (tag == "video-codecs") acc.videoCodec.clear()
                         }
 
                         XmlPullParser.END_TAG ->
@@ -1868,8 +1866,6 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
                                 }
 
                                 "audio-codec" -> if (text in audioCodecs) acc.audioCodec.add(text)
-
-                                "video-codec" -> if (text in videoCodecs) acc.videoCodec.add(text)
 
                                 "media-encoding" -> {
                                     val enc = text.lowercase(Locale.ROOT)
@@ -1943,8 +1939,6 @@ private fun initAccountFromNetwork(acc: Account, onConfigLoaded: () -> Unit) {
                 }
                 if (acc.audioCodec.isNotEmpty())
                     Api.account_set_audio_codecs(acc.accp, acc.audioCodec.joinToString(","))
-                if (acc.videoCodec.isNotEmpty())
-                    Api.account_set_video_codecs(acc.accp, acc.videoCodec.joinToString(","))
             } catch (e: XmlPullParserException) {
                 val line = parser.lineNumber
                 val column = parser.columnNumber

@@ -49,7 +49,6 @@ object Api {
     external fun account_medianat(acc: Long): String
     external fun account_set_medianat(acc: Long, medianat: String): Int
     external fun account_set_audio_codecs(acc: Long, codecs: String): Int
-    external fun account_set_video_codecs(acc: Long, codecs: String): Int
     external fun account_set_mwi(acc: Long, value: Boolean): Int
     external fun account_vm_uri(acc: Long): String
     external fun account_answermode(acc: Long): Int
@@ -116,7 +115,6 @@ object Api {
     external fun message_send(uap: Long, peer_uri: String, message: String, time: String): Int
 
     external fun audio_codecs(): String
-    external fun video_codecs(): String
 
     external fun log_level_set(level: Int)
 
