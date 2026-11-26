@@ -1,0 +1,3 @@
+– Kopierar samtal från systemets samtalslogg till baresips samtalshistorik när inställningen för standardtelefonapp är aktiverad
+- Lade till en indikator för skickade SMS i utgående SMS-meddelanden
+- Undviker potentiella krascher genom att lägga till säkerhetskontroller som visar att användaragenten fortfarande är aktiv
