@@ -1860,7 +1860,9 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1use_1nameserver(
         }
         count++;
     }
+    re_thread_enter();
     res = net_use_nameserver(baresip_network(), nsv, count);
+    re_thread_leave();
     return res;
 }
 
