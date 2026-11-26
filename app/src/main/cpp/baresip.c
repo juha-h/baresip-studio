@@ -1890,6 +1890,12 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1video_1enabled
     (void)obj;
     int res;
     re_thread_enter();
+    struct call *c = (struct call *)call;
+    if (!call_is_active(c)) {
+        LOGW("call_video_enabled: call %ld not found in active calls\n", (long)call);
+        re_thread_leave();
+        return EINVAL;
+    }
     res = call_has_video((struct call *)call)
           && sdp_media_dir(stream_sdpmedia(video_strm(call_video((struct call *)call))))
                      != SDP_INACTIVE;
