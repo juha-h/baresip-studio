@@ -1620,18 +1620,22 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1hold(
 {
     (void)env;
     (void)obj;
-    int err;
+    int err = EINVAL;
+    re_thread_enter();
+    struct call *c = (struct call *)call;
+    if (!call_is_active(c)) {
+        LOGW("call_hold: call %ld not found in active calls\n", (long)call);
+        re_thread_leave();
+        return false;
+    }
     if (hold) {
         LOGD("holding call %ld\n", (long)call);
-        re_thread_enter();
-        err = call_hold((struct call *)call, true);
-        re_thread_leave();
+        err = call_hold(c, true);
     } else {
         LOGD("resuming call %ld\n", (long)call);
-        re_thread_enter();
-        err = call_hold((struct call *)call, false);
-        re_thread_leave();
+        err = call_hold(c, false);
     }
+    re_thread_leave();
     if (err)
         LOGW("call_hold error: %d\n", err);
     return err == 0;
@@ -1660,7 +1664,14 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_plus_Api_call_1transfer(
     const char *native_peer = (*env)->GetStringUTFChars(env, jPeer, 0);
     LOGD("transfering call %ld to %s\n", (long)call, native_peer);
     re_thread_enter();
-    int err = call_transfer((struct call *)call, native_peer);
+    struct call *c = (struct call *)call;
+    if (!call_is_active(c)) {
+        LOGW("call_transfer: call %ld not found in active calls\n", (long)call);
+        re_thread_leave();
+        (*env)->ReleaseStringUTFChars(env, jPeer, native_peer);
+        return EINVAL;
+    }
+    int err = call_transfer(c, native_peer);
     re_thread_leave();
     if (err)
         LOGW("call_transfer error: %d\n", err);
@@ -1803,7 +1814,14 @@ JNIEXPORT jboolean JNICALL Java_com_tutpro_baresip_plus_Api_call_1replace_1trans
     (void)env;
     (void)obj;
     re_thread_enter();
-    int res = call_replace_transfer((struct call *)xferCall, (struct call *)call);
+    struct call *xc = (struct call *)xferCall;
+    struct call *c = (struct call *)call;
+    if (!call_is_active(xc) || !call_is_active(c)) {
+        LOGW("call_replace_transfer: calls not found in active calls\n");
+        re_thread_leave();
+        return false;
+    }
+    int res = call_replace_transfer(xc, c);
     re_thread_leave();
     return res == 0 ? true : false;
 }
