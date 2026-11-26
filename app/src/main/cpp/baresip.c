@@ -1843,6 +1843,10 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1use_1nameserver(
         count++;
     }
     re_thread_enter();
+    if (!engine_running || !baresip_network()) {
+        re_thread_leave();
+        return ENODEV;
+    }
     err = net_use_nameserver(baresip_network(), nsv, count);
     re_thread_leave();
     return err;
@@ -1861,8 +1865,13 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1add_1address_1ifname(
     if (0 == sa_set_str(&temp_sa, addr, 0)) {
         sa_ntop(&temp_sa, buf, 256);
         re_thread_enter();
-        res = net_add_address_ifname(baresip_network(), &temp_sa, name);
-        re_thread_leave();
+        if (!engine_running || !baresip_network()) {
+            re_thread_leave();
+            res = ENODEV;
+        } else {
+            res = net_add_address_ifname(baresip_network(), &temp_sa, name);
+            re_thread_leave();
+        }
     } else {
         LOGE("invalid ip address %s\n", addr);
         res = EAFNOSUPPORT;
@@ -1888,8 +1897,13 @@ JNIEXPORT jint JNICALL Java_com_tutpro_baresip_Api_net_1rm_1address(
     if (0 == sa_set_str(&temp_sa, native_ip, 0)) {
         sa_ntop(&temp_sa, buf, 256);
         re_thread_enter();
-        res = net_rm_address(baresip_network(), &temp_sa);
-        re_thread_leave();
+        if (!engine_running || !baresip_network()) {
+            re_thread_leave();
+            res = ENODEV;
+        } else {
+            res = net_rm_address(baresip_network(), &temp_sa);
+            re_thread_leave();
+        }
     } else {
         LOGE("invalid ip address %s\n", native_ip);
         res = EAFNOSUPPORT;
@@ -1905,6 +1919,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_uag_1reset_1transp(
     (void)obj;
     LOGD("resetting transports (%d, %d)\n", reg, reinvite);
     re_thread_enter();
+    if (!engine_running) {
+        re_thread_leave();
+        return;
+    }
     (void)uag_reset_transp(reg, reinvite);
     re_thread_leave();
 }
@@ -1933,6 +1951,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_net_1debug(JNIEnv *env, jobje
     (void)env;
     (void)obj;
     re_thread_enter();
+    if (!engine_running || !baresip_network()) {
+        re_thread_leave();
+        return;
+    }
     net_debug_log();
     re_thread_leave();
 }
@@ -1942,6 +1964,10 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_Api_net_1dns_1debug(JNIEnv *env, 
     (void)env;
     (void)obj;
     re_thread_enter();
+    if (!engine_running || !baresip_network()) {
+        re_thread_leave();
+        return;
+    }
     net_dns_debug_log();
     re_thread_leave();
 }
