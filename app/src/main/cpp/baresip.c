@@ -486,6 +486,11 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_BaresipService_baresipStart(
 {
     LOGI("starting baresip\n");
 
+    if (engine_running) {
+        LOGW("baresip engine is already running, skipping start\n");
+        return;
+    }
+
     int err;
     char start_error[64] = "";
 
