@@ -1,0 +1,1 @@
+- Avoid potential crash by using standards compliant account status notifications
