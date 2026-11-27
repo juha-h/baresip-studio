@@ -1,0 +1,3 @@
+- Fixed updating status of sent SIP message
+- Added safeguards to network related API functions
+- New translations (Swedish)
