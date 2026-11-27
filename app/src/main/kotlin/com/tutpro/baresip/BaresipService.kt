@@ -2265,37 +2265,19 @@ class BaresipService: Service() {
                         )
                 }
                 else {
+                    val statusText = if (uas.value.isEmpty())
+                        getString(R.string.status)
+                    else
+                        uas.value.joinToString(", ") { Utils.uriUserPart(it.account.aor) }
+
                     builder.setStyle(null)
-                    builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .setPriority(NotificationCompat.PRIORITY_MIN)
                         .setWhen(0)
                         .setShowWhen(false)
                         .setUsesChronometer(false)
                         .setContentTitle(getString(R.string.app_name))
-                        .setContentText("")
-
-                    val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
-                    for (i in 0..3) {
-                        val resId = when (i) {
-                            0 -> R.id.status0
-                            1 -> R.id.status1
-                            2 -> R.id.status2
-                            else -> R.id.status3
-                        }
-                        if (i < uas.value.size) {
-                            notificationLayout.setImageViewResource(resId, uas.value[i].status)
-                            notificationLayout.setViewVisibility(resId, View.VISIBLE)
-                        }
-                        else
-                            notificationLayout.setViewVisibility(resId, View.INVISIBLE)
-                    }
-                    if (uas.value.size > 4)
-                        notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
-                    else
-                        notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
-
-                    builder.setCustomContentView(notificationLayout)
+                        .setContentText(statusText)
                 }
 
                 if (VERSION.SDK_INT >= 31)
