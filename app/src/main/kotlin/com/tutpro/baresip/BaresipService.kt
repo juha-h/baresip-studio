@@ -2164,15 +2164,15 @@ class BaresipService: Service() {
             deleteIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
+        val notificationLayout = createStatusNotificationLayout()
         snb.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.ic_notification_b)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.status))
             .setContentIntent(pi)
             .setDeleteIntent(dpi)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(notificationLayout)
 
         val notification = buildStatusNotification()
         try {
@@ -2187,6 +2187,33 @@ class BaresipService: Service() {
             if (!isStartReceived && !isServiceRunning)
                 stopSelf()
         }
+    }
+
+    private fun createStatusNotificationLayout(): RemoteViews {
+        val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
+        val currentUas = uas.value
+        for (i in 0..3) {
+            val resId = when (i) {
+                0 -> R.id.status0
+                1 -> R.id.status1
+                2 -> R.id.status2
+                else -> R.id.status3
+            }
+            if (i < currentUas.size) {
+                val icon = if (currentUas[i].status != 0) currentUas[i].status else R.drawable.circle_white
+                notificationLayout.setImageViewResource(resId, icon)
+                notificationLayout.setViewVisibility(resId, View.VISIBLE)
+            } else {
+                notificationLayout.setImageViewResource(resId, R.drawable.circle_white)
+                notificationLayout.setViewVisibility(resId, View.INVISIBLE)
+            }
+        }
+        if (currentUas.size > 4)
+            notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
+        else
+            notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
+
+        return notificationLayout
     }
 
     fun updateStatusNotification() {
@@ -2265,6 +2292,7 @@ class BaresipService: Service() {
                         )
                 }
                 else {
+                    val notificationLayout = createStatusNotificationLayout()
                     builder.setStyle(null)
                     builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
                         .setCategory(Notification.CATEGORY_SERVICE)
@@ -2274,28 +2302,7 @@ class BaresipService: Service() {
                         .setUsesChronometer(false)
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText("")
-
-                    val notificationLayout = RemoteViews(packageName, R.layout.status_notification)
-                    for (i in 0..3) {
-                        val resId = when (i) {
-                            0 -> R.id.status0
-                            1 -> R.id.status1
-                            2 -> R.id.status2
-                            else -> R.id.status3
-                        }
-                        if (i < uas.value.size) {
-                            notificationLayout.setImageViewResource(resId, uas.value[i].status)
-                            notificationLayout.setViewVisibility(resId, View.VISIBLE)
-                        }
-                        else
-                            notificationLayout.setViewVisibility(resId, View.INVISIBLE)
-                    }
-                    if (uas.value.size > 4)
-                        notificationLayout.setViewVisibility(R.id.etc, View.VISIBLE)
-                    else
-                        notificationLayout.setViewVisibility(R.id.etc, View.INVISIBLE)
-
-                    builder.setCustomContentView(notificationLayout)
+                        .setCustomContentView(notificationLayout)
                 }
 
                 if (VERSION.SDK_INT >= 31)
