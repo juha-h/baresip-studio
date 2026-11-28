@@ -549,6 +549,11 @@ JNIEXPORT void JNICALL Java_com_tutpro_baresip_plus_BaresipService_baresipStart(
     g_ctx.mainActivityClz = (*env)->NewGlobalRef(env, clz);
     g_ctx.mainActivityObj = (*env)->NewGlobalRef(env, instance);
 
+    if (engine_running) {
+        LOGW("baresip engine is already running, skipping start\n");
+        return;
+    }
+
     int err;
     const char *path = (*env)->GetStringUTFChars(env, jPath, 0);
     const char *addrs = (*env)->GetStringUTFChars(env, jAddrs, 0);
