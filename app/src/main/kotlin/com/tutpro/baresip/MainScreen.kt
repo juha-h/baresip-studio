@@ -57,8 +57,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -136,7 +139,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -147,7 +149,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -155,10 +156,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -531,7 +529,6 @@ private fun MainScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopAppBar(
     viewModel: ViewModel,
@@ -1717,7 +1714,6 @@ private fun CallTimer(initialDurationSeconds: Long, modifier: Modifier = Modifie
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CallRow(
     ctx: Context,
@@ -2158,12 +2154,13 @@ private fun CallRow(
             val focusRequester = remember { FocusRequester() }
             val shouldRequestFocus by call.focusDtmf
             val interactionSource = remember { MutableInteractionSource() }
-            if (call.showHangupButton.value)
-                BasicTextField(
-                    value = call.dtmfText.value,
-                    onValueChange = { newText ->
-                        if (newText.text.length > call.dtmfText.value.text.length) {
-                            val addedChars = newText.text.substring(call.dtmfText.value.text.length)
+            if (call.showHangupButton.value) {
+                val dtmfState = rememberTextFieldState(call.dtmfText.value.text)
+                val currentText = dtmfState.text.toString()
+                LaunchedEffect(currentText) {
+                    if (currentText != call.dtmfText.value.text) {
+                        if (currentText.length > call.dtmfText.value.text.length) {
+                            val addedChars = currentText.substring(call.dtmfText.value.text.length)
                             val newTypes = call.dtmfTypes.value.toMutableList()
                             for (char in addedChars)
                                 if (char.isDigit() || char == '*' || char == '#') {
@@ -2172,41 +2169,38 @@ private fun CallRow(
                                     newTypes.add(false)
                                 }
                             call.dtmfTypes.value = newTypes
+                        } else if (currentText.length < call.dtmfText.value.text.length) {
+                            if (currentText.length <= call.dtmfTypes.value.size)
+                                call.dtmfTypes.value = call.dtmfTypes.value.take(currentText.length)
                         }
-                        else if (newText.text.length < call.dtmfText.value.text.length) {
-                            if (newText.text.length <= call.dtmfTypes.value.size)
-                                call.dtmfTypes.value = call.dtmfTypes.value.take(newText.text.length)
-                        }
-                        call.dtmfText.value = newText
-                    },
+                        call.dtmfText.value = TextFieldValue(currentText, selection = TextRange(currentText.length))
+                    }
+                }
+                LaunchedEffect(call.dtmfText.value.text) {
+                    if (dtmfState.text.toString() != call.dtmfText.value.text) {
+                        dtmfState.edit { replace(0, length, call.dtmfText.value.text) }
+                    }
+                }
+                OutlinedTextField(
+                    state = dtmfState,
                     modifier = Modifier.width(80.dp).focusRequester(focusRequester),
                     enabled = call.dtmfEnabled.value,
                     textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    singleLine = true,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    label = { Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp)) },
+                    outputTransformation = DtmfOutputTransformation,
                     interactionSource = interactionSource,
-                    visualTransformation = DtmfVisualTransformation(call.dtmfTypes.value, MaterialTheme.colorScheme.primary),
-                    decorationBox = { innerTextField ->
-                        OutlinedTextFieldDefaults.DecorationBox(
-                            value = call.dtmfText.value.text,
-                            visualTransformation = VisualTransformation.None,
-                            innerTextField = innerTextField,
-                            singleLine = true,
-                            enabled = call.dtmfEnabled.value,
-                            interactionSource = interactionSource,
-                            label = { Text(stringResource(R.string.dtmf), style = TextStyle(fontSize = 12.sp)) },
-                            contentPadding = PaddingValues(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                disabledContainerColor = Color.Transparent,
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        )
-                    }
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+                    contentPadding = OutlinedTextFieldDefaults.contentPaddingWithLabel()
                 )
+            }
 
             if (call.ua.account.isMobile && call.showCallTimer.value)
                 CallTimer(
@@ -3270,24 +3264,8 @@ private fun restore(ctx: Context, password: String, onRestartApp: () -> Unit) {
     downloadsInputUri = null
 }
 
-private class DtmfVisualTransformation(
-    private val receivedFlags: List<Boolean>,
-    private val receivedColor: Color
-) : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val annotatedString = buildAnnotatedString {
-            for (i in text.indices) {
-                val isReceived = i < receivedFlags.size && receivedFlags[i]
-                if (isReceived) {
-                    pushStyle(SpanStyle(color = receivedColor))
-                    append(text[i])
-                    pop()
-                }
-                else
-                    append(text[i])
-            }
-        }
-        return TransformedText(annotatedString, OffsetMapping.Identity)
+private object DtmfOutputTransformation : OutputTransformation {
+    override fun TextFieldBuffer.transformOutput() {
     }
 }
 

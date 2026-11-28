@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -127,7 +126,6 @@ fun NavGraphBuilder.accountScreenRoute(navController: NavController) {
 
 private var keyboardController: SoftwareKeyboardController? = null
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountScreen(
     viewModel: AccountViewModel,
@@ -423,6 +421,7 @@ private fun AccountContent(
         }
     }
 
+    @Suppress("DEPRECATION")
     @Composable
     fun AuthPass() {
         val authenticationPasswordTitle = stringResource(R.string.authentication_password)
@@ -446,7 +445,7 @@ private fun AccountContent(
                 trailingIcon = {
                     IconButton(onClick = { showPassword.value = !showPassword.value }) {
                         Icon(
-                            if (showPassword.value)
+                            imageVector = if (showPassword.value)
                                 Icons.Filled.Visibility
                             else
                                 Icons.Filled.VisibilityOff,
@@ -835,6 +834,7 @@ private fun AccountContent(
         }
     }
 
+    @Suppress("DEPRECATION")
     @Composable
     fun StunPass() {
         val stunPasswordTitle = stringResource(R.string.stun_password)
